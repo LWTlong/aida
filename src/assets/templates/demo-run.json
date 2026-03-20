@@ -1,0 +1,910 @@
+{
+  "meta": {
+    "schemaVersion": "1.0",
+    "runId": "demo-feature",
+    "project": "aidevos-demo",
+    "developer": "demo-dev",
+    "branch": "demo-feature",
+    "aiModel": "claude-sonnet-4",
+    "aiTool": "claude-code",
+    "startTime": "2026-03-01T09:00:00.000Z",
+    "endTime": "2026-03-01T15:30:00.000Z",
+    "status": "completed",
+    "prdPhases": [
+      "PRD1"
+    ]
+  },
+  "summary": {
+    "totalTasks": 10,
+    "completedTasks": 10,
+    "bugCount": 3,
+    "deviationCount": 5,
+    "reviewCount": 12,
+    "reviewPassCount": 10,
+    "reviewFailCount": 2,
+    "rulesSedimented": 3,
+    "prdPhaseCount": 1,
+    "filesChanged": 18,
+    "linesAdded": 1240,
+    "linesRemoved": 320
+  },
+  "workflow": [
+    {
+      "stage": "analysis",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-01T09:00:00.000Z",
+      "endTime": "2026-03-01T09:20:00.000Z"
+    },
+    {
+      "stage": "task_decomposition",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-01T09:20:00.000Z",
+      "endTime": "2026-03-01T09:35:00.000Z"
+    },
+    {
+      "stage": "coding",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-01T09:35:00.000Z",
+      "endTime": "2026-03-01T14:00:00.000Z"
+    },
+    {
+      "stage": "review",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-01T14:00:00.000Z",
+      "endTime": "2026-03-01T14:30:00.000Z"
+    },
+    {
+      "stage": "bug_fix",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-01T14:30:00.000Z",
+      "endTime": "2026-03-01T15:00:00.000Z"
+    },
+    {
+      "stage": "completed",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-01T15:00:00.000Z",
+      "endTime": "2026-03-01T15:30:00.000Z"
+    }
+  ],
+  "tasks": [
+    {
+      "taskId": "TASK-01",
+      "title": "Define TypeScript interfaces for User entity",
+      "status": "done",
+      "stageName": "Infrastructure",
+      "prdPhase": "PRD1",
+      "acceptance": "Types compile without error",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T09:50:00.000Z"
+    },
+    {
+      "taskId": "TASK-02",
+      "title": "Create API service layer with CRUD endpoints",
+      "status": "done",
+      "stageName": "Infrastructure",
+      "prdPhase": "PRD1",
+      "acceptance": "API functions callable",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T10:20:00.000Z"
+    },
+    {
+      "taskId": "TASK-03",
+      "title": "Add i18n language keys for user module",
+      "status": "done",
+      "stageName": "i18n",
+      "prdPhase": "PRD1",
+      "acceptance": "All UI text has i18n keys",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T10:40:00.000Z"
+    },
+    {
+      "taskId": "TASK-04",
+      "title": "Create UserList page with table component",
+      "status": "done",
+      "stageName": "Views",
+      "prdPhase": "PRD1",
+      "acceptance": "Table renders with mock data",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T11:20:00.000Z"
+    },
+    {
+      "taskId": "TASK-05",
+      "title": "Implement search and filter form",
+      "status": "done",
+      "stageName": "Views",
+      "prdPhase": "PRD1",
+      "acceptance": "Filters work correctly",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T11:50:00.000Z"
+    },
+    {
+      "taskId": "TASK-06",
+      "title": "Create UserDetail drawer component",
+      "status": "done",
+      "stageName": "Views",
+      "prdPhase": "PRD1",
+      "acceptance": "Drawer opens with user data",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T12:20:00.000Z"
+    },
+    {
+      "taskId": "TASK-07",
+      "title": "Implement create/edit user form with validation",
+      "status": "done",
+      "stageName": "Interaction",
+      "prdPhase": "PRD1",
+      "acceptance": "Form validates and submits",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T13:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-08",
+      "title": "Add role-based permission checks",
+      "status": "done",
+      "stageName": "Interaction",
+      "prdPhase": "PRD1",
+      "acceptance": "Buttons hidden for unauthorized users",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T13:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-09",
+      "title": "Implement batch operations (delete, export)",
+      "status": "done",
+      "stageName": "Interaction",
+      "prdPhase": "PRD1",
+      "acceptance": "Batch delete and CSV export work",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T13:50:00.000Z"
+    },
+    {
+      "taskId": "TASK-10",
+      "title": "Add loading states and error handling",
+      "status": "done",
+      "stageName": "Polish",
+      "prdPhase": "PRD1",
+      "acceptance": "Skeleton loading + error toast",
+      "createdAt": "2026-03-01T09:35:00.000Z",
+      "completedAt": "2026-03-01T14:00:00.000Z"
+    }
+  ],
+  "bugs": [
+    {
+      "bugId": "BUG-01",
+      "title": "API response type mismatch on pagination",
+      "severity": "high",
+      "source": "self_review",
+      "status": "fixed",
+      "taskId": "TASK-02",
+      "files": [
+        "src/api/user.ts"
+      ],
+      "fix": "Fixed response type to match paginated wrapper",
+      "fixedAt": "2026-03-01T14:15:00.000Z",
+      "reportedAt": "2026-03-01T14:05:00.000Z"
+    },
+    {
+      "bugId": "BUG-02",
+      "title": "Form validation not triggered on blur",
+      "severity": "medium",
+      "source": "user_feedback",
+      "status": "fixed",
+      "taskId": "TASK-07",
+      "files": [
+        "src/views/user/UserForm.vue"
+      ],
+      "fix": "Added validateOnBlur prop to form fields",
+      "fixedAt": "2026-03-01T14:45:00.000Z",
+      "reportedAt": "2026-03-01T14:35:00.000Z"
+    },
+    {
+      "bugId": "BUG-03",
+      "title": "Export CSV missing header row",
+      "severity": "low",
+      "source": "testing",
+      "status": "fixed",
+      "taskId": "TASK-09",
+      "files": [
+        "src/utils/export.ts"
+      ],
+      "fix": "Prepend column headers before data rows",
+      "fixedAt": "2026-03-01T14:55:00.000Z",
+      "reportedAt": "2026-03-01T14:50:00.000Z"
+    }
+  ],
+  "deviations": [
+    {
+      "deviationId": "DEV-01",
+      "title": "Used Dialog instead of Drawer for user detail",
+      "aiOutput": "Used el-dialog for user detail view",
+      "expectedOutput": "Should use el-drawer per project convention",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "component-usage",
+      "files": [
+        "src/views/user/UserDetail.vue"
+      ],
+      "ruleSedimented": {
+        "file": ".aidevos/rules/component-usage.md",
+        "content": "Detail views must use Drawer component, not Dialog"
+      },
+      "detectedAt": "2026-03-01T12:30:00.000Z",
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-02",
+      "title": "Hardcoded Chinese text in template",
+      "aiOutput": "Wrote raw Chinese strings in template",
+      "expectedOutput": "All text should use i18n $t() calls",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "i18n",
+      "files": [
+        "src/views/user/UserList.vue"
+      ],
+      "ruleSedimented": {
+        "file": ".aidevos/rules/i18n-rule.md",
+        "content": "All user-facing text must use $t() i18n calls, no hardcoded strings"
+      },
+      "detectedAt": "2026-03-01T11:30:00.000Z",
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-03",
+      "title": "Invented non-existent API endpoint",
+      "aiOutput": "Called /api/users/batch-update which does not exist",
+      "expectedOutput": "Should check existing API docs before inventing endpoints",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "api",
+      "files": [
+        "src/api/user.ts"
+      ],
+      "ruleSedimented": null,
+      "detectedAt": "2026-03-01T13:10:00.000Z",
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-04",
+      "title": "Wrong spacing in table action column",
+      "aiOutput": "8px gap between action buttons",
+      "expectedOutput": "12px gap per design system",
+      "rootCauseCategory": "context-insufficient",
+      "deviationCategory": "ui-spacing",
+      "files": [
+        "src/views/user/UserList.vue"
+      ],
+      "ruleSedimented": null,
+      "detectedAt": "2026-03-01T11:55:00.000Z",
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-05",
+      "title": "Used relative import instead of path alias",
+      "aiOutput": "import { User } from '../../../types/user'",
+      "expectedOutput": "import { User } from '@/types/user'",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "architecture",
+      "files": [
+        "src/views/user/UserForm.vue"
+      ],
+      "ruleSedimented": {
+        "file": ".aidevos/rules/coding-style.md",
+        "content": "Always use @/ path alias for imports, never relative paths with ../"
+      },
+      "detectedAt": "2026-03-01T13:05:00.000Z",
+      "fixedAt": null
+    }
+  ],
+  "reviews": [
+    {
+      "reviewId": "REV-01",
+      "taskId": "TASK-01",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/types/user.ts",
+      "reviewedAt": "2026-03-01T09:55:00.000Z"
+    },
+    {
+      "reviewId": "REV-02",
+      "taskId": "TASK-02",
+      "result": "fail",
+      "issueCount": 1,
+      "scope": "src/api/user.ts",
+      "reviewedAt": "2026-03-01T10:25:00.000Z"
+    },
+    {
+      "reviewId": "REV-03",
+      "taskId": "TASK-02",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/api/user.ts",
+      "reviewedAt": "2026-03-01T10:35:00.000Z"
+    },
+    {
+      "reviewId": "REV-04",
+      "taskId": "TASK-03",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/i18n/user.ts",
+      "reviewedAt": "2026-03-01T10:45:00.000Z"
+    },
+    {
+      "reviewId": "REV-05",
+      "taskId": "TASK-04",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/views/user/UserList.vue",
+      "reviewedAt": "2026-03-01T11:25:00.000Z"
+    },
+    {
+      "reviewId": "REV-06",
+      "taskId": "TASK-05",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/views/user/SearchForm.vue",
+      "reviewedAt": "2026-03-01T11:55:00.000Z"
+    },
+    {
+      "reviewId": "REV-07",
+      "taskId": "TASK-06",
+      "result": "fail",
+      "issueCount": 2,
+      "scope": "src/views/user/UserDetail.vue",
+      "reviewedAt": "2026-03-01T12:25:00.000Z"
+    },
+    {
+      "reviewId": "REV-08",
+      "taskId": "TASK-06",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/views/user/UserDetail.vue",
+      "reviewedAt": "2026-03-01T12:40:00.000Z"
+    },
+    {
+      "reviewId": "REV-09",
+      "taskId": "TASK-07",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/views/user/UserForm.vue",
+      "reviewedAt": "2026-03-01T13:05:00.000Z"
+    },
+    {
+      "reviewId": "REV-10",
+      "taskId": "TASK-08",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/views/user/permissions.ts",
+      "reviewedAt": "2026-03-01T13:35:00.000Z"
+    },
+    {
+      "reviewId": "REV-11",
+      "taskId": "TASK-09",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/views/user/BatchOps.vue",
+      "reviewedAt": "2026-03-01T13:55:00.000Z"
+    },
+    {
+      "reviewId": "REV-12",
+      "taskId": "TASK-10",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/views/user/",
+      "reviewedAt": "2026-03-01T14:05:00.000Z"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/types/user.ts",
+      "changeType": "created",
+      "linesAdded": 45,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/api/user.ts",
+      "changeType": "created",
+      "linesAdded": 120,
+      "linesRemoved": 15,
+      "changeCount": 3
+    },
+    {
+      "path": "src/i18n/user.ts",
+      "changeType": "created",
+      "linesAdded": 80,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/views/user/UserList.vue",
+      "changeType": "created",
+      "linesAdded": 180,
+      "linesRemoved": 25,
+      "changeCount": 4
+    },
+    {
+      "path": "src/views/user/SearchForm.vue",
+      "changeType": "created",
+      "linesAdded": 65,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/views/user/UserDetail.vue",
+      "changeType": "created",
+      "linesAdded": 95,
+      "linesRemoved": 40,
+      "changeCount": 3
+    },
+    {
+      "path": "src/views/user/UserForm.vue",
+      "changeType": "created",
+      "linesAdded": 150,
+      "linesRemoved": 30,
+      "changeCount": 3
+    },
+    {
+      "path": "src/views/user/permissions.ts",
+      "changeType": "created",
+      "linesAdded": 35,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/views/user/BatchOps.vue",
+      "changeType": "created",
+      "linesAdded": 70,
+      "linesRemoved": 10,
+      "changeCount": 2
+    },
+    {
+      "path": "src/utils/export.ts",
+      "changeType": "modified",
+      "linesAdded": 40,
+      "linesRemoved": 5,
+      "changeCount": 2
+    },
+    {
+      "path": "src/router/index.ts",
+      "changeType": "modified",
+      "linesAdded": 15,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/store/user.ts",
+      "changeType": "created",
+      "linesAdded": 55,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/components/UserAvatar.vue",
+      "changeType": "created",
+      "linesAdded": 30,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/views/user/index.ts",
+      "changeType": "created",
+      "linesAdded": 10,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/styles/user.scss",
+      "changeType": "created",
+      "linesAdded": 60,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/hooks/useUserTable.ts",
+      "changeType": "created",
+      "linesAdded": 45,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/constants/user.ts",
+      "changeType": "created",
+      "linesAdded": 25,
+      "linesRemoved": 0,
+      "changeCount": 1
+    },
+    {
+      "path": "src/views/user/StatusTag.vue",
+      "changeType": "created",
+      "linesAdded": 20,
+      "linesRemoved": 0,
+      "changeCount": 1
+    }
+  ],
+  "metrics": {
+    "aiDeviationRate": 0.5,
+    "bugRate": 0.3,
+    "reviewPassRate": 0.83,
+    "firstPassRate": 0.8,
+    "rulesSedimentedCount": 3,
+    "deviationToRuleRatio": 0.6,
+    "avgTaskTimeSeconds": 2340,
+    "totalDevelopmentTimeSeconds": 23400
+  },
+  "timeline": [
+    {
+      "type": "workflow",
+      "title": "Analysis started",
+      "timestamp": "2026-03-01T09:00:00.000Z"
+    },
+    {
+      "type": "workflow",
+      "title": "Task decomposition",
+      "timestamp": "2026-03-01T09:20:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-01: TypeScript interfaces",
+      "timestamp": "2026-03-01T09:50:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-02: API service layer",
+      "timestamp": "2026-03-01T10:20:00.000Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-02: API review failed",
+      "timestamp": "2026-03-01T10:25:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-03: i18n keys",
+      "timestamp": "2026-03-01T10:40:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-04: UserList page",
+      "timestamp": "2026-03-01T11:20:00.000Z"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-02: Hardcoded Chinese text",
+      "timestamp": "2026-03-01T11:30:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-05: Search and filter",
+      "timestamp": "2026-03-01T11:50:00.000Z"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-04: Wrong spacing",
+      "timestamp": "2026-03-01T11:55:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-06: UserDetail drawer",
+      "timestamp": "2026-03-01T12:20:00.000Z"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-01: Dialog instead of Drawer",
+      "timestamp": "2026-03-01T12:30:00.000Z"
+    },
+    {
+      "type": "rule",
+      "title": "Rule: Use Drawer for detail views",
+      "timestamp": "2026-03-01T12:35:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-07: User form",
+      "timestamp": "2026-03-01T13:00:00.000Z"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-05: Relative import",
+      "timestamp": "2026-03-01T13:05:00.000Z"
+    },
+    {
+      "type": "rule",
+      "title": "Rule: Always use @/ path alias",
+      "timestamp": "2026-03-01T13:08:00.000Z"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-03: Invented API endpoint",
+      "timestamp": "2026-03-01T13:10:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-08: Permission checks",
+      "timestamp": "2026-03-01T13:30:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-09: Batch operations",
+      "timestamp": "2026-03-01T13:50:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-10: Loading & error states",
+      "timestamp": "2026-03-01T14:00:00.000Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: API pagination type mismatch",
+      "timestamp": "2026-03-01T14:05:00.000Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-02: Form validation on blur",
+      "timestamp": "2026-03-01T14:35:00.000Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-03: CSV missing headers",
+      "timestamp": "2026-03-01T14:50:00.000Z"
+    },
+    {
+      "type": "workflow",
+      "title": "All tasks completed",
+      "timestamp": "2026-03-01T15:30:00.000Z"
+    }
+  ],
+  "events": [
+    {
+      "type": "workflow_stage_changed",
+      "time": "2026-03-01T09:00:00.000Z",
+      "data": {
+        "stage": "analysis"
+      }
+    },
+    {
+      "type": "workflow_stage_changed",
+      "time": "2026-03-01T09:20:00.000Z",
+      "data": {
+        "stage": "task_decomposition"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-01T09:35:00.000Z",
+      "data": {
+        "count": 10
+      }
+    },
+    {
+      "type": "workflow_stage_changed",
+      "time": "2026-03-01T09:35:00.000Z",
+      "data": {
+        "stage": "coding"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T09:50:00.000Z",
+      "data": {
+        "taskId": "TASK-01"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T10:20:00.000Z",
+      "data": {
+        "taskId": "TASK-02"
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-03-01T10:25:00.000Z",
+      "data": {
+        "reviewId": "REV-02",
+        "result": "fail"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T10:40:00.000Z",
+      "data": {
+        "taskId": "TASK-03"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T11:20:00.000Z",
+      "data": {
+        "taskId": "TASK-04"
+      }
+    },
+    {
+      "type": "deviation_created",
+      "time": "2026-03-01T11:30:00.000Z",
+      "data": {
+        "deviationId": "DEV-02"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T11:50:00.000Z",
+      "data": {
+        "taskId": "TASK-05"
+      }
+    },
+    {
+      "type": "deviation_created",
+      "time": "2026-03-01T11:55:00.000Z",
+      "data": {
+        "deviationId": "DEV-04"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T12:20:00.000Z",
+      "data": {
+        "taskId": "TASK-06"
+      }
+    },
+    {
+      "type": "deviation_created",
+      "time": "2026-03-01T12:30:00.000Z",
+      "data": {
+        "deviationId": "DEV-01"
+      }
+    },
+    {
+      "type": "rule_sedimented",
+      "time": "2026-03-01T12:35:00.000Z",
+      "data": {
+        "ruleId": "RULE-01"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T13:00:00.000Z",
+      "data": {
+        "taskId": "TASK-07"
+      }
+    },
+    {
+      "type": "deviation_created",
+      "time": "2026-03-01T13:05:00.000Z",
+      "data": {
+        "deviationId": "DEV-05"
+      }
+    },
+    {
+      "type": "rule_sedimented",
+      "time": "2026-03-01T13:08:00.000Z",
+      "data": {
+        "ruleId": "RULE-02"
+      }
+    },
+    {
+      "type": "deviation_created",
+      "time": "2026-03-01T13:10:00.000Z",
+      "data": {
+        "deviationId": "DEV-03"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T13:30:00.000Z",
+      "data": {
+        "taskId": "TASK-08"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T13:50:00.000Z",
+      "data": {
+        "taskId": "TASK-09"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-01T14:00:00.000Z",
+      "data": {
+        "taskId": "TASK-10"
+      }
+    },
+    {
+      "type": "workflow_stage_changed",
+      "time": "2026-03-01T14:00:00.000Z",
+      "data": {
+        "stage": "review"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-03-01T14:05:00.000Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-03-01T14:15:00.000Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "workflow_stage_changed",
+      "time": "2026-03-01T14:30:00.000Z",
+      "data": {
+        "stage": "bug_fix"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-03-01T14:35:00.000Z",
+      "data": {
+        "bugId": "BUG-02"
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-03-01T14:45:00.000Z",
+      "data": {
+        "bugId": "BUG-02"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-03-01T14:50:00.000Z",
+      "data": {
+        "bugId": "BUG-03"
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-03-01T14:55:00.000Z",
+      "data": {
+        "bugId": "BUG-03"
+      }
+    },
+    {
+      "type": "workflow_stage_changed",
+      "time": "2026-03-01T15:00:00.000Z",
+      "data": {
+        "stage": "completed"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "ruleId": "RULE-01",
+      "file": ".aidevos/rules/component-usage.md",
+      "content": "Detail views must use Drawer component, not Dialog",
+      "sourceDeviation": "DEV-01",
+      "sedimentedAt": "2026-03-01T12:35:00.000Z"
+    },
+    {
+      "ruleId": "RULE-02",
+      "file": ".aidevos/rules/coding-style.md",
+      "content": "Always use @/ path alias for imports, never relative paths with ../",
+      "sourceDeviation": "DEV-05",
+      "sedimentedAt": "2026-03-01T13:08:00.000Z"
+    },
+    {
+      "ruleId": "RULE-03",
+      "file": ".aidevos/rules/i18n-rule.md",
+      "content": "All user-facing text must use $t() i18n calls, no hardcoded strings",
+      "sourceDeviation": "DEV-02",
+      "sedimentedAt": "2026-03-01T11:35:00.000Z"
+    }
+  ],
+  "context": {
+    "currentPrdPhase": "PRD1",
+    "currentTaskId": null,
+    "currentStage": "completed",
+    "lastUpdated": "2026-03-01T15:30:00.000Z"
+  },
+  "extensions": {}
+}
