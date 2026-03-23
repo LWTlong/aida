@@ -1,0 +1,49 @@
+{
+  "name": "ai-dev-analytics",
+  "version": "1.0.0-beta.1",
+  "description": "AI Development Analytics Platform - Track what AI actually does in your codebase",
+  "type": "module",
+  "bin": {
+    "aida": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:test": "tsc -p tsconfig.test.json",
+    "test": "npm run build:test && node --test dist-test/tests/*.test.js",
+    "dev": "tsc --watch",
+    "start": "node dist/cli/index.js",
+    "prepublishOnly": "npm run build && cd dashboard && npm run build"
+  },
+  "keywords": [
+    "ai",
+    "development",
+    "analytics",
+    "observability",
+    "claude",
+    "cursor",
+    "devops",
+    "dashboard"
+  ],
+  "author": "wen tao",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LWTlong/ai-dev-os.git"
+  },
+  "homepage": "https://github.com/LWTlong/ai-dev-os#readme",
+  "bugs": {
+    "url": "https://github.com/LWTlong/ai-dev-os/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "src/assets",
+    "src/dashboard"
+  ],
+  "devDependencies": {
+    "@types/node": "^25.4.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-test/
+*.tsbuildinfo
+.DS_Store
+.agent/
+.agents/
+skills-lock.json
+.aidevos/skills-backup-*/
+DATA_CONTRACT_AUDIT.md
+.aidevos/
+.claude/
