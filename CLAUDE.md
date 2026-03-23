@@ -18,41 +18,50 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**ai-dev-os** (AIDevOS) is an open-source AI Development Observability Platform. It tracks the full lifecycle of AI-assisted development: PRD ingestion, requirement analysis, task decomposition, code generation, deviations, bug fixes, self-review, and timeline — then visualizes it all in a dashboard.
+**AIDA** (AI Development Analytics) is an open-source AI Development Observability Platform. It tracks the full lifecycle of AI-assisted development: PRD ingestion, requirement analysis, task decomposition, code generation, deviations, bug fixes, self-review, and timeline — then visualizes it all in a dashboard.
 
-The project is in early planning stage with PRD and technical design docs but no source code yet.
+## Tech Stack
 
-## Planned Tech Stack
+- Node.js + TypeScript (zero runtime dependencies)
+- React 19 + ECharts + Tailwind CSS 4 (dashboard)
+- JSON files (data storage, no database)
+- MCP (Model Context Protocol) over stdio
 
-- Node.js + TypeScript
-- React (dashboard)
-- SQLite (data storage)
-
-## Planned Architecture
+## Architecture
 
 ```
-CLI → structured markdown → data collector → SQLite → dashboard server
+AI Tool → MCP Server (9 tools) → run.json ← CLI (aida log)
+                                     ↓
+                              Dashboard (React)
 ```
 
-Planned modules: `core/`, `tracker/`, `rules/`, `workflow/`, `dashboard/`
+Key modules: `src/cli/`, `src/mcp/`, `src/schemas/`, `src/utils/`, `dashboard/`
 
-## Planned CLI Commands
+## CLI Commands
 
 ```bash
-npx aidevos init          # Initialize project
-aidevos start FEATURE-001 # Create new requirement
-aidevos analyze           # Run analysis
-aidevos tasks             # Generate tasks
-aidevos dashboard         # Launch dashboard
+aida init          # Initialize project
+aida start         # Create new development run
+aida mcp           # Start MCP server (stdio)
+aida log <sub>     # Write structured data to run.json
+aida dashboard     # Launch visualization dashboard
+aida status        # Show current run status
+aida update        # Update skills to latest version
+aida rules <sub>   # Manage rules registry
+aida reindex       # Rebuild project-level index
+aida report        # Generate performance report
+aida migrate       # Migrate old schema
 ```
 
-## Key Design Documents
+## Naming Convention
 
-- `docs/PRD.md` — Full product requirements (bilingual CN/EN)
-- `docs/Technical.md` — Technical architecture spec
+- npm package: `ai-dev-analytics`
+- CLI command: `aida`
+- MCP tool prefix: `aida_` (e.g. `aida_task_start`)
+- Data directory: `.aidevos/` (unchanged for backwards compatibility)
+- Brand: AIDA
 
-
-## AIDevOS Iron Rules
+## AIDA Iron Rules
 
 1. 禁止任何形式的臆想，不清楚必须询问
 2. 禁止随意生成文档，如需生成文档，必须询问用户是否需要
