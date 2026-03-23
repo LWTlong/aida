@@ -114,7 +114,7 @@ function App() {
       <div className="grid grid-cols-2 gap-4 px-8 pb-5 max-md:grid-cols-1">
         {/* 效率与耗时 */}
         <ChartCard title="各节点累计耗时">
-          <NodeTimeChart metrics={runData!.metrics} cost={runData!.cost} />
+          <NodeTimeChart metrics={runData!.metrics} cost={runData!.cost} tasks={runData!.tasks} bugs={runData!.bugs} />
         </ChartCard>
 
         <ChartCard title="任务耗时排行 TOP 10">
