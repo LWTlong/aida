@@ -32,12 +32,12 @@ globs: ['.aidevos/runs/*/*/run.json']
 3. 产出详尽的高级审查结果，内容需要包含：安全审查、性能预警和可维护性健康度三块。
 4. 执行以下命令记录审查结果：
    ```bash
-   aidevos log review --result pass --scope "审查覆盖的模块" --issues 0
+   aidevo log review --result pass --scope "审查覆盖的模块" --issues 0
    # 或
-   aidevos log review --result fail --scope "审查覆盖的模块" --issues 3
+   aidevo log review --result fail --scope "审查覆盖的模块" --issues 3
    ```
 5. 基于审查结果，如需生成改进任务：
    ```bash
-   aidevos log task --title "改进任务描述" --stage "安全加固"
+   aidevo log task --title "改进任务描述" --stage "安全加固"
    ```
    CLI 会自动更新 summary 统计和 timeline。

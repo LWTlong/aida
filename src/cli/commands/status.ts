@@ -19,7 +19,7 @@ export async function status(): Promise<void> {
 
   if (!fileExists(configPath(projectRoot))) {
     console.log(
-      red('\n  AIDevOS not initialized. Run `npx aidevos init` first.\n'),
+      red('\n  AIDevOS not initialized. Run `npx aidevo init` first.\n'),
     );
     return;
   }
@@ -36,7 +36,7 @@ export async function status(): Promise<void> {
 
   if (!fileExists(runJsonPath)) {
     console.log(
-      red('\n  No active run found. Run `aidevos start` first.\n'),
+      red('\n  No active run found. Run `aidevo start` first.\n'),
     );
     return;
   }

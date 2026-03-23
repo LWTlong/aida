@@ -56,21 +56,27 @@ async function main() {
       await rules();
       break;
     }
+    case 'mcp': {
+      const { startMcpServer } = await import('../mcp/server.js');
+      startMcpServer();
+      return; // Don't exit — MCP server runs until stdin closes
+    }
     default: {
       console.log(`
-  AIDevOS - AI Development Observability Platform
+  AIDevo - AI Development Observability Platform
 
   Usage:
-    aidevos init        Initialize AIDevOS in current project
-    aidevos start       Create a new development run
-    aidevos log         Write structured data to run.json
-    aidevos dashboard   Launch the visualization dashboard
-    aidevos status      Show current run status
-    aidevos update      Update all skills to latest version
-    aidevos migrate     Migrate old run.json data to new schema
-    aidevos reindex     Rebuild project-level index from all runs
-    aidevos report      Generate performance report data
-    aidevos rules       Manage project rules registry (build/dedupe/merge)
+    aidevo init        Initialize AIDevo in current project
+    aidevo start       Create a new development run
+    aidevo mcp         Start MCP server (stdio mode, for AI tools)
+    aidevo log         Write structured data to run.json
+    aidevo dashboard   Launch the visualization dashboard
+    aidevo status      Show current run status
+    aidevo update      Update all skills to latest version
+    aidevo migrate     Migrate old run.json data to new schema
+    aidevo reindex     Rebuild project-level index from all runs
+    aidevo report      Generate performance report data
+    aidevo rules       Manage project rules registry (build/dedupe/merge)
 `);
     }
   }

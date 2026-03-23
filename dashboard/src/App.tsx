@@ -114,11 +114,11 @@ function App() {
       <div className="grid grid-cols-2 gap-4 px-8 pb-5 max-md:grid-cols-1">
         {/* 效率与耗时 */}
         <ChartCard title="各节点累计耗时">
-          <NodeTimeChart metrics={runData!.metrics} />
+          <NodeTimeChart metrics={runData!.metrics} cost={runData!.cost} />
         </ChartCard>
 
         <ChartCard title="任务耗时排行 TOP 10">
-          <TaskTimeRanking tasks={runData!.tasks} />
+          <TaskTimeRanking tasks={runData!.tasks} cost={runData!.cost} />
         </ChartCard>
 
         <ChartCard title="阶段时间分布">
@@ -131,7 +131,7 @@ function App() {
 
         {/* 质量与偏差 */}
         <ChartCard title="各阶段任务完成情况">
-          <TaskChart tasks={runData!.tasks} prdPhases={runData!.meta.prdPhases} />
+          <TaskChart tasks={runData!.tasks} prdPhases={runData!.meta.prdPhases} cost={runData!.cost} />
         </ChartCard>
 
         <ChartCard title="首次通过率趋势">

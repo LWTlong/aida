@@ -1,9 +1,10 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
-import type { RunMetrics } from '../../types'
+import type { RunMetrics, RunCost } from '../../types'
 
 interface Props {
   metrics: RunMetrics
+  cost?: RunCost
 }
 
 const nodeLabels: Record<string, string> = {
@@ -23,26 +24,51 @@ function formatSeconds(s: number): string {
   return `${(s / 3600).toFixed(1)}h`
 }
 
-export function NodeTimeChart({ metrics }: Props) {
+function formatTokens(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
+  return `${n}`
+}
+
+export function NodeTimeChart({ metrics, cost }: Props) {
   const breakdown = metrics.nodeTimeBreakdown
   if (!breakdown || Object.keys(breakdown).length === 0) {
     return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无节点耗时数据</div>
   }
 
+  // Build token map from tokenBreakdown
+  const tokenMap: Record<string, number> = {}
+  if (cost?.tokenBreakdown) {
+    for (const item of cost.tokenBreakdown) {
+      tokenMap[item.stage] = (tokenMap[item.stage] || 0) + item.tokens
+    }
+  }
+  const hasTokens = Object.keys(tokenMap).length > 0
+  const totalTokens = cost?.totalTokens || 0
+
   const sorted = Object.entries(breakdown).sort((a, b) => a[1] - b[1])
+  const rawKeys = sorted.map(([k]) => k)
   const names = sorted.map(([k]) => nodeLabels[k] || k)
   const values = sorted.map(([, v]) => v)
+  const tokenValues = rawKeys.map(k => tokenMap[k] || 0)
 
   const option = {
     ...darkTheme,
     tooltip: {
       trigger: 'axis' as const,
-      formatter: (params: { name: string; value: number }[]) => {
-        const p = Array.isArray(params) ? params[0] : params
-        return `${p.name}: ${formatSeconds(p.value)}`
+      formatter: (params: any) => {
+        const list = Array.isArray(params) ? params : [params]
+        const idx = list[0]?.dataIndex
+        if (idx == null) return ''
+        const name = names[idx]
+        let tip = `<b>${name}</b><br/>耗时: ${formatSeconds(values[idx])}`
+        if (hasTokens && tokenValues[idx] > 0) {
+          tip += `<br/>Token: ${formatTokens(tokenValues[idx])}`
+        }
+        return tip
       },
     },
-    grid: { left: 20, right: 40, top: 10, bottom: 5, containLabel: true },
+    grid: { left: 20, right: 60, top: 10, bottom: 5, containLabel: true },
     yAxis: {
       type: 'category' as const,
       data: names,
@@ -68,13 +94,27 @@ export function NodeTimeChart({ metrics }: Props) {
           show: true,
           position: 'right' as const,
           color: '#94a3b8',
-          fontSize: 11,
-          formatter: (p: { value: number }) => formatSeconds(p.value),
+          fontSize: 10,
+          formatter: (p: { dataIndex: number; value: number }) => {
+            const tokens = tokenValues[p.dataIndex]
+            let label = formatSeconds(p.value)
+            if (hasTokens && tokens > 0) label += ` · ${formatTokens(tokens)}`
+            return label
+          },
         },
         barWidth: '50%',
       },
     ],
   }
 
-  return <ReactECharts option={option} style={{ height: Math.max(200, names.length * 45) }} />
+  return (
+    <div>
+      <ReactECharts option={option} style={{ height: Math.max(200, names.length * 45) }} />
+      {totalTokens > 0 && !hasTokens && (
+        <div className="text-center text-xs text-[#6b7b8d] mt-1">
+          总 Token 消耗: {totalTokens.toLocaleString()}
+        </div>
+      )}
+    </div>
+  )
 }

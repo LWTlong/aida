@@ -1,10 +1,11 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
-import type { TaskItem } from '../../types'
+import type { TaskItem, RunCost } from '../../types'
 
 interface Props {
   tasks: TaskItem[]
   prdPhases?: string[]
+  cost?: RunCost
 }
 
 const prdColorList: [string, string][] = [
@@ -15,18 +16,41 @@ const prdColorList: [string, string][] = [
   ['#dc2626', '#f87171'],
 ]
 
-export function TaskChart({ tasks, prdPhases }: Props) {
+function formatSeconds(s: number): string {
+  if (s < 60) return `${Math.round(s)}s`
+  if (s < 3600) return `${Math.round(s / 60)}m`
+  return `${(s / 3600).toFixed(1)}h`
+}
+
+function formatTokens(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
+  return `${n}`
+}
+
+export function TaskChart({ tasks, prdPhases, cost }: Props) {
   // Group tasks by stageName, preserve order of appearance
   const stageOrder: string[] = []
-  const stageMap: Record<string, { count: number; prd: string }> = {}
+  const stageMap: Record<string, { count: number; prd: string; seconds: number }> = {}
 
   for (const t of tasks) {
     const stage = t.stageName || '未分类'
     if (!stageMap[stage]) {
       stageOrder.push(stage)
-      stageMap[stage] = { count: 0, prd: t.prdPhase || '' }
+      stageMap[stage] = { count: 0, prd: t.prdPhase || '', seconds: 0 }
     }
     stageMap[stage].count++
+    if (t.startedAt && t.completedAt) {
+      stageMap[stage].seconds += (new Date(t.completedAt).getTime() - new Date(t.startedAt).getTime()) / 1000
+    }
+  }
+
+  // Build per-stage token map from tokenBreakdown
+  const stageTokens: Record<string, number> = {}
+  if (cost?.tokenBreakdown) {
+    for (const item of cost.tokenBreakdown) {
+      stageTokens[item.stage] = (stageTokens[item.stage] || 0) + item.tokens
+    }
   }
 
   // Build prd → color mapping
@@ -38,14 +62,28 @@ export function TaskChart({ tasks, prdPhases }: Props) {
 
   const names = stageOrder
   const data = stageOrder.map((s) => stageMap[s].count)
+  const reversedNames = [...names].reverse()
 
   const option = {
     ...darkTheme,
-    tooltip: { trigger: 'axis' as const },
-    grid: { left: 10, right: 30, top: 5, bottom: 5, containLabel: true },
+    tooltip: {
+      trigger: 'axis' as const,
+      formatter: (params: any[]) => {
+        const p = Array.isArray(params) ? params[0] : params
+        const idx = stageOrder.length - 1 - reversedNames.indexOf(p.name)
+        const stage = stageOrder[idx]
+        const info = stageMap[stage]
+        const tokens = stageTokens[stage] || 0
+        let tip = `<b>${p.name}</b><br/>任务数: ${info.count}`
+        if (info.seconds > 0) tip += `<br/>耗时: ${formatSeconds(info.seconds)}`
+        if (tokens > 0) tip += `<br/>Token: ${formatTokens(tokens)}`
+        return tip
+      },
+    },
+    grid: { left: 10, right: 80, top: 5, bottom: 5, containLabel: true },
     yAxis: {
       type: 'category' as const,
-      data: [...names].reverse(),
+      data: reversedNames,
       axisLabel: { color: '#6b7b8d', fontSize: 10 },
       axisLine: { lineStyle: { color: '#1e2d3d' } },
     },
@@ -69,7 +107,22 @@ export function TaskChart({ tasks, prdPhases }: Props) {
             },
           }
         }),
-        label: { show: true, position: 'right' as const, color: '#94a3b8', fontSize: 11, fontWeight: 600 },
+        label: {
+          show: true,
+          position: 'right' as const,
+          color: '#94a3b8',
+          fontSize: 10,
+          formatter: (p: { dataIndex: number; value: number }) => {
+            const origIndex = stageOrder.length - 1 - p.dataIndex
+            const stage = stageOrder[origIndex]
+            const info = stageMap[stage]
+            const tokens = stageTokens[stage] || 0
+            let label = `${p.value}`
+            if (info.seconds > 0) label += ` · ${formatSeconds(info.seconds)}`
+            if (tokens > 0) label += ` · ${formatTokens(tokens)}`
+            return label
+          },
+        },
         barWidth: '55%',
       },
     ],

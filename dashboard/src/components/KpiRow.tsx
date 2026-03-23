@@ -8,12 +8,18 @@ interface Props {
   data: RunData
 }
 
-type ModalType = 'tasks' | 'prd' | 'deviation' | 'bug' | 'review' | 'files' | 'time' | 'roi' | null
+type ModalType = 'tasks' | 'prd' | 'deviation' | 'bug' | 'review' | 'files' | 'time' | 'roi' | 'tokens' | null
 
 function formatSeconds(s: number): string {
   if (s < 60) return `${Math.round(s)}s`
   if (s < 3600) return `${Math.round(s / 60)}m`
   return `${(s / 3600).toFixed(1)}h`
+}
+
+function formatTokens(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
+  return `${n}`
 }
 
 export function KpiRow({ data }: Props) {
@@ -28,15 +34,18 @@ export function KpiRow({ data }: Props) {
     { key: 'bug', label: '缺陷修复', color: 'text-red-500', value: `${s.bugCount}` },
   ]
 
+  const totalTokens = data.cost?.totalTokens || 0
+
   const efficiencyCards: { key: ModalType; label: string; color: string; value: string }[] = [
-    { key: 'review', label: '自检通过率', color: 'text-purple-500', value: m.reviewPassRate != null ? `${Math.round(m.reviewPassRate * 100)}%` : '-' },
+    { key: 'review', label: '自检通过率', color: 'text-purple-500', value: m.reviewPassRate != null ? `${Math.round(m.reviewPassRate)}%` : '-' },
+    { key: 'tokens', label: 'Token 消耗', color: 'text-orange-500', value: totalTokens > 0 ? formatTokens(totalTokens) : '-' },
     { key: 'files', label: '文件变更', color: 'text-cyan-500', value: `${s.filesChanged}` },
     { key: 'time', label: '实际工时', color: 'text-teal-500', value: m.actualWorkSeconds ? formatSeconds(m.actualWorkSeconds) : '-' },
     { key: 'roi', label: 'ROI', color: 'text-emerald-500', value: m.roi != null ? `${Math.round(m.roi)}%` : '-' },
   ]
 
   const renderCards = (cards: typeof qualityCards) => (
-    <div className="grid grid-cols-4 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-2">
+    <div className={`grid gap-4 max-lg:grid-cols-2 max-sm:grid-cols-2 ${cards.length > 4 ? 'grid-cols-5' : 'grid-cols-4'}`}>
       {cards.map((card) => (
         <div
           key={card.key}
@@ -280,6 +289,47 @@ export function KpiRow({ data }: Props) {
             <span className="text-[#6b7b8d]">Total Tokens</span>
             <span className="text-[#e0e6ed]">{data.cost.totalTokens ? data.cost.totalTokens.toLocaleString() : '-'}</span>
           </div>
+        </div>
+      </Modal>
+
+      {/* Tokens Modal */}
+      <Modal title="Token 消耗详情" open={modal === 'tokens'} onClose={() => setModal(null)}>
+        <div className="space-y-3 text-[13px]">
+          <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
+            <span className="text-[#6b7b8d]">总 Token</span>
+            <span className="text-orange-500 font-bold text-lg">{totalTokens ? totalTokens.toLocaleString() : '-'}</span>
+          </div>
+          {data.cost?.tokenDetail && (
+            <>
+              <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
+                <span className="text-[#6b7b8d]">Input Tokens</span>
+                <span className="text-[#e0e6ed]">{data.cost.tokenDetail.inputTokens?.toLocaleString() || '0'}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
+                <span className="text-[#6b7b8d]">Output Tokens</span>
+                <span className="text-[#e0e6ed]">{data.cost.tokenDetail.outputTokens?.toLocaleString() || '0'}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
+                <span className="text-[#6b7b8d]">Cache Creation</span>
+                <span className="text-[#e0e6ed]">{data.cost.tokenDetail.cacheCreationTokens?.toLocaleString() || '0'}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
+                <span className="text-[#6b7b8d]">Cache Read</span>
+                <span className="text-[#e0e6ed]">{data.cost.tokenDetail.cacheReadTokens?.toLocaleString() || '0'}</span>
+              </div>
+            </>
+          )}
+          {data.cost?.tokenBreakdown && data.cost.tokenBreakdown.length > 0 && (
+            <div className="pt-3 border-t border-[#1e2d3d]">
+              <div className="text-[#6b7b8d] text-xs mb-2">各阶段 Token 消耗</div>
+              {data.cost.tokenBreakdown.map((item) => (
+                <div key={item.stage} className="flex justify-between py-1 text-xs">
+                  <span className="text-[#94a3b8]">{item.stage}</span>
+                  <span className="text-[#e0e6ed]">{item.tokens.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Modal>
     </>
