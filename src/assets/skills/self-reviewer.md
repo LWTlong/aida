@@ -46,8 +46,8 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
    - 执行以下命令记录审查结果：
    ```bash
    # 通过时不传 --issues
-   aidevo log review --task-id TASK-XX --result pass --scope "审查覆盖的文件/模块"
+   aida log review --task-id TASK-XX --result pass --scope "审查覆盖的文件/模块"
    # 未通过时，--issues 传逗号分隔的问题描述
-   aidevo log review --task-id TASK-XX --result fail --scope "审查覆盖的文件/模块" --issues "问题1描述,问题2描述,问题3描述"
+   aida log review --task-id TASK-XX --result fail --scope "审查覆盖的文件/模块" --issues "问题1描述,问题2描述,问题3描述"
    ```
    CLI 会自动更新 summary 统计和 timeline。

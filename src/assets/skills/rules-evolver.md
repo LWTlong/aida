@@ -24,7 +24,7 @@ globs: ['.aidevos/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
    - 将新规则总结、泛化后通过 CLI 写入注册表：
    ```bash
-   aidevo log rule --content "规则内容" --category component --source-deviation DEV-XX
+   aida log rule --content "规则内容" --category component --source-deviation DEV-XX
    ```
    - `--category` 可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`
    - CLI 会自动检查 fingerprint 去重，如果规则已存在会提示
@@ -38,11 +38,11 @@ globs: ['.aidevos/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 - **Source of Truth**：`.aidevos/rules.json`（JSON 数组，提交到 git）
 - **只读视图**：`.aidevos/rules/*.md`（按分类自动生成，已 gitignore）
 - **去重机制**：每条规则有 fingerprint（内容 hash），自动防止重复沉淀
-- **合并策略**：并行分支各自追加规则到 JSON，合并时取并集（`aidevo rules merge`）
+- **合并策略**：并行分支各自追加规则到 JSON，合并时取并集（`aida rules merge`）
 
 ## 规则质量要求
 
 - 每条规则必须有**明确的执行标准**（"必须"、"禁止"、"当...时"）
 - 规则必须引用真实代码模式，不得臆造
-- 规则之间不得冲突（可用 `aidevo rules dedupe` 检测近似冲突）
+- 规则之间不得冲突（可用 `aida rules dedupe` 检测近似冲突）
 - 新增规则后应检查与现有规则的一致性

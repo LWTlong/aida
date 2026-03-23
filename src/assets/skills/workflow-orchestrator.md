@@ -136,12 +136,12 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
 3. **核心执行循环 (代码生成 + 质量自检)：**
 
    - 一旦任务被确认，开始循环执行：
-     - **Step A:** 触发 `code-generator`，先调用 `aidevo log task-start --id TASK-XX` 记录开始时间，再读取 `run.json.tasks[]` 开始编写该任务。
-     - **Step B:** `code-generator` 完成后通过 `aidevo log file` 记录文件变更，再通过 `aidevo log task-done --id TASK-XX` 标记任务完成。
+     - **Step A:** 触发 `code-generator`，先调用 `aida log task-start --id TASK-XX` 记录开始时间，再读取 `run.json.tasks[]` 开始编写该任务。
+     - **Step B:** `code-generator` 完成后通过 `aida log file` 记录文件变更，再通过 `aida log task-done --id TASK-XX` 标记任务完成。
      - **Step C:** 立即触发 `self-reviewer` 进行质量查验。
      - **Step D:**
        - 如查验**未通过**：触发 `bug-fixer` 根据 review 结果进行专项修复代码，然后回到 Step C。
-       - 如查验**通过**：通过 `aidevo log review` 记录审查结果。
+       - 如查验**通过**：通过 `aida log review` 记录审查结果。
        - 如人工指定需高阶审计：转 `mcp-reviewer`（脱离主循环）。
 
 4. **保存进度与状态更新：**
@@ -176,8 +176,8 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
        2. [从任务/PRD 推断的亮点]
      请补充业务价值数据（如性能指标、成本节省等），输入 ok 跳过：
      ```
-   - 用户补充或确认后，通过 `aidevo log highlight --content "..." --source auto` 写入
-   - 用户手动补充的通过 `aidevo log highlight --content "..." --source manual` 写入
+   - 用户补充或确认后，通过 `aida log highlight --content "..." --source auto` 写入
+   - 用户手动补充的通过 `aida log highlight --content "..." --source manual` 写入
 
 ## 关于中断恢复
 
@@ -187,10 +187,10 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
 
 - **执行状态**：`run.json.context`（currentStage, currentTaskId, currentPrdPhase）
 - **开发工单**：`run.json.tasks[]`（每个任务含 taskId, title, status, stageName, startedAt, completedAt）
-- **Bug 记录**：`run.json.bugs[]`（通过 `aidevo log bug` / `aidevo log bug-fix` 写入）
-- **质量自检**：`run.json.reviews[]`（通过 `aidevo log review` 写入）
-- **偏差记录**：`run.json.deviations[]`（通过 `aidevo log deviation` 写入，用户手动触发）
-- **规则沉淀**：`run.json.rules[]`（通过 `aidevo log rule` 写入）
+- **Bug 记录**：`run.json.bugs[]`（通过 `aida log bug` / `aida log bug-fix` 写入）
+- **质量自检**：`run.json.reviews[]`（通过 `aida log review` 写入）
+- **偏差记录**：`run.json.deviations[]`（通过 `aida log deviation` 写入，用户手动触发）
+- **规则沉淀**：`run.json.rules[]`（通过 `aida log rule` 写入）
 - **工作流阶段**：`run.json.workflow[]`（记录各阶段执行状态和耗时）
 - **时间线**：`run.json.timeline[]`（记录关键事件时间点）
 - **文件变更**：`run.json.files[]`（记录修改过的文件路径和统计）

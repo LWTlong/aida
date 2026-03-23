@@ -39,7 +39,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/analysis.md', '.aidevos/r
 3. **写入任务清单（强制，不可跳过）：**
    对拆解出的每个任务，**必须**执行以下命令：
    ```bash
-   aidevo log task --title "创建类型定义文件" --stage "基础设施" --prd-phase "PRD1" --acceptance "类型文件可正常导入，无编译错误"
+   aida log task --title "创建类型定义文件" --stage "基础设施" --prd-phase "PRD1" --acceptance "类型文件可正常导入，无编译错误"
    ```
    **关键要求：**
    - `--prd-phase` 参数**不能省略**，必须填写实际的PRD阶段（从步骤1中识别出的，如PRD1/PRD2/PRD3）

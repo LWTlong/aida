@@ -35,7 +35,7 @@ function getRunJson(): { path: string; data: RunData } | null {
   const projectRoot = process.cwd();
   const result = loadRunJson(projectRoot);
   if (!result) {
-    console.log(red('\n  No active run. Run `aidevo start` or configure MCP first.\n'));
+    console.log(red('\n  No active run. Run `aida start` or configure MCP first.\n'));
     return null;
   }
   return result;
@@ -446,7 +446,7 @@ export async function log(): Promise<void> {
       return logHighlight(flags);
     default:
       console.log(`
-  ${cyan('aidevo log')} - Write structured data to run.json
+  ${cyan('aida log')} - Write structured data to run.json
 
   Subcommands:
     task          Add a new task
@@ -462,18 +462,18 @@ export async function log(): Promise<void> {
     highlight     Record a business value highlight
 
   Examples:
-    aidevo log task --title "Create API layer" --stage "Infrastructure"
-    aidevo log task-start --id TASK-01
-    aidevo log task-done --id TASK-01
-    aidevo log bug --title "Type mismatch" --severity high --source self-review
-    aidevo log bug-fix --id BUG-01 --fix "Fixed response type"
-    aidevo log deviation --title "Wrong component" --root-cause rule-missing --category component-usage
-    aidevo log review --task-id TASK-01 --result pass --scope "src/api/"
-    aidevo log rule --content "Use Drawer for detail views" --category component --source-deviation DEV-01 --status pending
-    aidevo log file --path "src/api/user.ts" --change-type modified --lines-added 50
-    aidevo log cost --tokens 125000 --stage "requirement-analysis"
-    aidevo log cost --estimated-hours 40 --actual-hours 18
-    aidevo log highlight --content "FCP reduced from 3.2s to 0.8s"
+    aida log task --title "Create API layer" --stage "Infrastructure"
+    aida log task-start --id TASK-01
+    aida log task-done --id TASK-01
+    aida log bug --title "Type mismatch" --severity high --source self-review
+    aida log bug-fix --id BUG-01 --fix "Fixed response type"
+    aida log deviation --title "Wrong component" --root-cause rule-missing --category component-usage
+    aida log review --task-id TASK-01 --result pass --scope "src/api/"
+    aida log rule --content "Use Drawer for detail views" --category component --source-deviation DEV-01 --status pending
+    aida log file --path "src/api/user.ts" --change-type modified --lines-added 50
+    aida log cost --tokens 125000 --stage "requirement-analysis"
+    aida log cost --estimated-hours 40 --actual-hours 18
+    aida log highlight --content "FCP reduced from 3.2s to 0.8s"
 `);
   }
 }

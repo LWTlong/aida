@@ -49,7 +49,7 @@ export async function update(): Promise<void> {
   const aidevos = resolve(projectRoot, '.aidevos');
   const configPath = resolve(aidevos, 'config.json');
 
-  console.log(`\n  ${bold('AIDevOS')} - Update Skills\n`);
+  console.log(`\n  ${bold('AIDA')} - Update Skills\n`);
 
   // Check if initialized
   if (!fileExists(configPath)) {
@@ -57,7 +57,7 @@ export async function update(): Promise<void> {
       yellow('  AIDevOS is not initialized in this project.'),
     );
     console.log(
-      dim('  Run `aidevo init` first.\n'),
+      dim('  Run `aida init` first.\n'),
     );
     return;
   }

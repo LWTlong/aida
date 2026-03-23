@@ -63,20 +63,20 @@ async function main() {
     }
     default: {
       console.log(`
-  AIDevo - AI Development Observability Platform
+  AIDA - AI Development Analytics Platform
 
   Usage:
-    aidevo init        Initialize AIDevo in current project
-    aidevo start       Create a new development run
-    aidevo mcp         Start MCP server (stdio mode, for AI tools)
-    aidevo log         Write structured data to run.json
-    aidevo dashboard   Launch the visualization dashboard
-    aidevo status      Show current run status
-    aidevo update      Update all skills to latest version
-    aidevo migrate     Migrate old run.json data to new schema
-    aidevo reindex     Rebuild project-level index from all runs
-    aidevo report      Generate performance report data
-    aidevo rules       Manage project rules registry (build/dedupe/merge)
+    aida init        Initialize AIDA in current project
+    aida start       Create a new development run
+    aida mcp         Start MCP server (stdio mode, for AI tools)
+    aida log         Write structured data to run.json
+    aida dashboard   Launch the visualization dashboard
+    aida status      Show current run status
+    aida update      Update all skills to latest version
+    aida migrate     Migrate old run.json data to new schema
+    aida reindex     Rebuild project-level index from all runs
+    aida report      Generate performance report data
+    aida rules       Manage project rules registry (build/dedupe/merge)
 `);
     }
   }
