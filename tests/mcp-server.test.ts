@@ -158,27 +158,27 @@ describe('MCP Server - tools/list', () => {
 
     const names = tools.map((t: any) => t.name).sort();
     const expected = [
-      'aidevos_bug_fix',
-      'aidevos_highlight',
-      'aidevos_log_bug',
-      'aidevos_log_deviation',
-      'aidevos_log_files',
-      'aidevos_log_review',
-      'aidevos_status',
-      'aidevos_task_done',
-      'aidevos_task_start',
+      'aida_bug_fix',
+      'aida_highlight',
+      'aida_log_bug',
+      'aida_log_deviation',
+      'aida_log_files',
+      'aida_log_review',
+      'aida_status',
+      'aida_task_done',
+      'aida_task_start',
     ];
     assert.deepEqual(names, expected);
   });
 });
 
-// ─── aidevos_task_start ───────────────────────────────────
+// ─── aida_task_start ───────────────────────────────────
 
-describe('MCP Server - aidevos_task_start', () => {
+describe('MCP Server - aida_task_start', () => {
   it('should create a task and run.json via lazy init', async () => {
     await client.initialize();
 
-    const result = await client.callTool('aidevos_task_start', {
+    const result = await client.callTool('aida_task_start', {
       title: 'Implement auth module',
       stage: 'Authentication',
     });
@@ -198,15 +198,15 @@ describe('MCP Server - aidevos_task_start', () => {
   });
 });
 
-// ─── aidevos_task_done ────────────────────────────────────
+// ─── aida_task_done ────────────────────────────────────
 
-describe('MCP Server - aidevos_task_done', () => {
+describe('MCP Server - aida_task_done', () => {
   it('should mark task as done', async () => {
     await client.initialize();
 
-    await client.callTool('aidevos_task_start', { title: 'Build API', stage: 'Backend' });
+    await client.callTool('aida_task_start', { title: 'Build API', stage: 'Backend' });
 
-    const result = await client.callTool('aidevos_task_done', { taskId: 'TASK-01' });
+    const result = await client.callTool('aida_task_done', { taskId: 'TASK-01' });
     assert.equal(result.success, true);
 
     const data = readJson<any>(project.runJsonPath);
@@ -218,18 +218,18 @@ describe('MCP Server - aidevos_task_done', () => {
   it('should return error for unknown task ID', async () => {
     await client.initialize();
 
-    const result = await client.callTool('aidevos_task_done', { taskId: 'TASK-99' });
+    const result = await client.callTool('aida_task_done', { taskId: 'TASK-99' });
     assert.equal(result.success, false);
   });
 });
 
-// ─── aidevos_log_bug ──────────────────────────────────────
+// ─── aida_log_bug ──────────────────────────────────────
 
-describe('MCP Server - aidevos_log_bug', () => {
+describe('MCP Server - aida_log_bug', () => {
   it('should record a bug with defaults', async () => {
     await client.initialize();
 
-    const result = await client.callTool('aidevos_log_bug', {
+    const result = await client.callTool('aida_log_bug', {
       title: 'Null pointer in parser',
     });
 
@@ -248,7 +248,7 @@ describe('MCP Server - aidevos_log_bug', () => {
   it('should record a bug with explicit severity and source', async () => {
     await client.initialize();
 
-    const result = await client.callTool('aidevos_log_bug', {
+    const result = await client.callTool('aida_log_bug', {
       title: 'Critical crash on start',
       severity: 'critical',
       source: 'testing',
@@ -261,29 +261,29 @@ describe('MCP Server - aidevos_log_bug', () => {
   });
 });
 
-// ─── aidevos_log_files ────────────────────────────────────
+// ─── aida_log_files ────────────────────────────────────
 
-describe('MCP Server - aidevos_log_files', () => {
+describe('MCP Server - aida_log_files', () => {
   it('should handle no git diff gracefully', async () => {
     await client.initialize();
 
-    const result = await client.callTool('aidevos_log_files');
+    const result = await client.callTool('aida_log_files');
 
     assert.equal(result.success, true);
     assert.equal(result.filesLogged, 0);
   });
 });
 
-// ─── aidevos_status ───────────────────────────────────────
+// ─── aida_status ───────────────────────────────────────
 
-describe('MCP Server - aidevos_status', () => {
+describe('MCP Server - aida_status', () => {
   it('should return current state with summary', async () => {
     await client.initialize();
 
-    await client.callTool('aidevos_task_start', { title: 'Task A' });
-    await client.callTool('aidevos_log_bug', { title: 'Bug X' });
+    await client.callTool('aida_task_start', { title: 'Task A' });
+    await client.callTool('aida_log_bug', { title: 'Bug X' });
 
-    const result = await client.callTool('aidevos_status');
+    const result = await client.callTool('aida_status');
 
     assert.equal(result.status, 'running');
     assert.equal(result.summary.totalTasks, 1);
@@ -300,24 +300,24 @@ describe('MCP Server - aidevos_status', () => {
 // ─── prompts/list ─────────────────────────────────────────
 
 describe('MCP Server - prompts/list', () => {
-  it('should return aidevos-guide prompt', async () => {
+  it('should return aida-guide prompt', async () => {
     await client.initialize();
 
     const resp = await client.rpc('prompts/list');
     assert.ok(resp.result);
     const prompts = resp.result.prompts;
     assert.equal(prompts.length, 1);
-    assert.equal(prompts[0].name, 'aidevos-guide');
+    assert.equal(prompts[0].name, 'aida-guide');
   });
 
   it('should return prompt content via prompts/get', async () => {
     await client.initialize();
 
-    const resp = await client.rpc('prompts/get', { name: 'aidevos-guide' });
+    const resp = await client.rpc('prompts/get', { name: 'aida-guide' });
     assert.ok(resp.result);
     assert.ok(Array.isArray(resp.result.messages));
     assert.equal(resp.result.messages.length, 1);
     assert.equal(resp.result.messages[0].role, 'user');
-    assert.ok(resp.result.messages[0].content.text.includes('aidevos_task_start'));
+    assert.ok(resp.result.messages[0].content.text.includes('aida_task_start'));
   });
 });

@@ -126,7 +126,7 @@ function getTaskTokens(startTime: string, endTime: string): number {
 
 const TOOLS = [
   {
-    name: 'aidevos_task_start',
+    name: 'aida_task_start',
     description: '当你开始一个新任务或功能开发时调用。记录任务标题和所属模块。在接到用户需求、开始编码前调用。',
     inputSchema: {
       type: 'object',
@@ -138,18 +138,18 @@ const TOOLS = [
     },
   },
   {
-    name: 'aidevos_task_done',
+    name: 'aida_task_done',
     description: '当你完成一个任务后调用。标记任务为已完成，自动计算耗时。',
     inputSchema: {
       type: 'object',
       properties: {
-        taskId: { type: 'string', description: '任务ID，如 TASK-01。如不确定，可调用 aidevos_status 查看。' },
+        taskId: { type: 'string', description: '任务ID，如 TASK-01。如不确定，可调用 aida_status 查看。' },
       },
       required: ['taskId'],
     },
   },
   {
-    name: 'aidevos_log_bug',
+    name: 'aida_log_bug',
     description: '当你在开发或测试中发现 bug 时调用。记录 bug 信息。',
     inputSchema: {
       type: 'object',
@@ -162,7 +162,7 @@ const TOOLS = [
     },
   },
   {
-    name: 'aidevos_bug_fix',
+    name: 'aida_bug_fix',
     description: '当你修复了一个 bug 后调用。标记 bug 为已修复。',
     inputSchema: {
       type: 'object',
@@ -174,7 +174,7 @@ const TOOLS = [
     },
   },
   {
-    name: 'aidevos_log_review',
+    name: 'aida_log_review',
     description: '当你完成一轮代码审查后调用。记录审查结果。',
     inputSchema: {
       type: 'object',
@@ -188,7 +188,7 @@ const TOOLS = [
     },
   },
   {
-    name: 'aidevos_log_deviation',
+    name: 'aida_log_deviation',
     description: '当 AI 产出与用户预期不符时调用。记录偏差用于后续分析。',
     inputSchema: {
       type: 'object',
@@ -201,7 +201,7 @@ const TOOLS = [
     },
   },
   {
-    name: 'aidevos_log_files',
+    name: 'aida_log_files',
     description: '记录文件变更。无需传参，自动扫描 git diff 获取变更文件列表和行数。在完成一轮代码修改后调用。',
     inputSchema: {
       type: 'object',
@@ -209,7 +209,7 @@ const TOOLS = [
     },
   },
   {
-    name: 'aidevos_highlight',
+    name: 'aida_highlight',
     description: '记录值得关注的亮点，如性能提升、架构优化等。',
     inputSchema: {
       type: 'object',
@@ -220,7 +220,7 @@ const TOOLS = [
     },
   },
   {
-    name: 'aidevos_status',
+    name: 'aida_status',
     description: '查看当前开发运行的状态：任务列表、bug 数量、进度等。在需要了解当前进度时调用。',
     inputSchema: {
       type: 'object',
@@ -233,19 +233,19 @@ const TOOLS = [
 
 const PROMPTS = [
   {
-    name: 'aidevos-guide',
-    description: 'AIDevOS 数据采集使用指南',
+    name: 'aida-guide',
+    description: 'AIDA 数据采集使用指南',
   },
 ];
 
-const PROMPT_CONTENT = `你拥有 AIDevOS 数据采集工具，请在开发过程中的关键节点自然使用：
+const PROMPT_CONTENT = `你拥有 AIDA 数据采集工具，请在开发过程中的关键节点自然使用：
 
-- 开始一个新任务时 → aidevos_task_start
-- 完成任务时 → aidevos_task_done
-- 发现 bug 时 → aidevos_log_bug，修复后 → aidevos_bug_fix
-- 完成一轮代码修改后 → aidevos_log_files（自动扫描 git diff，无需传参）
-- 完成代码审查时 → aidevos_log_review
-- 有值得记录的亮点时 → aidevos_highlight
+- 开始一个新任务时 → aida_task_start
+- 完成任务时 → aida_task_done
+- 发现 bug 时 → aida_log_bug，修复后 → aida_bug_fix
+- 完成一轮代码修改后 → aida_log_files（自动扫描 git diff，无需传参）
+- 完成代码审查时 → aida_log_review
+- 有值得记录的亮点时 → aida_highlight
 
 不需要改变你的开发流程，在关键节点顺手记录即可。漏报几个也没关系，有数据比没数据好。`;
 
@@ -592,31 +592,31 @@ function handleRequest(req: JsonRpcRequest): void {
 
       try {
         switch (toolName) {
-          case 'aidevos_task_start':
+          case 'aida_task_start':
             result = handleTaskStart(args);
             break;
-          case 'aidevos_task_done':
+          case 'aida_task_done':
             result = handleTaskDone(args);
             break;
-          case 'aidevos_log_bug':
+          case 'aida_log_bug':
             result = handleLogBug(args);
             break;
-          case 'aidevos_bug_fix':
+          case 'aida_bug_fix':
             result = handleBugFix(args);
             break;
-          case 'aidevos_log_review':
+          case 'aida_log_review':
             result = handleLogReview(args);
             break;
-          case 'aidevos_log_deviation':
+          case 'aida_log_deviation':
             result = handleLogDeviation(args);
             break;
-          case 'aidevos_log_files':
+          case 'aida_log_files':
             result = handleLogFiles();
             break;
-          case 'aidevos_highlight':
+          case 'aida_highlight':
             result = handleHighlight(args);
             break;
-          case 'aidevos_status':
+          case 'aida_status':
             result = handleStatus();
             break;
           default:
@@ -641,7 +641,7 @@ function handleRequest(req: JsonRpcRequest): void {
 
     case 'prompts/get': {
       const promptName = params?.name;
-      if (promptName === 'aidevos-guide') {
+      if (promptName === 'aida-guide') {
         sendResult(id!, {
           messages: [{
             role: 'user',
