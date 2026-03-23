@@ -151,19 +151,19 @@ The MCP server is the primary data collection mechanism. Your AI tool calls thes
 
 | Tool | Description |
 |------|-------------|
-| `aidevos_task_start` | Mark a task as in-progress |
-| `aidevos_task_done` | Mark a task as completed |
-| `aidevos_log_bug` | Record a bug found during development |
-| `aidevos_bug_fix` | Record a bug fix |
-| `aidevos_log_review` | Log a self-review result (pass/fail) |
-| `aidevos_log_deviation` | Record when AI output deviates from expectations |
-| `aidevos_log_files` | Track file changes (added, modified, deleted) |
-| `aidevos_highlight` | Capture notable achievements or milestones |
-| `aidevos_status` | Return current run status as structured data |
+| `aida_task_start` | Mark a task as in-progress |
+| `aida_task_done` | Mark a task as completed |
+| `aida_log_bug` | Record a bug found during development |
+| `aida_bug_fix` | Record a bug fix |
+| `aida_log_review` | Log a self-review result (pass/fail) |
+| `aida_log_deviation` | Record when AI output deviates from expectations |
+| `aida_log_files` | Track file changes (added, modified, deleted) |
+| `aida_highlight` | Capture notable achievements or milestones |
+| `aida_status` | Return current run status as structured data |
 
 ### MCP Prompts
 
-The server exposes an `aidevos-guide` prompt that teaches your AI tool when and how to call each tool. AI tools that support MCP prompts will automatically understand the observability protocol.
+The server exposes an `aida-guide` prompt that teaches your AI tool when and how to call each tool. AI tools that support MCP prompts will automatically understand the observability protocol.
 
 ### Lazy Init
 
