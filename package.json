@@ -1,6 +1,6 @@
 {
   "name": "ai-dev-analytics",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "AI Development Analytics Platform - Track what AI actually does in your codebase",
   "type": "module",
   "bin": {
@@ -28,11 +28,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LWTlong/ai-dev-os.git"
+    "url": "git+https://github.com/LWTlong/ai-dev-analytics.git"
   },
-  "homepage": "https://github.com/LWTlong/ai-dev-os#readme",
+  "homepage": "https://github.com/LWTlong/ai-dev-analytics#readme",
   "bugs": {
-    "url": "https://github.com/LWTlong/ai-dev-os/issues"
+    "url": "https://github.com/LWTlong/ai-dev-analytics/issues"
   },
   "engines": {
     "node": ">=18.0.0"
