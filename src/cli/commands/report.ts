@@ -188,7 +188,7 @@ export async function report(): Promise<void> {
   const projectRoot = process.cwd();
 
   if (!fileExists(configPath(projectRoot))) {
-    console.log(red('\n  AIDevOS not initialized. Run `npx aidevos init` first.\n'));
+    console.log(red('\n  AIDevOS not initialized. Run `npx aidevo init` first.\n'));
     return;
   }
 

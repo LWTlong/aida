@@ -48,7 +48,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 4. **记录偏差（强制，不可跳过）：**
    执行以下命令记录偏差：
    ```bash
-   aidevos log deviation --title "偏差简述" --root-cause rule-missing --category component-usage --ai-output "AI实际生成了什么" --expected "用户实际想要什么" --files "file1.ts,file2.ts"
+   aidevo log deviation --title "偏差简述" --root-cause rule-missing --category component-usage --ai-output "AI实际生成了什么" --expected "用户实际想要什么" --files "file1.ts,file2.ts"
    ```
    `--root-cause` 可选值：`rule-missing`, `context-insufficient`, `hallucination`, `misunderstanding`, `reference-copy`, `process-omission`, `other`
    `--category` 可选值：`ui-spacing`, `layout`, `component-usage`, `i18n`, `api`, `logic`, `architecture`, `style`, `other`
@@ -71,7 +71,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
    **a) 无业务逻辑 → 创建 pending 规则：**
    - 如果是**技术规范**（无业务逻辑），立即创建 pending 规则：
    ```bash
-   aidevos log rule --content "规则描述" --category component --source-deviation DEV-XX --status pending
+   aidevo log rule --content "规则描述" --category component --source-deviation DEV-XX --status pending
    ```
    - `--category` 可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`
    - 规则会自动写入 `.aidevos/rules.json`（项目级注册表），并通过 fingerprint 自动去重
@@ -79,11 +79,11 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 
    **b) 正式沉淀规则（去掉 pending）：**
    ```bash
-   aidevos log rule --content "正式规则内容" --category component --source-deviation DEV-XX
+   aidevo log rule --content "正式规则内容" --category component --source-deviation DEV-XX
    ```
    - 不带 `--status pending` 即为正式沉淀，更新 `summary.rulesSedimented` 统计
 
    **c) 带业务逻辑 → 不创建规则：**
    - 如果是**业务逻辑**（特定功能需求），不创建规则，只记录偏差即可。
 
-   **注意**：规则的 source of truth 是 `.aidevos/rules.json`（提交到 git），`.aidevos/rules/*.md` 是自动生成的只读视图（已 gitignore）。并行分支的规则通过 fingerprint 自动去重，合并冲突可用 `aidevos rules merge` 解决。
+   **注意**：规则的 source of truth 是 `.aidevos/rules.json`（提交到 git），`.aidevos/rules/*.md` 是自动生成的只读视图（已 gitignore）。并行分支的规则通过 fingerprint 自动去重，合并冲突可用 `aidevo rules merge` 解决。

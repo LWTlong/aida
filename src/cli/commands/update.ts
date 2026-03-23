@@ -57,7 +57,7 @@ export async function update(): Promise<void> {
       yellow('  AIDevOS is not initialized in this project.'),
     );
     console.log(
-      dim('  Run `aidevos init` first.\n'),
+      dim('  Run `aidevo init` first.\n'),
     );
     return;
   }

@@ -1,12 +1,12 @@
 ---
 name: dev-flower
-description: 母 Skill，用于初始化 aiDevOS 开发流程：生成 Skill 文件、Rules 占位、需求目录结构。现已由 `aidevos init` CLI 命令替代。
+description: 母 Skill，用于初始化 aiDevOS 开发流程：生成 Skill 文件、Rules 占位、需求目录结构。现已由 `aidevo init` CLI 命令替代。
 globs: []
 ---
 
 # dev-flower (初始化生成器 / 母 Skill)
 
-> **注意**：此 Skill 的功能已由 `npx aidevos init` CLI 命令替代。以下文档保留作为参考。
+> **注意**：此 Skill 的功能已由 `npx aidevo init` CLI 命令替代。以下文档保留作为参考。
 
 ## 角色
 

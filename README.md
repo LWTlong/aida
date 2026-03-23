@@ -1,6 +1,6 @@
 <div align="center">
 
-# AIDevOS
+# AIDevo
 
 ### AI Development Observability Platform
 
@@ -11,12 +11,12 @@ How many tasks did it complete? How many bugs did it introduce? How often did it
 
 AIDevOS gives you the answers.
 
-[![npm version](https://img.shields.io/npm/v/aidevos?color=%230066ff&label=npm)](https://www.npmjs.com/package/aidevos)
+[![npm version](https://img.shields.io/npm/v/aidevo?color=%230066ff&label=npm)](https://www.npmjs.com/package/aidevo)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-os?color=%23333)](./LICENSE)
-[![node](https://img.shields.io/node/v/aidevos?color=%23339933)](https://nodejs.org)
-[![tests](https://img.shields.io/badge/tests-71%20passed-brightgreen)](#testing)
+[![node](https://img.shields.io/node/v/aidevo?color=%23339933)](https://nodejs.org)
+[![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#testing)
 
-[Quick Start](#quick-start) · [How It Works](#how-it-works) · [Dashboard](#dashboard) · [Skills](#skills) · [CLI Reference](#cli-reference)
+[Quick Start](#quick-start) · [MCP Server](#mcp-server) · [How It Works](#how-it-works) · [Dashboard](#dashboard) · [Skills](#skills) · [CLI Reference](#cli-reference)
 
 </div>
 
@@ -36,81 +36,184 @@ All that development process data? **Gone.** Every single session.
 
 ## The Solution
 
-AIDevOS injects standardized **Skills** (structured SOPs) into your AI coding tool, turning chaotic AI-assisted development into a **trackable, measurable, self-improving process**.
+AIDevOS works in **two modes** — pick the one that fits your workflow:
 
-```
-PRD → Analysis → Tasks → Code → Review → Ship
-         ↑                          |
-         └── Rules ← Deviations ←──┘
-```
+| Mode | What you get | Setup effort |
+|------|-------------|--------------|
+| **Data Collection Only** (via MCP) | Full observability with zero workflow changes | Add one JSON config block |
+| **Full Workflow** (MCP + Skills + Commands) | Observability + structured AI SOPs + self-improving rules | `npm install` + `aidevo init` |
 
-Every step is recorded. Every deviation becomes a rule. Every rule makes the next run better.
+**Most teams start with data collection.** Your AI tool calls MCP tools automatically as it works — you change nothing about how you code. When you're ready for structured workflows, upgrade to full mode.
 
 ## Quick Start
 
+### Path A: Data Collection Only (Recommended)
+
+Add the MCP server config to your AI tool and start working. That's it.
+
+**Claude Code** — add to `.mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "aidevo": {
+      "command": "npx",
+      "args": ["-y", "aidevo", "mcp"]
+    }
+  }
+}
+```
+
+**Cursor** — add to `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "aidevo": {
+      "command": "npx",
+      "args": ["-y", "aidevo", "mcp"]
+    }
+  }
+}
+```
+
+**VS Code Copilot** — add to `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "aidevo": {
+      "command": "npx",
+      "args": ["-y", "aidevo", "mcp"]
+    }
+  }
+}
+```
+
+**Windsurf** — add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "aidevo": {
+      "command": "npx",
+      "args": ["-y", "aidevo", "mcp"]
+    }
+  }
+}
+```
+
+No `aidevo init` or `aidevo start` needed. The MCP server uses **lazy init** — it auto-creates `.aidevos/` and `run.json` on the first tool call.
+
+Then view your data:
+
+```bash
+npx aidevo dashboard
+```
+
+Open `http://localhost:2375` — real-time dashboard with live updates.
+
+### Path B: Full Workflow
+
 ```bash
 # Install globally
-npm install -g aidevos
+npm install -g aidevo
 
 # Initialize in your project (interactive setup)
 cd your-project
-aidevos init
+aidevo init
 ```
 
-Choose your AI tool (Claude Code or Cursor). AIDevOS will:
+`aidevo init` now offers **mode selection**:
 
-1. Create `.aidevos/` with 14 AI Skills
-2. Register slash commands (`/workflow`, `/audit`, `/deviation`...)
-3. Seed project rules with iron laws
+1. **Data collection only** — sets up MCP config for your chosen AI tool(s)
+2. **Full workflow** — MCP config + 14 AI Skills + slash commands + project rules
+
+Multi-tool support: select one or more AI tools (Claude Code, Cursor, VS Code Copilot, Windsurf) and AIDevOS writes the correct MCP config for each.
 
 Then start building:
 
 ```bash
 # Create a new development run
-aidevos start
+aidevo start
 
 # Place your PRD, then let AI take over
 /workflow
 ```
 
-The AI will execute: **Requirement Analysis** → *User Confirmation* → **Task Decomposition** → **Code Generation** → **Self-Review** → loop until done.
+The AI will execute: **Requirement Analysis** -> *User Confirmation* -> **Task Decomposition** -> **Code Generation** -> **Self-Review** -> loop until done.
 
-```bash
-# See what happened
-aidevos dashboard
-```
+## MCP Server
 
-Open `http://localhost:2375` — real-time dashboard with live updates.
+The MCP server is the primary data collection mechanism. Your AI tool calls these tools automatically as part of its normal workflow — no extra prompts or commands required.
+
+### 9 MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `aidevos_task_start` | Mark a task as in-progress |
+| `aidevos_task_done` | Mark a task as completed |
+| `aidevos_log_bug` | Record a bug found during development |
+| `aidevos_bug_fix` | Record a bug fix |
+| `aidevos_log_review` | Log a self-review result (pass/fail) |
+| `aidevos_log_deviation` | Record when AI output deviates from expectations |
+| `aidevos_log_files` | Track file changes (added, modified, deleted) |
+| `aidevos_highlight` | Capture notable achievements or milestones |
+| `aidevos_status` | Return current run status as structured data |
+
+### MCP Prompts
+
+The server exposes an `aidevos-guide` prompt that teaches your AI tool when and how to call each tool. AI tools that support MCP prompts will automatically understand the observability protocol.
+
+### Lazy Init
+
+No manual setup required for data collection. On the first MCP tool call, the server will:
+
+1. Create `.aidevos/` if it doesn't exist
+2. Create `run.json` for the current branch and developer
+3. Start recording immediately
+
+### Token Auto-Collection
+
+For **Claude Code** users, AIDevOS automatically reads Claude session files to collect token usage data:
+
+- Token usage per task and per bug fix
+- Breakdown: `input_tokens`, `output_tokens`, `cache_creation_input_tokens`, `cache_read_input_tokens`
+- Aggregated totals at the run level
+
+This enables accurate **ROI calculation** — you can see exactly how many tokens each task or bug fix consumed and correlate cost with output.
 
 ## How It Works
 
 AIDevOS is **not** an AI coding agent. It's an **observability layer** that standardizes how your existing AI tools work.
 
 ```
-┌─────────────────────────────────────────────────┐
-│  Your IDE (Claude Code / Cursor)                │
-│                                                 │
-│  ┌──────────┐  reads   ┌──────────────────┐    │
-│  │ AI Agent ├─────────→│ .aidevos/skills/ │    │
-│  │          │          │ (14 SOPs)        │    │
-│  │          │  writes  ┌──────────────────┐    │
-│  │          ├─────────→│ aidevos log ...  │    │
-│  └──────────┘          │ (structured CLI) │    │
-│                        └────────┬─────────┘    │
-└─────────────────────────┬───────┘──────────────┘
-                          │
-                          ▼
-                   ┌─────────────┐
-                   │  run.json   │ ← Single source of truth
-                   └──────┬──────┘
-                          │
-              ┌───────────┼───────────┐
-              ▼           ▼           ▼
-        ┌──────────┐ ┌────────┐ ┌─────────┐
-        │Dashboard │ │Reports │ │Analysis │
-        │ (React)  │ │ (.md)  │ │ (JSON)  │
-        └──────────┘ └────────┘ └─────────┘
+┌──────────────────────────────────────────────────────┐
+│  Your IDE (Claude Code / Cursor / VS Code / Windsurf)│
+│                                                      │
+│  ┌──────────┐  MCP calls  ┌────────────────────┐    │
+│  │ AI Agent ├────────────→│ AIDevOS MCP Server │    │
+│  │          │             │ (9 tools)          │    │
+│  │          │  reads      ┌──────────────────┐  │    │
+│  │          ├────────────→│ .aidevos/skills/ │  │    │
+│  │          │             │ (14 SOPs)        │  │    │
+│  └──────────┘             └───────┬──────────┘  │    │
+└───────────────────────────┬───────┘──────────────┘
+                            │
+                            ▼
+                     ┌─────────────┐
+                     │  run.json   │ <- Single source of truth
+                     └──────┬──────┘
+                            │
+                ┌───────────┼───────────┐
+                ▼           ▼           ▼
+          ┌──────────┐ ┌────────┐ ┌─────────┐
+          │Dashboard │ │Reports │ │Analysis │
+          │ (React)  │ │ (.md)  │ │ (JSON)  │
+          └──────────┘ └────────┘ └─────────┘
 ```
+
+The **MCP path** (top arrow) is the primary data collection mechanism. Skills are optional and used only in full workflow mode.
 
 ### Three-Layer Data Model
 
@@ -130,9 +233,9 @@ This is what makes AIDevOS different. It's not just tracking — it's **learning
          ▼
    Self-review catches issues
          │
-         ├── Pass → next task
+         ├── Pass -> next task
          │
-         └── Fail → fix → record deviation
+         └── Fail -> fix -> record deviation
                               │
                               ▼
                     Is it a missing rule?
@@ -162,6 +265,7 @@ Real-time visualization powered by React + ECharts with dark theme.
 - Bug severity distribution
 - Review issue categories
 - File change heatmap
+- Token usage breakdown per task
 
 **Project Overview** — team lead perspective across all branches:
 
@@ -170,15 +274,15 @@ Real-time visualization powered by React + ECharts with dark theme.
 - Cross-branch totals and highlights
 
 ```bash
-aidevos dashboard              # Default port 2375
-aidevos dashboard --port 3000  # Custom port
+aidevo dashboard              # Default port 2375
+aidevo dashboard --port 3000  # Custom port
 ```
 
 Dashboard updates in real-time via SSE — no refresh needed.
 
 ## Skills
 
-AIDevOS ships with **14 AI Skills** — structured SOPs that tell your AI tool exactly what to do and how to record it.
+AIDevOS ships with **14 AI Skills** — structured SOPs that tell your AI tool exactly what to do and how to record it. Skills are used in **full workflow mode** and are optional for data-collection-only setups.
 
 ### Workflow Skills (auto-orchestrated)
 
@@ -214,46 +318,47 @@ AIDevOS ships with **14 AI Skills** — structured SOPs that tell your AI tool e
 AIDevOS uses a **Registry + Generated Views** pattern for project rules:
 
 ```
-.aidevos/rules.json     ← Source of truth (committed to git)
-.aidevos/rules/*.md     ← Auto-generated views (gitignored)
+.aidevos/rules.json     <- Source of truth (committed to git)
+.aidevos/rules/*.md     <- Auto-generated views (gitignored)
 ```
 
 - **Fingerprint dedup**: SHA256 hash prevents duplicate rules across parallel branches
-- **Auto-merge**: `aidevos rules merge` resolves git conflicts by taking the union
-- **Similarity detection**: `aidevos rules dedupe` finds near-duplicate rules via Jaccard similarity
+- **Auto-merge**: `aidevo rules merge` resolves git conflicts by taking the union
+- **Similarity detection**: `aidevo rules dedupe` finds near-duplicate rules via Jaccard similarity
 - **Category system**: `component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`
 
-Rules are automatically rebuilt on every `aidevos start` and every rule sedimentation.
+Rules are automatically rebuilt on every `aidevo start` and every rule sedimentation.
 
 ## CLI Reference
 
 | Command | Description |
 |---------|-------------|
-| `aidevos init` | Interactive project setup (choose AI tool, select optional skills) |
-| `aidevos start` | Create a new development run for current branch |
-| `aidevos status` | Show current run status in terminal |
-| `aidevos log <sub>` | Write structured data to run.json (12 subcommands) |
-| `aidevos dashboard` | Launch real-time visualization dashboard |
-| `aidevos rules <sub>` | Manage rules registry (`build`, `dedupe`, `merge`, `list`) |
-| `aidevos reindex` | Rebuild project-level index from all runs |
-| `aidevos report` | Generate markdown performance report (`--scope me/team`) |
-| `aidevos update` | Update all skills to latest version |
-| `aidevos migrate` | Migrate old run.json format to current schema |
+| `aidevo init` | Interactive project setup: mode selection (data collection / full workflow), multi-tool support |
+| `aidevo start` | Create a new development run for current branch |
+| `aidevo status` | Show current run status in terminal |
+| `aidevo log <sub>` | Write structured data to run.json (12 subcommands) |
+| `aidevo dashboard` | Launch real-time visualization dashboard |
+| `aidevo mcp` | Start the MCP server (used in MCP config, not called directly) |
+| `aidevo rules <sub>` | Manage rules registry (`build`, `dedupe`, `merge`, `list`) |
+| `aidevo reindex` | Rebuild project-level index from all runs |
+| `aidevo report` | Generate markdown performance report (`--scope me/team`) |
+| `aidevo update` | Update all skills to latest version |
+| `aidevo migrate` | Migrate old run.json format to current schema |
 
-### `aidevos log` Subcommands
+### `aidevo log` Subcommands
 
 ```bash
-aidevos log task --title "Create API layer" --stage "Infrastructure" --prd-phase "PRD1"
-aidevos log task-start --id TASK-01
-aidevos log task-done --id TASK-01
-aidevos log bug --title "Type mismatch" --severity high --source self-review
-aidevos log bug-fix --id BUG-01 --fix "Fixed response type"
-aidevos log deviation --title "Wrong component" --root-cause rule-missing --category component-usage
-aidevos log review --task-id TASK-01 --result pass --scope "src/api/"
-aidevos log rule --content "Use Drawer for detail views" --category component
-aidevos log file --path "src/api/user.ts" --change-type modified --lines-added 50
-aidevos log cost --tokens 125000 --stage "requirement-analysis"
-aidevos log highlight --content "FCP reduced from 3.2s to 0.8s"
+aidevo log task --title "Create API layer" --stage "Infrastructure" --prd-phase "PRD1"
+aidevo log task-start --id TASK-01
+aidevo log task-done --id TASK-01
+aidevo log bug --title "Type mismatch" --severity high --source self-review
+aidevo log bug-fix --id BUG-01 --fix "Fixed response type"
+aidevo log deviation --title "Wrong component" --root-cause rule-missing --category component-usage
+aidevo log review --task-id TASK-01 --result pass --scope "src/api/"
+aidevo log rule --content "Use Drawer for detail views" --category component
+aidevo log file --path "src/api/user.ts" --change-type modified --lines-added 50
+aidevo log cost --tokens 125000 --stage "requirement-analysis"
+aidevo log highlight --content "FCP reduced from 3.2s to 0.8s"
 ```
 
 All writes are validated against the schema. Invalid enum values or missing required fields are rejected with clear error messages.
@@ -262,6 +367,9 @@ All writes are validated against the schema. Invalid enum values or missing requ
 
 ```
 your-project/
+├── .mcp.json                       # MCP server config (Claude Code)
+├── .cursor/mcp.json                # MCP server config (Cursor)
+├── .vscode/mcp.json                # MCP server config (VS Code Copilot)
 ├── .aidevos/
 │   ├── config.json              # Project configuration
 │   ├── rules.json               # Rules registry (source of truth)
@@ -285,8 +393,9 @@ your-project/
 npm test
 ```
 
-71 tests across 4 test suites:
+82 tests across 5 test suites:
 
+- **`mcp-server.test`** — MCP protocol, all 9 tools, prompts, lazy init, end-to-end data verification
 - **`rules.test`** — Fingerprint dedup, registry CRUD, view generation, merge, similarity detection
 - **`cli-log.test`** — All 12 log subcommands, enum validation, metrics calculation, requirement.json sync
 - **`cli-start.test`** — run.json structure integrity, schema alignment, gitignore management
@@ -295,6 +404,7 @@ npm test
 ## Tech Stack
 
 - **CLI**: Node.js + TypeScript (zero runtime dependencies)
+- **MCP Server**: Model Context Protocol over stdio
 - **Dashboard**: React 19 + ECharts + Tailwind CSS 4
 - **Data**: JSON files (no database required)
 - **Real-time**: Server-Sent Events (SSE)

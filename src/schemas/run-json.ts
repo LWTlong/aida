@@ -163,6 +163,12 @@ export interface RunCost {
   estimatedManualHours?: number
   actualHours?: number
   tokenBreakdown?: { stage: string; tokens: number }[]
+  tokenDetail?: {
+    inputTokens: number
+    outputTokens: number
+    cacheCreationTokens: number
+    cacheReadTokens: number
+  }
 }
 
 export interface HighlightItem {

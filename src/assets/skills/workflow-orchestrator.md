@@ -38,27 +38,29 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
 0. **初始化与需求接入：**
 
    **a) 检测并转换 PRD 文档：**
-   - 检查**分支目录**下是否存在 `prd.md` 或 `prd.docx`。
-   - 如果存在 `.docx` 文件且无对应 `.md`，先触发 `docx-to-markdown` 转换。
+   - 扫描**分支目录**和**开发者目录**下的所有 `.docx` 和 `.md` 文件（不限文件名）。
+   - 常见命名：`prd.md`、`PRD4.docx`、`需求文档.docx`、`【MTR-XXX】功能设计.docx` 等，**任何文件名都应识别**。
+   - 如果发现 `.docx` 文件且无同名 `.md`，先触发 `docx-to-markdown` 转换。
+   - 将所有 PRD 相关文档内容合并写入或追加到 `prd.md`（分支目录共享）。
+   - **注意**：文档应放在**分支目录**下（共享层级），不要求用户移动到开发者目录。
 
-   **b) 检测并转换接口文档（可选，后续追加）：**
-   - 检查分支目录下是否存在接口文档（支持多种命名）：
-     - `api.md` / `api.docx`
-     - `interface.md` / `interface.docx`
-     - `接口文档.md` / `接口文档.docx`
-     - 或其他包含 "api"、"interface"、"接口" 关键词的文档
-   - 如果发现 `.docx` 格式，自动转换为 `.md`
-   - 接口文档为可选项，有则读取，无则跳过
+   **b) 检测并转换接口文档（可选）：**
+   - 扫描分支目录下包含 "api"、"interface"、"接口"、"设计" 关键词的文档。
+   - 如果发现 `.docx` 格式，自动转换为 `.md`。
+   - 接口文档为可选项，有则读取，无则跳过。
 
-   **c) 初始化 PRD 阶段：**
-   - 检查 `run.json.meta.prdPhases` 是否为空：
-     - 如果为空，从 `prd.md` 内容中识别PRD阶段（如 "PRD1"、"PRD2"等），更新到 `meta.prdPhases[]`
+   **c) 初始化或追加 PRD 阶段：**
+   - 读取 `run.json.meta.prdPhases`：
+     - 如果为空，从 `prd.md` 内容中识别 PRD 阶段（如 "PRD1"、"PRD2"等），写入 `meta.prdPhases[]`
+     - 如果已有阶段，检查是否有**新增 PRD 文档**尚未纳入阶段列表：
+       - 发现新文档 → 识别新的 PRD 阶段编号（如已有 PRD1-3，新文档为 PRD4），追加到 `meta.prdPhases[]`
+       - **如果 `run.json.meta.status === "completed"`**，将其改为 `"running"`，重新开启工作流
      - 更新 `summary.prdPhaseCount` 为 `meta.prdPhases.length`
 
    **d) 判断是否需要重新分析：**
-   - 比对 `prd.md` 与现有 `analysis.md`。
-     - 如果有新增内容 -> 触发执行 `requirement-analyzer`（生成新的或增补分析）。
-     - 如果没有新增内容 -> 跳过分析，直接读取 `run.json` 中的 `context` 恢复上次的进度状态。
+   - 比对当前所有 PRD 文档内容与现有 `analysis.md`。
+     - 如果有新增内容（新 PRD 阶段、新文档）→ 触发 `requirement-analyzer`（增量分析，保留已有分析内容）。
+     - 如果没有新增内容 → 跳过分析，直接读取 `run.json.context` 恢复上次进度。
 
    **必须执行的数据写入：**
    - 更新 `run.json.workflow[]` 添加/更新当前阶段：
@@ -113,8 +115,11 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
    - 用户确认需求理解无误后，加载上下文 (`run.json.context`)。
    - 读取 `run.json` 中的 `context` 字段。如果是空或全新的需求，初始化流程起点。
    - 判断当前 run_id 是否存在并有未完成的任务（检查 `run.json.tasks[]`）。
-   - 如果 `run.json.meta.status === "completed"` -> 提示工作流已闭环结束。
-   - 当 `analysis.md` 存在但 `run.json.tasks[]` 为空时，调用 `task-splitter`，将生成的任务写入 `run.json.tasks[]`。
+   - 如果 `run.json.meta.status === "completed"`：
+     - 检查是否在 Step 0 中发现了**新的 PRD 文档/阶段**。
+     - 如果有新阶段 → status 已在 Step 0c 中改为 `"running"`，继续执行。
+     - 如果没有新内容 → 提示工作流已闭环结束，询问用户是否有新的 PRD 文档需要处理。
+   - 当 `analysis.md` 存在但 `run.json.tasks[]` 为空或当前 PRD 阶段无任务时，调用 `task-splitter`，将生成的任务写入 `run.json.tasks[]`。
    - **task-splitter 只为当前开发者认领的模块拆分任务**（从 requirement.json.modules 读取 assignee）。
    - 任务拆分完成后**可以**暂停让用户核查（可选，优先级低于需求确认），也可以直接进入执行循环。
 
@@ -131,12 +136,12 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
 3. **核心执行循环 (代码生成 + 质量自检)：**
 
    - 一旦任务被确认，开始循环执行：
-     - **Step A:** 触发 `code-generator`，先调用 `aidevos log task-start --id TASK-XX` 记录开始时间，再读取 `run.json.tasks[]` 开始编写该任务。
-     - **Step B:** `code-generator` 完成后通过 `aidevos log file` 记录文件变更，再通过 `aidevos log task-done --id TASK-XX` 标记任务完成。
+     - **Step A:** 触发 `code-generator`，先调用 `aidevo log task-start --id TASK-XX` 记录开始时间，再读取 `run.json.tasks[]` 开始编写该任务。
+     - **Step B:** `code-generator` 完成后通过 `aidevo log file` 记录文件变更，再通过 `aidevo log task-done --id TASK-XX` 标记任务完成。
      - **Step C:** 立即触发 `self-reviewer` 进行质量查验。
      - **Step D:**
        - 如查验**未通过**：触发 `bug-fixer` 根据 review 结果进行专项修复代码，然后回到 Step C。
-       - 如查验**通过**：通过 `aidevos log review` 记录审查结果。
+       - 如查验**通过**：通过 `aidevo log review` 记录审查结果。
        - 如人工指定需高阶审计：转 `mcp-reviewer`（脱离主循环）。
 
 4. **保存进度与状态更新：**
@@ -171,8 +176,8 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
        2. [从任务/PRD 推断的亮点]
      请补充业务价值数据（如性能指标、成本节省等），输入 ok 跳过：
      ```
-   - 用户补充或确认后，通过 `aidevos log highlight --content "..." --source auto` 写入
-   - 用户手动补充的通过 `aidevos log highlight --content "..." --source manual` 写入
+   - 用户补充或确认后，通过 `aidevo log highlight --content "..." --source auto` 写入
+   - 用户手动补充的通过 `aidevo log highlight --content "..." --source manual` 写入
 
 ## 关于中断恢复
 
@@ -182,10 +187,10 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
 
 - **执行状态**：`run.json.context`（currentStage, currentTaskId, currentPrdPhase）
 - **开发工单**：`run.json.tasks[]`（每个任务含 taskId, title, status, stageName, startedAt, completedAt）
-- **Bug 记录**：`run.json.bugs[]`（通过 `aidevos log bug` / `aidevos log bug-fix` 写入）
-- **质量自检**：`run.json.reviews[]`（通过 `aidevos log review` 写入）
-- **偏差记录**：`run.json.deviations[]`（通过 `aidevos log deviation` 写入，用户手动触发）
-- **规则沉淀**：`run.json.rules[]`（通过 `aidevos log rule` 写入）
+- **Bug 记录**：`run.json.bugs[]`（通过 `aidevo log bug` / `aidevo log bug-fix` 写入）
+- **质量自检**：`run.json.reviews[]`（通过 `aidevo log review` 写入）
+- **偏差记录**：`run.json.deviations[]`（通过 `aidevo log deviation` 写入，用户手动触发）
+- **规则沉淀**：`run.json.rules[]`（通过 `aidevo log rule` 写入）
 - **工作流阶段**：`run.json.workflow[]`（记录各阶段执行状态和耗时）
 - **时间线**：`run.json.timeline[]`（记录关键事件时间点）
 - **文件变更**：`run.json.files[]`（记录修改过的文件路径和统计）

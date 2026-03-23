@@ -1,7 +1,4 @@
-import { resolve } from 'node:path';
-import { getBranchName, getDevName, isGitRepo } from '../../utils/git.js';
-import { runDir, configPath, requirementPath, branchDir } from '../../utils/paths.js';
-import { fileExists, readJson, writeJson, ensureDir } from '../../utils/fs.js';
+import { getBranchName, getDevName } from '../../utils/git.js';
 import { green, cyan, red, yellow } from '../../utils/display.js';
 import type {
   RunData,
@@ -12,8 +9,6 @@ import type {
   RuleItem,
   FileItem,
   HighlightItem,
-  RequirementData,
-  DeveloperSummary,
 } from '../../schemas/run-json.js';
 import { addRule, buildRuleViews } from '../../utils/rules.js';
 import {
@@ -25,38 +20,25 @@ import {
   CHANGE_TYPE_VALUES,
   RULE_CATEGORIES,
 } from '../../schemas/run-json.js';
+import {
+  now,
+  nextId,
+  addEvent,
+  addTimeline,
+  saveRunData,
+  loadRunJson,
+} from '../../utils/run-data.js';
 
 // ─── Helpers ──────────────────────────────────────────────
 
 function getRunJson(): { path: string; data: RunData } | null {
   const projectRoot = process.cwd();
-  if (!fileExists(configPath(projectRoot))) {
-    console.log(red('\n  AIDevOS not initialized. Run `npx aidevos init` first.\n'));
+  const result = loadRunJson(projectRoot);
+  if (!result) {
+    console.log(red('\n  No active run. Run `aidevo start` or configure MCP first.\n'));
     return null;
   }
-  if (!isGitRepo()) {
-    console.log(red('\n  Not a git repository.\n'));
-    return null;
-  }
-  const branch = getBranchName();
-  const dev = getDevName();
-  const dir = runDir(projectRoot, branch, dev);
-  const p = resolve(dir, 'run.json');
-  if (!fileExists(p)) {
-    console.log(red('\n  No active run. Run `aidevos start` first.\n'));
-    return null;
-  }
-  const data = readJson<RunData>(p);
-  // Normalize arrays
-  for (const key of ['tasks', 'bugs', 'deviations', 'reviews', 'rules', 'files', 'timeline', 'events', 'workflow', 'highlights']) {
-    if (!Array.isArray((data as any)[key])) (data as any)[key] = [];
-  }
-  if (!data.summary) data.summary = {} as any;
-  if (!data.meta) data.meta = {} as any;
-  if (!data.context) data.context = {};
-  if (!data.metrics) data.metrics = {};
-  if (!data.cost) data.cost = {};
-  return { path: p, data };
+  return result;
 }
 
 function parseFlags(args: string[]): Record<string, string> {
@@ -70,241 +52,8 @@ function parseFlags(args: string[]): Record<string, string> {
   return flags;
 }
 
-function nextId(arr: any[], prefix: string): string {
-  const nums = arr
-    .map((item: any) => {
-      const id: string = item.taskId || item.bugId || item.deviationId || item.reviewId || item.ruleId || '';
-      const match = id.match(new RegExp(`^${prefix}-(\\d+)$`));
-      return match ? parseInt(match[1]) : 0;
-    })
-    .filter((n: number) => n > 0);
-  const max = nums.length > 0 ? Math.max(...nums) : 0;
-  const pad = prefix === 'RULE' ? 3 : 2;
-  return `${prefix}-${String(max + 1).padStart(pad, '0')}`;
-}
-
-function now(): string {
-  return new Date().toISOString();
-}
-
-function loadConfig(): Record<string, any> {
-  try {
-    const cfgPath = configPath(process.cwd());
-    if (fileExists(cfgPath)) return readJson<Record<string, any>>(cfgPath);
-  } catch { /* ignore */ }
-  return {};
-}
-
-function recalcMetrics(data: RunData): void {
-  const s = data.summary;
-  const m = data.metrics;
-  const totalTasks = s.totalTasks || 0;
-  const reviewCount = s.reviewCount || 0;
-
-  m.aiDeviationRate = totalTasks > 0 ? Math.round((s.deviationCount || 0) / totalTasks * 100 * 100) / 100 : 0;
-  m.bugRate = totalTasks > 0 ? Math.round((s.bugCount || 0) / totalTasks * 100 * 100) / 100 : 0;
-  m.reviewPassRate = reviewCount > 0 ? Math.round((s.reviewPassCount || 0) / reviewCount * 100 * 100) / 100 : 0;
-  m.rulesSedimentedCount = s.rulesSedimented || 0;
-
-  const totalLines = (s.linesAdded || 0) + (s.linesRemoved || 0);
-  m.averageLinesPerTask = totalTasks > 0 ? Math.round(totalLines / totalTasks) : 0;
-
-  // Wall clock time (reference only)
-  if (data.meta?.startTime) {
-    const elapsed = (Date.now() - new Date(data.meta.startTime).getTime()) / 1000;
-    m.totalDevelopmentTimeSeconds = Math.round(elapsed);
-    const hours = elapsed / 3600;
-    m.developmentVelocity = hours > 0 ? Math.round((s.completedTasks || 0) / hours * 100) / 100 : 0;
-  }
-
-  // Actual work time: sum of all node durations
-  const nodeTimes: Record<string, number> = {};
-
-  // Workflow stage durations (requirement analysis, task splitting, etc.)
-  for (const w of data.workflow) {
-    if (w.startTime && w.endTime) {
-      const sec = (new Date(w.endTime).getTime() - new Date(w.startTime).getTime()) / 1000;
-      if (sec > 0) {
-        nodeTimes[w.stage] = (nodeTimes[w.stage] || 0) + sec;
-      }
-    }
-  }
-
-  // Code generation: sum of task execution times
-  let codeGenTotal = 0;
-  for (const t of data.tasks) {
-    if (t.startedAt && t.completedAt) {
-      const sec = (new Date(t.completedAt).getTime() - new Date(t.startedAt).getTime()) / 1000;
-      if (sec > 0) codeGenTotal += sec;
-    }
-  }
-  if (codeGenTotal > 0) nodeTimes['代码生成'] = codeGenTotal;
-
-  // Bug fix durations
-  let bugFixTotal = 0;
-  for (const b of data.bugs) {
-    if (b.reportedAt && b.fixedAt) {
-      const sec = (new Date(b.fixedAt).getTime() - new Date(b.reportedAt).getTime()) / 1000;
-      if (sec > 0) bugFixTotal += sec;
-    }
-  }
-  if (bugFixTotal > 0) nodeTimes['Bug修复'] = bugFixTotal;
-
-  // Deviation fix durations
-  let devFixTotal = 0;
-  for (const d of data.deviations) {
-    if (d.detectedAt && d.fixedAt) {
-      const sec = (new Date(d.fixedAt).getTime() - new Date(d.detectedAt).getTime()) / 1000;
-      if (sec > 0) devFixTotal += sec;
-    }
-  }
-  if (devFixTotal > 0) nodeTimes['偏差修复'] = devFixTotal;
-
-  m.nodeTimeBreakdown = nodeTimes;
-  m.actualWorkSeconds = Math.round(Object.values(nodeTimes).reduce((a, b) => a + b, 0));
-
-  // Efficiency multiplier
-  const actualHours = (m.actualWorkSeconds || 0) / 3600;
-  if (data.cost?.estimatedManualHours && actualHours > 0) {
-    m.efficiencyMultiplier = Math.round(data.cost.estimatedManualHours / actualHours * 10) / 10;
-  }
-
-  // ROI calculation
-  // tokenPricePer1M and hourlyRate come from config.json
-  const config = loadConfig();
-  const tokenPricePer1M = config.tokenPricePer1M || 0;   // e.g. 15 means $15/1M tokens
-  const hourlyRate = config.hourlyRate || 0;               // e.g. 50 means $50/hour
-
-  const totalTokens = data.cost?.totalTokens || 0;
-  const estimatedManualHours = data.cost?.estimatedManualHours || 0;
-
-  if (totalTokens > 0 && tokenPricePer1M > 0) {
-    m.tokenCost = Math.round(totalTokens / 1000000 * tokenPricePer1M * 100) / 100;
-  }
-
-  if (estimatedManualHours > 0 && actualHours > 0) {
-    m.hoursSaved = Math.round((estimatedManualHours - actualHours) * 10) / 10;
-  }
-
-  if (m.hoursSaved && hourlyRate > 0) {
-    m.moneySaved = Math.round(m.hoursSaved * hourlyRate * 100) / 100;
-  }
-
-  if (m.moneySaved && m.tokenCost && m.tokenCost > 0) {
-    m.roi = Math.round((m.moneySaved - m.tokenCost) / m.tokenCost * 100 * 100) / 100;
-  }
-}
-
 function save(path: string, data: RunData): void {
-  data.context.lastUpdated = now();
-  recalcMetrics(data);
-  writeJson(path, data);
-  updateRequirement(data);
-}
-
-function updateRequirement(data: RunData): void {
-  try {
-    const projectRoot = process.cwd();
-    const branch = data.meta?.branch;
-    if (!branch) return;
-
-    const reqPath = requirementPath(projectRoot, branch);
-    const bDir = branchDir(projectRoot, branch);
-    ensureDir(bDir);
-
-    let req: RequirementData;
-    if (fileExists(reqPath)) {
-      req = readJson<RequirementData>(reqPath);
-    } else {
-      req = {
-        branch,
-        title: '',
-        summary: '',
-        prdPhases: [],
-        modules: [],
-        highlights: [],
-        developers: [],
-        totals: { tasks: 0, completedTasks: 0, bugs: 0, deviations: 0, linesAdded: 0, linesRemoved: 0, totalTokens: 0 },
-        createdAt: now(),
-        updatedAt: '',
-      };
-    }
-
-    // Update this developer's summary
-    const devName = data.meta?.developer || '';
-    if (!devName) return;
-
-    const s = data.summary || {};
-    const m = data.metrics || {};
-    const reviewCount = s.reviewCount || 0;
-    const reviewPassCount = s.reviewPassCount || 0;
-
-    const devSummary: DeveloperSummary = {
-      name: devName,
-      modules: [],
-      tasks: s.totalTasks || 0,
-      completedTasks: s.completedTasks || 0,
-      bugs: s.bugCount || 0,
-      deviations: s.deviationCount || 0,
-      linesAdded: s.linesAdded || 0,
-      linesRemoved: s.linesRemoved || 0,
-      firstPassRate: reviewCount > 0 ? Math.round(reviewPassCount / reviewCount * 100) / 100 : 0,
-      actualWorkSeconds: m.actualWorkSeconds || 0,
-      totalTokens: data.cost?.totalTokens || 0,
-    };
-
-    // Populate modules from requirement.json assignments
-    const assignedModules = req.modules.filter(mod => mod.assignee === devName);
-    devSummary.modules = assignedModules.map(mod => mod.name);
-
-    // Upsert developer entry
-    const idx = req.developers.findIndex(d => d.name === devName);
-    if (idx >= 0) {
-      req.developers[idx] = devSummary;
-    } else {
-      req.developers.push(devSummary);
-    }
-
-    // Recalc totals from all developers
-    req.totals = {
-      tasks: req.developers.reduce((a, d) => a + d.tasks, 0),
-      completedTasks: req.developers.reduce((a, d) => a + d.completedTasks, 0),
-      bugs: req.developers.reduce((a, d) => a + d.bugs, 0),
-      deviations: req.developers.reduce((a, d) => a + d.deviations, 0),
-      linesAdded: req.developers.reduce((a, d) => a + d.linesAdded, 0),
-      linesRemoved: req.developers.reduce((a, d) => a + d.linesRemoved, 0),
-      totalTokens: req.developers.reduce((a, d) => a + d.totalTokens, 0),
-    };
-
-    // Merge highlights from run into requirement (dedup by content)
-    if (data.highlights?.length) {
-      const existingContents = new Set(req.highlights.map(h => h.content));
-      for (const h of data.highlights) {
-        if (!existingContents.has(h.content)) {
-          req.highlights.push(h);
-          existingContents.add(h.content);
-        }
-      }
-    }
-
-    // Sync status from meta
-    if (!req.title && data.meta?.branch) {
-      req.title = data.meta.branch;
-    }
-
-    req.updatedAt = now();
-    writeJson(reqPath, req);
-  } catch {
-    // Non-critical: don't block run.json writes
-  }
-}
-
-function addEvent(data: RunData, type: string, eventData: Record<string, any>): void {
-  data.events.push({ type, time: now(), data: eventData });
-}
-
-function addTimeline(data: RunData, type: string, title: string): void {
-  data.timeline.push({ type, title, timestamp: now() });
+  saveRunData(path, data, process.cwd());
 }
 
 // ─── Validators ────────────────────────────────────────────
@@ -697,7 +446,7 @@ export async function log(): Promise<void> {
       return logHighlight(flags);
     default:
       console.log(`
-  ${cyan('aidevos log')} - Write structured data to run.json
+  ${cyan('aidevo log')} - Write structured data to run.json
 
   Subcommands:
     task          Add a new task
@@ -713,18 +462,18 @@ export async function log(): Promise<void> {
     highlight     Record a business value highlight
 
   Examples:
-    aidevos log task --title "Create API layer" --stage "Infrastructure"
-    aidevos log task-start --id TASK-01
-    aidevos log task-done --id TASK-01
-    aidevos log bug --title "Type mismatch" --severity high --source self-review
-    aidevos log bug-fix --id BUG-01 --fix "Fixed response type"
-    aidevos log deviation --title "Wrong component" --root-cause rule-missing --category component-usage
-    aidevos log review --task-id TASK-01 --result pass --scope "src/api/"
-    aidevos log rule --content "Use Drawer for detail views" --category component --source-deviation DEV-01 --status pending
-    aidevos log file --path "src/api/user.ts" --change-type modified --lines-added 50
-    aidevos log cost --tokens 125000 --stage "requirement-analysis"
-    aidevos log cost --estimated-hours 40 --actual-hours 18
-    aidevos log highlight --content "FCP reduced from 3.2s to 0.8s"
+    aidevo log task --title "Create API layer" --stage "Infrastructure"
+    aidevo log task-start --id TASK-01
+    aidevo log task-done --id TASK-01
+    aidevo log bug --title "Type mismatch" --severity high --source self-review
+    aidevo log bug-fix --id BUG-01 --fix "Fixed response type"
+    aidevo log deviation --title "Wrong component" --root-cause rule-missing --category component-usage
+    aidevo log review --task-id TASK-01 --result pass --scope "src/api/"
+    aidevo log rule --content "Use Drawer for detail views" --category component --source-deviation DEV-01 --status pending
+    aidevo log file --path "src/api/user.ts" --change-type modified --lines-added 50
+    aidevo log cost --tokens 125000 --stage "requirement-analysis"
+    aidevo log cost --estimated-hours 40 --actual-hours 18
+    aidevo log highlight --content "FCP reduced from 3.2s to 0.8s"
 `);
   }
 }

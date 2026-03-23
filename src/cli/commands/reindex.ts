@@ -86,13 +86,13 @@ export function buildIndex(projectRoot: string): number {
 }
 
 /**
- * CLI entry point for `aidevos reindex`
+ * CLI entry point for `aidevo reindex`
  */
 export async function reindex(): Promise<void> {
   const projectRoot = process.cwd();
 
   if (!fileExists(configPath(projectRoot))) {
-    console.log(red('\n  AIDevOS not initialized. Run `npx aidevos init` first.\n'));
+    console.log(red('\n  AIDevOS not initialized. Run `npx aidevo init` first.\n'));
     return;
   }
 
