@@ -46,10 +46,29 @@ export function TaskChart({ tasks, prdPhases, cost }: Props) {
   }
 
   // Build per-stage token map from tokenBreakdown
+  // tokenBreakdown entries are "task:TASK-01" format — map to stageName via tasks
   const stageTokens: Record<string, number> = {}
   if (cost?.tokenBreakdown) {
+    const taskStageMap: Record<string, string> = {}
+    for (const t of tasks) {
+      taskStageMap[t.taskId] = t.stageName || '未分类'
+    }
     for (const item of cost.tokenBreakdown) {
-      stageTokens[item.stage] = (stageTokens[item.stage] || 0) + item.tokens
+      if (item.stage.startsWith('task:')) {
+        const taskId = item.stage.replace('task:', '')
+        const stage = taskStageMap[taskId] || item.stage
+        stageTokens[stage] = (stageTokens[stage] || 0) + item.tokens
+      }
+    }
+  }
+  // Also check per-task tokensConsumed
+  if (Object.keys(stageTokens).length === 0) {
+    for (const t of tasks) {
+      const consumed = (t as any).tokensConsumed || 0
+      if (consumed > 0) {
+        const stage = t.stageName || '未分类'
+        stageTokens[stage] = (stageTokens[stage] || 0) + consumed
+      }
     }
   }
 

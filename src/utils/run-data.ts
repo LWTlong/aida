@@ -123,14 +123,23 @@ export function recalcMetrics(data: RunData, projectRoot?: string): void {
 
   // ROI calculation
   const config = projectRoot ? loadConfig(projectRoot) : {};
-  const tokenPricePer1M = config.tokenPricePer1M || 0;
   const hourlyRate = config.hourlyRate || 0;
   const totalTokens = data.cost?.totalTokens || 0;
   const estimatedManualHours = data.cost?.estimatedManualHours || 0;
+  const detail = (data.cost as any)?.tokenDetail;
 
-  if (totalTokens > 0 && tokenPricePer1M > 0) {
-    m.tokenCost = Math.round(totalTokens / 1000000 * tokenPricePer1M * 100) / 100;
+  // Calculate tokenCost: prefer tokenDetail with real pricing, fallback to config flat rate
+  if (detail && (detail.inputTokens || detail.outputTokens || detail.cacheCreationTokens || detail.cacheReadTokens)) {
+    // Claude pricing (per 1M tokens): input $3, output $15, cache creation $3.75, cache read $0.30
+    const inputCost = (detail.inputTokens || 0) / 1_000_000 * 3;
+    const outputCost = (detail.outputTokens || 0) / 1_000_000 * 15;
+    const cacheCreateCost = (detail.cacheCreationTokens || 0) / 1_000_000 * 3.75;
+    const cacheReadCost = (detail.cacheReadTokens || 0) / 1_000_000 * 0.30;
+    m.tokenCost = Math.round((inputCost + outputCost + cacheCreateCost + cacheReadCost) * 100) / 100;
+  } else if (totalTokens > 0 && config.tokenPricePer1M) {
+    m.tokenCost = Math.round(totalTokens / 1_000_000 * config.tokenPricePer1M * 100) / 100;
   }
+
   if (estimatedManualHours > 0 && actualHours > 0) {
     m.hoursSaved = Math.round((estimatedManualHours - actualHours) * 10) / 10;
   }

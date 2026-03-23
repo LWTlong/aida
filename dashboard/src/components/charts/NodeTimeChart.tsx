@@ -1,10 +1,12 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
-import type { RunMetrics, RunCost } from '../../types'
+import type { RunMetrics, RunCost, TaskItem, BugItem } from '../../types'
 
 interface Props {
   metrics: RunMetrics
   cost?: RunCost
+  tasks?: TaskItem[]
+  bugs?: BugItem[]
 }
 
 const nodeLabels: Record<string, string> = {
@@ -30,19 +32,44 @@ function formatTokens(n: number): string {
   return `${n}`
 }
 
-export function NodeTimeChart({ metrics, cost }: Props) {
+export function NodeTimeChart({ metrics, cost, tasks, bugs }: Props) {
   const breakdown = metrics.nodeTimeBreakdown
   if (!breakdown || Object.keys(breakdown).length === 0) {
     return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无节点耗时数据</div>
   }
 
-  // Build token map from tokenBreakdown
+  // Build node-level token map from tokenBreakdown
+  // tokenBreakdown entries are like "task:TASK-01" or "bugfix:BUG-01"
+  // We aggregate task tokens into "Code Generation" and bugfix tokens into "Bug Fix"
   const tokenMap: Record<string, number> = {}
   if (cost?.tokenBreakdown) {
     for (const item of cost.tokenBreakdown) {
-      tokenMap[item.stage] = (tokenMap[item.stage] || 0) + item.tokens
+      if (item.stage.startsWith('task:')) {
+        tokenMap['Code Generation'] = (tokenMap['Code Generation'] || 0) + item.tokens
+      } else if (item.stage.startsWith('bugfix:')) {
+        tokenMap['Bug Fix'] = (tokenMap['Bug Fix'] || 0) + item.tokens
+      } else {
+        tokenMap[item.stage] = (tokenMap[item.stage] || 0) + item.tokens
+      }
     }
   }
+
+  // Also check per-task tokensConsumed (set by MCP server)
+  if (tasks && Object.keys(tokenMap).length === 0) {
+    let taskTokenTotal = 0
+    for (const t of tasks) {
+      taskTokenTotal += (t as any).tokensConsumed || 0
+    }
+    if (taskTokenTotal > 0) tokenMap['Code Generation'] = taskTokenTotal
+    if (bugs) {
+      let bugTokenTotal = 0
+      for (const b of bugs) {
+        bugTokenTotal += (b as any).tokensConsumed || 0
+      }
+      if (bugTokenTotal > 0) tokenMap['Bug Fix'] = bugTokenTotal
+    }
+  }
+
   const hasTokens = Object.keys(tokenMap).length > 0
   const totalTokens = cost?.totalTokens || 0
 
