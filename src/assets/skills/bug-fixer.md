@@ -39,10 +39,10 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
    - 执行以下命令记录 Bug 和修复：
    ```bash
    # 记录 Bug
-   aidevo log bug --title "Bug简述" --severity high --source self-review --task TASK-XX --files "file1.ts,file2.ts"
+   aida log bug --title "Bug简述" --severity high --source self-review --task TASK-XX --files "file1.ts,file2.ts"
    # 修复后标记
-   aidevo log bug-fix --id BUG-XX --fix "修复方案描述"
+   aida log bug-fix --id BUG-XX --fix "修复方案描述"
    # 记录修改的文件
-   aidevo log file --path "修改的文件路径" --change-type modified --lines-added XX --lines-removed XX
+   aida log file --path "修改的文件路径" --change-type modified --lines-added XX --lines-removed XX
    ```
    CLI 会自动更新 summary 统计和 timeline。

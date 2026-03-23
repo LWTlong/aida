@@ -53,7 +53,7 @@ async function rulesDedupe(): Promise<void> {
 
   console.log(
     dim('  To resolve: manually edit .aidevos/rules.json,') +
-    dim(' then run `aidevo rules build`.\n'),
+    dim(' then run `aida rules build`.\n'),
   );
 }
 
@@ -143,7 +143,7 @@ export async function rules(): Promise<void> {
   const projectRoot = process.cwd();
 
   if (!fileExists(configPath(projectRoot))) {
-    console.log(red('\n  AIDevOS not initialized. Run `npx aidevo init` first.\n'));
+    console.log(red('\n  AIDA not initialized. Run `npx aida init` first.\n'));
     return;
   }
 
@@ -161,7 +161,7 @@ export async function rules(): Promise<void> {
       return rulesList();
     default:
       console.log(`
-  ${cyan('aidevo rules')} - Manage project rules registry
+  ${cyan('aida rules')} - Manage project rules registry
 
   Subcommands:
     build     Rebuild .aidevos/rules/*.md views from rules.json

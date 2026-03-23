@@ -1,5 +1,5 @@
 /**
- * AIDevOS MCP Server
+ * AIDA MCP Server
  *
  * Implements MCP (Model Context Protocol) over stdio using JSON-RPC 2.0.
  * Zero dependencies — raw stdin/stdout processing.
@@ -571,7 +571,7 @@ function handleRequest(req: JsonRpcRequest): void {
           prompts: {},
         },
         serverInfo: {
-          name: 'aidevos',
+          name: 'aida',
           version: '1.0.0',
         },
       });

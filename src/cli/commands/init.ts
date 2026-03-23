@@ -59,8 +59,8 @@ type AiToolChoice = 'claude-code' | 'cursor' | 'vscode-copilot' | 'windsurf';
 
 const MCP_CONFIG_JSON = JSON.stringify({
   mcpServers: {
-    aidevo: {
-      command: 'aidevo',
+    aida: {
+      command: 'aida',
       args: ['mcp'],
     },
   },
@@ -77,9 +77,9 @@ function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
           // Merge into existing
           try {
             const existing = JSON.parse(readText(mcpPath));
-            if (!existing.mcpServers?.aidevo) {
+            if (!existing.mcpServers?.aida) {
               existing.mcpServers = existing.mcpServers || {};
-              existing.mcpServers.aidevo = { command: 'aidevo', args: ['mcp'] };
+              existing.mcpServers.aida = { command: 'aida', args: ['mcp'] };
               writeText(mcpPath, JSON.stringify(existing, null, 2) + '\n');
               written.push('.mcp.json');
             }
@@ -101,9 +101,9 @@ function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
         if (fileExists(mcpPath)) {
           try {
             const existing = JSON.parse(readText(mcpPath));
-            if (!existing.mcpServers?.aidevo) {
+            if (!existing.mcpServers?.aida) {
               existing.mcpServers = existing.mcpServers || {};
-              existing.mcpServers.aidevo = { command: 'aidevo', args: ['mcp'] };
+              existing.mcpServers.aida = { command: 'aida', args: ['mcp'] };
               writeText(mcpPath, JSON.stringify(existing, null, 2) + '\n');
               written.push('.cursor/mcp.json');
             }
@@ -124,9 +124,9 @@ function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
         if (fileExists(mcpPath)) {
           try {
             const existing = JSON.parse(readText(mcpPath));
-            if (!existing.mcpServers?.aidevo) {
+            if (!existing.mcpServers?.aida) {
               existing.mcpServers = existing.mcpServers || {};
-              existing.mcpServers.aidevo = { command: 'aidevo', args: ['mcp'] };
+              existing.mcpServers.aida = { command: 'aida', args: ['mcp'] };
               writeText(mcpPath, JSON.stringify(existing, null, 2) + '\n');
               written.push('.vscode/mcp.json');
             }
@@ -157,12 +157,12 @@ export async function init(): Promise<void> {
   const projectRoot = process.cwd();
   const aidevos = resolve(projectRoot, '.aidevos');
 
-  console.log(`\n  ${bold('AIDevOS')} - AI Development Observability Platform\n`);
+  console.log(`\n  ${bold('AIDA')} - AI Development Observability Platform\n`);
 
   // Check if already initialized
   if (fileExists(resolve(aidevos, 'config.json'))) {
     console.log(
-      yellow('  AIDevOS is already initialized in this project.'),
+      yellow('  AIDA is already initialized in this project.'),
     );
     console.log(
       dim('  To reinitialize, delete the .aidevos directory first.\n'),
@@ -347,7 +347,7 @@ export async function init(): Promise<void> {
     MCP Server will auto-start when your AI tool loads.
     AI will silently collect data during development.
 
-    View data anytime: ${cyan('aidevo dashboard')}
+    View data anytime: ${cyan('aida dashboard')}
 `);
   } else {
     console.log(`
@@ -356,7 +356,7 @@ export async function init(): Promise<void> {
     1. Run ${cyan('/audit')} to generate project-specific rules
     2. Start coding — AI will auto-collect data via MCP
     3. Run ${cyan('/workflow')} for the full AI development loop
-    4. View data: ${cyan('aidevo dashboard')}
+    4. View data: ${cyan('aida dashboard')}
 `);
   }
 }

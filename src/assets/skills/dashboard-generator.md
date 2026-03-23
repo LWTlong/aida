@@ -1,12 +1,12 @@
 ---
 name: dashboard-generator
-description: 根据 run.json 数据自动生成/更新数据看板。现已由 `aidevo dashboard` CLI 命令替代（实时 Web Dashboard）。
+description: 根据 run.json 数据自动生成/更新数据看板。现已由 `aida dashboard` CLI 命令替代（实时 Web Dashboard）。
 globs: ['.aidevos/runs/*/*/run.json']
 ---
 
 # dashboard-generator (数据看板生成器)
 
-> **注意**：此 Skill 的功能已由 `aidevo dashboard` CLI 命令替代。CLI 命令启动本地 HTTP Server + SSE 实时推送，提供更好的可视化体验。以下文档保留作为参考。
+> **注意**：此 Skill 的功能已由 `aida dashboard` CLI 命令替代。CLI 命令启动本地 HTTP Server + SSE 实时推送，提供更好的可视化体验。以下文档保留作为参考。
 
 ## 角色
 

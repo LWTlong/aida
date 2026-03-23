@@ -28,7 +28,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
    - 如果所有任务 `status: "done"`，提示工作结束。
    - **立即执行**（记录任务开始时间，用于耗时统计）：
    ```bash
-   aidevo log task-start --id TASK-XX
+   aida log task-start --id TASK-XX
    ```
 
 2. **强制规则加载与参考文档读取：**
@@ -62,16 +62,16 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 
    **a) 记录所有文件变更（必须，不能遗漏）：**
    ```bash
-   aidevo log file --path "src/views/xxx.vue" --change-type modified --lines-added 50 --lines-removed 10
-   aidevo log file --path "src/api/yyy.ts" --change-type created --lines-added 30
+   aida log file --path "src/views/xxx.vue" --change-type modified --lines-added 50 --lines-removed 10
+   aida log file --path "src/api/yyy.ts" --change-type created --lines-added 30
    ```
-   - **对每个修改过的文件都必须执行一次** `aidevo log file`
+   - **对每个修改过的文件都必须执行一次** `aida log file`
    - `--change-type` 可选值：`created`（新建）、`modified`（修改）、`deleted`（删除）
    - `--lines-added` 和 `--lines-removed` 从 git diff 或编辑器统计获取
 
    **b) 标记任务完成：**
    ```bash
-   aidevo log task-done --id TASK-XX
+   aida log task-done --id TASK-XX
    ```
 
    CLI 会自动更新 summary.filesChanged、summary.linesAdded、timeline 和 files[] 数组。

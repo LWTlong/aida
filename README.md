@@ -1,6 +1,6 @@
 <div align="center">
 
-# AIDevo
+# AIDA
 
 ### AI Development Observability Platform
 
@@ -9,11 +9,11 @@
 AI writes more and more of your code — but what did it actually do?<br>
 How many tasks did it complete? How many bugs did it introduce? How often did it deviate from your architecture?
 
-AIDevOS gives you the answers.
+AIDA gives you the answers.
 
-[![npm version](https://img.shields.io/npm/v/aidevo?color=%230066ff&label=npm)](https://www.npmjs.com/package/aidevo)
+[![npm version](https://img.shields.io/npm/v/ai-dev-analytics?color=%230066ff&label=npm)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-os?color=%23333)](./LICENSE)
-[![node](https://img.shields.io/node/v/aidevo?color=%23339933)](https://nodejs.org)
+[![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#testing)
 
 [Quick Start](#quick-start) · [MCP Server](#mcp-server) · [How It Works](#how-it-works) · [Dashboard](#dashboard) · [Skills](#skills) · [CLI Reference](#cli-reference)
@@ -36,12 +36,12 @@ All that development process data? **Gone.** Every single session.
 
 ## The Solution
 
-AIDevOS works in **two modes** — pick the one that fits your workflow:
+AIDA works in **two modes** — pick the one that fits your workflow:
 
 | Mode | What you get | Setup effort |
 |------|-------------|--------------|
 | **Data Collection Only** (via MCP) | Full observability with zero workflow changes | Add one JSON config block |
-| **Full Workflow** (MCP + Skills + Commands) | Observability + structured AI SOPs + self-improving rules | `npm install` + `aidevo init` |
+| **Full Workflow** (MCP + Skills + Commands) | Observability + structured AI SOPs + self-improving rules | `npm install` + `aida init` |
 
 **Most teams start with data collection.** Your AI tool calls MCP tools automatically as it works — you change nothing about how you code. When you're ready for structured workflows, upgrade to full mode.
 
@@ -56,9 +56,9 @@ Add the MCP server config to your AI tool and start working. That's it.
 ```json
 {
   "mcpServers": {
-    "aidevo": {
+    "aida": {
       "command": "npx",
-      "args": ["-y", "aidevo", "mcp"]
+      "args": ["-y", "ai-dev-analytics", "mcp"]
     }
   }
 }
@@ -69,9 +69,9 @@ Add the MCP server config to your AI tool and start working. That's it.
 ```json
 {
   "mcpServers": {
-    "aidevo": {
+    "aida": {
       "command": "npx",
-      "args": ["-y", "aidevo", "mcp"]
+      "args": ["-y", "ai-dev-analytics", "mcp"]
     }
   }
 }
@@ -82,9 +82,9 @@ Add the MCP server config to your AI tool and start working. That's it.
 ```json
 {
   "servers": {
-    "aidevo": {
+    "aida": {
       "command": "npx",
-      "args": ["-y", "aidevo", "mcp"]
+      "args": ["-y", "ai-dev-analytics", "mcp"]
     }
   }
 }
@@ -95,20 +95,20 @@ Add the MCP server config to your AI tool and start working. That's it.
 ```json
 {
   "mcpServers": {
-    "aidevo": {
+    "aida": {
       "command": "npx",
-      "args": ["-y", "aidevo", "mcp"]
+      "args": ["-y", "ai-dev-analytics", "mcp"]
     }
   }
 }
 ```
 
-No `aidevo init` or `aidevo start` needed. The MCP server uses **lazy init** — it auto-creates `.aidevos/` and `run.json` on the first tool call.
+No `aida init` or `aida start` needed. The MCP server uses **lazy init** — it auto-creates `.aidevos/` and `run.json` on the first tool call.
 
 Then view your data:
 
 ```bash
-npx aidevo dashboard
+npx ai-dev-analytics dashboard
 ```
 
 Open `http://localhost:2375` — real-time dashboard with live updates.
@@ -117,25 +117,25 @@ Open `http://localhost:2375` — real-time dashboard with live updates.
 
 ```bash
 # Install globally
-npm install -g aidevo
+npm install -g ai-dev-analytics
 
 # Initialize in your project (interactive setup)
 cd your-project
-aidevo init
+aida init
 ```
 
-`aidevo init` now offers **mode selection**:
+`aida init` now offers **mode selection**:
 
 1. **Data collection only** — sets up MCP config for your chosen AI tool(s)
 2. **Full workflow** — MCP config + 14 AI Skills + slash commands + project rules
 
-Multi-tool support: select one or more AI tools (Claude Code, Cursor, VS Code Copilot, Windsurf) and AIDevOS writes the correct MCP config for each.
+Multi-tool support: select one or more AI tools (Claude Code, Cursor, VS Code Copilot, Windsurf) and AIDA writes the correct MCP config for each.
 
 Then start building:
 
 ```bash
 # Create a new development run
-aidevo start
+aida start
 
 # Place your PRD, then let AI take over
 /workflow
@@ -175,7 +175,7 @@ No manual setup required for data collection. On the first MCP tool call, the se
 
 ### Token Auto-Collection
 
-For **Claude Code** users, AIDevOS automatically reads Claude session files to collect token usage data:
+For **Claude Code** users, AIDA automatically reads Claude session files to collect token usage data:
 
 - Token usage per task and per bug fix
 - Breakdown: `input_tokens`, `output_tokens`, `cache_creation_input_tokens`, `cache_read_input_tokens`
@@ -185,14 +185,14 @@ This enables accurate **ROI calculation** — you can see exactly how many token
 
 ## How It Works
 
-AIDevOS is **not** an AI coding agent. It's an **observability layer** that standardizes how your existing AI tools work.
+AIDA is **not** an AI coding agent. It's an **observability layer** that standardizes how your existing AI tools work.
 
 ```
 ┌──────────────────────────────────────────────────────┐
 │  Your IDE (Claude Code / Cursor / VS Code / Windsurf)│
 │                                                      │
 │  ┌──────────┐  MCP calls  ┌────────────────────┐    │
-│  │ AI Agent ├────────────→│ AIDevOS MCP Server │    │
+│  │ AI Agent ├────────────→│ AIDA MCP Server │    │
 │  │          │             │ (9 tools)          │    │
 │  │          │  reads      ┌──────────────────┐  │    │
 │  │          ├────────────→│ .aidevos/skills/ │  │    │
@@ -225,7 +225,7 @@ The **MCP path** (top arrow) is the primary data collection mechanism. Skills ar
 
 ### The Self-Improving Loop
 
-This is what makes AIDevOS different. It's not just tracking — it's **learning**.
+This is what makes AIDA different. It's not just tracking — it's **learning**.
 
 ```
    AI generates code
@@ -259,13 +259,15 @@ Real-time visualization powered by React + ECharts with dark theme.
 
 **Branch Detail View** — deep dive into a single development run:
 
-- KPI cards: task completion, deviation rate, bug count, review pass rate, ROI
-- Task timeline with stage breakdown
-- Node time distribution (where did the AI spend time?)
+- KPI cards: task completion, deviation rate, bug count, review pass rate, token consumption, ROI
+- Token consumption with detail breakdown (input/output/cache tokens)
+- Node time distribution with token overlay
+- Per-stage task completion with duration and token stats
+- Task time ranking TOP 10
 - Bug severity distribution
-- Review issue categories
+- Review issue categories and first-pass rate trend
 - File change heatmap
-- Token usage breakdown per task
+- Deviation root cause analysis and category distribution
 
 **Project Overview** — team lead perspective across all branches:
 
@@ -274,15 +276,15 @@ Real-time visualization powered by React + ECharts with dark theme.
 - Cross-branch totals and highlights
 
 ```bash
-aidevo dashboard              # Default port 2375
-aidevo dashboard --port 3000  # Custom port
+aida dashboard              # Default port 2375
+aida dashboard --port 3000  # Custom port
 ```
 
 Dashboard updates in real-time via SSE — no refresh needed.
 
 ## Skills
 
-AIDevOS ships with **14 AI Skills** — structured SOPs that tell your AI tool exactly what to do and how to record it. Skills are used in **full workflow mode** and are optional for data-collection-only setups.
+AIDA ships with **14 AI Skills** — structured SOPs that tell your AI tool exactly what to do and how to record it. Skills are used in **full workflow mode** and are optional for data-collection-only setups.
 
 ### Workflow Skills (auto-orchestrated)
 
@@ -315,7 +317,7 @@ AIDevOS ships with **14 AI Skills** — structured SOPs that tell your AI tool e
 
 ## Rules System
 
-AIDevOS uses a **Registry + Generated Views** pattern for project rules:
+AIDA uses a **Registry + Generated Views** pattern for project rules:
 
 ```
 .aidevos/rules.json     <- Source of truth (committed to git)
@@ -323,45 +325,60 @@ AIDevOS uses a **Registry + Generated Views** pattern for project rules:
 ```
 
 - **Fingerprint dedup**: SHA256 hash prevents duplicate rules across parallel branches
-- **Auto-merge**: `aidevo rules merge` resolves git conflicts by taking the union
-- **Similarity detection**: `aidevo rules dedupe` finds near-duplicate rules via Jaccard similarity
+- **Auto-merge**: `aida rules merge` resolves git conflicts by taking the union
+- **Similarity detection**: `aida rules dedupe` finds near-duplicate rules via Jaccard similarity
 - **Category system**: `component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`
 
-Rules are automatically rebuilt on every `aidevo start` and every rule sedimentation.
+Rules are automatically rebuilt on every `aida start` and every rule sedimentation.
 
 ## CLI Reference
 
 | Command | Description |
 |---------|-------------|
-| `aidevo init` | Interactive project setup: mode selection (data collection / full workflow), multi-tool support |
-| `aidevo start` | Create a new development run for current branch |
-| `aidevo status` | Show current run status in terminal |
-| `aidevo log <sub>` | Write structured data to run.json (12 subcommands) |
-| `aidevo dashboard` | Launch real-time visualization dashboard |
-| `aidevo mcp` | Start the MCP server (used in MCP config, not called directly) |
-| `aidevo rules <sub>` | Manage rules registry (`build`, `dedupe`, `merge`, `list`) |
-| `aidevo reindex` | Rebuild project-level index from all runs |
-| `aidevo report` | Generate markdown performance report (`--scope me/team`) |
-| `aidevo update` | Update all skills to latest version |
-| `aidevo migrate` | Migrate old run.json format to current schema |
+| `aida init` | Interactive project setup: mode selection (data collection / full workflow), multi-tool support |
+| `aida start` | Create a new development run for current branch |
+| `aida status` | Show current run status in terminal |
+| `aida log <sub>` | Write structured data to run.json (12 subcommands) |
+| `aida dashboard` | Launch real-time visualization dashboard |
+| `aida mcp` | Start the MCP server (used in MCP config, not called directly) |
+| `aida rules <sub>` | Manage rules registry (`build`, `dedupe`, `merge`, `list`) |
+| `aida reindex` | Rebuild project-level index from all runs |
+| `aida report` | Generate markdown performance report (`--scope me/team`) |
+| `aida update` | Update all skills to latest version |
+| `aida migrate` | Migrate old run.json format to current schema |
 
-### `aidevo log` Subcommands
+### `aida log` Subcommands
 
 ```bash
-aidevo log task --title "Create API layer" --stage "Infrastructure" --prd-phase "PRD1"
-aidevo log task-start --id TASK-01
-aidevo log task-done --id TASK-01
-aidevo log bug --title "Type mismatch" --severity high --source self-review
-aidevo log bug-fix --id BUG-01 --fix "Fixed response type"
-aidevo log deviation --title "Wrong component" --root-cause rule-missing --category component-usage
-aidevo log review --task-id TASK-01 --result pass --scope "src/api/"
-aidevo log rule --content "Use Drawer for detail views" --category component
-aidevo log file --path "src/api/user.ts" --change-type modified --lines-added 50
-aidevo log cost --tokens 125000 --stage "requirement-analysis"
-aidevo log highlight --content "FCP reduced from 3.2s to 0.8s"
+aida log task --title "Create API layer" --stage "Infrastructure" --prd-phase "PRD1"
+aida log task-start --id TASK-01
+aida log task-done --id TASK-01
+aida log bug --title "Type mismatch" --severity high --source self-review
+aida log bug-fix --id BUG-01 --fix "Fixed response type"
+aida log deviation --title "Wrong component" --root-cause rule-missing --category component-usage
+aida log review --task-id TASK-01 --result pass --scope "src/api/"
+aida log rule --content "Use Drawer for detail views" --category component
+aida log file --path "src/api/user.ts" --change-type modified --lines-added 50
+aida log cost --tokens 125000 --stage "requirement-analysis"
+aida log highlight --content "FCP reduced from 3.2s to 0.8s"
 ```
 
 All writes are validated against the schema. Invalid enum values or missing required fields are rejected with clear error messages.
+
+### Data Migration
+
+Upgrading from an older version? `aida migrate` handles schema evolution automatically:
+
+```bash
+cd your-project
+aida migrate
+```
+
+- Detects old `run.json` files and migrates to schema 2.0
+- Remaps renamed fields, normalizes enum values
+- Auto-generates timeline from task/bug/deviation timestamps
+- Recalculates all metrics
+- Backs up originals as `*.backup.json`
 
 ## Project Structure
 
@@ -414,7 +431,7 @@ npm test
 
 > The performance of a system is not determined by its strongest component, but by the synergy between all parts.
 
-AIDevOS is built on three iron laws:
+AIDA is built on three iron laws:
 
 1. **No hallucination** — When uncertain, ask. Never guess.
 2. **No unauthorized docs** — Don't generate documents without explicit permission.

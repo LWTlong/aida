@@ -23,7 +23,7 @@ export async function dashboard(): Promise<void> {
 
   if (!isDemo && !fileExists(configPath(projectRoot))) {
     console.log(
-      red('\n  AIDevOS not initialized. Run `npx aidevo init` first.\n'),
+      red('\n  AIDA not initialized. Run `npx aida init` first.\n'),
     );
     return;
   }
@@ -77,6 +77,6 @@ export async function dashboard(): Promise<void> {
     }
     console.log('');
   } else {
-    console.log(dim('  No runs found. Run `aidevo start` first.\n'));
+    console.log(dim('  No runs found. Run `aida start` first.\n'));
   }
 }

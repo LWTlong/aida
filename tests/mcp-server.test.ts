@@ -138,7 +138,7 @@ describe('MCP Server - initialize', () => {
 
     assert.ok(resp.result);
     assert.equal(resp.result.protocolVersion, '2024-11-05');
-    assert.equal(resp.result.serverInfo.name, 'aidevos');
+    assert.equal(resp.result.serverInfo.name, 'aida');
     assert.equal(resp.result.serverInfo.version, '1.0.0');
     assert.ok(resp.result.capabilities.tools);
     assert.ok(resp.result.capabilities.prompts);
