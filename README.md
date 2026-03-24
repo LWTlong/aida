@@ -2,51 +2,53 @@
 
 # AIDA
 
-### AI Development Analytics
+### AI coding is a black box. AIDA makes it measurable.
 
-**The black box recorder for AI-assisted development.**
+You vibe-code with Claude, Cursor, or Copilot every day — but you can't answer basic questions:<br>
+*How many tokens did that feature cost? Which task took the longest? Is AI actually saving me money?*<br>
+**Stop guessing. Run AIDA. See the data.**
 
-Your AI writes code every day — but you have no idea what actually happened.<br>
-AIDA records everything, shows you the data, and makes your AI get better over time.
+```bash
+npx ai-dev-analytics init
+```
 
 [![npm version](https://img.shields.io/npm/v/ai-dev-analytics?color=%230066ff&label=npm)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#testing)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Interactive%20Dashboard-FF4B4B?style=for-the-badge&logo=react)](https://lwtlong.github.io/ai-dev-analytics/)
 
-[Quick Start](#quick-start) · [Dashboard](#dashboard) · [How It Works](#how-it-works) · [Full Workflow](#full-workflow-mode) · [CLI Reference](#cli-reference) · [中文文档](./README.zh-CN.md)
+[30-Second Setup](#-30-second-setup) · [What You See](#-what-you-see) · [How It Works](#️-how-it-works) · [Use Cases](#-use-cases) · [中文文档](./README.zh-CN.md)
 
 </div>
 
 ---
 
-## Why AIDA?
+## Dashboard
 
-You use Claude Code, Cursor, or Copilot to build features. The AI generates hundreds of lines of code. Then:
+**Token usage, time per task, retry count, pass rate, cost savings — all in one view.**
 
-- How many tasks did it complete? **No idea.**
-- How many bugs did it introduce? **No record.**
-- Which architectural rules did it violate? **Lost forever.**
-- Is the AI actually saving you time? **Can't prove it.**
+![Dashboard](./docs/dashboard.png)
 
-Every AI development session is a **black box**. The process data disappears the moment you close your IDE.
+> **[Live Demo →](https://lwtlong.github.io/ai-dev-analytics/)** No install. No setup. Just open and explore.
 
-**AIDA is the flight recorder.** It silently captures what your AI does — tasks, bugs, deviations, reviews, file changes, token consumption — and turns it into structured data you can analyze, visualize, and act on.
+Run `npx ai-dev-analytics dashboard` and see **your own data** in seconds — not a demo, your actual project.
 
-## Two Modes
+<details>
+<summary>🔒 Privacy: all data stays local</summary>
 
-| Mode | What it does | Setup |
-|------|-------------|-------|
-| **Data Collection** | Silent recording, zero workflow changes — your AI development black box | One JSON config |
-| **Full Workflow** | Data collection + structured AI SOPs + self-improving rules | `aida init` |
+AIDA writes JSON files to `.aidevos/` in your project directory. No telemetry, no cloud sync, no external calls. Your code never leaves your machine.
 
-**Start with data collection.** It's non-invasive — your AI tool calls MCP tools automatically as it works, you change nothing about how you code. When you see the value in the data, upgrade to full workflow to close the loop.
+</details>
 
-## Quick Start
+---
 
-Add the MCP config to your AI tool. Done — AIDA starts recording automatically.
+## ⚡ 30-Second Setup
 
-**Claude Code** `.mcp.json`:
+### Already using Claude Code? Add one config — done.
+
+Create or edit `.mcp.json` in your project root:
+
 ```json
 {
   "mcpServers": {
@@ -57,6 +59,10 @@ Add the MCP config to your AI tool. Done — AIDA starts recording automatically
   }
 }
 ```
+
+That's it. No `npm install`, no initialization. AIDA auto-creates everything on first use.
+
+> *Tip: For faster startup times (especially in regions with slow npm registries), run `npm install -g ai-dev-analytics` and change the command from `"npx"` to `"aida"`.*
 
 <details>
 <summary>Cursor / VS Code Copilot / Windsurf</summary>
@@ -98,200 +104,244 @@ Add the MCP config to your AI tool. Done — AIDA starts recording automatically
 ```
 </details>
 
-No initialization needed. The MCP server uses **lazy init** — it auto-creates data directories and starts recording on the first tool call.
-
-View your data anytime:
+### See your data
 
 ```bash
 npx ai-dev-analytics dashboard
 ```
 
-Open `http://localhost:2375` — real-time dashboard with live updates via SSE.
+Open `http://localhost:2375` — real-time updates via SSE, Chinese/English toggle built in.
 
-## Dashboard
+### Starting a new project?
 
-Real-time visualization powered by React + ECharts.
+```bash
+npx ai-dev-analytics init      # Interactive setup
+npx ai-dev-analytics start     # Create a development run
+# ... code with your AI tool ...
+npx ai-dev-analytics dashboard  # See what happened
+```
 
-**What you see per branch:**
+---
 
-- KPI overview: tasks completed, deviation rate, bug count, review pass rate, token consumption, ROI
-- Token breakdown: input / output / cache tokens per task
-- Node time distribution with token overlay
-- Per-stage task completion with duration and token stats
-- Task time ranking TOP 10
-- Bug severity distribution
-- Review issue categories and first-pass rate trend
-- File change heatmap
-- Deviation root cause analysis
+## 🤔 Why You Need This
 
-**Project overview for team leads:**
+**You're already using AI to write code. But you're not measuring anything.**
+
+| Without AIDA | With AIDA |
+|---|---|
+| "I think AI saved me time" | "AI completed 47 tasks in 95h of processing, replacing 57h of manual work" |
+| "Tokens seem expensive this month" | "506K tokens, $2.52 — auth module used 40% of that" |
+| "That feature had a lot of bugs" | "5 bugs, 3 critical — all in the database migration phase" |
+| "AI keeps making the same mistakes" | "23 deviations tracked, top root cause: rule missing (→ auto-sedimented to project rules)" |
+
+The difference: **gut feeling vs. data you can act on.**
+
+---
+
+## 📊 What You See
+
+### Per-Branch Development View
+
+| Category | Metrics |
+|----------|---------|
+| **Token Usage** | Total tokens, input/output/cache breakdown, per-task consumption, cost estimation |
+| **Time Analysis** | Cumulative time per node, task time ranking TOP 10, phase time distribution |
+| **Quality** | Bug severity distribution, deviation root cause analysis, review pass rate trend |
+| **Efficiency** | Task completion by phase, first-pass rate trend, file modification hotspots |
+| **Cost** | Manual cost vs. AI token cost, savings amount, cost-per-task breakdown |
+
+### Project Overview (for team leads)
 
 - Requirement status across all branches
 - Developer efficiency comparison
-- Cross-branch totals and highlights
+- Cross-branch aggregated stats
+
+Every KPI card is clickable — drill into task details, deviation root causes, review reports, file changes, and token breakdowns.
+
+**In short: everything your AI did, structured and visualized.**
+
+---
+
+## 🎯 Use Cases
+
+**Solo Developer — "Where did my tokens go?"**
+> You vibe-code a feature over the weekend. Monday morning, open the dashboard: 300K tokens, 12 tasks, 2 bugs fixed. The chart shows the form validation task took 5x longer than others. Next time, you write clearer specs for that part.
+
+**Tech Lead — "Is AI actually helping the team?"**
+> Your team of 4 uses Claude Code daily. The project overview shows: 150 tasks completed across 8 branches, 15 deviations, 89% first-pass review rate. Developer A has 0 deviations; Developer B has 9. Time for a rules audit on B's workflow.
+
+**Freelancer — "Show the client the ROI"**
+> Client asks: "Why should I pay for AI tools?" You open the cost analysis: 40 hours of manual work estimated, AI token cost $3.80. Cost savings: $596. Screenshots → invoice attachment.
+
+**Open Source Maintainer — "Track AI contribution quality"**
+> You accept AI-generated PRs. AIDA records which tasks were AI-generated, their review pass rate, and bug rate. Data-driven: AI handles boilerplate well (98% pass) but struggles with API design (60% pass).
+
+---
+
+## ⚙️ How It Works
+
+```
+Your AI Tool (Claude Code / Cursor / Windsurf / VS Code)
+    │
+    │  AI writes code normally — zero workflow changes
+    │
+    ├──→ MCP Server (9 tools)     ──→  .aidevos/run.json  ──→  Dashboard
+    │    auto-called by AI              local JSON files        localhost:2375
+    │    zero friction                  git-friendly            real-time SSE
+```
+
+```mermaid
+flowchart LR
+    A["Your AI Tool\nClaude Code / Cursor"] -->|Normal Coding| B{"MCP Server\n9 Tools"}
+    B -->|Silent Logging| C[".aidevos/run.json"]
+    C -->|Local Data| D["AIDA Dashboard\nlocalhost:2375"]
+```
+
+Your AI tool calls MCP tools automatically as it works. You don't invoke them manually. No prompts to write, no scripts to run.
+
+<details>
+<summary>📋 9 MCP Tools (auto-collected)</summary>
+
+| Tool | What it captures |
+|------|-----------------|
+| `aida_task_start` | Task begins — ID, title, stage, PRD phase |
+| `aida_task_done` | Task completed — duration auto-calculated |
+| `aida_log_bug` | Bug found — severity, title, related files |
+| `aida_bug_fix` | Bug fixed — links fix to original bug |
+| `aida_log_review` | Code self-review — pass/fail, issue list |
+| `aida_log_deviation` | AI output ≠ expectation — root cause, category |
+| `aida_log_files` | File changes — auto-scans `git diff`, zero args needed |
+| `aida_highlight` | Notable achievement worth recording |
+| `aida_status` | Current run status snapshot |
+
+For **Claude Code** users, AIDA also auto-collects token usage from session files — input, output, cache creation, cache read tokens — broken down per task.
+
+</details>
+
+### Data Model
+
+All data is local JSON. No database, no cloud.
+
+| Level | File | What it contains |
+|-------|------|-----------------|
+| **Run** | `.aidevos/runs/{branch}/{dev}/run.json` | Every task, bug, deviation, review, file change, token |
+| **Branch** | `.aidevos/runs/{branch}/requirement.json` | Aggregated stats per requirement |
+| **Project** | `.aidevos/index.json` | Cross-branch overview for team leads |
+
+---
+
+## 🚀 Advanced: Full Workflow Mode
+
+Beyond data collection, AIDA offers structured AI development workflows with self-improving project rules.
 
 ```bash
-aida dashboard              # Default port 2375
-aida dashboard --port 3000  # Custom port
-```
-
-## How It Works
-
-AIDA is **not** an AI coding agent. It's an **observability layer** for your existing AI tools.
-
-```
-Your IDE (Claude Code / Cursor / VS Code / Windsurf)
-    │
-    │  AI works normally
-    │
-    ├──→ MCP Server (9 tools)  ──→  run.json  ──→  Dashboard
-    │    silent data collection      structured     real-time
-    │                                data           visualization
-    │
-    └──→ Skills (14 SOPs)      ──→  run.json  ──→  Rules
-         workflow orchestration      same data      self-improving
-         (optional)                  source         AI knowledge base
-```
-
-### Data Collection (MCP) — The Black Box
-
-9 MCP tools that your AI calls automatically:
-
-| Tool | What it records |
-|------|----------------|
-| `aida_task_start` / `aida_task_done` | Task lifecycle and duration |
-| `aida_log_bug` / `aida_bug_fix` | Bugs found and fixed |
-| `aida_log_review` | Code review results (pass/fail) |
-| `aida_log_deviation` | AI output vs. your expectations |
-| `aida_log_files` | File changes (auto-scans git diff) |
-| `aida_highlight` | Notable achievements |
-| `aida_status` | Current run status |
-
-For **Claude Code** users, AIDA also auto-collects token usage from session files — input, output, cache tokens per task.
-
-**This alone gives you a complete development flight record.** No workflow changes, no extra commands, no friction.
-
-### Three-Layer Data Model
-
-| Layer | File | Scope |
-|-------|------|-------|
-| **L0** | `run.json` | Per developer — every task, bug, deviation, review |
-| **L1** | `requirement.json` | Per branch — aggregated stats, module assignments |
-| **L2** | `index.json` | Per project — cross-branch overview |
-
-## Full Workflow Mode
-
-When data collection alone isn't enough and you want **AI that gets better with every run**, enable full workflow mode.
-
-```bash
-npm install -g ai-dev-analytics
-cd your-project
 aida init    # Select "Full workflow"
 aida start   # Create a development run
-/workflow    # Let AI take over
 ```
 
-### The Development Loop
+This enables 14 AI skills — requirement analysis, task decomposition, code generation, self-review, bug fixing — with a feedback loop that **automatically converts mistakes into project rules**.
 
 ```
-PRD Document
-    │
-    ▼
-Requirement Analysis ──→ User confirms understanding
-    │
-    ▼
-Task Decomposition ──→ Atomic, testable tasks
-    │
-    ▼
-┌─→ Code Generation ──→ Self-Review
-│       │                    │
-│       │              Pass ─┤── Fail
-│       │                    │
-│       │              Next  └─→ Bug Fix ─→ Re-review
-│       │              task
-└───────┘
-    │
-    ▼
-All tasks done → Workflow complete
+AI generates code → Self-review catches issue → Record as deviation
+                                                       ↓
+                                    Is it a pattern? → Sediment as project rule
+                                                       ↓
+                                    AI reads rules next time → Same mistake never happens again
 ```
 
-Each step records structured data to `run.json`. If interrupted, the workflow resumes exactly where it left off.
+Your `.aidevos/rules/` directory becomes a project-specific AI knowledge base that grows with every run.
 
-### The Self-Improving Loop — Why This Matters
+---
 
-This is what makes full workflow mode fundamentally different from just using an AI tool:
+<details>
+<summary>🖥 CLI Reference</summary>
 
-```
-AI generates code
-       ↓
-Self-review catches issues
-       ↓
-Record as deviation ← "AI used wrong component"
-       ↓
-Is it a pattern? → Sediment as project rule
-       ↓
-AI reads rules next time
-       ↓
-Same mistake never happens again
-```
-
-Your `.aidevos/rules/` directory grows into a **project-specific AI knowledge base**. Every deviation, every bug, every review failure is a data point. Over time, the rules evolve, and your AI's output quality improves measurably.
-
-**Data collection is the black box. Full workflow closes the loop.**
-
-### 14 AI Skills
-
-| Category | Skills |
-|----------|--------|
-| **Workflow** | `workflow-orchestrator`, `requirement-analyzer`, `task-splitter`, `code-generator`, `self-reviewer`, `bug-fixer` |
-| **Manual** | `/audit` (generate project rules), `/deviation` (record AI deviations), `/rules-evolver` (evolve rules from PR feedback) |
-| **Utility** | `dashboard-generator`, `commit-code`, `docx-to-markdown`, `mcp-reviewer`, `dev-flower` |
-
-### Rules System
-
-```
-.aidevos/rules.json     ← Source of truth (committed to git)
-.aidevos/rules/*.md     ← Auto-generated views (gitignored)
+```bash
+aida init              # Interactive project setup
+aida start             # Create a new development run
+aida status            # Show current run status
+aida dashboard         # Launch dashboard (default port 2375)
+aida dashboard -p 3000 # Custom port
+aida mcp               # Start MCP server (for AI tool config)
+aida log <subcommand>  # Write structured data (task, bug, review, etc.)
+aida reindex           # Rebuild project-level index
+aida report            # Generate performance report
+aida rules build       # Generate rule view files from registry
+aida rules dedupe      # Find and remove near-duplicate rules
+aida rules merge       # Merge rules from parallel branches
+aida update            # Update skills to latest version
+aida migrate           # Migrate old data to current schema
 ```
 
-- **Fingerprint dedup**: SHA256 prevents duplicate rules across parallel branches
-- **Auto-merge**: `aida rules merge` resolves git conflicts by union
-- **Similarity detection**: `aida rules dedupe` finds near-duplicates via Jaccard similarity
+</details>
 
-## CLI Reference
+<details>
+<summary>🔌 MCP Integration Details</summary>
 
-| Command | Description |
-|---------|-------------|
-| `aida init` | Interactive setup (mode + AI tool selection) |
-| `aida start` | Create a new development run |
-| `aida status` | Show current run status |
-| `aida log <sub>` | Write structured data (12 subcommands) |
-| `aida dashboard` | Launch visualization dashboard |
-| `aida mcp` | Start MCP server (for AI tool config) |
-| `aida rules <sub>` | Manage rules (`build`, `dedupe`, `merge`, `list`) |
-| `aida reindex` | Rebuild project-level index |
-| `aida report` | Generate performance report |
-| `aida update` | Update skills to latest version |
-| `aida migrate` | Migrate old data to current schema |
+AIDA uses [Model Context Protocol](https://modelcontextprotocol.io/) — the standard way for AI tools to interact with external systems. The MCP server runs over stdio with zero dependencies.
+
+**What happens when you add the config:**
+
+1. Your AI tool discovers AIDA's 9 tools via MCP
+2. As the AI works, it naturally calls `aida_task_start`, `aida_log_files`, etc.
+3. Data flows into `run.json` silently
+4. You open the dashboard whenever you want to see the data
+
+**No prompts to write. No scripts to run. No workflow to learn.**
+
+</details>
+
+---
+
+## Roadmap
+
+- [ ] Token cost tracking with provider-specific pricing (OpenAI, Anthropic, Google)
+- [ ] Export reports as PDF / HTML
+- [ ] Team dashboard with multi-project aggregation
+- [ ] VS Code extension for inline analytics
+- [ ] Webhook integrations (Slack, Discord, GitHub Issues)
+- [ ] Historical trend analysis across runs
+
+---
+
+## Tech Stack
+
+| | |
+|---|---|
+| **Runtime** | Node.js + TypeScript, zero dependencies |
+| **Dashboard** | React 19 + ECharts + Tailwind CSS 4 |
+| **Protocol** | MCP over stdio (JSON-RPC 2.0) |
+| **Data** | Local JSON files, no database |
+| **Real-time** | Server-Sent Events (SSE) |
+| **i18n** | Chinese / English, switchable in dashboard |
 
 ## Testing
 
 ```bash
-npm test    # 82 tests across 5 suites
+npm test    # 82 tests across 29 suites
 ```
-
-## Tech Stack
-
-- **Zero runtime dependencies** — Node.js + TypeScript
-- **MCP Server** — Model Context Protocol over stdio
-- **Dashboard** — React 19 + ECharts + Tailwind CSS 4
-- **Data** — JSON files, no database required
-- **Real-time** — Server-Sent Events (SSE)
 
 ## Contributing
 
-Issues and PRs welcome at [github.com/LWTlong/ai-dev-analytics](https://github.com/LWTlong/ai-dev-analytics).
+Issues, feature requests, and PRs are welcome.
+
+```bash
+git clone https://github.com/LWTlong/ai-dev-analytics.git
+cd ai-dev-analytics
+npm install
+npm test
+```
 
 ## License
 
 [MIT](./LICENSE)
+
+---
+
+<div align="center">
+
+**You're already vibe-coding. Now see what actually happened.**
+
+[Get Started in 30 Seconds →](#-30-second-setup)
+
+</div>

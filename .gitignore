@@ -1,6 +1,7 @@
 node_modules/
 dist/
 dist-test/
+demo-dist/
 *.tsbuildinfo
 .DS_Store
 .agent/
