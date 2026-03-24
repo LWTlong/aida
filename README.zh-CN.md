@@ -76,21 +76,15 @@ Vibe Coding 过程
 
 **第一步：看清 AI *为什么*出错** —— 根因分布一目了然：是 AI 幻觉、规则缺失、还是上下文不足？
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-root-cause.png" alt="偏差根因分布" width="700" />
-</div>
+![偏差根因分布](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-root-cause.png)
 
 **第二步：看清 AI *在哪*出错** —— 类别分布精准定位：UI 间距、布局结构、组件使用、API 模式。
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-category.png" alt="偏差类别分布" width="700" />
-</div>
+![偏差类别分布](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-category.png)
 
 **第三步：看规则的复利效应** —— 随着规则积累（绿色线），同类偏差模式不再复现。
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png" alt="偏差与规则趋势" width="700" />
-</div>
+![偏差与规则趋势](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png)
 
 `.aidevos/rules/` 目录就是你的**项目专属 AI 知识库**。用 AI 写得越多，它对*你的项目*就越懂。
 
@@ -100,11 +94,7 @@ Vibe Coding 过程
 
 **你的整个 Vibe Coding 过程 —— 结构化、可视化、可操作。**
 
-<div align="center">
-  <a href="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png">
-    <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png" alt="Dashboard" width="800" />
-  </a>
-</div>
+![Dashboard](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png)
 
 > **[在线 Demo →](https://lwtlong.github.io/ai-dev-analytics/)** 真实脱敏数据，无需安装。
 
