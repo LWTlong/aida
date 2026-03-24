@@ -18,8 +18,10 @@
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#测试)
-[![在线 Demo](https://img.shields.io/badge/在线Demo-交互式看板-FF4B4B?style=for-the-badge&logo=react)](https://lwtlong.github.io/ai-dev-analytics/)
+[![在线 Demo](https://img.shields.io/badge/🎯_在线Demo-交互式看板-FF4B4B)](https://lwtlong.github.io/ai-dev-analytics/)
 [![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/score.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
+
+[![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/card.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
 [一行接入](#-30-秒上手) · [数据驱动闭环](#-数据驱动闭环) · [数据看板](#-数据看板) · [SOP 流程](#-标准化-ai-开发流程) · [数据沉淀](#-数据沉淀与绩效汇报) · [English](./README.md)
 
