@@ -19,6 +19,7 @@
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#测试)
 [![在线 Demo](https://img.shields.io/badge/在线Demo-交互式看板-FF4B4B?style=for-the-badge&logo=react)](https://lwtlong.github.io/ai-dev-analytics/)
+[![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/score.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
 [一行接入](#-30-秒上手) · [数据驱动闭环](#-数据驱动闭环) · [数据看板](#-数据看板) · [SOP 流程](#-标准化-ai-开发流程) · [数据沉淀](#-数据沉淀与绩效汇报) · [English](./README.md)
 
@@ -74,19 +75,19 @@ Vibe Coding 过程
 **第一步：看清 AI *为什么*出错** —— 根因分布一目了然：是 AI 幻觉、规则缺失、还是上下文不足？
 
 <div align="center">
-  <img src="./docs/deviation-root-cause.png" alt="偏差根因分布" width="700" />
+  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-root-cause.png" alt="偏差根因分布" width="700" />
 </div>
 
 **第二步：看清 AI *在哪*出错** —— 类别分布精准定位：UI 间距、布局结构、组件使用、API 模式。
 
 <div align="center">
-  <img src="./docs/deviation-category.png" alt="偏差类别分布" width="700" />
+  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-category.png" alt="偏差类别分布" width="700" />
 </div>
 
 **第三步：看规则的复利效应** —— 随着规则积累（绿色线），同类偏差模式不再复现。
 
 <div align="center">
-  <img src="./docs/deviation-rule-trend.png" alt="偏差与规则趋势" width="700" />
+  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png" alt="偏差与规则趋势" width="700" />
 </div>
 
 `.aidevos/rules/` 目录就是你的**项目专属 AI 知识库**。用 AI 写得越多，它对*你的项目*就越懂。
@@ -98,8 +99,8 @@ Vibe Coding 过程
 **你的整个 Vibe Coding 过程 —— 结构化、可视化、可操作。**
 
 <div align="center">
-  <a href="./docs/dashboard.png">
-    <img src="./docs/dashboard.png" alt="Dashboard" width="800" />
+  <a href="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png">
+    <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png" alt="Dashboard" width="800" />
   </a>
 </div>
 
