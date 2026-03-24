@@ -55,7 +55,6 @@ export function ProjectOverview({ data, onSelectBranch }: Props) {
   const totalBugs = runs.reduce((s, r) => s + r.totals.bugs, 0)
   const totalDeviations = runs.reduce((s, r) => s + r.totals.deviations, 0)
   const totalLines = runs.reduce((s, r) => s + r.totals.linesAdded, 0)
-  const totalTokens = runs.reduce((s, r) => s + r.totals.totalTokens, 0)
   const activeRuns = runs.filter((r) => r.status !== 'completed').length
   const completedRuns = runs.filter((r) => r.status === 'completed').length
 
@@ -67,7 +66,6 @@ export function ProjectOverview({ data, onSelectBranch }: Props) {
     { label: t.ovTotalDeviations, value: `${totalDeviations}`, color: 'text-amber-500' },
     { label: t.ovTotalBugs, value: `${totalBugs}`, color: 'text-red-500' },
     { label: t.ovCodeLines, value: totalLines > 1000 ? `${(totalLines / 1000).toFixed(1)}k` : `${totalLines}`, color: 'text-purple-500' },
-    { label: 'Tokens', value: totalTokens > 1000000 ? `${(totalTokens / 1000000).toFixed(1)}M` : totalTokens > 1000 ? `${(totalTokens / 1000).toFixed(0)}k` : `${totalTokens}`, color: 'text-teal-500' },
   ]
 
   // Collect all highlights across runs
@@ -148,7 +146,6 @@ export function ProjectOverview({ data, onSelectBranch }: Props) {
                 <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">Bug</th>
                 <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovLinesAdded}</th>
                 <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovAiHours}</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">Tokens</th>
                 <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovModule}</th>
               </tr>
             </thead>
@@ -163,7 +160,6 @@ export function ProjectOverview({ data, onSelectBranch }: Props) {
                   <td className="px-3 py-2 border-b border-[#1e2d3d] text-red-500">{d.bugs}</td>
                   <td className="px-3 py-2 border-b border-[#1e2d3d]">{d.linesAdded.toLocaleString()}</td>
                   <td className="px-3 py-2 border-b border-[#1e2d3d] text-teal-500">{formatSeconds(d.actualWorkSeconds)}</td>
-                  <td className="px-3 py-2 border-b border-[#1e2d3d] text-xs text-[#6b7b8d]">{d.totalTokens > 1000 ? `${(d.totalTokens / 1000).toFixed(0)}k` : d.totalTokens}</td>
                   <td className="px-3 py-2 border-b border-[#1e2d3d] text-xs text-[#6b7b8d]">{d.modules.join(', ') || '-'}</td>
                 </tr>
               ))}

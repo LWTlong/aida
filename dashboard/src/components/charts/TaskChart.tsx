@@ -2,12 +2,11 @@ import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
 import { useLocale } from '../../i18n'
 import { stageLabel } from '../../labelMap'
-import type { TaskItem, RunCost } from '../../types'
+import type { TaskItem } from '../../types'
 
 interface Props {
   tasks: TaskItem[]
   prdPhases?: string[]
-  cost?: RunCost
 }
 
 const prdColorList: [string, string][] = [
@@ -24,13 +23,7 @@ function formatSeconds(s: number): string {
   return `${(s / 3600).toFixed(1)}h`
 }
 
-function formatTokens(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
-  return `${n}`
-}
-
-export function TaskChart({ tasks, prdPhases, cost }: Props) {
+export function TaskChart({ tasks, prdPhases }: Props) {
   const { t } = useLocale()
 
   // Group tasks by stageName, preserve order of appearance
@@ -46,33 +39,6 @@ export function TaskChart({ tasks, prdPhases, cost }: Props) {
     stageMap[stage].count++
     if (tk.startedAt && tk.completedAt) {
       stageMap[stage].seconds += (new Date(tk.completedAt).getTime() - new Date(tk.startedAt).getTime()) / 1000
-    }
-  }
-
-  // Build per-stage token map from tokenBreakdown
-  // tokenBreakdown entries are "task:TASK-01" format — map to stageName via tasks
-  const stageTokens: Record<string, number> = {}
-  if (cost?.tokenBreakdown) {
-    const taskStageMap: Record<string, string> = {}
-    for (const tk of tasks) {
-      taskStageMap[tk.taskId] = tk.stageName || t.stageUncategorized
-    }
-    for (const item of cost.tokenBreakdown) {
-      if (item.stage.startsWith('task:')) {
-        const taskId = item.stage.replace('task:', '')
-        const stage = taskStageMap[taskId] || item.stage
-        stageTokens[stage] = (stageTokens[stage] || 0) + item.tokens
-      }
-    }
-  }
-  // Also check per-task tokensConsumed
-  if (Object.keys(stageTokens).length === 0) {
-    for (const tk of tasks) {
-      const consumed = (tk as any).tokensConsumed || 0
-      if (consumed > 0) {
-        const stage = tk.stageName || t.stageUncategorized
-        stageTokens[stage] = (stageTokens[stage] || 0) + consumed
-      }
     }
   }
 
@@ -96,10 +62,8 @@ export function TaskChart({ tasks, prdPhases, cost }: Props) {
         const idx = stageOrder.length - 1 - reversedNames.indexOf(p.name)
         const stage = stageOrder[idx]
         const info = stageMap[stage]
-        const tokens = stageTokens[stage] || 0
         let tip = `<b>${p.name}</b><br/>${t.tipTaskCount}: ${info.count}`
         if (info.seconds > 0) tip += `<br/>${t.tipDuration}: ${formatSeconds(info.seconds)}`
-        if (tokens > 0) tip += `<br/>Token: ${formatTokens(tokens)}`
         return tip
       },
     },
@@ -139,10 +103,8 @@ export function TaskChart({ tasks, prdPhases, cost }: Props) {
             const origIndex = stageOrder.length - 1 - p.dataIndex
             const stage = stageOrder[origIndex]
             const info = stageMap[stage]
-            const tokens = stageTokens[stage] || 0
             let label = `${p.value}`
             if (info.seconds > 0) label += ` · ${formatSeconds(info.seconds)}`
-            if (tokens > 0) label += ` · ${formatTokens(tokens)}`
             return label
           },
         },

@@ -1,11 +1,10 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
 import { useLocale } from '../../i18n'
-import type { TaskItem, RunCost } from '../../types'
+import type { TaskItem } from '../../types'
 
 interface Props {
   tasks: TaskItem[]
-  cost?: RunCost
 }
 
 function formatSeconds(s: number): string {
@@ -14,11 +13,8 @@ function formatSeconds(s: number): string {
   return `${(s / 3600).toFixed(1)}h`
 }
 
-export function TaskTimeRanking({ tasks, cost }: Props) {
+export function TaskTimeRanking({ tasks }: Props) {
   const { t } = useLocale()
-  const totalTokens = cost?.totalTokens || 0
-  const taskCount = tasks.filter(t => t.startedAt && t.completedAt).length
-  const avgTokensPerTask = taskCount > 0 && totalTokens > 0 ? Math.round(totalTokens / taskCount) : 0
 
   const timed = tasks
     .filter((t) => t.startedAt && t.completedAt)
@@ -46,9 +42,7 @@ export function TaskTimeRanking({ tasks, cost }: Props) {
       formatter: (params: { name: string; value: number }[]) => {
         const p = Array.isArray(params) ? params[0] : params
         const task = reversed.find((t) => p.name.startsWith(t.id))
-        let tip = `${task?.title || p.name}: ${formatSeconds(p.value)}`
-        if (avgTokensPerTask > 0) tip += `<br/>≈ ${avgTokensPerTask.toLocaleString()} tokens/task`
-        return tip
+        return `${task?.title || p.name}: ${formatSeconds(p.value)}`
       },
     },
     grid: { left: 20, right: 40, top: 10, bottom: 5, containLabel: true },
