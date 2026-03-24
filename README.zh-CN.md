@@ -79,7 +79,11 @@ Vibe Coding 过程
 
 **你的整个 Vibe Coding 过程 —— 结构化、可视化、可操作。**
 
-![Dashboard](./docs/dashboard.png)
+<div align="center">
+  <a href="./docs/dashboard.png">
+    <img src="./docs/dashboard.png" alt="Dashboard" width="800" />
+  </a>
+</div>
 
 > **[在线 Demo →](https://lwtlong.github.io/ai-dev-analytics/)** 真实脱敏数据，无需安装。
 

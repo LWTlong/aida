@@ -79,7 +79,11 @@ The `.aidevos/rules/` directory is your **project-specific AI knowledge base**. 
 
 **Your entire vibe coding process — structured, visualized, actionable.**
 
-![Dashboard](./docs/dashboard.png)
+<div align="center">
+  <a href="./docs/dashboard.png">
+    <img src="./docs/dashboard.png" alt="Dashboard" width="800" />
+  </a>
+</div>
 
 > **[Live Demo →](https://lwtlong.github.io/ai-dev-analytics/)** Real anonymized project data. No install needed.
 
