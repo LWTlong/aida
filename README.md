@@ -76,21 +76,15 @@ Vibe Coding Session
 
 **Step 1: See *why* AI deviates** — Root cause breakdown reveals whether issues stem from hallucination, missing rules, or insufficient context.
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-root-cause.png" alt="Deviation Root Cause" width="700" />
-</div>
+![Deviation Root Cause](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-root-cause.png)
 
 **Step 2: See *where* AI deviates** — Category distribution pinpoints the exact areas: UI spacing, layout, component usage, API patterns.
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-category.png" alt="Deviation Category Distribution" width="700" />
-</div>
+![Deviation Category Distribution](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-category.png)
 
 **Step 3: Watch rules compound** — As rules accumulate (green line), the same deviation patterns stop recurring.
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png" alt="Deviation & Rule Trend" width="700" />
-</div>
+![Deviation & Rule Trend](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png)
 
 The `.aidevos/rules/` directory is your **project-specific AI knowledge base**. It grows with every run. The more you use AI, the smarter it gets at *your* project.
 
@@ -100,11 +94,7 @@ The `.aidevos/rules/` directory is your **project-specific AI knowledge base**. 
 
 **Your entire vibe coding process — structured, visualized, actionable.**
 
-<div align="center">
-  <a href="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png">
-    <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png" alt="Dashboard" width="800" />
-  </a>
-</div>
+![Dashboard](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png)
 
 > **[Live Demo →](https://lwtlong.github.io/ai-dev-analytics/)** Real anonymized project data. No install needed.
 
