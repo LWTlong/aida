@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { RunSummary, RunData } from '../types'
-import { fetchRuns, fetchRunData, fetchAggregatedData } from '../api'
+import { fetchRuns, fetchRunData, fetchAggregatedData, isDemo } from '../api'
 
 export const ALL_PROJECT_ID = '__all__'
 
@@ -9,7 +9,7 @@ export function useRunData() {
   const [currentRunId, setCurrentRunId] = useState<string>('')
   const [runData, setRunData] = useState<RunData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [connected, setConnected] = useState(false)
+  const [connected, setConnected] = useState(isDemo)
   const esRef = useRef<EventSource | null>(null)
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -37,8 +37,9 @@ export function useRunData() {
     if (currentRunId) loadRunData(currentRunId)
   }, [currentRunId, loadRunData])
 
-  // SSE with reconnect
+  // SSE with reconnect (skip in demo mode)
   useEffect(() => {
+    if (isDemo) return
     function connect() {
       if (esRef.current) {
         esRef.current.close()

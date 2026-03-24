@@ -1,32 +1,47 @@
 import type { RunSummary, RunData, RequirementData, IndexData } from './types'
 
 const BASE = ''
+export const isDemo = import.meta.env.VITE_DEMO === 'true'
+const DEMO_BASE = `${import.meta.env.BASE_URL}demo`
+
+async function demoFetch<T>(file: string, fallback: T): Promise<T> {
+  try {
+    const res = await fetch(`${DEMO_BASE}/${file}`)
+    if (!res.ok) return fallback
+    return res.json()
+  } catch { return fallback }
+}
 
 export async function fetchRuns(): Promise<RunSummary[]> {
+  if (isDemo) return demoFetch('runs.json', [])
   const res = await fetch(`${BASE}/api/runs`)
   if (!res.ok) return []
   return res.json()
 }
 
 export async function fetchRunData(runId: string): Promise<RunData | null> {
+  if (isDemo) return demoFetch('run.json', null)
   const res = await fetch(`${BASE}/api/runs/${runId}`)
   if (!res.ok) return null
   return res.json()
 }
 
 export async function fetchAggregatedData(): Promise<RunData | null> {
+  if (isDemo) return demoFetch('run.json', null)
   const res = await fetch(`${BASE}/api/aggregate`)
   if (!res.ok) return null
   return res.json()
 }
 
 export async function fetchOverview(): Promise<IndexData | null> {
+  if (isDemo) return demoFetch('overview.json', null)
   const res = await fetch(`${BASE}/api/overview`)
   if (!res.ok) return null
   return res.json()
 }
 
 export async function fetchRequirement(branch: string): Promise<RequirementData | null> {
+  if (isDemo) return null
   const res = await fetch(`${BASE}/api/requirement/${encodeURIComponent(branch)}`)
   if (!res.ok) return null
   return res.json()
@@ -36,6 +51,7 @@ export async function updateRunCost(
   runId: string,
   updates: { estimatedManualHours?: number },
 ): Promise<boolean> {
+  if (isDemo) return true
   const res = await fetch(`${BASE}/api/runs/${runId}/cost`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -49,6 +65,7 @@ export async function updateRunCost(
 export async function updateConfig(
   updates: { hourlyRate?: number },
 ): Promise<boolean> {
+  if (isDemo) return true
   const res = await fetch(`${BASE}/api/config`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -60,6 +77,7 @@ export async function updateConfig(
 }
 
 export function subscribeSSE(onUpdate: (data: unknown) => void): () => void {
+  if (isDemo) return () => {}
   const es = new EventSource(`${BASE}/api/events`)
   es.onmessage = (e) => {
     try {

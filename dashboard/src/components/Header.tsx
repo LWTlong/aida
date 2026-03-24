@@ -2,6 +2,7 @@ import type { RunSummary, RunMeta } from '../types'
 import { ALL_PROJECT_ID } from '../hooks/useRunData'
 import { formatDate } from '../utils/date'
 import { useLocale } from '../i18n'
+import { isDemo } from '../api'
 
 interface Props {
   runs: RunSummary[]
@@ -52,12 +53,19 @@ export function Header({ runs, currentRunId, onSelectRun, meta, connected }: Pro
             </option>
           ))}
         </select>
-        <div
-          className={`w-2 h-2 rounded-full transition-colors ${
-            connected ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-[#4a5a6a]'
-          }`}
-          title={connected ? t.sseConnected : t.sseDisconnected}
-        />
+        {isDemo && (
+          <span className="text-[10px] font-medium bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded px-1.5 py-0.5">
+            DEMO
+          </span>
+        )}
+        {!isDemo && (
+          <div
+            className={`w-2 h-2 rounded-full transition-colors ${
+              connected ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-[#4a5a6a]'
+            }`}
+            title={connected ? t.sseConnected : t.sseDisconnected}
+          />
+        )}
         <button
           onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
           className="text-[11px] text-[#6b7b8d] hover:text-white border border-[#1e2d3d] hover:border-[#2a4a6b] rounded px-2 py-1 cursor-pointer transition-colors"
