@@ -32,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: dashboard
-        run: npm install
+        run: rm -f package-lock.json && npm install
 
       - name: Build demo
         working-directory: dashboard
