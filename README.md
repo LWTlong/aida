@@ -19,6 +19,7 @@ One line to integrate. Zero workflow changes.
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#testing)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Interactive%20Dashboard-FF4B4B?style=for-the-badge&logo=react)](https://lwtlong.github.io/ai-dev-analytics/)
+[![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/score.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
 [One-Line Setup](#-30-second-setup) · [Data-Driven Loop](#-the-data-driven-loop) · [Dashboard](#-the-dashboard) · [SOP Workflow](#-standardized-ai-development-workflow) · [Data for Reports](#-data-sedimentation--performance-reports) · [中文文档](./README.zh-CN.md)
 
@@ -74,19 +75,19 @@ Vibe Coding Session
 **Step 1: See *why* AI deviates** — Root cause breakdown reveals whether issues stem from hallucination, missing rules, or insufficient context.
 
 <div align="center">
-  <img src="./docs/deviation-root-cause.png" alt="Deviation Root Cause" width="700" />
+  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-root-cause.png" alt="Deviation Root Cause" width="700" />
 </div>
 
 **Step 2: See *where* AI deviates** — Category distribution pinpoints the exact areas: UI spacing, layout, component usage, API patterns.
 
 <div align="center">
-  <img src="./docs/deviation-category.png" alt="Deviation Category Distribution" width="700" />
+  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-category.png" alt="Deviation Category Distribution" width="700" />
 </div>
 
 **Step 3: Watch rules compound** — As rules accumulate (green line), the same deviation patterns stop recurring.
 
 <div align="center">
-  <img src="./docs/deviation-rule-trend.png" alt="Deviation & Rule Trend" width="700" />
+  <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png" alt="Deviation & Rule Trend" width="700" />
 </div>
 
 The `.aidevos/rules/` directory is your **project-specific AI knowledge base**. It grows with every run. The more you use AI, the smarter it gets at *your* project.
@@ -98,8 +99,8 @@ The `.aidevos/rules/` directory is your **project-specific AI knowledge base**. 
 **Your entire vibe coding process — structured, visualized, actionable.**
 
 <div align="center">
-  <a href="./docs/dashboard.png">
-    <img src="./docs/dashboard.png" alt="Dashboard" width="800" />
+  <a href="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png">
+    <img src="https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/dashboard.png" alt="Dashboard" width="800" />
   </a>
 </div>
 
