@@ -1,5 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
 import type { DeviationItem } from '../../types'
 import { deviationCategoryLabel } from '../../labelMap'
 
@@ -7,32 +8,36 @@ interface Props {
   deviations: DeviationItem[]
 }
 
-const categoryColors: Record<string, string> = {
-  'UI/间距': '#f59e0b',
-  '布局/结构': '#3b82f6',
-  '组件使用': '#a855f7',
-  'i18n/国际化': '#06b6d4',
-  '逻辑错误': '#ef4444',
-  '流程/缓存': '#22c55e',
-  '其他': '#94a3b8',
+const rawCategoryColors: Record<string, string> = {
+  'ui-spacing': '#f59e0b',
+  'layout': '#3b82f6',
+  'component-usage': '#a855f7',
+  'i18n': '#06b6d4',
+  'logic': '#ef4444',
+  'process': '#22c55e',
+  'other': '#94a3b8',
 }
 
 export function DeviationBar({ deviations }: Props) {
+  const { t } = useLocale()
+
   const counts: Record<string, number> = {}
+  const labelToRawKey: Record<string, string> = {}
   for (const d of deviations) {
-    const cat = deviationCategoryLabel(d.deviationCategory)
+    const cat = deviationCategoryLabel(d.deviationCategory, t)
     counts[cat] = (counts[cat] || 0) + 1
+    labelToRawKey[cat] = d.deviationCategory
   }
 
   if (Object.keys(counts).length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无偏差数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoDeviation}</div>
   }
 
   const sorted = Object.entries(counts).sort((a, b) => a[1] - b[1])
   const categories = sorted.map(([c]) => c)
   const values = sorted.map(([c, v]) => ({
     value: v,
-    itemStyle: { color: categoryColors[c] || '#94a3b8' },
+    itemStyle: { color: rawCategoryColors[labelToRawKey[c]] || '#94a3b8' },
   }))
 
   const option = {

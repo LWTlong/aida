@@ -1,6 +1,7 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
 import type { IndexRunEntry } from '../../types'
+import { useLocale } from '../../i18n'
 
 interface Props {
   runs: IndexRunEntry[]
@@ -13,15 +14,17 @@ const statusColors: Record<string, string> = {
   failed: '#ef4444',
 }
 
-const statusLabels: Record<string, string> = {
-  completed: '已完成',
-  'in-progress': '进行中',
-  'in_progress': '进行中',
-  pending: '待开始',
-  failed: '失败',
-}
-
 export function RequirementStatusChart({ runs }: Props) {
+  const { t } = useLocale()
+
+  const statusLabels: Record<string, string> = {
+    completed: t.reqCompleted,
+    'in-progress': t.reqInProgress,
+    'in_progress': t.reqInProgress,
+    pending: t.reqPending,
+    failed: t.reqFailed,
+  }
+
   const counts: Record<string, number> = {}
   for (const r of runs) {
     const status = r.status || 'pending'
@@ -30,7 +33,7 @@ export function RequirementStatusChart({ runs }: Props) {
 
   const entries = Object.entries(counts)
   if (entries.length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无需求数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoReqData}</div>
   }
 
   const data = entries.map(([status, value]) => ({

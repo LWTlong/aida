@@ -1,5 +1,7 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
+import { stageLabel } from '../../labelMap'
 import type { WorkflowStage } from '../../types'
 
 interface Props {
@@ -15,6 +17,7 @@ function formatSeconds(s: number): string {
 }
 
 export function StageTimeDistribution({ workflow }: Props) {
+  const { t } = useLocale()
   const stageTime: Record<string, number> = {}
   for (const w of workflow) {
     if (w.startTime && w.endTime) {
@@ -27,11 +30,11 @@ export function StageTimeDistribution({ workflow }: Props) {
 
   const entries = Object.entries(stageTime).filter(([, v]) => v > 0)
   if (entries.length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无阶段耗时数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoStageTime}</div>
   }
 
   const data = entries.map(([name, value], i) => ({
-    name,
+    name: stageLabel(name, t),
     value: Math.round(value),
     itemStyle: { color: stageColors[i % stageColors.length] },
   }))

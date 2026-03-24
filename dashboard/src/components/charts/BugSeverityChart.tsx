@@ -1,5 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
 import type { BugItem } from '../../types'
 
 interface Props {
@@ -13,14 +14,16 @@ const severityColors: Record<string, string> = {
   low: '#3b82f6',
 }
 
-const severityLabels: Record<string, string> = {
-  critical: '严重',
-  high: '高',
-  medium: '中',
-  low: '低',
-}
-
 export function BugSeverityChart({ bugs }: Props) {
+  const { t } = useLocale()
+
+  const severityLabels: Record<string, string> = {
+    critical: t.bugCritical,
+    high: t.bugHigh,
+    medium: t.bugMedium,
+    low: t.bugLow,
+  }
+
   const counts: Record<string, number> = {}
   for (const b of bugs) {
     counts[b.severity] = (counts[b.severity] || 0) + 1
@@ -28,7 +31,7 @@ export function BugSeverityChart({ bugs }: Props) {
 
   const entries = Object.entries(counts)
   if (entries.length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无缺陷数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoBug}</div>
   }
 
   const order = ['critical', 'high', 'medium', 'low']

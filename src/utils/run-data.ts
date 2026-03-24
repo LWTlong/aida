@@ -77,11 +77,26 @@ export function recalcMetrics(data: RunData, projectRoot?: string): void {
   }
 
   // Node time breakdown
+  // Normalize Chinese stage names to English keys for consistent display
+  const stageNormalize: Record<string, string> = {
+    '代码生成': 'Code Generation',
+    '需求分析': 'Requirement Analysis',
+    '任务拆分': 'Task Split',
+    '自检审查': 'Self Review',
+    '质量自检': 'Self Review',
+    '偏差修复': 'Deviation Fix',
+    '缺陷修复': 'Bug Fix',
+    'Bug 修复': 'Bug Fix',
+    'bug修复': 'Bug Fix',
+    '需求接入': 'Requirement Ingestion',
+    '构建验证': 'Build Verification',
+  };
   const nodeTimes: Record<string, number> = {};
   for (const w of data.workflow) {
     if (w.startTime && w.endTime) {
       const sec = (new Date(w.endTime).getTime() - new Date(w.startTime).getTime()) / 1000;
-      if (sec > 0) nodeTimes[w.stage] = (nodeTimes[w.stage] || 0) + sec;
+      const stage = stageNormalize[w.stage] || w.stage;
+      if (sec > 0) nodeTimes[stage] = (nodeTimes[stage] || 0) + sec;
     }
   }
 
@@ -140,14 +155,20 @@ export function recalcMetrics(data: RunData, projectRoot?: string): void {
     m.tokenCost = Math.round(totalTokens / 1_000_000 * config.tokenPricePer1M * 100) / 100;
   }
 
-  if (estimatedManualHours > 0 && actualHours > 0) {
-    m.hoursSaved = Math.round((estimatedManualHours - actualHours) * 10) / 10;
+  // hoursSaved: human hours that AI replaced (= estimatedManualHours)
+  if (estimatedManualHours > 0) {
+    m.hoursSaved = estimatedManualHours;
   }
-  if (m.hoursSaved && hourlyRate > 0) {
-    m.moneySaved = Math.round(m.hoursSaved * hourlyRate * 100) / 100;
+
+  // moneySaved: manual labor cost - AI token cost
+  if (estimatedManualHours > 0 && hourlyRate > 0) {
+    const manualCost = estimatedManualHours * hourlyRate;
+    m.moneySaved = Math.round((manualCost - (m.tokenCost || 0)) * 100) / 100;
   }
-  if (m.moneySaved && m.tokenCost && m.tokenCost > 0) {
-    m.roi = Math.round((m.moneySaved - m.tokenCost) / m.tokenCost * 100 * 100) / 100;
+
+  // ROI: cost savings relative to AI cost
+  if (m.moneySaved != null && m.tokenCost && m.tokenCost > 0) {
+    m.roi = Math.round(m.moneySaved / m.tokenCost * 100 * 100) / 100;
   }
 }
 

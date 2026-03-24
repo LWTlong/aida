@@ -1,32 +1,76 @@
-export const rootCauseLabels: Record<string, string> = {
-  'rule-missing': '规则缺失',
-  'context-insufficient': '上下文不足',
-  'hallucination': '盲目照搬/臆想',
-  'misunderstanding': '需求理解偏差',
-  'reference-copy': '参考照搬',
-  'process-omission': '流程遗漏',
-  'multi-round': '多轮未收敛',
-  'context-lost': '上下文丢失',
-  'other': '其他原因',
+import type { TranslationMap } from './i18n'
+
+const rootCauseKeys: Record<string, keyof TranslationMap> = {
+  'rule-missing': 'lmRuleMissing',
+  'context-insufficient': 'lmContextInsufficient',
+  'hallucination': 'lmHallucination',
+  'misunderstanding': 'lmReqMisunderstand',
+  'reference-copy': 'lmRefCopy',
+  'process-omission': 'lmProcessOmission',
+  'multi-round': 'lmMultiRound',
+  'context-lost': 'lmContextLost',
+  'other': 'lmOtherReason',
 }
 
-export const deviationCategoryLabels: Record<string, string> = {
-  'ui-spacing': 'UI/间距',
-  'layout': '布局/结构',
-  'component-usage': '组件使用',
-  'i18n': 'i18n/国际化',
-  'api': 'API 接口',
-  'logic': '逻辑错误',
-  'architecture': '架构设计',
-  'style': '样式问题',
-  'process': '流程/缓存',
-  'other': '其他',
+const deviationCategoryKeys: Record<string, keyof TranslationMap> = {
+  'ui-spacing': 'lmUiSpacing',
+  'layout': 'lmLayout',
+  'component-usage': 'lmComponent',
+  'i18n': 'lmI18n',
+  'api': 'lmApi',
+  'logic': 'lmLogicError',
+  'architecture': 'lmArchitecture',
+  'style': 'lmStyle',
+  'process': 'lmProcessCache',
+  'other': 'lmOther',
 }
 
-export function rootCauseLabel(key: string): string {
-  return rootCauseLabels[key] || key
+export function rootCauseLabel(key: string, t?: TranslationMap): string {
+  const tKey = rootCauseKeys[key]
+  if (tKey && t) return t[tKey]
+  return key
 }
 
-export function deviationCategoryLabel(key: string): string {
-  return deviationCategoryLabels[key] || key
+export function deviationCategoryLabel(key: string, t?: TranslationMap): string {
+  const tKey = deviationCategoryKeys[key]
+  if (tKey && t) return t[tKey]
+  return key
+}
+
+// Stage/node name mapping — covers both English keys and Chinese data values
+const stageNameKeys: Record<string, keyof TranslationMap> = {
+  // English keys (from recalcMetrics hardcoded names)
+  'Code Generation': 'nodeCodeGen',
+  'Bug Fix': 'nodeBugFix',
+  'Deviation Fix': 'nodeDeviationFix',
+  'Self Review': 'nodeSelfReview',
+  'Task Split': 'nodeTaskSplit',
+  'Requirement Analysis': 'nodeReqAnalysis',
+  // kebab-case keys (from workflow stage field)
+  'code-generation': 'nodeCodeGen',
+  'bug-fix': 'nodeBugFix',
+  'deviation-fix': 'nodeDeviationFix',
+  'self-review': 'nodeSelfReview',
+  'task-split': 'nodeTaskSplit',
+  'requirement-analysis': 'nodeReqAnalysis',
+  'requirement-ingestion': 'nodeReqIngestion',
+  'build-verify': 'nodeBuildVerify',
+  // Chinese data values (written to run.json by Chinese-language workflows)
+  '代码生成': 'nodeCodeGen',
+  'Bug 修复': 'nodeBugFix',
+  'bug修复': 'nodeBugFix',
+  '偏差修复': 'nodeDeviationFix',
+  '缺陷修复': 'nodeBugFix',
+  '自检审查': 'nodeSelfReview',
+  '质量自检': 'nodeSelfReview',
+  '任务拆分': 'nodeTaskSplit',
+  '需求分析': 'nodeReqAnalysis',
+  '需求接入': 'nodeReqIngestion',
+  '构建验证': 'nodeBuildVerify',
+}
+
+export function stageLabel(key: string, t?: TranslationMap): string {
+  const tKey = stageNameKeys[key]
+  if (tKey && t) return t[tKey]
+  return key
 }

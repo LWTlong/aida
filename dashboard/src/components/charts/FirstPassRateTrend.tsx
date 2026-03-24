@@ -1,5 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
 import type { ReviewItem } from '../../types'
 
 interface Props {
@@ -7,8 +8,10 @@ interface Props {
 }
 
 export function FirstPassRateTrend({ reviews }: Props) {
+  const { t } = useLocale()
+
   if (reviews.length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无自检数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoReviewData}</div>
   }
 
   const chunkSize = 3

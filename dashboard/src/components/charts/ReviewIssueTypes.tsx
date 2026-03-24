@@ -1,5 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
 import type { ReviewItem } from '../../types'
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 const colorPool = ['#ef4444', '#f59e0b', '#3b82f6', '#a855f7', '#06b6d4', '#22c55e', '#ec4899', '#f97316']
 
 export function ReviewIssueTypes({ reviews }: Props) {
+  const { t } = useLocale()
   const issueCounts: Record<string, number> = {}
   for (const r of reviews) {
     if (r.issues) {
@@ -21,7 +23,7 @@ export function ReviewIssueTypes({ reviews }: Props) {
 
   const entries = Object.entries(issueCounts).sort((a, b) => a[1] - b[1])
   if (entries.length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无自检问题数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoReviewIssue}</div>
   }
 
   const top = entries.slice(-10)

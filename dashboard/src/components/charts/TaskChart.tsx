@@ -1,5 +1,7 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
+import { stageLabel } from '../../labelMap'
 import type { TaskItem, RunCost } from '../../types'
 
 interface Props {
@@ -29,19 +31,21 @@ function formatTokens(n: number): string {
 }
 
 export function TaskChart({ tasks, prdPhases, cost }: Props) {
+  const { t } = useLocale()
+
   // Group tasks by stageName, preserve order of appearance
   const stageOrder: string[] = []
   const stageMap: Record<string, { count: number; prd: string; seconds: number }> = {}
 
-  for (const t of tasks) {
-    const stage = t.stageName || '未分类'
+  for (const tk of tasks) {
+    const stage = tk.stageName || t.stageUncategorized
     if (!stageMap[stage]) {
       stageOrder.push(stage)
-      stageMap[stage] = { count: 0, prd: t.prdPhase || '', seconds: 0 }
+      stageMap[stage] = { count: 0, prd: tk.prdPhase || '', seconds: 0 }
     }
     stageMap[stage].count++
-    if (t.startedAt && t.completedAt) {
-      stageMap[stage].seconds += (new Date(t.completedAt).getTime() - new Date(t.startedAt).getTime()) / 1000
+    if (tk.startedAt && tk.completedAt) {
+      stageMap[stage].seconds += (new Date(tk.completedAt).getTime() - new Date(tk.startedAt).getTime()) / 1000
     }
   }
 
@@ -50,8 +54,8 @@ export function TaskChart({ tasks, prdPhases, cost }: Props) {
   const stageTokens: Record<string, number> = {}
   if (cost?.tokenBreakdown) {
     const taskStageMap: Record<string, string> = {}
-    for (const t of tasks) {
-      taskStageMap[t.taskId] = t.stageName || '未分类'
+    for (const tk of tasks) {
+      taskStageMap[tk.taskId] = tk.stageName || t.stageUncategorized
     }
     for (const item of cost.tokenBreakdown) {
       if (item.stage.startsWith('task:')) {
@@ -63,10 +67,10 @@ export function TaskChart({ tasks, prdPhases, cost }: Props) {
   }
   // Also check per-task tokensConsumed
   if (Object.keys(stageTokens).length === 0) {
-    for (const t of tasks) {
-      const consumed = (t as any).tokensConsumed || 0
+    for (const tk of tasks) {
+      const consumed = (tk as any).tokensConsumed || 0
       if (consumed > 0) {
-        const stage = t.stageName || '未分类'
+        const stage = tk.stageName || t.stageUncategorized
         stageTokens[stage] = (stageTokens[stage] || 0) + consumed
       }
     }
@@ -79,7 +83,7 @@ export function TaskChart({ tasks, prdPhases, cost }: Props) {
     prdColors[p] = prdColorList[i % prdColorList.length]
   })
 
-  const names = stageOrder
+  const names = stageOrder.map((s) => stageLabel(s, t))
   const data = stageOrder.map((s) => stageMap[s].count)
   const reversedNames = [...names].reverse()
 
@@ -93,8 +97,8 @@ export function TaskChart({ tasks, prdPhases, cost }: Props) {
         const stage = stageOrder[idx]
         const info = stageMap[stage]
         const tokens = stageTokens[stage] || 0
-        let tip = `<b>${p.name}</b><br/>任务数: ${info.count}`
-        if (info.seconds > 0) tip += `<br/>耗时: ${formatSeconds(info.seconds)}`
+        let tip = `<b>${p.name}</b><br/>${t.tipTaskCount}: ${info.count}`
+        if (info.seconds > 0) tip += `<br/>${t.tipDuration}: ${formatSeconds(info.seconds)}`
         if (tokens > 0) tip += `<br/>Token: ${formatTokens(tokens)}`
         return tip
       },
