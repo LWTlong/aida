@@ -14,7 +14,7 @@
 { "mcpServers": { "aida": { "command": "npx", "args": ["-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-[![npm version](https://img.shields.io/npm/v/ai-dev-analytics?color=%230066ff&label=npm)](https://www.npmjs.com/package/ai-dev-analytics)
+[![npm version](https://img.shields.io/badge/npm-v1.0.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#测试)
