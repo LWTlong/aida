@@ -1,0 +1,2667 @@
+{
+  "meta": {
+    "schemaVersion": "2.0",
+    "runId": "feat/notification-center",
+    "project": "saas-crm-platform",
+    "developer": "alex-chen",
+    "branch": "feat/notification-center",
+    "aiModel": "claude-sonnet-4-20250514",
+    "aiTool": "claude-code",
+    "startTime": "2026-03-06T00:00:00.000Z",
+    "endTime": "2026-03-23T12:05:00.000Z",
+    "status": "completed",
+    "prdPhases": [
+      "PRD1",
+      "PRD2",
+      "PRD3",
+      "PRD4"
+    ]
+  },
+  "summary": {
+    "totalTasks": 47,
+    "completedTasks": 47,
+    "bugCount": 5,
+    "deviationCount": 23,
+    "reviewCount": 4,
+    "reviewPassCount": 3,
+    "reviewFailCount": 1,
+    "rulesSedimented": 6,
+    "prdPhaseCount": 4,
+    "filesChanged": 45,
+    "linesAdded": 4064,
+    "linesRemoved": 42
+  },
+  "metrics": {
+    "aiDeviationRate": 48.94,
+    "bugRate": 10.64,
+    "reviewPassRate": 75,
+    "rulesSedimentedCount": 6,
+    "averageLinesPerTask": 87,
+    "totalDevelopmentTimeSeconds": 1507750,
+    "developmentVelocity": 0.11,
+    "nodeTimeBreakdown": {
+      "需求接入": 5700,
+      "需求分析": 6000,
+      "任务拆分": 5820,
+      "代码生成": 123780,
+      "质量自检": 10800,
+      "缺陷修复": 7200,
+      "构建验证": 300,
+      "Code Generation": 147195.763,
+      "Bug Fix": 7200,
+      "Deviation Fix": 29700
+    },
+    "actualWorkSeconds": 343696,
+    "tokenCost": 2.52,
+    "efficiencyMultiplier": 3.6,
+    "hoursSaved": 57,
+    "moneySaved": 852.48,
+    "roi": 33828.57
+  },
+  "context": {
+    "currentStage": "completed",
+    "currentTaskId": "TASK-47",
+    "currentPrdPhase": "PRD4",
+    "lastUpdated": "2026-03-23T10:49:09.840Z"
+  },
+  "tasks": [
+    {
+      "taskId": "TASK-01",
+      "title": "创建 pushTemplate API Mock",
+      "stageName": "阶段一：API 接口层（Mock）",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "函数可正常导入调用，返回 Mock 数据结构",
+      "createdAt": "2026-03-06T08:00:00.000Z",
+      "completedAt": "2026-03-06T09:30:00.000Z",
+      "startedAt": "2026-03-06T08:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-02",
+      "title": "创建 smsTemplate API Mock",
+      "stageName": "阶段一：API 接口层（Mock）",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "函数可正常导入调用，返回 Mock 数据结构",
+      "createdAt": "2026-03-06T09:30:00.000Z",
+      "completedAt": "2026-03-06T11:00:00.000Z",
+      "startedAt": "2026-03-06T09:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-03",
+      "title": "创建 pushTemplate i18n 文件",
+      "stageName": "阶段二：国际化",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "key 覆盖 PRD 4.5 中所有文案，中英文齐全",
+      "createdAt": "2026-03-06T11:00:00.000Z",
+      "completedAt": "2026-03-06T12:00:00.000Z",
+      "startedAt": "2026-03-06T11:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-04",
+      "title": "创建 smsTemplate i18n 文件",
+      "stageName": "阶段二：国际化",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "key 覆盖 PRD 4.7 中所有文案，中英文齐全",
+      "createdAt": "2026-03-06T12:00:00.000Z",
+      "completedAt": "2026-03-06T13:00:00.000Z",
+      "startedAt": "2026-03-06T12:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-05",
+      "title": "创建 Push 列表页 PageLayout 骨架",
+      "stageName": "阶段三：Push 模板列表页",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "页面渲染出 PageLayout 骨架，无报错",
+      "createdAt": "2026-03-06T13:00:00.000Z",
+      "completedAt": "2026-03-06T14:00:00.000Z",
+      "startedAt": "2026-03-06T13:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-06",
+      "title": "实现 Push 列表 FormJ 筛选区",
+      "stageName": "阶段三：Push 模板列表页",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "所有筛选项正常展示，查询/重置按钮功能正常",
+      "createdAt": "2026-03-06T14:00:00.000Z",
+      "completedAt": "2026-03-06T15:30:00.000Z",
+      "startedAt": "2026-03-06T14:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-07",
+      "title": "实现 Push 列表 Table + TableBtns",
+      "stageName": "阶段三：Push 模板列表页",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "表格正常展示 Mock 数据，分页正常，操作按钮展示正确",
+      "createdAt": "2026-03-06T15:30:00.000Z",
+      "completedAt": "2026-03-06T17:00:00.000Z",
+      "startedAt": "2026-03-06T15:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-08",
+      "title": "创建短信列表页完整实现",
+      "stageName": "阶段四：短信模板列表页",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "表格正常展示 Mock 数据，分页正常",
+      "createdAt": "2026-03-06T17:00:00.000Z",
+      "completedAt": "2026-03-06T19:00:00.000Z",
+      "startedAt": "2026-03-06T17:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-09",
+      "title": "PRD1 质量自检",
+      "stageName": "阶段四：短信模板列表页",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "所有规范检查通过",
+      "createdAt": "2026-03-06T19:00:00.000Z",
+      "completedAt": "2026-03-06T20:00:00.000Z",
+      "startedAt": "2026-03-06T19:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-10",
+      "title": "增补 pushTemplate API 编辑页 Mock 接口",
+      "stageName": "阶段五：编辑页 API 层（Mock）",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "getDetail/saveTemplate/getAttributes 可正常调用",
+      "createdAt": "2026-03-09T08:00:00.000Z",
+      "completedAt": "2026-03-09T09:00:00.000Z",
+      "startedAt": "2026-03-09T08:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-11",
+      "title": "增补 smsTemplate API 编辑页 Mock 接口",
+      "stageName": "阶段五：编辑页 API 层（Mock）",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "getDetail/saveTemplate/getAttributes 可正常调用",
+      "createdAt": "2026-03-09T09:00:00.000Z",
+      "completedAt": "2026-03-09T10:00:00.000Z",
+      "startedAt": "2026-03-09T09:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-12",
+      "title": "增补 pushTemplate i18n 编辑页文案",
+      "stageName": "阶段六：编辑页国际化",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "key 覆盖编辑页所有文案，中英文齐全",
+      "createdAt": "2026-03-09T10:00:00.000Z",
+      "completedAt": "2026-03-09T10:30:00.000Z",
+      "startedAt": "2026-03-09T10:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-13",
+      "title": "增补 smsTemplate i18n 编辑页文案",
+      "stageName": "阶段六：编辑页国际化",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "key 覆盖编辑页所有文案，中英文齐全",
+      "createdAt": "2026-03-09T10:30:00.000Z",
+      "completedAt": "2026-03-09T11:00:00.000Z",
+      "startedAt": "2026-03-09T10:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-14",
+      "title": "创建 PushEditor 组件",
+      "stageName": "阶段七：公共内容编辑器组件",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "组件独立可渲染，多语言增删正常，编辑器可输入，预览实时同步",
+      "createdAt": "2026-03-09T11:00:00.000Z",
+      "completedAt": "2026-03-09T14:00:00.000Z",
+      "startedAt": "2026-03-09T11:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-15",
+      "title": "创建 SmsEditor 组件",
+      "stageName": "阶段七：公共内容编辑器组件",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "组件独立可渲染，多语言增删正常，编辑器可输入，预览实时同步",
+      "createdAt": "2026-03-09T14:00:00.000Z",
+      "completedAt": "2026-03-09T17:00:00.000Z",
+      "startedAt": "2026-03-09T14:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-16",
+      "title": "创建 Push 编辑页骨架",
+      "stageName": "阶段八：Push 模板编辑页",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "页面可通过路由正常访问，骨架渲染无报错",
+      "createdAt": "2026-03-09T17:00:00.000Z",
+      "completedAt": "2026-03-09T17:30:00.000Z",
+      "startedAt": "2026-03-09T17:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-17",
+      "title": "实现 Push 编辑页 FormJ 基础信息区",
+      "stageName": "阶段八：Push 模板编辑页",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "基础信息区表单正常渲染，校验生效，编辑模式数据回填正常",
+      "createdAt": "2026-03-09T17:30:00.000Z",
+      "completedAt": "2026-03-09T18:30:00.000Z",
+      "startedAt": "2026-03-09T17:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-18",
+      "title": "集成 PushEditor + 保存逻辑",
+      "stageName": "阶段八：Push 模板编辑页",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "完整表单流程可跑通，校验拦截正常",
+      "createdAt": "2026-03-09T18:30:00.000Z",
+      "completedAt": "2026-03-09T19:30:00.000Z",
+      "startedAt": "2026-03-09T18:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-19",
+      "title": "创建短信编辑页完整实现",
+      "stageName": "阶段九：短信模板编辑页",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "完整表单流程可跑通",
+      "createdAt": "2026-03-09T19:30:00.000Z",
+      "completedAt": "2026-03-09T21:00:00.000Z",
+      "startedAt": "2026-03-09T19:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-20",
+      "title": "Push 列表页对接编辑页路由",
+      "stageName": "阶段十：列表页对接编辑页路由",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "列表页按钮可正常跳转到编辑页，编辑模式携带 id",
+      "createdAt": "2026-03-09T21:00:00.000Z",
+      "completedAt": "2026-03-09T21:15:00.000Z",
+      "startedAt": "2026-03-09T21:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-21",
+      "title": "短信列表页对接编辑页路由",
+      "stageName": "阶段十：列表页对接编辑页路由",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "列表页按钮可正常跳转到编辑页",
+      "createdAt": "2026-03-09T21:15:00.000Z",
+      "completedAt": "2026-03-09T21:30:00.000Z",
+      "startedAt": "2026-03-09T21:15:00.000Z"
+    },
+    {
+      "taskId": "TASK-22",
+      "title": "PRD2 构建验证",
+      "stageName": "阶段十：列表页对接编辑页路由",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "yarn build 零错误完成",
+      "createdAt": "2026-03-09T21:30:00.000Z",
+      "completedAt": "2026-03-09T22:00:00.000Z",
+      "startedAt": "2026-03-09T21:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-23",
+      "title": "PRD2 质量自检",
+      "stageName": "阶段十：列表页对接编辑页路由",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "所有规范检查通过",
+      "createdAt": "2026-03-09T22:00:00.000Z",
+      "completedAt": "2026-03-09T23:00:00.000Z",
+      "startedAt": "2026-03-09T22:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-24",
+      "title": "创建统一 API 类型定义 types.ts",
+      "stageName": "阶段十一：统一 API 类型定义",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "类型文件可正常被其他模块导入，无 TS 报错",
+      "createdAt": "2026-03-10T08:00:00.000Z",
+      "completedAt": "2026-03-10T09:00:00.000Z",
+      "startedAt": "2026-03-10T08:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-25",
+      "title": "创建统一模板管理 API template.ts",
+      "stageName": "阶段十二：统一 API 文件重构",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "所有函数可正常导入调用，类型签名正确",
+      "createdAt": "2026-03-10T09:00:00.000Z",
+      "completedAt": "2026-03-10T11:00:00.000Z",
+      "startedAt": "2026-03-10T09:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-26",
+      "title": "重构 pushTemplate.ts 为薄代理层",
+      "stageName": "阶段十二：统一 API 文件重构",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "View 层 import 路径不变，API 函数签名兼容",
+      "createdAt": "2026-03-10T11:00:00.000Z",
+      "completedAt": "2026-03-10T11:30:00.000Z",
+      "startedAt": "2026-03-10T11:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-27",
+      "title": "重构 smsTemplate.ts 为薄代理层",
+      "stageName": "阶段十二：统一 API 文件重构",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "View 层 import 路径不变",
+      "createdAt": "2026-03-10T11:30:00.000Z",
+      "completedAt": "2026-03-10T12:00:00.000Z",
+      "startedAt": "2026-03-10T11:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-28",
+      "title": "适配 Push 列表页字段映射",
+      "stageName": "阶段十三：列表页字段适配",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "列表页查询参数和表格列与后端接口字段一致",
+      "createdAt": "2026-03-10T12:00:00.000Z",
+      "completedAt": "2026-03-10T13:00:00.000Z",
+      "startedAt": "2026-03-10T12:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-29",
+      "title": "适配短信列表页字段映射",
+      "stageName": "阶段十三：列表页字段适配",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "列表页字段与后端一致",
+      "createdAt": "2026-03-10T13:00:00.000Z",
+      "completedAt": "2026-03-10T14:00:00.000Z",
+      "startedAt": "2026-03-10T13:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-30",
+      "title": "适配 Push 编辑页详情加载与保存",
+      "stageName": "阶段十四：编辑页字段适配",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "编辑页加载详情和保存的数据结构与后端一致",
+      "createdAt": "2026-03-10T14:00:00.000Z",
+      "completedAt": "2026-03-10T15:30:00.000Z",
+      "startedAt": "2026-03-10T14:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-31",
+      "title": "适配短信编辑页及内容编辑器",
+      "stageName": "阶段十四：编辑页字段适配",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "编辑器组件数据结构一致",
+      "createdAt": "2026-03-10T15:30:00.000Z",
+      "completedAt": "2026-03-10T17:00:00.000Z",
+      "startedAt": "2026-03-10T15:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-32",
+      "title": "增补 i18n 新增操作文案",
+      "stageName": "阶段十五：i18n 增补",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "所有新增操作文案中英文齐全",
+      "createdAt": "2026-03-10T17:00:00.000Z",
+      "completedAt": "2026-03-10T17:30:00.000Z",
+      "startedAt": "2026-03-10T17:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-33",
+      "title": "全量构建验证",
+      "stageName": "阶段十六：构建验证",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "yarn build 零错误完成",
+      "createdAt": "2026-03-10T17:30:00.000Z",
+      "completedAt": "2026-03-10T18:00:00.000Z",
+      "startedAt": "2026-03-10T17:30:00.000Z"
+    },
+    {
+      "taskId": "TASK-34",
+      "title": "PRD4 类型定义与 API 层准备",
+      "status": "done",
+      "stageName": "基础设施",
+      "prdPhase": "PRD4",
+      "acceptance": "新增 TemplateListItem mock 字段(msgType/language/compatibility)、getCountryList API 函数、测试发送接口参数更新、plan 保存/详情接口 templateType/templateCode/templateLatestVersion 字段类型定义，无编译错误",
+      "createdAt": "2026-03-23T08:03:50.851Z",
+      "completedAt": "2026-03-23T08:09:10.952Z",
+      "startedAt": "2026-03-23T08:07:52.146Z"
+    },
+    {
+      "taskId": "TASK-35",
+      "title": "PRD4 i18n 国际化文案",
+      "status": "done",
+      "stageName": "国际化",
+      "prdPhase": "PRD4",
+      "acceptance": "zh-cn.ts 和 en.ts 新增创建方式、模板选择弹窗、测试发送变量替换等相关 i18n key，t() 调用正常",
+      "createdAt": "2026-03-23T08:06:41.747Z",
+      "completedAt": "2026-03-23T08:10:00.603Z",
+      "startedAt": "2026-03-23T08:09:15.423Z"
+    },
+    {
+      "taskId": "TASK-36",
+      "title": "通用模板选择弹窗 templatePicker",
+      "status": "done",
+      "stageName": "公共组件",
+      "prdPhase": "PRD4",
+      "acceptance": "el-dialog 弹窗含 8 筛选项 + 9 列分页表格 + 单选 + 新增模板快捷入口(TODO路由)，sendMethod prop 区分渠道，defineAsyncComponent 异步加载",
+      "createdAt": "2026-03-23T08:06:41.925Z",
+      "completedAt": "2026-03-23T08:11:45.023Z",
+      "startedAt": "2026-03-23T08:10:05.797Z"
+    },
+    {
+      "taskId": "TASK-37",
+      "title": "Email 模板模式组件 EmailTemplateContent",
+      "status": "done",
+      "stageName": "视图层-模板模式",
+      "prdPhase": "PRD4",
+      "acceptance": "新建 EmailTemplateContent.vue：选择模板按钮、已选模板多语言内容以 HTML 只读渲染、语言 tag 切换，参考 TemplatePreviewDialog 左侧面板样式",
+      "createdAt": "2026-03-23T08:06:42.065Z",
+      "completedAt": "2026-03-23T08:13:04.974Z",
+      "startedAt": "2026-03-23T08:11:50.123Z"
+    },
+    {
+      "taskId": "TASK-38",
+      "title": "Push 模板模式组件 PushTemplateContent",
+      "status": "done",
+      "stageName": "视图层-模板模式",
+      "prdPhase": "PRD4",
+      "acceptance": "新建 PushTemplateContent.vue：选择模板按钮、已选模板多语言 title/content 纯文本只读预览、语言 tag 切换，参考 TemplatePreviewDialog 左侧面板样式",
+      "createdAt": "2026-03-23T08:06:52.064Z",
+      "completedAt": "2026-03-23T08:13:09.227Z",
+      "startedAt": "2026-03-23T08:13:09.093Z"
+    },
+    {
+      "taskId": "TASK-39",
+      "title": "SMS 模板模式组件 SmsTemplateContent",
+      "status": "done",
+      "stageName": "视图层-模板模式",
+      "prdPhase": "PRD4",
+      "acceptance": "新建 SmsTemplateContent.vue：选择模板按钮、已选模板多语言 content 纯文本只读预览、语言 tag 切换，参考 TemplatePreviewDialog 左侧面板样式",
+      "createdAt": "2026-03-23T08:06:52.251Z",
+      "completedAt": "2026-03-23T08:13:09.487Z",
+      "startedAt": "2026-03-23T08:13:09.360Z"
+    },
+    {
+      "taskId": "TASK-40",
+      "title": "email.vue 接入创建方式 Radio 切换",
+      "status": "done",
+      "stageName": "视图层-主页面改造",
+      "prdPhase": "PRD4",
+      "acceptance": "email.vue 新增 createMode radio(手动/模板)，v-if 切换旧编辑器和 EmailTemplateContent；模式切换 ElMessageBox 确认清空；替换旧 sendCloudTemplateCreate 逻辑；保存时传 templateType/templateCode/templateLatestVersion",
+      "createdAt": "2026-03-23T08:06:52.439Z",
+      "completedAt": "2026-03-23T08:14:53.405Z",
+      "startedAt": "2026-03-23T08:13:14.158Z"
+    },
+    {
+      "taskId": "TASK-41",
+      "title": "push.vue 接入创建方式 Radio 切换",
+      "status": "done",
+      "stageName": "视图层-主页面改造",
+      "prdPhase": "PRD4",
+      "acceptance": "push.vue 新增 createMode radio，v-if 切换旧编辑器和 PushTemplateContent；模式切换确认清空；保存时传 templateType/templateCode/templateLatestVersion",
+      "createdAt": "2026-03-23T08:06:59.673Z",
+      "completedAt": "2026-03-23T08:16:09.592Z",
+      "startedAt": "2026-03-23T08:14:57.656Z"
+    },
+    {
+      "taskId": "TASK-42",
+      "title": "sms.vue 接入创建方式 Radio 切换",
+      "status": "done",
+      "stageName": "视图层-主页面改造",
+      "prdPhase": "PRD4",
+      "acceptance": "sms.vue 新增 createMode radio，v-if 切换旧编辑器和 SmsTemplateContent；模式切换确认清空；保存时传 templateType/templateCode/templateLatestVersion",
+      "createdAt": "2026-03-23T08:06:59.811Z",
+      "completedAt": "2026-03-23T08:17:04.116Z",
+      "startedAt": "2026-03-23T08:16:15.079Z"
+    },
+    {
+      "taskId": "TASK-43",
+      "title": "模板版本更新校验",
+      "status": "done",
+      "stageName": "交互逻辑",
+      "prdPhase": "PRD4",
+      "acceptance": "运营计划提交前，若 createMode=templateSelect，调用 getTemplateVersions 检查是否有新版本，有则提示刷新或降级保存草稿",
+      "createdAt": "2026-03-23T08:06:59.958Z",
+      "completedAt": "2026-03-23T12:00:00.000Z",
+      "startedAt": "2026-03-23T08:18:49.332Z"
+    },
+    {
+      "taskId": "TASK-44",
+      "title": "测试发送弹窗改造 - 变量占位符替换",
+      "status": "done",
+      "stageName": "测试发送改造",
+      "prdPhase": "PRD4",
+      "acceptance": "testSendDialog 新增变量解析功能：自动解析内容中 ${xxx} 变量并生成 key-value 编辑表单，发送时替换占位符；三渠道通用",
+      "createdAt": "2026-03-23T08:07:14.037Z",
+      "completedAt": "2026-03-23T08:18:37.201Z",
+      "startedAt": "2026-03-23T08:17:10.789Z"
+    },
+    {
+      "taskId": "TASK-45",
+      "title": "测试发送弹窗改造 - 邮件/短信直接输入",
+      "status": "done",
+      "stageName": "测试发送改造",
+      "prdPhase": "PRD4",
+      "acceptance": "邮件模式新增 email 输入框(uid/email 二选一)；短信模式新增区号下拉(getCountryList)+手机号输入(uid/phone 二选一)；Push 仅 uid 不变",
+      "createdAt": "2026-03-23T08:07:14.204Z",
+      "completedAt": "2026-03-23T08:18:43.465Z",
+      "startedAt": "2026-03-23T08:18:43.326Z"
+    },
+    {
+      "taskId": "TASK-46",
+      "title": "运营计划详情回显模板模式",
+      "status": "done",
+      "stageName": "数据回显",
+      "prdPhase": "PRD4",
+      "acceptance": "GET /operation/{id} 返回 templateType=2 时，自动切换为模板模式，调用 getTemplateDetail 回填内容到 TemplateContent 组件只读展示",
+      "createdAt": "2026-03-23T08:07:14.425Z",
+      "completedAt": "2026-03-23T12:00:00.000Z",
+      "startedAt": "2026-03-23T12:00:00.000Z"
+    },
+    {
+      "taskId": "TASK-47",
+      "title": "全量构建验证",
+      "status": "done",
+      "stageName": "构建验证",
+      "prdPhase": "PRD4",
+      "acceptance": "yarn build 零错误完成，无 TypeScript 编译报错",
+      "createdAt": "2026-03-23T08:07:18.094Z",
+      "completedAt": "2026-03-23T12:05:00.000Z",
+      "startedAt": "2026-03-23T12:03:00.000Z"
+    }
+  ],
+  "bugs": [
+    {
+      "bugId": "BUG-01",
+      "title": "form 页面不需要标题（h3）",
+      "severity": "low",
+      "source": "user-feedback",
+      "status": "fixed",
+      "files": [
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "fix": "移除 <div class=\"template-form-header\"> 及对应样式",
+      "taskId": null,
+      "reportedAt": "2026-03-09T10:00:00.000Z",
+      "fixedAt": "2026-03-09T10:15:00.000Z"
+    },
+    {
+      "bugId": "BUG-02",
+      "title": "基础信息 FormJ 应使用上下布局（label 在上，输入框在下）",
+      "severity": "medium",
+      "source": "user-feedback",
+      "status": "fixed",
+      "files": [
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "fix": "label-position=\"top\" 直接以 attrs 透传给 el-form",
+      "taskId": null,
+      "reportedAt": "2026-03-09T10:15:00.000Z",
+      "fixedAt": "2026-03-09T10:30:00.000Z"
+    },
+    {
+      "bugId": "BUG-03",
+      "title": "FormJ 传参方式错误，:formProps 对象不会被 $attrs 透传",
+      "severity": "high",
+      "source": "user-feedback",
+      "status": "fixed",
+      "files": [
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "fix": "从 :formProps=\"{ labelPosition: 'top' }\" 改为 label-position=\"top\" 直接 attrs 传递",
+      "taskId": null,
+      "reportedAt": "2026-03-09T10:30:00.000Z",
+      "fixedAt": "2026-03-09T10:45:00.000Z"
+    },
+    {
+      "bugId": "BUG-04",
+      "title": "全局样式 .el-col .el-form-item { display: flex } 导致 label-position=\"top\" 不生效",
+      "severity": "high",
+      "source": "user-feedback",
+      "status": "fixed",
+      "files": [
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "fix": "scoped 样式中 :deep(.el-col .el-form-item) 补充 flex-direction: column",
+      "taskId": null,
+      "reportedAt": "2026-03-09T10:45:00.000Z",
+      "fixedAt": "2026-03-09T11:00:00.000Z"
+    },
+    {
+      "bugId": "BUG-05",
+      "title": "form 页面缺少统一布局壳，无间距和白色背景",
+      "severity": "medium",
+      "source": "user-feedback",
+      "status": "fixed",
+      "files": [
+        "src/components/FormLayout/FormLayout.vue"
+      ],
+      "fix": "新建 FormLayout 组件，专用于表单/详情二级页面",
+      "taskId": null,
+      "reportedAt": "2026-03-09T11:00:00.000Z",
+      "fixedAt": "2026-03-09T12:00:00.000Z"
+    }
+  ],
+  "deviations": [
+    {
+      "deviationId": "DEV-01",
+      "title": "form 页面不应有独立标题",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "ui-spacing",
+      "aiOutput": "form 页面顶部渲染了 <h3>新增/编辑 XXX 模板</h3> 标题",
+      "expectedOutput": "不需要标题，菜单名已经表达了页面含义",
+      "files": [
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T10:00:00.000Z",
+      "fixedAt": "2026-03-09T10:15:00.000Z"
+    },
+    {
+      "deviationId": "DEV-02",
+      "title": "表单页 FormJ 应使用上下布局",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "component-usage",
+      "aiOutput": "labelPosition: 'right'（左右布局），labelWidth: '120px'",
+      "expectedOutput": "labelPosition: 'top'（上下布局），label 在上输入框在下",
+      "files": [
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "ruleSedimented": {
+        "file": ".ai/rules/component-usage.md",
+        "content": "编辑页 FormJ 必须 labelPosition: top"
+      },
+      "detectedAt": "2026-03-09T10:15:00.000Z",
+      "fixedAt": "2026-03-09T10:30:00.000Z"
+    },
+    {
+      "deviationId": "DEV-03",
+      "title": "FormJ 属性透传方式错误",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "component-usage",
+      "aiOutput": ":formProps=\"{ labelPosition: 'top' }\"（包裹在对象 prop 中）",
+      "expectedOutput": "直接 attrs 传递 label-position=\"top\"",
+      "files": [
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "ruleSedimented": {
+        "file": ".ai/rules/component-usage.md",
+        "content": "FormJ 属性必须直接以 attrs 形式传入"
+      },
+      "detectedAt": "2026-03-09T10:30:00.000Z",
+      "fixedAt": "2026-03-09T10:45:00.000Z"
+    },
+    {
+      "deviationId": "DEV-04",
+      "title": "未考虑全局样式对表单布局的干扰",
+      "rootCauseCategory": "context-insufficient",
+      "deviationCategory": "style",
+      "aiOutput": "仅设置 label-position=\"top\"，未处理全局 flex 覆盖",
+      "expectedOutput": "label 真正显示在 input 上方",
+      "files": [
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T10:45:00.000Z",
+      "fixedAt": "2026-03-09T11:00:00.000Z"
+    },
+    {
+      "deviationId": "DEV-05",
+      "title": "表单页不应直接使用 PageLayout",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "component-usage",
+      "aiOutput": "使用 PageLayout + #table 插槽（高度不撑开）",
+      "expectedOutput": "专门的二级页面布局组件（撑满高度 + 内容溢出滚动）",
+      "files": [
+        "src/components/FormLayout/FormLayout.vue"
+      ],
+      "ruleSedimented": {
+        "file": ".ai/rules/component-usage.md",
+        "content": "FormLayout 组件规范"
+      },
+      "detectedAt": "2026-03-09T11:00:00.000Z",
+      "fixedAt": "2026-03-09T12:00:00.000Z"
+    },
+    {
+      "deviationId": "DEV-06",
+      "title": "bug-fixer 未记录 bugTask.md",
+      "rootCauseCategory": "process-omission",
+      "deviationCategory": "process",
+      "aiOutput": "执行 /bug-fixer 时只修复代码，未在 bugTask.md 中记录任务",
+      "expectedOutput": "每次 /bug-fixer 都必须更新 bugTask.md",
+      "files": [
+        "bugTask.md",
+        ".ai/skills/bug-fixer/SKILL.md"
+      ],
+      "ruleSedimented": {
+        "file": ".ai/skills/bug-fixer/SKILL.md",
+        "content": "bug-fixer 第 4 步强化为强制不可跳过"
+      },
+      "detectedAt": "2026-03-09T12:00:00.000Z",
+      "fixedAt": "2026-03-09T12:15:00.000Z"
+    },
+    {
+      "deviationId": "DEV-07",
+      "title": "Push 编辑器消息类型和点击推送后应在同一行",
+      "rootCauseCategory": "context-insufficient",
+      "deviationCategory": "layout",
+      "aiOutput": "消息类型独占一行，点击推送后另起一行",
+      "expectedOutput": "两个字段在同一行展示，节省纵向空间",
+      "files": [
+        "src/views/notifications/components/PushEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T14:00:00.000Z",
+      "fixedAt": "2026-03-09T14:15:00.000Z"
+    },
+    {
+      "deviationId": "DEV-08",
+      "title": "多语言编辑区块灰色卡片背景不美观",
+      "rootCauseCategory": "context-insufficient",
+      "deviationCategory": "style",
+      "aiOutput": "el-card 背景色为 var(--el-color-info-light-8)（灰色）",
+      "expectedOutput": "更清爽的视觉设计",
+      "files": [
+        "src/views/notifications/components/PushEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T14:15:00.000Z",
+      "fixedAt": "2026-03-09T14:30:00.000Z"
+    },
+    {
+      "deviationId": "DEV-09",
+      "title": "字数统计和描述文本不应换行显示",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "ui-spacing",
+      "aiOutput": "字数统计数值和描述文本使用 <div> + <p> 标签包裹，导致换行显示",
+      "expectedOutput": "字数和描述在同一行内联展示，描述文字用更小字号",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T14:30:00.000Z",
+      "fixedAt": "2026-03-09T14:45:00.000Z"
+    },
+    {
+      "deviationId": "DEV-10",
+      "title": "编辑器卡片左侧蓝色色条过于突兀",
+      "rootCauseCategory": "context-insufficient",
+      "deviationCategory": "style",
+      "aiOutput": "el-card 设置 border-left: 3px solid var(--el-color-primary) 蓝色左边框",
+      "expectedOutput": "去除左侧色条，使用普通边框即可",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T14:45:00.000Z",
+      "fixedAt": "2026-03-09T15:00:00.000Z"
+    },
+    {
+      "deviationId": "DEV-11",
+      "title": "新增语言按钮与消息类型表单缺少间距",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "ui-spacing",
+      "aiOutput": "新增语言按钮行与上方消息类型 select 之间无额外边距",
+      "expectedOutput": "按钮行上方应有适当间距，视觉上与表单项分隔",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T15:00:00.000Z",
+      "fixedAt": "2026-03-09T15:10:00.000Z"
+    },
+    {
+      "deviationId": "DEV-12",
+      "title": "新增语言按钮间距方向不合理",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "ui-spacing",
+      "aiOutput": "按钮行 mt10 mb20（上边距小、下边距大），按钮远离编辑卡片",
+      "expectedOutput": "按钮应更贴近下方编辑卡片，上边距大于下边距",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T15:10:00.000Z",
+      "fixedAt": "2026-03-09T15:20:00.000Z"
+    },
+    {
+      "deviationId": "DEV-13",
+      "title": "字数统计使用 el-form-item 导致 label 和内容分行",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "component-usage",
+      "aiOutput": "<el-form-item :label=\"字数统计\"><span>0</span></el-form-item>",
+      "expectedOutput": "字数统计全部在一行内联展示",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T15:20:00.000Z",
+      "fixedAt": "2026-03-09T15:35:00.000Z"
+    },
+    {
+      "deviationId": "DEV-14",
+      "title": "测试发送按钮上边距过大",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "ui-spacing",
+      "aiOutput": "测试发送按钮使用 mt20（20px 上边距）",
+      "expectedOutput": "上边距改为 15px",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T15:35:00.000Z",
+      "fixedAt": "2026-03-09T15:45:00.000Z"
+    },
+    {
+      "deviationId": "DEV-15",
+      "title": "字数统计应在编辑器容器内而非独立区块",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "layout",
+      "aiOutput": ".word-count-line 放在 .content 容器外部",
+      "expectedOutput": "字数统计应包裹在 .content 容器内，紧贴编辑器下方",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T15:45:00.000Z",
+      "fixedAt": "2026-03-09T16:00:00.000Z"
+    },
+    {
+      "deviationId": "DEV-16",
+      "title": "保存按钮被返回顶部组件遮挡",
+      "rootCauseCategory": "context-insufficient",
+      "deviationCategory": "layout",
+      "aiOutput": "FormLayout footer 使用 text-align: right，按钮靠右对齐",
+      "expectedOutput": "按钮居中显示，避免被右下角返回顶部组件遮挡",
+      "files": [
+        "src/components/FormLayout/FormLayout.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T16:00:00.000Z",
+      "fixedAt": "2026-03-09T16:10:00.000Z"
+    },
+    {
+      "deviationId": "DEV-17",
+      "title": "字数统计与编辑器间距仍然过大",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "ui-spacing",
+      "aiOutput": ".content 内的 el-form-item 保留默认 margin-bottom（~18px）",
+      "expectedOutput": "编辑器与字数统计间距仅需 5px",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T16:10:00.000Z",
+      "fixedAt": "2026-03-09T16:20:00.000Z"
+    },
+    {
+      "deviationId": "DEV-18",
+      "title": "测试发送按钮上边距仍然偏大",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "ui-spacing",
+      "aiOutput": "测试发送按钮使用 mt15（15px 上边距）",
+      "expectedOutput": "上边距改为 5px",
+      "files": [
+        "PushEditor.vue",
+        "SmsEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T16:20:00.000Z",
+      "fixedAt": "2026-03-09T16:25:00.000Z"
+    },
+    {
+      "deviationId": "DEV-19",
+      "title": "FormLayout 内容区与底部操作栏间距不足",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "ui-spacing",
+      "aiOutput": "body padding-bottom 为 20px",
+      "expectedOutput": "增加到 40px，让内容与保存按钮有更明显的视觉分隔",
+      "files": [
+        "src/components/FormLayout/FormLayout.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-09T16:25:00.000Z",
+      "fixedAt": "2026-03-09T16:30:00.000Z"
+    },
+    {
+      "deviationId": "DEV-20",
+      "title": "列表页使用 onActivated 无差别刷新破坏 keep-alive 缓存体验",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "logic",
+      "aiOutput": "在列表页添加 onActivated(() => getDataList())，导致任何页面切换回来都会刷新列表数据",
+      "expectedOutput": "仅在保存成功后定向刷新列表，取消操作不刷新；keep-alive 缓存的列表页在普通切换时不应重新请求",
+      "files": [
+        "pushNotify/index.vue",
+        "smsNotify/index.vue",
+        "pushNotify/form.vue",
+        "smsNotify/form.vue"
+      ],
+      "ruleSedimented": {
+        "file": ".ai/rules/component-usage.md",
+        "content": "列表页刷新必须使用 mittBus 定向事件，禁止在 onActivated 中无条件调用 getDataList"
+      },
+      "detectedAt": "2026-03-09T16:30:00.000Z",
+      "fixedAt": "2026-03-09T17:00:00.000Z"
+    },
+    {
+      "deviationId": "DEV-21",
+      "title": "删除确认框标题缺少 common.warning i18n key",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "i18n",
+      "aiOutput": "删除确认框使用 t('common.warning') 作为标题，但全局 i18n 文件中未定义该 key",
+      "expectedOutput": "确认框标题正常显示 警告 / Warning",
+      "files": [
+        "src/i18n/pages/form/zh-cn.ts",
+        "src/i18n/pages/form/en.ts"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-10T08:00:00.000Z",
+      "fixedAt": "2026-03-10T08:15:00.000Z"
+    },
+    {
+      "deviationId": "DEV-22",
+      "title": "Push 表单页 URL 输入框与前面两个 Select 不对齐",
+      "rootCauseCategory": "hallucination",
+      "deviationCategory": "layout",
+      "aiOutput": "msgType 在外层 el-col :span=\"6\" 中，linkType 和 url 在嵌套的 el-row（gutter=8）内",
+      "expectedOutput": "三个表单项在同一行对齐展示",
+      "files": [
+        "src/views/notifications/components/PushEditor.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-10T08:15:00.000Z",
+      "fixedAt": "2026-03-10T08:30:00.000Z"
+    },
+    {
+      "deviationId": "DEV-23",
+      "title": "预览、版本记录、引用侧边栏等操作仅为 TODO 占位",
+      "rootCauseCategory": "process-omission",
+      "deviationCategory": "other",
+      "aiOutput": "handlePreview、handleVersionHistory、handleViewReference 仅有 console.log 占位",
+      "expectedOutput": "搭建弹窗/侧边栏组件骨架，含 Mock 数据",
+      "files": [
+        "components/TemplatePreviewDialog.vue",
+        "components/TemplateVersionDialog.vue",
+        "components/TemplateReferenceDrawer.vue"
+      ],
+      "ruleSedimented": false,
+      "detectedAt": "2026-03-10T08:30:00.000Z",
+      "fixedAt": "2026-03-10T11:00:00.000Z"
+    }
+  ],
+  "reviews": [
+    {
+      "reviewId": "REVIEW-01",
+      "taskId": "TASK-09",
+      "result": "pass",
+      "issueCount": 2,
+      "scope": "Push 模板列表页 + 短信模板列表页（8 个新建文件）",
+      "reviewedAt": "2026-03-06T20:00:00.000Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REVIEW-02",
+      "taskId": "TASK-23",
+      "result": "pass",
+      "issueCount": 2,
+      "scope": "PRD2 编辑页（4 个新建文件 + 8 个修改文件）",
+      "reviewedAt": "2026-03-09T23:00:00.000Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REVIEW-03",
+      "taskId": "TASK-33",
+      "result": "fail",
+      "issueCount": 3,
+      "scope": "PRD3 接口对接阶段（14 个文件）",
+      "reviewedAt": "2026-03-10T18:00:00.000Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REVIEW-04",
+      "taskId": "TASK-33",
+      "result": "pass",
+      "issueCount": 2,
+      "scope": "DevicePreview 提取 + el-tag 修复 + 预览样式同步",
+      "reviewedAt": "2026-03-10T19:00:00.000Z",
+      "issues": []
+    }
+  ],
+  "rules": [
+    {
+      "ruleId": "RULE-01",
+      "content": "编辑页 FormJ 必须使用 labelPosition: 'top'，label 在上输入框在下",
+      "sourceDeviation": "DEV-02",
+      "sedimentedAt": "2026-03-09T10:30:00.000Z",
+      "file": ".ai/rules/component-usage.md"
+    },
+    {
+      "ruleId": "RULE-02",
+      "content": "FormJ 属性必须直接以 attrs 形式传入（如 label-position=\"top\"），不能包裹在 :formProps 对象中",
+      "sourceDeviation": "DEV-03",
+      "sedimentedAt": "2026-03-09T10:45:00.000Z",
+      "file": ".ai/rules/component-usage.md"
+    },
+    {
+      "ruleId": "RULE-03",
+      "content": "表单/详情二级页面必须使用 FormLayout 组件，不应使用 PageLayout",
+      "sourceDeviation": "DEV-05",
+      "sedimentedAt": "2026-03-09T12:00:00.000Z",
+      "file": ".ai/rules/component-usage.md"
+    },
+    {
+      "ruleId": "RULE-04",
+      "content": "bug-fixer 执行时第 4 步（记录反馈）强制不可跳过，必须更新 bugTask.md",
+      "sourceDeviation": "DEV-06",
+      "sedimentedAt": "2026-03-09T12:15:00.000Z",
+      "file": ".ai/skills/bug-fixer/SKILL.md"
+    },
+    {
+      "ruleId": "RULE-05",
+      "content": "列表页刷新必须使用 mittBus 定向事件通知，禁止在 onActivated 中无条件调用 getDataList（破坏 keep-alive 缓存）",
+      "sourceDeviation": "DEV-20",
+      "sedimentedAt": "2026-03-09T17:00:00.000Z",
+      "file": ".ai/rules/component-usage.md"
+    },
+    {
+      "ruleId": "RULE-06",
+      "content": "UI 实现必须优先使用 Element Plus 标准组件，保持与项目主题风格一致。只有当 Element Plus 没有满足需求的组件时才考虑自定义实现",
+      "sourceDeviation": null,
+      "sedimentedAt": "2026-03-23T06:15:00.000Z",
+      "file": ".ai/rules/component-usage.md"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/api/notifications/pushTemplate.ts",
+      "changeType": "created",
+      "linesAdded": 85,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-06T09:30:00.000Z"
+    },
+    {
+      "path": "src/api/notifications/smsTemplate.ts",
+      "changeType": "created",
+      "linesAdded": 82,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-06T11:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/i18n/zh-cn.ts",
+      "changeType": "created",
+      "linesAdded": 95,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-06T12:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/i18n/en.ts",
+      "changeType": "created",
+      "linesAdded": 95,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-06T12:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/i18n/zh-cn.ts",
+      "changeType": "created",
+      "linesAdded": 88,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-06T13:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/i18n/en.ts",
+      "changeType": "created",
+      "linesAdded": 88,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-06T13:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/index.vue",
+      "changeType": "created",
+      "linesAdded": 285,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-06T17:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/index.vue",
+      "changeType": "created",
+      "linesAdded": 272,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-06T19:00:00.000Z"
+    },
+    {
+      "path": "src/api/notifications/pushTemplate.ts",
+      "changeType": "modified",
+      "linesAdded": 48,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T09:00:00.000Z"
+    },
+    {
+      "path": "src/api/notifications/smsTemplate.ts",
+      "changeType": "modified",
+      "linesAdded": 45,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T10:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/i18n/zh-cn.ts",
+      "changeType": "modified",
+      "linesAdded": 58,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T10:30:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/i18n/en.ts",
+      "changeType": "modified",
+      "linesAdded": 58,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T10:30:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/i18n/zh-cn.ts",
+      "changeType": "modified",
+      "linesAdded": 52,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T11:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/i18n/en.ts",
+      "changeType": "modified",
+      "linesAdded": 52,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T11:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/components/PushEditor.vue",
+      "changeType": "created",
+      "linesAdded": 458,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T14:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/components/SmsEditor.vue",
+      "changeType": "created",
+      "linesAdded": 392,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T17:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/form.vue",
+      "changeType": "created",
+      "linesAdded": 245,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T19:30:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/form.vue",
+      "changeType": "created",
+      "linesAdded": 238,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T21:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/index.vue",
+      "changeType": "modified",
+      "linesAdded": 18,
+      "linesRemoved": 2,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T21:15:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/index.vue",
+      "changeType": "modified",
+      "linesAdded": 18,
+      "linesRemoved": 2,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T21:30:00.000Z"
+    },
+    {
+      "path": "src/components/FormLayout/FormLayout.vue",
+      "changeType": "created",
+      "linesAdded": 68,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-09T12:00:00.000Z"
+    },
+    {
+      "path": "src/api/notifications/types.ts",
+      "changeType": "created",
+      "linesAdded": 142,
+      "linesRemoved": 0,
+      "changeCount": 2,
+      "lastModified": "2026-03-23T08:09:10.539Z"
+    },
+    {
+      "path": "src/api/notifications/template.ts",
+      "changeType": "created",
+      "linesAdded": 325,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T11:00:00.000Z"
+    },
+    {
+      "path": "src/api/notifications/pushTemplate.ts",
+      "changeType": "modified",
+      "linesAdded": 95,
+      "linesRemoved": 18,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T11:30:00.000Z"
+    },
+    {
+      "path": "src/api/notifications/smsTemplate.ts",
+      "changeType": "modified",
+      "linesAdded": 92,
+      "linesRemoved": 15,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T12:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/index.vue",
+      "changeType": "modified",
+      "linesAdded": 68,
+      "linesRemoved": 5,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T13:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/index.vue",
+      "changeType": "modified",
+      "linesAdded": 65,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T14:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/pushNotify/form.vue",
+      "changeType": "modified",
+      "linesAdded": 88,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T15:30:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/smsNotify/form.vue",
+      "changeType": "modified",
+      "linesAdded": 82,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T16:00:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/components/PushEditor.vue",
+      "changeType": "modified",
+      "linesAdded": 125,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T16:30:00.000Z"
+    },
+    {
+      "path": "src/views/notifications/components/SmsEditor.vue",
+      "changeType": "modified",
+      "linesAdded": 118,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T17:00:00.000Z"
+    },
+    {
+      "path": "src/i18n/pages/form/zh-cn.ts",
+      "changeType": "modified",
+      "linesAdded": 12,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T17:15:00.000Z"
+    },
+    {
+      "path": "src/i18n/pages/form/en.ts",
+      "changeType": "modified",
+      "linesAdded": 12,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-10T17:30:00.000Z"
+    },
+    {
+      "path": "src/api/campaign/plan.ts",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:09:10.684Z"
+    },
+    {
+      "path": "src/api/campaign/planApiType.d.ts",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:09:10.821Z"
+    },
+    {
+      "path": "src/views/campaign/i18n/zh-cn.ts",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:10:00.332Z"
+    },
+    {
+      "path": "src/views/campaign/i18n/en.ts",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:10:00.469Z"
+    },
+    {
+      "path": "src/views/campaign/components/dialogs/templatePicker.vue",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:11:44.889Z"
+    },
+    {
+      "path": "src/views/campaign/components/settings/EmailTemplateContent.vue",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:13:04.571Z"
+    },
+    {
+      "path": "src/views/campaign/components/settings/PushTemplateContent.vue",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:13:04.701Z"
+    },
+    {
+      "path": "src/views/campaign/components/settings/SmsTemplateContent.vue",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:13:04.842Z"
+    },
+    {
+      "path": "src/views/campaign/components/settings/email.vue",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:14:53.252Z"
+    },
+    {
+      "path": "src/views/campaign/components/settings/push.vue",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:16:09.460Z"
+    },
+    {
+      "path": "src/views/campaign/components/settings/sms.vue",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:17:03.989Z"
+    },
+    {
+      "path": "src/views/campaign/components/dialogs/testSendDialog.vue",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-03-23T08:18:37.062Z"
+    }
+  ],
+  "timeline": [
+    {
+      "type": "workflow-start",
+      "title": "开始工作流 - PRD1 列表页开发",
+      "timestamp": "2026-03-06T08:00:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "requirement-confirmed",
+      "title": "需求理解已确认 - PRD1",
+      "timestamp": "2026-03-06T08:30:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "tasks-generated",
+      "title": "任务清单已生成 - PRD1（9个任务）",
+      "timestamp": "2026-03-06T09:00:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-completed",
+      "title": "完成 TASK-01: 创建 pushTemplate API Mock",
+      "timestamp": "2026-03-06T09:30:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-completed",
+      "title": "完成 TASK-02: 创建 smsTemplate API Mock",
+      "timestamp": "2026-03-06T11:00:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-completed",
+      "title": "完成 TASK-03-04: 国际化文件",
+      "timestamp": "2026-03-06T13:00:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-completed",
+      "title": "完成 TASK-05-07: Push 列表页",
+      "timestamp": "2026-03-06T17:00:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-completed",
+      "title": "完成 TASK-08: 短信列表页",
+      "timestamp": "2026-03-06T19:00:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "review-completed",
+      "title": "完成 REVIEW-01: PRD1 质量自检通过",
+      "timestamp": "2026-03-06T20:00:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "workflow-start",
+      "title": "开始工作流 - PRD2 编辑页开发",
+      "timestamp": "2026-03-09T08:00:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "requirement-confirmed",
+      "title": "需求理解已确认 - PRD2",
+      "timestamp": "2026-03-09T08:30:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "tasks-generated",
+      "title": "任务清单已生成 - PRD2（14个任务）",
+      "timestamp": "2026-03-09T09:00:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "bug-reported",
+      "title": "发现 BUG-01: form 页面标题问题",
+      "timestamp": "2026-03-09T10:00:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "deviation-detected",
+      "title": "记录 DEV-01: form 页面不应有独立标题",
+      "timestamp": "2026-03-09T10:00:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "bug-fixed",
+      "title": "修复 BUG-01-05",
+      "timestamp": "2026-03-09T12:00:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "rule-sedimented",
+      "title": "沉淀规则 RULE-01-04",
+      "timestamp": "2026-03-09T12:15:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task-completed",
+      "title": "完成 TASK-10-23: PRD2 所有任务",
+      "timestamp": "2026-03-09T22:00:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "review-completed",
+      "title": "完成 REVIEW-02: PRD2 质量自检通过",
+      "timestamp": "2026-03-09T23:00:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "workflow-start",
+      "title": "开始工作流 - PRD3 接口对接",
+      "timestamp": "2026-03-10T08:00:00.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "requirement-confirmed",
+      "title": "需求理解已确认 - PRD3",
+      "timestamp": "2026-03-10T08:30:00.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "tasks-generated",
+      "title": "任务清单已生成 - PRD3（10个任务）",
+      "timestamp": "2026-03-10T09:00:00.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task-completed",
+      "title": "完成 TASK-24-33: PRD3 所有任务",
+      "timestamp": "2026-03-10T18:00:00.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "review-completed",
+      "title": "完成 REVIEW-03: PRD3 质量自检（未通过）",
+      "timestamp": "2026-03-10T18:00:00.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "review-completed",
+      "title": "完成 REVIEW-04: 修复后重新自检通过",
+      "timestamp": "2026-03-10T19:00:00.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "workflow-completed",
+      "title": "工作流完成 - 所有 PRD 阶段完成",
+      "timestamp": "2026-03-10T23:59:59.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "workflow-start",
+      "title": "开始工作流 - PRD4 模板与运营计划衔接",
+      "timestamp": "2026-03-23T03:30:00.000Z",
+      "prdPhase": "PRD4"
+    },
+    {
+      "type": "requirement-revision",
+      "title": "需求理解修正 - PRD4（扩展至Email/Push/SMS，模板回填，共用弹窗）",
+      "timestamp": "2026-03-23T06:15:00.000Z",
+      "prdPhase": "PRD4"
+    },
+    {
+      "type": "requirement-revision",
+      "title": "需求理解二次修正 - PRD4（筛选/列修正、回填可编辑、变量占位符替换）",
+      "timestamp": "2026-03-23T07:00:00.000Z",
+      "prdPhase": "PRD4"
+    },
+    {
+      "type": "requirement-revision",
+      "title": "需求理解三次修正 - PRD4（产品确认：模板多语言单选+只读回填、新增模板快捷入口）",
+      "timestamp": "2026-03-23T07:30:00.000Z",
+      "prdPhase": "PRD4"
+    },
+    {
+      "type": "requirement-revision",
+      "title": "架构决策 - 手动/模板两种模式组件隔离，新建TemplateContent组件",
+      "timestamp": "2026-03-23T08:00:00.000Z",
+      "prdPhase": "PRD4"
+    },
+    {
+      "type": "requirement-confirmed",
+      "title": "PRD4 需求理解确认 - 进入任务拆分",
+      "timestamp": "2026-03-23T08:05:00.000Z",
+      "prdPhase": "PRD4"
+    },
+    {
+      "type": "task",
+      "title": "TASK-34: PRD4 类型定义与 API 层准备",
+      "timestamp": "2026-03-23T08:03:50.858Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-35: PRD4 i18n 国际化文案",
+      "timestamp": "2026-03-23T08:06:41.752Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-36: 通用模板选择弹窗 templatePicker",
+      "timestamp": "2026-03-23T08:06:41.926Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-37: Email 模板模式组件 EmailTemplateContent",
+      "timestamp": "2026-03-23T08:06:42.065Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-38: Push 模板模式组件 PushTemplateContent",
+      "timestamp": "2026-03-23T08:06:52.064Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-39: SMS 模板模式组件 SmsTemplateContent",
+      "timestamp": "2026-03-23T08:06:52.252Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-40: email.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:06:52.440Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-41: push.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:06:59.674Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-42: sms.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:06:59.811Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-43: 模板版本更新校验",
+      "timestamp": "2026-03-23T08:06:59.958Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-44: 测试发送弹窗改造 - 变量占位符替换",
+      "timestamp": "2026-03-23T08:07:14.038Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-45: 测试发送弹窗改造 - 邮件/短信直接输入",
+      "timestamp": "2026-03-23T08:07:14.205Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-46: 运营计划详情回显模板模式",
+      "timestamp": "2026-03-23T08:07:14.426Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-47: 全量构建验证",
+      "timestamp": "2026-03-23T08:07:18.095Z"
+    },
+    {
+      "type": "tasks-generated",
+      "title": "PRD4 任务清单已生成（14 个任务：TASK-34 ~ TASK-47）",
+      "timestamp": "2026-03-23T08:08:00.000Z",
+      "prdPhase": "PRD4"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-34: PRD4 类型定义与 API 层准备",
+      "timestamp": "2026-03-23T08:07:52.147Z"
+    },
+    {
+      "type": "file",
+      "title": "src/api/notifications/types.ts [modified]",
+      "timestamp": "2026-03-23T08:09:10.540Z"
+    },
+    {
+      "type": "file",
+      "title": "src/api/campaign/plan.ts [modified]",
+      "timestamp": "2026-03-23T08:09:10.685Z"
+    },
+    {
+      "type": "file",
+      "title": "src/api/campaign/planApiType.d.ts [modified]",
+      "timestamp": "2026-03-23T08:09:10.822Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-34: PRD4 类型定义与 API 层准备",
+      "timestamp": "2026-03-23T08:09:10.953Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-35: PRD4 i18n 国际化文案",
+      "timestamp": "2026-03-23T08:09:15.423Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/i18n/zh-cn.ts [modified]",
+      "timestamp": "2026-03-23T08:10:00.333Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/i18n/en.ts [modified]",
+      "timestamp": "2026-03-23T08:10:00.470Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-35: PRD4 i18n 国际化文案",
+      "timestamp": "2026-03-23T08:10:00.604Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-36: 通用模板选择弹窗 templatePicker",
+      "timestamp": "2026-03-23T08:10:05.798Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/components/dialogs/templatePicker.vue [modified]",
+      "timestamp": "2026-03-23T08:11:44.890Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-36: 通用模板选择弹窗 templatePicker",
+      "timestamp": "2026-03-23T08:11:45.024Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-37: Email 模板模式组件 EmailTemplateContent",
+      "timestamp": "2026-03-23T08:11:50.124Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/components/settings/EmailTemplateContent.vue [modified]",
+      "timestamp": "2026-03-23T08:13:04.572Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/components/settings/PushTemplateContent.vue [modified]",
+      "timestamp": "2026-03-23T08:13:04.702Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/components/settings/SmsTemplateContent.vue [modified]",
+      "timestamp": "2026-03-23T08:13:04.843Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-37: Email 模板模式组件 EmailTemplateContent",
+      "timestamp": "2026-03-23T08:13:04.975Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-38: Push 模板模式组件 PushTemplateContent",
+      "timestamp": "2026-03-23T08:13:09.093Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-38: Push 模板模式组件 PushTemplateContent",
+      "timestamp": "2026-03-23T08:13:09.228Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-39: SMS 模板模式组件 SmsTemplateContent",
+      "timestamp": "2026-03-23T08:13:09.361Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-39: SMS 模板模式组件 SmsTemplateContent",
+      "timestamp": "2026-03-23T08:13:09.488Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-40: email.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:13:14.159Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/components/settings/email.vue [modified]",
+      "timestamp": "2026-03-23T08:14:53.253Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-40: email.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:14:53.405Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-41: push.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:14:57.657Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/components/settings/push.vue [modified]",
+      "timestamp": "2026-03-23T08:16:09.461Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-41: push.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:16:09.592Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-42: sms.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:16:15.079Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/components/settings/sms.vue [modified]",
+      "timestamp": "2026-03-23T08:17:03.990Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-42: sms.vue 接入创建方式 Radio 切换",
+      "timestamp": "2026-03-23T08:17:04.116Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-44: 测试发送弹窗改造 - 变量占位符替换",
+      "timestamp": "2026-03-23T08:17:10.790Z"
+    },
+    {
+      "type": "file",
+      "title": "src/views/campaign/components/dialogs/testSendDialog.vue [modified]",
+      "timestamp": "2026-03-23T08:18:37.062Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-44: 测试发送弹窗改造 - 变量占位符替换",
+      "timestamp": "2026-03-23T08:18:37.202Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-45: 测试发送弹窗改造 - 邮件/短信直接输入",
+      "timestamp": "2026-03-23T08:18:43.326Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-45: 测试发送弹窗改造 - 邮件/短信直接输入",
+      "timestamp": "2026-03-23T08:18:43.465Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-43: 模板版本更新校验",
+      "timestamp": "2026-03-23T08:18:49.333Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-43: 模板版本更新校验完成",
+      "timestamp": "2026-03-23T12:00:00.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-46: 运营计划详情回显模板模式完成",
+      "timestamp": "2026-03-23T12:00:00.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-47: 全量构建验证通过",
+      "timestamp": "2026-03-23T12:05:00.000Z"
+    },
+    {
+      "type": "workflow-completed",
+      "title": "工作流完成（PRD1-PRD4 全部闭环）",
+      "timestamp": "2026-03-23T12:05:00.000Z",
+      "prdPhase": "PRD4"
+    }
+  ],
+  "events": [
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:03:50.858Z",
+      "data": {
+        "taskId": "TASK-34"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:41.752Z",
+      "data": {
+        "taskId": "TASK-35"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:41.926Z",
+      "data": {
+        "taskId": "TASK-36"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:42.065Z",
+      "data": {
+        "taskId": "TASK-37"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:52.064Z",
+      "data": {
+        "taskId": "TASK-38"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:52.251Z",
+      "data": {
+        "taskId": "TASK-39"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:52.440Z",
+      "data": {
+        "taskId": "TASK-40"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:59.674Z",
+      "data": {
+        "taskId": "TASK-41"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:59.811Z",
+      "data": {
+        "taskId": "TASK-42"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:06:59.958Z",
+      "data": {
+        "taskId": "TASK-43"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:07:14.038Z",
+      "data": {
+        "taskId": "TASK-44"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:07:14.205Z",
+      "data": {
+        "taskId": "TASK-45"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:07:14.426Z",
+      "data": {
+        "taskId": "TASK-46"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-03-23T08:07:18.095Z",
+      "data": {
+        "taskId": "TASK-47"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:07:52.147Z",
+      "data": {
+        "taskId": "TASK-34"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:09:10.540Z",
+      "data": {
+        "path": "src/api/notifications/types.ts",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:09:10.685Z",
+      "data": {
+        "path": "src/api/campaign/plan.ts",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:09:10.822Z",
+      "data": {
+        "path": "src/api/campaign/planApiType.d.ts",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:09:10.953Z",
+      "data": {
+        "taskId": "TASK-34"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:09:15.423Z",
+      "data": {
+        "taskId": "TASK-35"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:10:00.333Z",
+      "data": {
+        "path": "src/views/campaign/i18n/zh-cn.ts",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:10:00.470Z",
+      "data": {
+        "path": "src/views/campaign/i18n/en.ts",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:10:00.604Z",
+      "data": {
+        "taskId": "TASK-35"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:10:05.798Z",
+      "data": {
+        "taskId": "TASK-36"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:11:44.889Z",
+      "data": {
+        "path": "src/views/campaign/components/dialogs/templatePicker.vue",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:11:45.024Z",
+      "data": {
+        "taskId": "TASK-36"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:11:50.124Z",
+      "data": {
+        "taskId": "TASK-37"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:13:04.572Z",
+      "data": {
+        "path": "src/views/campaign/components/settings/EmailTemplateContent.vue",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:13:04.702Z",
+      "data": {
+        "path": "src/views/campaign/components/settings/PushTemplateContent.vue",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:13:04.843Z",
+      "data": {
+        "path": "src/views/campaign/components/settings/SmsTemplateContent.vue",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:13:04.975Z",
+      "data": {
+        "taskId": "TASK-37"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:13:09.093Z",
+      "data": {
+        "taskId": "TASK-38"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:13:09.228Z",
+      "data": {
+        "taskId": "TASK-38"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:13:09.361Z",
+      "data": {
+        "taskId": "TASK-39"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:13:09.488Z",
+      "data": {
+        "taskId": "TASK-39"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:13:14.159Z",
+      "data": {
+        "taskId": "TASK-40"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:14:53.253Z",
+      "data": {
+        "path": "src/views/campaign/components/settings/email.vue",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:14:53.405Z",
+      "data": {
+        "taskId": "TASK-40"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:14:57.657Z",
+      "data": {
+        "taskId": "TASK-41"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:16:09.461Z",
+      "data": {
+        "path": "src/views/campaign/components/settings/push.vue",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:16:09.592Z",
+      "data": {
+        "taskId": "TASK-41"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:16:15.079Z",
+      "data": {
+        "taskId": "TASK-42"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:17:03.990Z",
+      "data": {
+        "path": "src/views/campaign/components/settings/sms.vue",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:17:04.116Z",
+      "data": {
+        "taskId": "TASK-42"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:17:10.790Z",
+      "data": {
+        "taskId": "TASK-44"
+      }
+    },
+    {
+      "type": "file_changed",
+      "time": "2026-03-23T08:18:37.062Z",
+      "data": {
+        "path": "src/views/campaign/components/dialogs/testSendDialog.vue",
+        "changeType": "modified"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:18:37.202Z",
+      "data": {
+        "taskId": "TASK-44"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:18:43.326Z",
+      "data": {
+        "taskId": "TASK-45"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-03-23T08:18:43.465Z",
+      "data": {
+        "taskId": "TASK-45"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-03-23T08:18:49.333Z",
+      "data": {
+        "taskId": "TASK-43"
+      }
+    }
+  ],
+  "workflow": [
+    {
+      "stage": "需求接入",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-06T08:00:00.000Z",
+      "endTime": "2026-03-06T08:30:00.000Z"
+    },
+    {
+      "stage": "需求分析",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-06T08:30:00.000Z",
+      "endTime": "2026-03-06T09:00:00.000Z"
+    },
+    {
+      "stage": "任务拆分",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-06T09:00:00.000Z",
+      "endTime": "2026-03-06T09:30:00.000Z"
+    },
+    {
+      "stage": "代码生成",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-06T09:30:00.000Z",
+      "endTime": "2026-03-06T19:00:00.000Z"
+    },
+    {
+      "stage": "质量自检",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-06T19:00:00.000Z",
+      "endTime": "2026-03-06T20:00:00.000Z"
+    },
+    {
+      "stage": "需求接入",
+      "prdPhase": "PRD2",
+      "status": "completed",
+      "startTime": "2026-03-09T08:00:00.000Z",
+      "endTime": "2026-03-09T08:30:00.000Z"
+    },
+    {
+      "stage": "需求分析",
+      "prdPhase": "PRD2",
+      "status": "completed",
+      "startTime": "2026-03-09T08:30:00.000Z",
+      "endTime": "2026-03-09T09:00:00.000Z"
+    },
+    {
+      "stage": "任务拆分",
+      "prdPhase": "PRD2",
+      "status": "completed",
+      "startTime": "2026-03-09T09:00:00.000Z",
+      "endTime": "2026-03-09T09:30:00.000Z"
+    },
+    {
+      "stage": "代码生成",
+      "prdPhase": "PRD2",
+      "status": "completed",
+      "startTime": "2026-03-09T09:30:00.000Z",
+      "endTime": "2026-03-09T22:00:00.000Z"
+    },
+    {
+      "stage": "缺陷修复",
+      "prdPhase": "PRD2",
+      "status": "completed",
+      "startTime": "2026-03-09T10:00:00.000Z",
+      "endTime": "2026-03-09T12:00:00.000Z"
+    },
+    {
+      "stage": "质量自检",
+      "prdPhase": "PRD2",
+      "status": "completed",
+      "startTime": "2026-03-09T22:00:00.000Z",
+      "endTime": "2026-03-09T23:00:00.000Z"
+    },
+    {
+      "stage": "需求接入",
+      "prdPhase": "PRD3",
+      "status": "completed",
+      "startTime": "2026-03-10T08:00:00.000Z",
+      "endTime": "2026-03-10T08:30:00.000Z"
+    },
+    {
+      "stage": "需求分析",
+      "prdPhase": "PRD3",
+      "status": "completed",
+      "startTime": "2026-03-10T08:30:00.000Z",
+      "endTime": "2026-03-10T09:00:00.000Z"
+    },
+    {
+      "stage": "任务拆分",
+      "prdPhase": "PRD3",
+      "status": "completed",
+      "startTime": "2026-03-10T09:00:00.000Z",
+      "endTime": "2026-03-10T09:30:00.000Z"
+    },
+    {
+      "stage": "代码生成",
+      "prdPhase": "PRD3",
+      "status": "completed",
+      "startTime": "2026-03-10T09:30:00.000Z",
+      "endTime": "2026-03-10T18:00:00.000Z"
+    },
+    {
+      "stage": "质量自检",
+      "prdPhase": "PRD3",
+      "status": "completed",
+      "startTime": "2026-03-10T18:00:00.000Z",
+      "endTime": "2026-03-10T19:00:00.000Z"
+    },
+    {
+      "stage": "需求接入",
+      "prdPhase": "PRD4",
+      "status": "completed",
+      "startTime": "2026-03-23T03:30:00.000Z",
+      "endTime": "2026-03-23T03:35:00.000Z"
+    },
+    {
+      "stage": "需求分析",
+      "prdPhase": "PRD4",
+      "status": "completed",
+      "startTime": "2026-03-23T03:35:00.000Z",
+      "endTime": "2026-03-23T03:45:00.000Z"
+    },
+    {
+      "stage": "任务拆分",
+      "prdPhase": "PRD4",
+      "status": "completed",
+      "startTime": "2026-03-23T08:00:00.000Z",
+      "endTime": "2026-03-23T08:07:00.000Z"
+    },
+    {
+      "stage": "代码生成",
+      "prdPhase": "PRD4",
+      "status": "completed",
+      "startTime": "2026-03-23T08:07:00.000Z",
+      "endTime": "2026-03-23T12:00:00.000Z"
+    },
+    {
+      "stage": "构建验证",
+      "prdPhase": "PRD4",
+      "status": "completed",
+      "startTime": "2026-03-23T12:00:00.000Z",
+      "endTime": "2026-03-23T12:05:00.000Z"
+    }
+  ],
+  "cost": {
+    "totalTokens": 505885,
+    "estimatedManualHours": 57,
+    "actualHours": 0,
+    "tokenBreakdown": [
+      {
+        "stage": "task:TASK-01",
+        "tokens": 9797
+      },
+      {
+        "stage": "task:TASK-02",
+        "tokens": 9447
+      },
+      {
+        "stage": "task:TASK-03",
+        "tokens": 11660
+      },
+      {
+        "stage": "task:TASK-04",
+        "tokens": 10449
+      },
+      {
+        "stage": "task:TASK-05",
+        "tokens": 10753
+      },
+      {
+        "stage": "task:TASK-06",
+        "tokens": 10397
+      },
+      {
+        "stage": "task:TASK-07",
+        "tokens": 9454
+      },
+      {
+        "stage": "task:TASK-08",
+        "tokens": 7385
+      },
+      {
+        "stage": "task:TASK-09",
+        "tokens": 6810
+      },
+      {
+        "stage": "task:TASK-10",
+        "tokens": 7802
+      },
+      {
+        "stage": "task:TASK-11",
+        "tokens": 8144
+      },
+      {
+        "stage": "task:TASK-12",
+        "tokens": 12120
+      },
+      {
+        "stage": "task:TASK-13",
+        "tokens": 10514
+      },
+      {
+        "stage": "task:TASK-14",
+        "tokens": 35200
+      },
+      {
+        "stage": "task:TASK-15",
+        "tokens": 34800
+      },
+      {
+        "stage": "task:TASK-16",
+        "tokens": 10296
+      },
+      {
+        "stage": "task:TASK-17",
+        "tokens": 8562
+      },
+      {
+        "stage": "task:TASK-18",
+        "tokens": 7971
+      },
+      {
+        "stage": "task:TASK-19",
+        "tokens": 7120
+      },
+      {
+        "stage": "task:TASK-20",
+        "tokens": 11573
+      },
+      {
+        "stage": "task:TASK-21",
+        "tokens": 11295
+      },
+      {
+        "stage": "task:TASK-22",
+        "tokens": 11239
+      },
+      {
+        "stage": "task:TASK-23",
+        "tokens": 9062
+      },
+      {
+        "stage": "task:TASK-24",
+        "tokens": 8110
+      },
+      {
+        "stage": "task:TASK-25",
+        "tokens": 11249
+      },
+      {
+        "stage": "task:TASK-26",
+        "tokens": 6790
+      },
+      {
+        "stage": "task:TASK-27",
+        "tokens": 10826
+      },
+      {
+        "stage": "task:TASK-28",
+        "tokens": 11930
+      },
+      {
+        "stage": "task:TASK-29",
+        "tokens": 11044
+      },
+      {
+        "stage": "task:TASK-30",
+        "tokens": 7179
+      },
+      {
+        "stage": "task:TASK-31",
+        "tokens": 8423
+      },
+      {
+        "stage": "task:TASK-32",
+        "tokens": 10173
+      },
+      {
+        "stage": "task:TASK-33",
+        "tokens": 6848
+      },
+      {
+        "stage": "task:TASK-34",
+        "tokens": 8042
+      },
+      {
+        "stage": "task:TASK-35",
+        "tokens": 9363
+      },
+      {
+        "stage": "task:TASK-36",
+        "tokens": 10839
+      },
+      {
+        "stage": "task:TASK-37",
+        "tokens": 8055
+      },
+      {
+        "stage": "task:TASK-38",
+        "tokens": 9429
+      },
+      {
+        "stage": "task:TASK-39",
+        "tokens": 6550
+      },
+      {
+        "stage": "task:TASK-40",
+        "tokens": 25100
+      },
+      {
+        "stage": "task:TASK-41",
+        "tokens": 9768
+      },
+      {
+        "stage": "task:TASK-42",
+        "tokens": 9644
+      },
+      {
+        "stage": "task:TASK-43",
+        "tokens": 10184
+      },
+      {
+        "stage": "task:TASK-44",
+        "tokens": 10467
+      },
+      {
+        "stage": "task:TASK-45",
+        "tokens": 11316
+      },
+      {
+        "stage": "task:TASK-46",
+        "tokens": 11088
+      },
+      {
+        "stage": "task:TASK-47",
+        "tokens": 1618
+      }
+    ],
+    "tokenDetail": {
+      "inputTokens": 128456,
+      "outputTokens": 42890,
+      "cacheCreationTokens": 87234,
+      "cacheReadTokens": 247305
+    }
+  },
+  "highlights": [
+    {
+      "content": "Built full notification management pipeline (PRD1-3): CRUD, multi-language editors, version management, preview, test send across all channels",
+      "source": "auto",
+      "createdAt": "2026-03-10T23:59:59.000Z"
+    },
+    {
+      "content": "Implemented notification-campaign integration (PRD4): manual/template dual-mode, template picker (8 filters + 9 columns), read-only backfill, pre-submit version validation",
+      "source": "auto",
+      "createdAt": "2026-03-23T12:05:00.000Z"
+    },
+    {
+      "content": "Enhanced test send: variable placeholder ${xxx} parsing, direct email input, country code + phone for SMS",
+      "source": "auto",
+      "createdAt": "2026-03-23T12:05:00.000Z"
+    },
+    {
+      "content": "47 tasks completed, zero-error build, 4 PRD phases across all notification channels",
+      "source": "auto",
+      "createdAt": "2026-03-23T12:05:00.000Z"
+    }
+  ]
+}

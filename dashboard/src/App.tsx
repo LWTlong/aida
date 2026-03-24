@@ -30,7 +30,7 @@ function App() {
     storeLocale(l)
   }
 
-  const { runs, currentRunId, setCurrentRunId, runData, loading, connected, refresh } = useRunData()
+  const { runs, currentRunId, setCurrentRunId, runData, loading, connected } = useRunData()
   const { data: overviewData, loading: overviewLoading } = useOverviewData()
 
   const isOverview = currentRunId === ALL_PROJECT_ID
@@ -124,15 +124,15 @@ function App() {
           connected={connected}
         />
 
-        <KpiRow data={runData!} runId={currentRunId} onDataUpdate={refresh} />
+        <KpiRow data={runData!} />
 
         <div className="grid grid-cols-2 gap-4 px-8 pb-5 max-md:grid-cols-1">
           <ChartCard title={t.chartNodeTime}>
-            <NodeTimeChart metrics={runData!.metrics} cost={runData!.cost} tasks={runData!.tasks} bugs={runData!.bugs} />
+            <NodeTimeChart metrics={runData!.metrics} />
           </ChartCard>
 
           <ChartCard title={t.chartTaskRanking}>
-            <TaskTimeRanking tasks={runData!.tasks} cost={runData!.cost} />
+            <TaskTimeRanking tasks={runData!.tasks} />
           </ChartCard>
 
           <ChartCard title={t.chartStageTime}>
@@ -144,7 +144,7 @@ function App() {
           </ChartCard>
 
           <ChartCard title={t.chartTaskCompletion}>
-            <TaskChart tasks={runData!.tasks} prdPhases={runData!.meta.prdPhases} cost={runData!.cost} />
+            <TaskChart tasks={runData!.tasks} prdPhases={runData!.meta.prdPhases} />
           </ChartCard>
 
           <ChartCard title={t.chartFirstPassRate}>

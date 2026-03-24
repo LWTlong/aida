@@ -3,16 +3,13 @@ import type { RunData } from '../types'
 import { Modal } from './Modal'
 import { deviationCategoryLabel, rootCauseLabel } from '../labelMap'
 import { formatLocalDate } from '../utils/date'
-import { updateRunCost, updateConfig } from '../api'
 import { useLocale } from '../i18n'
 
 interface Props {
   data: RunData
-  runId?: string
-  onDataUpdate?: () => void
 }
 
-type ModalType = 'tasks' | 'prd' | 'deviation' | 'bug' | 'review' | 'files' | 'time' | 'roi' | 'tokens' | null
+type ModalType = 'tasks' | 'prd' | 'deviation' | 'bug' | 'review' | 'files' | 'time' | null
 
 function formatSeconds(s: number): string {
   if (s < 60) return `${Math.round(s)}s`
@@ -20,27 +17,11 @@ function formatSeconds(s: number): string {
   return `${(s / 3600).toFixed(1)}h`
 }
 
-function formatTokens(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
-  return `${n}`
-}
-
-export function KpiRow({ data, runId, onDataUpdate }: Props) {
+export function KpiRow({ data }: Props) {
   const { t } = useLocale()
   const [modal, setModal] = useState<ModalType>(null)
-  const [manualHours, setManualHours] = useState('')
-  const [hourlyRateInput, setHourlyRateInput] = useState('')
-  const [saving, setSaving] = useState(false)
   const s = data.summary
   const m = data.metrics
-  const cur = t.currency
-  const rate = parseFloat(t.exchangeRate) || 1
-
-  const fmtMoney = (v: number) => {
-    const converted = v * rate
-    return `${cur}${Math.abs(converted) < 1 ? converted.toFixed(2) : Math.round(converted).toLocaleString()}`
-  }
 
   const qualityCards: { key: ModalType; label: string; color: string; value: string }[] = [
     { key: 'prd', label: t.kpiPrd, color: 'text-blue-500', value: s.prdPhaseCount ? `${s.prdPhaseCount}` : '-' },
@@ -49,20 +30,14 @@ export function KpiRow({ data, runId, onDataUpdate }: Props) {
     { key: 'bug', label: t.kpiBug, color: 'text-red-500', value: `${s.bugCount}` },
   ]
 
-  const totalTokens = data.cost?.totalTokens || 0
-
   const efficiencyCards: { key: ModalType; label: string; color: string; value: string }[] = [
     { key: 'review', label: t.kpiReviewRate, color: 'text-purple-500', value: m.reviewPassRate != null ? `${Math.round(m.reviewPassRate)}%` : '-' },
-    { key: 'tokens', label: t.kpiTokens, color: 'text-orange-500', value: totalTokens > 0 ? formatTokens(totalTokens) : '-' },
     { key: 'files', label: t.kpiFiles, color: 'text-cyan-500', value: `${s.filesChanged}` },
     { key: 'time', label: t.kpiTime, color: 'text-teal-500', value: m.actualWorkSeconds ? formatSeconds(m.actualWorkSeconds) : '-' },
-    { key: 'roi', label: t.kpiRoi, color: 'text-emerald-500', value: m.moneySaved != null ? fmtMoney(m.moneySaved) : '-' },
   ]
 
-  const needsRoiSetup = m.roi == null && runId
-
   const renderCards = (cards: typeof qualityCards) => (
-    <div className={`grid gap-4 max-lg:grid-cols-2 max-sm:grid-cols-2 ${cards.length > 4 ? 'grid-cols-5' : 'grid-cols-4'}`}>
+    <div className={`grid gap-4 max-lg:grid-cols-2 max-sm:grid-cols-2 ${cards.length > 4 ? 'grid-cols-5' : cards.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
       {cards.map((card) => (
         <div
           key={card.key}
@@ -71,9 +46,6 @@ export function KpiRow({ data, runId, onDataUpdate }: Props) {
         >
           <div className={`text-[32px] font-bold mb-1 ${card.color}`}>{card.value}</div>
           <div className="text-xs text-[#6b7b8d] uppercase tracking-wide">{card.label}</div>
-          {card.key === 'roi' && needsRoiSetup && (
-            <div className="text-[10px] text-amber-400/70 mt-1">{t.clickToSet}</div>
-          )}
         </div>
       ))}
     </div>
@@ -286,157 +258,6 @@ export function KpiRow({ data, runId, onDataUpdate }: Props) {
         </div>
       </Modal>
 
-      {/* ROI Modal */}
-      <Modal title={t.modalRoi} open={modal === 'roi'} onClose={() => setModal(null)}>
-        <div className="space-y-3 text-[13px]">
-          {/* Always show ROI settings when runId is available */}
-          {runId && (
-            <div className="bg-[#1a2a3a] border border-[#2a4a6b] rounded-lg p-4 mb-4">
-              <div className="text-blue-400 text-sm font-medium mb-2">{t.roiSettingTitle}</div>
-              <div className="text-[#6b7b8d] text-xs mb-3">{t.roiSettingHint}</div>
-
-              <div className="flex items-center gap-3 mb-3">
-                <label className="text-[#94a3b8] text-xs whitespace-nowrap min-w-[100px]">{t.roiEstManualHours}</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  placeholder={data.cost?.estimatedManualHours ? `${data.cost.estimatedManualHours}` : `${t.eg}: 8`}
-                  value={manualHours}
-                  onChange={(e) => setManualHours(e.target.value)}
-                  className="flex-1 bg-[#0f1923] border border-[#1e2d3d] rounded px-3 py-1.5 text-sm text-white outline-none focus:border-[#3b82f6] transition-colors"
-                />
-                <span className="text-[#6b7b8d] text-xs">{t.hours}</span>
-              </div>
-
-              <div className="flex items-center gap-3 mb-3">
-                <label className="text-[#94a3b8] text-xs whitespace-nowrap min-w-[100px]">{t.roiHourlyRate}</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  placeholder={m.moneySaved != null && data.cost?.estimatedManualHours ? '' : `${t.eg}: 50`}
-                  value={hourlyRateInput}
-                  onChange={(e) => setHourlyRateInput(e.target.value)}
-                  className="flex-1 bg-[#0f1923] border border-[#1e2d3d] rounded px-3 py-1.5 text-sm text-white outline-none focus:border-[#3b82f6] transition-colors"
-                />
-                <span className="text-[#6b7b8d] text-xs">{t.perHour}</span>
-              </div>
-
-              <button
-                disabled={saving || (!manualHours && !hourlyRateInput)}
-                onClick={async () => {
-                  setSaving(true)
-                  try {
-                    if (manualHours && runId) {
-                      await updateRunCost(runId, { estimatedManualHours: parseFloat(manualHours) })
-                    }
-                    if (hourlyRateInput) {
-                      await updateConfig({ hourlyRate: parseFloat(hourlyRateInput) / rate })
-                    }
-                    setManualHours('')
-                    setHourlyRateInput('')
-                    onDataUpdate?.()
-                  } finally {
-                    setSaving(false)
-                  }
-                }}
-                className="mt-1 px-4 py-1.5 bg-[#3b82f6] hover:bg-[#2563eb] disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs rounded transition-colors"
-              >
-                {saving ? t.saving : t.save}
-              </button>
-            </div>
-          )}
-
-          <div className="text-[#6b7b8d] text-xs mb-1">{t.roiCostComparison}</div>
-          <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-            <span className="text-[#6b7b8d]">{t.roiEstManualHours}</span>
-            <span className="text-[#e0e6ed]">{data.cost?.estimatedManualHours ? `${data.cost.estimatedManualHours}h` : '-'}</span>
-          </div>
-          <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-            <span className="text-[#6b7b8d]">{t.roiManualCost}</span>
-            <span className="text-[#e0e6ed]">
-              {data.cost?.estimatedManualHours && m.moneySaved != null && m.tokenCost != null
-                ? fmtMoney(m.moneySaved + m.tokenCost)
-                : '-'}
-            </span>
-          </div>
-          <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-            <span className="text-[#6b7b8d]">{t.roiAiCost}</span>
-            <span className="text-red-400">{m.tokenCost != null ? fmtMoney(m.tokenCost) : '-'}</span>
-          </div>
-          <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-            <span className="text-[#6b7b8d]">{t.roiSaved}</span>
-            <span className="text-emerald-500 font-medium">{m.moneySaved != null ? fmtMoney(m.moneySaved) : '-'}</span>
-          </div>
-          <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-            <span className="text-[#6b7b8d]">{t.roiValue}</span>
-            <span className="text-emerald-500 font-bold text-lg">{m.roi != null ? fmtMoney(Math.round(m.roi / 100)) : '-'}</span>
-          </div>
-          <div className="pt-3 border-t border-[#1e2d3d] mt-1">
-            <div className="text-[#6b7b8d] text-xs mb-1">{t.roiTimeComparison}</div>
-            <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-              <span className="text-[#6b7b8d]">{t.roiHoursSaved}</span>
-              <span className={`${m.hoursSaved != null && m.hoursSaved > 0 ? 'text-emerald-500' : 'text-[#e0e6ed]'}`}>
-                {m.hoursSaved != null ? `${m.hoursSaved.toFixed(1)}h` : '-'}
-              </span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-              <span className="text-[#6b7b8d]">{t.roiAiProcessTime}</span>
-              <span className="text-[#e0e6ed]">{m.actualWorkSeconds ? formatSeconds(m.actualWorkSeconds) : '-'}</span>
-            </div>
-            <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-              <span className="text-[#6b7b8d]">{t.timeEfficiency}</span>
-              <span className="text-blue-400 font-medium">{m.efficiencyMultiplier ? `${m.efficiencyMultiplier.toFixed(1)}x` : '-'}</span>
-            </div>
-          </div>
-          <div className="flex justify-between py-2 mt-1">
-            <span className="text-[#6b7b8d]">{t.tokenTotal}</span>
-            <span className="text-[#e0e6ed]">{data.cost?.totalTokens ? data.cost.totalTokens.toLocaleString() : '-'}</span>
-          </div>
-        </div>
-      </Modal>
-
-      {/* Tokens Modal */}
-      <Modal title={t.modalTokens} open={modal === 'tokens'} onClose={() => setModal(null)}>
-        <div className="space-y-3 text-[13px]">
-          <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-            <span className="text-[#6b7b8d]">{t.tokenTotal}</span>
-            <span className="text-orange-500 font-bold text-lg">{totalTokens ? totalTokens.toLocaleString() : '-'}</span>
-          </div>
-          {data.cost?.tokenDetail && (
-            <>
-              <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-                <span className="text-[#6b7b8d]">{t.tokenInput}</span>
-                <span className="text-[#e0e6ed]">{data.cost.tokenDetail.inputTokens?.toLocaleString() || '0'}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-                <span className="text-[#6b7b8d]">{t.tokenOutput}</span>
-                <span className="text-[#e0e6ed]">{data.cost.tokenDetail.outputTokens?.toLocaleString() || '0'}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-                <span className="text-[#6b7b8d]">{t.tokenCacheCreation}</span>
-                <span className="text-[#e0e6ed]">{data.cost.tokenDetail.cacheCreationTokens?.toLocaleString() || '0'}</span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-[#1e2d3d]">
-                <span className="text-[#6b7b8d]">{t.tokenCacheRead}</span>
-                <span className="text-[#e0e6ed]">{data.cost.tokenDetail.cacheReadTokens?.toLocaleString() || '0'}</span>
-              </div>
-            </>
-          )}
-          {data.cost?.tokenBreakdown && data.cost.tokenBreakdown.length > 0 && (
-            <div className="pt-3 border-t border-[#1e2d3d]">
-              <div className="text-[#6b7b8d] text-xs mb-2">{t.tokenPerPhase}</div>
-              {data.cost.tokenBreakdown.map((item) => (
-                <div key={item.stage} className="flex justify-between py-1 text-xs">
-                  <span className="text-[#94a3b8]">{item.stage}</span>
-                  <span className="text-[#e0e6ed]">{item.tokens.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </Modal>
     </>
   )
 }
