@@ -6,7 +6,7 @@
 
 Every vibe coding session generates massive insights — deviations, patterns, quality signals.<br>
 *But you close the terminal, and all of it vanishes. Next session, you start blind again.*<br>
-**AIDA captures every data point, visualizes it in a live dashboard, and distills it into rules that make your AI write better code — every single run.**
+**AIDA captures structured data at every development checkpoint, visualizes it in a live dashboard, and distills deviation patterns into rules that make your AI write better code — every single run.**
 
 One line to integrate. Zero workflow changes.
 
@@ -56,7 +56,7 @@ Vibe Coding Session
    Dashboard visualizes patterns
    "9 deviations → 56% hallucination, 44% rule-missing"
         ↓
-   Deviation patterns identified → AI creates project rules via skill guidance
+   Deviation patterns identified → AI suggests rules → user confirms → sedimented
    .aidevos/rules/ ← your AI's growing knowledge base
         ↓
    AI reads rules next session → same mistakes eliminated
@@ -70,6 +70,24 @@ Vibe Coding Session
 |-----|-----------|---------------|-----------------|
 | #1 | 23 deviations across 47 tasks | AI misused components, wrong layouts, incorrect API patterns | 6 project-specific rules |
 | #2 | **0 repeat deviations** | AI read the rules. Same patterns — zero errors. | — |
+
+**Step 1: See *why* AI deviates** — Root cause breakdown reveals whether issues stem from hallucination, missing rules, or insufficient context.
+
+<div align="center">
+  <img src="./docs/deviation-root-cause.png" alt="Deviation Root Cause" width="700" />
+</div>
+
+**Step 2: See *where* AI deviates** — Category distribution pinpoints the exact areas: UI spacing, layout, component usage, API patterns.
+
+<div align="center">
+  <img src="./docs/deviation-category.png" alt="Deviation Category Distribution" width="700" />
+</div>
+
+**Step 3: Watch rules compound** — As rules accumulate (green line), the same deviation patterns stop recurring.
+
+<div align="center">
+  <img src="./docs/deviation-rule-trend.png" alt="Deviation & Rule Trend" width="700" />
+</div>
 
 The `.aidevos/rules/` directory is your **project-specific AI knowledge base**. It grows with every run. The more you use AI, the smarter it gets at *your* project.
 
@@ -181,7 +199,7 @@ Open `http://localhost:2375` — real-time updates via SSE, Chinese/English togg
 | Vibing blind | Vibing with data |
 |---|---|
 | "AI keeps getting layouts wrong" | Dashboard shows: 9 layout deviations, root cause 56% hallucination + 44% rule-missing. 4 rules sedimented → zero repeats next run |
-| "I corrected this three times already" | AIDA recorded the deviation pattern. AI created a rule via the deviation-recorder skill. AI reads it every session — you never correct it again |
+| "I corrected this three times already" | AIDA recorded the deviation pattern. AI detected `rule-missing`, suggested a rule, you confirmed — AI reads it every session, you never correct it again |
 | "That feature had a lot of bugs" | 5 bugs, 3 critical — all concentrated in one phase. Now you know where to add guardrails |
 | "What did I even do this quarter?" | 47 tasks, 23 deviations fixed, 6 rules sedimented, 4064 lines. Export → H1 performance review done |
 
@@ -192,7 +210,7 @@ Open `http://localhost:2375` — real-time updates via SSE, Chinese/English togg
 ## 🎯 Use Cases
 
 **Vibe Coder — "I want my AI to actually learn my project"**
-> You've been using Claude Code for a week. AIDA's dashboard shows: 23 deviations, concentrated in `component-usage` and `layout` categories, root cause mostly `rule-missing`. Through the deviation-recorder skill, AI identified patterns and created 6 project rules. Next week, those categories show zero deviations. Your AI now knows your project conventions.
+> You've been using Claude Code for a week. AIDA's dashboard shows: 23 deviations, concentrated in `component-usage` and `layout` categories, root cause mostly `rule-missing`. AI detects the patterns and suggests rules — you confirm, 6 project rules sedimented. Next week, those categories show zero deviations. Your AI now knows your project conventions.
 
 **Tech Lead — "I need to see what AI is actually doing across the team"**
 > Team of 4 uses Claude Code daily. Open the project overview: Developer A has 2 deviations + 5 sedimented rules (AI is learning). Developer B has 15 deviations + 0 rules (AI is not learning). The data tells you exactly where to intervene.
@@ -233,7 +251,7 @@ All data is structured JSON in `.aidevos/`. No vendor lock-in. Export it, query 
 
 ```mermaid
 flowchart LR
-    A["Your AI Tool\nClaude Code / Cursor"] -->|Vibe Coding| B{"AIDA MCP Server\n9 Tools"}
+    A["Your AI Tool\nClaude Code / Cursor"] -->|Vibe Coding| B{"AIDA MCP Server\n10 Tools"}
     B -->|Silent Data Collection| C[".aidevos/run.json"]
     C -->|Visualization| D["Dashboard\nlocalhost:2375"]
     C -->|Pattern Analysis| E[".aidevos/rules/"]
@@ -243,7 +261,7 @@ flowchart LR
 Your AI tool calls AIDA's MCP tools automatically as it works. You don't invoke them manually. No prompts to write, no scripts to run — just vibe code as usual.
 
 <details>
-<summary>📋 9 MCP Tools (auto-collected)</summary>
+<summary>📋 10 MCP Tools (auto-collected)</summary>
 
 | Tool | What it captures |
 |------|-----------------|
@@ -256,6 +274,7 @@ Your AI tool calls AIDA's MCP tools automatically as it works. You don't invoke 
 | `aida_log_files` | File changes — auto-scans `git diff`, zero args needed |
 | `aida_highlight` | Notable achievement worth recording |
 | `aida_status` | Current run status snapshot |
+| `aida_log_rule` | Sediment project rule — user confirms, then AI calls this tool |
 
 </details>
 
@@ -337,10 +356,10 @@ AIDA uses [Model Context Protocol](https://modelcontextprotocol.io/) — the sta
 
 **What happens when you add the config:**
 
-1. Your AI tool discovers AIDA's 9 tools via MCP
+1. Your AI tool discovers AIDA's 10 tools via MCP
 2. As the AI works, it naturally calls `aida_task_start`, `aida_log_files`, etc.
 3. Data flows into `run.json` silently
-4. Deviation patterns emerge → AI creates rules via skill guidance
+4. Deviation patterns emerge → AI suggests rules → user confirms → sedimented
 5. AI reads rules next session → output quality improves
 
 **No prompts to write. No scripts to run. No workflow to learn.**

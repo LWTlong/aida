@@ -25,6 +25,7 @@ import {
   DEVIATION_CAT_VALUES,
   REVIEW_RESULT_VALUES,
   CHANGE_TYPE_VALUES,
+  RULE_CATEGORIES,
 } from '../schemas/run-json.js';
 import {
   now,
@@ -35,6 +36,8 @@ import {
   ensureRunJson as ensureRunJsonShared,
 } from '../utils/run-data.js';
 import { collectClaudeTokens, collectClaudeTokensBetween } from '../utils/tokens.js';
+import { getBranchName, getDevName } from '../utils/git.js';
+import { addRule, buildRuleViews } from '../utils/rules.js';
 
 // ─── JSON-RPC / MCP Protocol ─────────────────────────────
 
@@ -127,7 +130,7 @@ function getTaskTokens(startTime: string, endTime: string): number {
 const TOOLS = [
   {
     name: 'aida_task_start',
-    description: '当你开始一个新任务或功能开发时调用。记录任务标题和所属模块。在接到用户需求、开始编码前调用。',
+    description: '当你开始一个新任务或功能开发时调用。在接到用户需求、开始编码前调用。每个任务的完整数据采集流程：1) aida_task_start 2) 编码 3) aida_log_files 4) aida_log_review 5) aida_task_done。多个子任务必须每个都单独 start/done。',
     inputSchema: {
       type: 'object',
       properties: {
@@ -189,7 +192,7 @@ const TOOLS = [
   },
   {
     name: 'aida_log_deviation',
-    description: '当 AI 产出与用户预期不符时调用。记录偏差用于后续分析。',
+    description: '当 AI 产出与用户预期不符时调用。记录偏差用于后续分析。当 rootCause 为 rule-missing 时，修复后如果属于项目级技术规范（非业务逻辑），应询问用户是否沉淀为规则。',
     inputSchema: {
       type: 'object',
       properties: {
@@ -227,6 +230,19 @@ const TOOLS = [
       properties: {},
     },
   },
+  {
+    name: 'aida_log_rule',
+    description: '沉淀项目规则。当偏差的 rootCause 为 rule-missing 且修复方案属于项目级技术规范（非业务逻辑）时，询问用户同意后调用此工具沉淀规则。仅限：公共组件使用规范、API 调用规范、参数传递规范、代码风格/架构规范。禁止沉淀业务逻辑。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        content: { type: 'string', description: '规则内容，简洁描述项目规范' },
+        category: { type: 'string', enum: [...RULE_CATEGORIES], description: '规则分类' },
+        sourceDeviation: { type: 'string', description: '关联的偏差 ID，如 DEV-01' },
+      },
+      required: ['content', 'category'],
+    },
+  },
 ];
 
 // ─── MCP Prompts ─────────────────────────────────────────
@@ -238,16 +254,24 @@ const PROMPTS = [
   },
 ];
 
-const PROMPT_CONTENT = `你拥有 AIDA 数据采集工具，请在开发过程中的关键节点自然使用：
+const PROMPT_CONTENT = `你拥有 AIDA 数据采集工具，必须在开发过程中的关键节点调用，确保数据完整性。
 
-- 开始一个新任务时 → aida_task_start
-- 完成任务时 → aida_task_done
-- 发现 bug 时 → aida_log_bug，修复后 → aida_bug_fix
-- 完成一轮代码修改后 → aida_log_files（自动扫描 git diff，无需传参）
-- 完成代码审查时 → aida_log_review
-- 有值得记录的亮点时 → aida_highlight
+每个任务的完整流程：
+1. 开始前 → aida_task_start（传入标题和所属模块）
+2. 编码完成 → aida_log_files（自动扫描 git diff，无需传参）
+3. 自检代码 → aida_log_review（pass/fail + 问题列表）
+4. 任务完成 → aida_task_done（传入任务 ID）
 
-不需要改变你的开发流程，在关键节点顺手记录即可。漏报几个也没关系，有数据比没数据好。`;
+过程中遇到以下情况必须立即记录：
+- 发现 Bug → aida_log_bug，修复后 → aida_bug_fix
+- 用户指出 AI 产出偏差 → aida_log_deviation（传入描述、rootCause、category）
+- 值得记录的亮点 → aida_highlight
+
+偏差规则沉淀：
+- 当 aida_log_deviation 的 rootCause 为 rule-missing 时，修复后判断是否属于项目级技术规范（非业务逻辑）
+- 如果是，询问用户是否沉淀为规则，用户同意后调用 aida_log_rule 工具（传入 content、category、sourceDeviation）
+
+多任务场景下，每个子任务都必须单独 aida_task_start 和 aida_task_done。`;
 
 // ─── Tool Handlers ───────────────────────────────────────
 
@@ -417,7 +441,23 @@ function handleLogDeviation(args: any): any {
   addEvent(data, 'deviation_created', { deviationId: id });
   addTimeline(data, 'deviation', `${id}: ${args.title}`);
   save(path, data);
-  return { success: true, deviationId: id, message: `${id} 已记录: ${args.title}` };
+
+  const result: any = { success: true, deviationId: id, message: `${id} 已记录: ${args.title}` };
+
+  // When rootCause is rule-missing, check for pattern and hint rule sedimentation
+  if (rootCause === 'rule-missing') {
+    const sameCategoryCount = data.deviations.filter(
+      d => d.deviationCategory === category && d.rootCauseCategory === 'rule-missing',
+    ).length;
+
+    if (sameCategoryCount >= 2) {
+      result.ruleHint = `同类偏差已出现 ${sameCategoryCount} 次（${category} / rule-missing）。如果修复方案属于项目级技术规范（非业务逻辑），请询问用户是否沉淀为规则：调用 aida_log_rule 工具，传入 content="<规则描述>" category="${category}" sourceDeviation="${id}"`;
+    } else {
+      result.ruleHint = `rootCause 为 rule-missing，修复后如果属于项目级技术规范（非业务逻辑），请询问用户是否沉淀为规则：调用 aida_log_rule 工具，传入 content="<规则描述>" category="${category}" sourceDeviation="${id}"`;
+    }
+  }
+
+  return result;
 }
 
 function handleLogFiles(): any {
@@ -557,6 +597,47 @@ function handleStatus(): any {
   }
 }
 
+function handleLogRule(args: any): any {
+  const { path, data } = ensureRunJson();
+  const branch = getBranchName();
+  const dev = getDevName();
+  const category = args.category || 'general';
+  const content = args.content;
+
+  // Write to project-level registry with fingerprint dedup
+  const { entry, isDuplicate } = addRule(projectRoot, {
+    content,
+    category,
+    branch,
+    deviation: args.sourceDeviation || null,
+    author: dev,
+    status: 'active',
+  });
+
+  if (isDuplicate) {
+    return { success: true, message: `规则已存在: ${entry.id}（fingerprint 重复）`, ruleId: entry.id, isDuplicate: true };
+  }
+
+  // Also record in run.json.rules[] for per-run tracking
+  const localId = nextId(data.rules, 'RULE');
+  data.rules.push({
+    ruleId: localId,
+    file: `rules.json#${entry.id}`,
+    content,
+    sourceDeviation: args.sourceDeviation || null,
+    sedimentedAt: now(),
+  });
+  data.summary.rulesSedimented = data.rules.filter(r => (r as any).status !== 'pending').length;
+  addEvent(data, 'rule_sedimented', { ruleId: localId, registryId: entry.id });
+  addTimeline(data, 'rule', `${localId}: ${content.substring(0, 50)}`);
+  save(path, data);
+
+  // Rebuild markdown views so AI can read rules next session
+  buildRuleViews(projectRoot);
+
+  return { success: true, ruleId: entry.id, message: `规则已沉淀: ${entry.id} [${category}] ${content.substring(0, 60)}` };
+}
+
 // ─── MCP Request Router ─────────────────────────────────
 
 function handleRequest(req: JsonRpcRequest): void {
@@ -618,6 +699,9 @@ function handleRequest(req: JsonRpcRequest): void {
             break;
           case 'aida_status':
             result = handleStatus();
+            break;
+          case 'aida_log_rule':
+            result = handleLogRule(args);
             break;
           default:
             sendError(id!, -32601, `Unknown tool: ${toolName}`);

@@ -68,20 +68,13 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
    - ❌ "用户列表需要显示注册时间字段" ← 业务需求，不需要沉淀
    - ❌ "订单详情页需要增加物流信息" ← 业务逻辑，不需要沉淀
 
-   **a) 无业务逻辑 → 创建 pending 规则：**
-   - 如果是**技术规范**（无业务逻辑），立即创建 pending 规则：
-   ```bash
-   aida log rule --content "规则描述" --category component --source-deviation DEV-XX --status pending
-   ```
-   - `--category` 可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`
+   **a) 无业务逻辑 → 沉淀规则：**
+   - 如果是**技术规范**（无业务逻辑），询问用户确认后，调用 `aida_log_rule` MCP 工具：
+     - `content`: 规则描述
+     - `category`: 分类（可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`）
+     - `sourceDeviation`: 关联的偏差 ID（如 DEV-XX）
    - 规则会自动写入 `.aidevos/rules.json`（项目级注册表），并通过 fingerprint 自动去重
-   - CLI 会自动重建 `.aidevos/rules/*.md` 视图文件
-
-   **b) 正式沉淀规则（去掉 pending）：**
-   ```bash
-   aida log rule --content "正式规则内容" --category component --source-deviation DEV-XX
-   ```
-   - 不带 `--status pending` 即为正式沉淀，更新 `summary.rulesSedimented` 统计
+   - 工具会自动重建 `.aidevos/rules/*.md` 视图文件
 
    **c) 带业务逻辑 → 不创建规则：**
    - 如果是**业务逻辑**（特定功能需求），不创建规则，只记录偏差即可。

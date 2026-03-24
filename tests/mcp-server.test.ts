@@ -148,13 +148,13 @@ describe('MCP Server - initialize', () => {
 // ─── tools/list ───────────────────────────────────────────
 
 describe('MCP Server - tools/list', () => {
-  it('should return all 9 tools', async () => {
+  it('should return all 10 tools', async () => {
     await client.initialize();
 
     const resp = await client.rpc('tools/list');
     assert.ok(resp.result);
     const tools = resp.result.tools;
-    assert.equal(tools.length, 9);
+    assert.equal(tools.length, 10);
 
     const names = tools.map((t: any) => t.name).sort();
     const expected = [
@@ -164,6 +164,7 @@ describe('MCP Server - tools/list', () => {
       'aida_log_deviation',
       'aida_log_files',
       'aida_log_review',
+      'aida_log_rule',
       'aida_status',
       'aida_task_done',
       'aida_task_start',
