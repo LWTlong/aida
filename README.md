@@ -2,11 +2,11 @@
 
 # AIDA
 
-### AI coding is a black box. AIDA makes it measurable.
+### Your AI keeps making the same mistakes. AIDA fixes that.
 
-You vibe-code with Claude, Cursor, or Copilot every day — but you can't answer basic questions:<br>
-*How many tokens did that feature cost? Which task took the longest? Is AI actually saving me money?*<br>
-**Stop guessing. Run AIDA. See the data.**
+Every AI coding tool hallucinates, misuses components, and ignores project conventions.<br>
+*But you close the terminal and the evidence disappears. Next session, same mistakes.*<br>
+**AIDA tracks every deviation, finds the patterns, and turns them into rules — so your AI gets smarter with every run.**
 
 ```bash
 npx ai-dev-analytics init
@@ -18,21 +18,65 @@ npx ai-dev-analytics init
 [![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#testing)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Interactive%20Dashboard-FF4B4B?style=for-the-badge&logo=react)](https://lwtlong.github.io/ai-dev-analytics/)
 
-[30-Second Setup](#-30-second-setup) · [What You See](#-what-you-see) · [How It Works](#️-how-it-works) · [Use Cases](#-use-cases) · [中文文档](./README.zh-CN.md)
+[30-Second Setup](#-30-second-setup) · [The Self-Improving Loop](#-the-self-improving-loop) · [What You See](#-what-you-see) · [Use Cases](#-use-cases) · [中文文档](./README.zh-CN.md)
 
 </div>
 
 ---
 
+## The Problem
+
+You've been vibe-coding with Claude for a week. Then you notice:
+
+- **AI generates a form layout — wrong again.** Same `labelPosition` mistake as last time. And the time before that.
+- **A component is misused.** AI used `PageLayout` for a detail page, but your project convention is `FormPageLayout`. You corrected it twice already. AI doesn't remember.
+- **Spacing is off everywhere.** AI keeps adding `margin-top: 20px` when your design system uses `8px`. Every PR, same feedback.
+
+The root cause: **AI has no memory of its own mistakes.** Each session starts from zero.
+
+AIDA changes that. It records what went wrong, why, and automatically builds a project-specific rule set that your AI reads next time. **Same mistake never happens twice.**
+
+---
+
+## 🔄 The Self-Improving Loop
+
+This is the core of AIDA — not just tracking, but learning.
+
+```
+AI generates code → AIDA records deviation (what happened vs. what was expected)
+                                    ↓
+                    Root cause identified → "rule-missing" / "hallucination" / "context-insufficient"
+                                    ↓
+                    Pattern detected → Auto-sediment as project rule
+                                    ↓
+                    AI reads .aidevos/rules/ next session → Same mistake eliminated
+```
+
+**Real example from a production project:**
+
+| Run | Deviation | What happened | Rule sedimented |
+|-----|-----------|---------------|-----------------|
+| #1 | DEV-02 | AI used `labelPosition: 'right'` | "Edit forms must use `labelPosition: 'top'`" |
+| #1 | DEV-03 | AI wrapped props in `:formProps={}` | "FormJ attrs must be passed directly" |
+| #1 | DEV-05 | AI used `PageLayout` for detail page | "Detail pages must use `FormPageLayout`" |
+| #1 | DEV-20 | AI added `onActivated` refresh | "List refresh must use event bus, not `onActivated`" |
+| #2 | — | **Zero repeat deviations.** AI read the rules. | — |
+
+After 47 tasks and 23 deviations, this project accumulated 6 rules. Run #2 had **zero repeat errors** on the same patterns.
+
+Your `.aidevos/rules/` directory becomes a **project-specific AI knowledge base** that grows smarter with every run.
+
+---
+
 ## Dashboard
 
-**Token usage, time per task, retry count, pass rate, cost savings — all in one view.**
+**Deviations, bugs, tasks, time, tokens, rules — everything your AI did, structured and visualized.**
 
 ![Dashboard](./docs/dashboard.png)
 
-> **[Live Demo →](https://lwtlong.github.io/ai-dev-analytics/)** No install. No setup. Just open and explore.
+> **[Live Demo →](https://lwtlong.github.io/ai-dev-analytics/)** Real anonymized project data. No install needed.
 
-Run `npx ai-dev-analytics dashboard` and see **your own data** in seconds — not a demo, your actual project.
+Run `npx ai-dev-analytics dashboard` to see **your own project data** in seconds.
 
 <details>
 <summary>🔒 Privacy: all data stays local</summary>
@@ -60,9 +104,9 @@ Create or edit `.mcp.json` in your project root:
 }
 ```
 
-That's it. No `npm install`, no initialization. AIDA auto-creates everything on first use.
+That's it. AIDA auto-creates everything on first use. Zero workflow changes — your AI calls the MCP tools silently as it works.
 
-> *Tip: For faster startup times (especially in regions with slow npm registries), run `npm install -g ai-dev-analytics` and change the command from `"npx"` to `"aida"`.*
+> *Tip: For faster startup, run `npm install -g ai-dev-analytics` and change the command to `"aida"`.*
 
 <details>
 <summary>Cursor / VS Code Copilot / Windsurf</summary>
@@ -112,89 +156,86 @@ npx ai-dev-analytics dashboard
 
 Open `http://localhost:2375` — real-time updates via SSE, Chinese/English toggle built in.
 
-### Starting a new project?
-
-```bash
-npx ai-dev-analytics init      # Interactive setup
-npx ai-dev-analytics start     # Create a development run
-# ... code with your AI tool ...
-npx ai-dev-analytics dashboard  # See what happened
-```
-
 ---
 
 ## 🤔 Why You Need This
 
-**You're already using AI to write code. But you're not measuring anything.**
+**AI doesn't learn from its mistakes. You need a system that does it for AI.**
 
 | Without AIDA | With AIDA |
 |---|---|
-| "I think AI saved me time" | "AI completed 47 tasks in 95h of processing, replacing 57h of manual work" |
-| "Tokens seem expensive this month" | "506K tokens, $2.52 — auth module used 40% of that" |
-| "That feature had a lot of bugs" | "5 bugs, 3 critical — all in the database migration phase" |
-| "AI keeps making the same mistakes" | "23 deviations tracked, top root cause: rule missing (→ auto-sedimented to project rules)" |
+| "AI keeps getting the layout wrong" | "9 layout deviations tracked. Root cause: `hallucination` (56%), `rule-missing` (44%). 4 rules sedimented → zero repeats" |
+| "I corrected this three times already" | "DEV-03 auto-sedimented: 'FormJ attrs must be passed directly'. AI reads it every session now" |
+| "That feature had a lot of bugs" | "5 bugs, 3 critical — all in the database migration phase. Bug-to-task ratio: 10.6%" |
+| "What did I even do this quarter?" | "47 tasks, 23 deviations fixed, 6 rules sedimented, 4064 lines added. Export → H1 performance review" |
 
-The difference: **gut feeling vs. data you can act on.**
+The difference: **AI that keeps forgetting vs. AI that compounds its knowledge.**
 
 ---
 
 ## 📊 What You See
 
-### Per-Branch Development View
+### Deviation & Quality Intelligence
 
 | Category | Metrics |
 |----------|---------|
-| **Token Usage** | Total tokens, input/output/cache breakdown, per-task consumption, cost estimation |
-| **Time Analysis** | Cumulative time per node, task time ranking TOP 10, phase time distribution |
-| **Quality** | Bug severity distribution, deviation root cause analysis, review pass rate trend |
-| **Efficiency** | Task completion by phase, first-pass rate trend, file modification hotspots |
-| **Cost** | Manual cost vs. AI token cost, savings amount, cost-per-task breakdown |
+| **Deviation Analysis** | Root cause breakdown (rule-missing / hallucination / context-insufficient), deviation category distribution, trend over time |
+| **Bug Tracking** | Severity distribution, source analysis, bug-to-task ratio, fix time |
+| **Review Quality** | Self-review pass rate trend, issue type distribution, first-pass rate |
+| **Rules** | Sedimented rules list, source deviation mapping, category coverage |
 
-### Project Overview (for team leads)
+### Development Lifecycle
+
+| Category | Metrics |
+|----------|---------|
+| **Tasks** | Completion by phase, time per task TOP 10, stage time distribution |
+| **Files** | Modification hotspots, lines added/removed, change frequency |
+| **Timeline** | Full development history — every task, bug, review, deviation, chronologically |
+| **Token Usage** | Total tokens, input/output/cache breakdown, per-task consumption |
+
+### Project Overview (for teams)
 
 - Requirement status across all branches
 - Developer efficiency comparison
 - Cross-branch aggregated stats
 
-Every KPI card is clickable — drill into task details, deviation root causes, review reports, file changes, and token breakdowns.
+Every KPI card is clickable — drill into task details, deviation root causes, review reports, and file changes.
 
-**In short: everything your AI did, structured and visualized.**
+### Data You Can Export
+
+All data lives in structured JSON. Pull it for:
+- **H1 / H2 performance reviews** — tasks completed, quality metrics, lines of code
+- **Annual reports** — cross-project trends, deviation patterns, rule growth
+- **Sprint retrospectives** — what went wrong, what rules were added, quality improvement over time
+- **Team lead dashboards** — who has the most deviations? which modules need better rules?
 
 ---
 
 ## 🎯 Use Cases
 
-**Solo Developer — "Where did my tokens go?"**
-> You vibe-code a feature over the weekend. Monday morning, open the dashboard: 300K tokens, 12 tasks, 2 bugs fixed. The chart shows the form validation task took 5x longer than others. Next time, you write clearer specs for that part.
+**Vibe Coder — "Why does AI keep making the same mistake?"**
+> You notice AI keeps misusing your component library. After a week with AIDA, the dashboard shows: 9 deviations, all `component-usage` category, root cause `rule-missing`. AIDA sedimented 3 rules. Next run, AI reads the rules — zero component misuse.
 
-**Tech Lead — "Is AI actually helping the team?"**
-> Your team of 4 uses Claude Code daily. The project overview shows: 150 tasks completed across 8 branches, 15 deviations, 89% first-pass review rate. Developer A has 0 deviations; Developer B has 9. Time for a rules audit on B's workflow.
+**Tech Lead — "Which developer's AI workflow needs tuning?"**
+> Team of 4 uses Claude Code daily. Project overview: Developer A has 2 deviations and 5 sedimented rules. Developer B has 15 deviations and 0 rules. B's AI isn't learning because no one is recording the patterns. Time to set up AIDA on B's workflow.
 
-**Freelancer — "Show the client the ROI"**
-> Client asks: "Why should I pay for AI tools?" You open the cost analysis: 40 hours of manual work estimated, AI token cost $3.80. Cost savings: $596. Screenshots → invoice attachment.
+**Senior Engineer — "Show me the data for my performance review"**
+> End of H1. Open the dashboard: 150 tasks across 3 features, 89% first-pass review rate, 12 rules sedimented that now benefit the entire team. Export the data, attach to your review doc. Data beats "I think I did a lot."
 
-**Open Source Maintainer — "Track AI contribution quality"**
-> You accept AI-generated PRs. AIDA records which tasks were AI-generated, their review pass rate, and bug rate. Data-driven: AI handles boilerplate well (98% pass) but struggles with API design (60% pass).
+**Open Source Maintainer — "Is AI-generated code actually good enough?"**
+> You accept AI-generated PRs. AIDA shows: AI handles boilerplate at 98% pass rate but struggles with API design (60% pass rate, 8 deviations). You add API design rules — next quarter, pass rate jumps to 85%.
 
 ---
 
 ## ⚙️ How It Works
 
-```
-Your AI Tool (Claude Code / Cursor / Windsurf / VS Code)
-    │
-    │  AI writes code normally — zero workflow changes
-    │
-    ├──→ MCP Server (9 tools)     ──→  .aidevos/run.json  ──→  Dashboard
-    │    auto-called by AI              local JSON files        localhost:2375
-    │    zero friction                  git-friendly            real-time SSE
-```
-
 ```mermaid
 flowchart LR
     A["Your AI Tool\nClaude Code / Cursor"] -->|Normal Coding| B{"MCP Server\n9 Tools"}
     B -->|Silent Logging| C[".aidevos/run.json"]
-    C -->|Local Data| D["AIDA Dashboard\nlocalhost:2375"]
+    C -->|Deviation Patterns| D[".aidevos/rules/"]
+    C -->|Visualization| E["Dashboard\nlocalhost:2375"]
+    D -->|AI Reads Rules| A
 ```
 
 Your AI tool calls MCP tools automatically as it works. You don't invoke them manually. No prompts to write, no scripts to run.
@@ -227,29 +268,20 @@ All data is local JSON. No database, no cloud.
 | **Run** | `.aidevos/runs/{branch}/{dev}/run.json` | Every task, bug, deviation, review, file change, token |
 | **Branch** | `.aidevos/runs/{branch}/requirement.json` | Aggregated stats per requirement |
 | **Project** | `.aidevos/index.json` | Cross-branch overview for team leads |
+| **Rules** | `.aidevos/rules/` | Sedimented project rules — your AI's growing knowledge base |
 
 ---
 
-## 🚀 Advanced: Full Workflow Mode
+## 🚀 Full Workflow Mode
 
-Beyond data collection, AIDA offers structured AI development workflows with self-improving project rules.
+Beyond data collection, AIDA offers structured AI development workflows.
 
 ```bash
 aida init    # Select "Full workflow"
 aida start   # Create a development run
 ```
 
-This enables 14 AI skills — requirement analysis, task decomposition, code generation, self-review, bug fixing — with a feedback loop that **automatically converts mistakes into project rules**.
-
-```
-AI generates code → Self-review catches issue → Record as deviation
-                                                       ↓
-                                    Is it a pattern? → Sediment as project rule
-                                                       ↓
-                                    AI reads rules next time → Same mistake never happens again
-```
-
-Your `.aidevos/rules/` directory becomes a project-specific AI knowledge base that grows with every run.
+This enables 14 AI skills — requirement analysis, task decomposition, code generation, self-review, bug fixing — with the deviation → rule feedback loop built in.
 
 ---
 
@@ -285,7 +317,8 @@ AIDA uses [Model Context Protocol](https://modelcontextprotocol.io/) — the sta
 1. Your AI tool discovers AIDA's 9 tools via MCP
 2. As the AI works, it naturally calls `aida_task_start`, `aida_log_files`, etc.
 3. Data flows into `run.json` silently
-4. You open the dashboard whenever you want to see the data
+4. Deviation patterns emerge → rules get sedimented
+5. AI reads rules next session → output quality improves
 
 **No prompts to write. No scripts to run. No workflow to learn.**
 
@@ -295,12 +328,12 @@ AIDA uses [Model Context Protocol](https://modelcontextprotocol.io/) — the sta
 
 ## Roadmap
 
-- [ ] Token cost tracking with provider-specific pricing (OpenAI, Anthropic, Google)
-- [ ] Export reports as PDF / HTML
+- [ ] Export reports as PDF / HTML (H1/H2 performance reviews)
+- [ ] Historical trend analysis — deviation reduction over time
 - [ ] Team dashboard with multi-project aggregation
-- [ ] VS Code extension for inline analytics
+- [ ] VS Code extension for inline deviation alerts
 - [ ] Webhook integrations (Slack, Discord, GitHub Issues)
-- [ ] Historical trend analysis across runs
+- [ ] Cross-project rule sharing — team-wide AI knowledge base
 
 ---
 
@@ -340,7 +373,7 @@ npm test
 
 <div align="center">
 
-**You're already vibe-coding. Now see what actually happened.**
+**AI doesn't remember its mistakes. AIDA does — and makes sure they never happen again.**
 
 [Get Started in 30 Seconds →](#-30-second-setup)
 
