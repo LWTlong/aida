@@ -1,5 +1,6 @@
 import type { TimelineItem } from '../types'
 import { formatShortDate } from '../utils/date'
+import { useLocale } from '../i18n'
 
 interface Props {
   items: TimelineItem[]
@@ -23,12 +24,14 @@ function getPrdColor(prd: string): { bg: string; text: string } {
 }
 
 export function Timeline({ items, prdPhases }: Props) {
+  const { t } = useLocale()
+
   if (prdPhases) {
     prdPhases.forEach((p) => getPrdColor(p))
   }
 
   if (items.length === 0) {
-    return <div className="text-[#6b7b8d] text-sm py-8 text-center">暂无时间线数据</div>
+    return <div className="text-[#6b7b8d] text-sm py-8 text-center">{t.chartNoTimeline}</div>
   }
 
   return (

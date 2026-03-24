@@ -1,5 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
 import type { DeviationItem, BugItem } from '../../types'
 
 interface Props {
@@ -14,6 +15,7 @@ function isSourceFile(f: string): boolean {
 }
 
 export function FileHotspot({ deviations, bugs }: Props) {
+  const { t } = useLocale()
   const counts: Record<string, number> = {}
 
   for (const d of deviations) {
@@ -36,7 +38,7 @@ export function FileHotspot({ deviations, bugs }: Props) {
   const values = sorted.map(([, v]) => v)
 
   if (files.length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无文件热点数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoFileHotspot}</div>
   }
 
   const option = {

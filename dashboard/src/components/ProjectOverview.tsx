@@ -3,6 +3,7 @@ import { ChartCard } from './ChartCard'
 import { formatDate } from '../utils/date'
 import { TeamEfficiencyChart } from './charts/TeamEfficiencyChart'
 import { RequirementStatusChart } from './charts/RequirementStatusChart'
+import { useLocale } from '../i18n'
 
 interface Props {
   data: IndexData
@@ -45,6 +46,7 @@ function aggregateDevelopers(runs: IndexRunEntry[]): DeveloperSummary[] {
 }
 
 export function ProjectOverview({ data, onSelectBranch }: Props) {
+  const { t } = useLocale()
   const runs = data.runs
   const allDevs = aggregateDevelopers(runs)
 
@@ -58,13 +60,13 @@ export function ProjectOverview({ data, onSelectBranch }: Props) {
   const completedRuns = runs.filter((r) => r.status === 'completed').length
 
   const kpis = [
-    { label: '总需求数', value: `${runs.length}`, color: 'text-blue-500' },
-    { label: '进行中', value: `${activeRuns}`, color: 'text-amber-500' },
-    { label: '已完成', value: `${completedRuns}`, color: 'text-green-500' },
-    { label: '任务完成', value: `${totalCompleted}/${totalTasks}`, color: 'text-cyan-500' },
-    { label: '总偏差', value: `${totalDeviations}`, color: 'text-amber-500' },
-    { label: '总缺陷', value: `${totalBugs}`, color: 'text-red-500' },
-    { label: '代码行数', value: totalLines > 1000 ? `${(totalLines / 1000).toFixed(1)}k` : `${totalLines}`, color: 'text-purple-500' },
+    { label: t.ovTotalReqs, value: `${runs.length}`, color: 'text-blue-500' },
+    { label: t.ovInProgress, value: `${activeRuns}`, color: 'text-amber-500' },
+    { label: t.ovCompleted, value: `${completedRuns}`, color: 'text-green-500' },
+    { label: t.ovTaskCompletion, value: `${totalCompleted}/${totalTasks}`, color: 'text-cyan-500' },
+    { label: t.ovTotalDeviations, value: `${totalDeviations}`, color: 'text-amber-500' },
+    { label: t.ovTotalBugs, value: `${totalBugs}`, color: 'text-red-500' },
+    { label: t.ovCodeLines, value: totalLines > 1000 ? `${(totalLines / 1000).toFixed(1)}k` : `${totalLines}`, color: 'text-purple-500' },
     { label: 'Tokens', value: totalTokens > 1000000 ? `${(totalTokens / 1000000).toFixed(1)}M` : totalTokens > 1000 ? `${(totalTokens / 1000).toFixed(0)}k` : `${totalTokens}`, color: 'text-teal-500' },
   ]
 
@@ -85,27 +87,27 @@ export function ProjectOverview({ data, onSelectBranch }: Props) {
 
       <div className="grid grid-cols-2 gap-4 px-8 pb-5 max-md:grid-cols-1">
         {/* Charts */}
-        <ChartCard title="需求状态分布">
+        <ChartCard title={t.ovReqStatus}>
           <RequirementStatusChart runs={runs} />
         </ChartCard>
 
-        <ChartCard title="团队效率对比">
+        <ChartCard title={t.ovTeamEfficiency}>
           <TeamEfficiencyChart developers={allDevs} />
         </ChartCard>
 
         {/* Requirements List */}
-        <ChartCard title="需求列表" full>
+        <ChartCard title={t.ovReqList} full>
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">分支</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">标题</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">状态</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">任务</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">偏差</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovBranch}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovTitle}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovStatus}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovTasks}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovDeviations}</th>
                 <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">Bug</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">开发者</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">开始时间</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovDeveloper}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovStartTime}</th>
               </tr>
             </thead>
             <tbody>
@@ -136,18 +138,18 @@ export function ProjectOverview({ data, onSelectBranch }: Props) {
         </ChartCard>
 
         {/* Developer Table */}
-        <ChartCard title="团队成员汇总" full>
+        <ChartCard title={t.ovTeamSummary} full>
           <table className="w-full border-collapse text-[13px]">
             <thead>
               <tr>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">开发者</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">任务</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">偏差</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovDeveloper}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovTasks}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovDeviations}</th>
                 <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">Bug</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">+行数</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">AI 工时</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovLinesAdded}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovAiHours}</th>
                 <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">Tokens</th>
-                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">模块</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium">{t.ovModule}</th>
               </tr>
             </thead>
             <tbody>
@@ -171,13 +173,13 @@ export function ProjectOverview({ data, onSelectBranch }: Props) {
 
         {/* Highlights */}
         {allHighlights.length > 0 && (
-          <ChartCard title="业务价值亮点" full>
+          <ChartCard title={t.ovHighlights} full>
             <div className="space-y-3">
               {allHighlights.map((h, i) => (
                 <div key={i} className="flex items-start gap-3 py-2 border-b border-[#1e2d3d] last:border-b-0">
                   <span className={`inline-block px-2 py-0.5 rounded text-[11px] shrink-0 mt-0.5 ${
                     h.source === 'auto' ? 'bg-blue-900/30 text-blue-400' : 'bg-purple-900/30 text-purple-400'
-                  }`}>{h.source === 'auto' ? 'AI' : '手动'}</span>
+                  }`}>{h.source === 'auto' ? t.ovAi : t.ovManual}</span>
                   <div className="flex-1 text-[13px] text-[#e0e6ed]">{h.content}</div>
                   <div className="text-[11px] text-[#6b7b8d] shrink-0">
                     <span className="text-blue-400">{(h as { branch?: string }).branch}</span> {formatDate(h.createdAt)}

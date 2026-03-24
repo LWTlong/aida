@@ -32,6 +32,33 @@ export async function fetchRequirement(branch: string): Promise<RequirementData 
   return res.json()
 }
 
+export async function updateRunCost(
+  runId: string,
+  updates: { estimatedManualHours?: number },
+): Promise<boolean> {
+  const res = await fetch(`${BASE}/api/runs/${runId}/cost`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  })
+  if (!res.ok) return false
+  const data = await res.json()
+  return data.success === true
+}
+
+export async function updateConfig(
+  updates: { hourlyRate?: number },
+): Promise<boolean> {
+  const res = await fetch(`${BASE}/api/config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  })
+  if (!res.ok) return false
+  const data = await res.json()
+  return data.success === true
+}
+
 export function subscribeSSE(onUpdate: (data: unknown) => void): () => void {
   const es = new EventSource(`${BASE}/api/events`)
   es.onmessage = (e) => {

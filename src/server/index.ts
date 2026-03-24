@@ -2,7 +2,7 @@ import { createServer, ServerResponse } from 'node:http';
 import { readFileSync, watch, existsSync } from 'node:fs';
 import { resolve, extname } from 'node:path';
 import { PACKAGE_ROOT } from '../utils/paths.js';
-import { getAllRuns, getRunData, getAggregatedData, getRequirementData, getIndexData } from './api.js';
+import { getAllRuns, getRunData, getAggregatedData, getRequirementData, getIndexData, updateRunCost, updateProjectConfig } from './api.js';
 import { buildIndex } from '../cli/commands/reindex.js';
 
 const DASHBOARD_DIR = resolve(PACKAGE_ROOT, 'src', 'dashboard');
@@ -42,6 +42,68 @@ export async function startServer(
     const url = req.url || '/';
 
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    // POST API routes
+    if (req.method === 'POST' && url.startsWith('/api/runs/') && url.endsWith('/cost')) {
+      const middle = decodeURIComponent(url.replace('/api/runs/', '').replace('/cost', ''));
+      const parts = middle.split('/');
+      if (parts.length >= 2) {
+        const branch = parts[0];
+        const dev = parts[1];
+        if (branch.includes('..') || dev.includes('..') || branch.includes('\0') || dev.includes('\0')) {
+          res.writeHead(403, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Forbidden' }));
+          return;
+        }
+        let body = '';
+        req.on('data', (chunk) => { body += chunk; });
+        req.on('end', () => {
+          try {
+            const updates = JSON.parse(body);
+            const ok = updateRunCost(theRunsDir, branch, dev, updates, projectRoot);
+            res.writeHead(ok ? 200 : 404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: ok }));
+          } catch {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Invalid JSON' }));
+          }
+        });
+        return;
+      }
+    }
+
+    if (req.method === 'POST' && url === '/api/config') {
+      let body = '';
+      req.on('data', (chunk) => { body += chunk; });
+      req.on('end', () => {
+        try {
+          const updates = JSON.parse(body);
+          const ok = updateProjectConfig(projectRoot, updates);
+          // After config change, recalc all runs to pick up new hourlyRate
+          if (ok && updates.hourlyRate != null) {
+            const runs = getAllRuns(theRunsDir);
+            for (const run of runs) {
+              const p = run.runId.split('/');
+              if (p.length >= 2) updateRunCost(theRunsDir, p[0], p[1], {}, projectRoot);
+            }
+          }
+          res.writeHead(ok ? 200 : 500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: ok }));
+        } catch {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Invalid JSON' }));
+        }
+      });
+      return;
+    }
 
     // API routes
     if (url === '/api/runs') {
@@ -94,7 +156,7 @@ export async function startServer(
           res.end(JSON.stringify({ error: 'Forbidden' }));
           return;
         }
-        const data = getRunData(theRunsDir, branch, dev);
+        const data = getRunData(theRunsDir, branch, dev, projectRoot);
         if (data) {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify(data));

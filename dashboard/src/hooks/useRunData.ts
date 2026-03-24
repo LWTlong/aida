@@ -76,5 +76,10 @@ export function useRunData() {
     }
   }, [currentRunId, loadRuns, loadRunData])
 
-  return { runs, currentRunId, setCurrentRunId, runData, loading, connected }
+  const refresh = useCallback(() => {
+    loadRuns()
+    if (currentRunId) loadRunData(currentRunId)
+  }, [currentRunId, loadRuns, loadRunData])
+
+  return { runs, currentRunId, setCurrentRunId, runData, loading, connected, refresh }
 }

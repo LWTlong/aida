@@ -1,5 +1,6 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
 import type { TaskItem, RunCost } from '../../types'
 
 interface Props {
@@ -14,6 +15,7 @@ function formatSeconds(s: number): string {
 }
 
 export function TaskTimeRanking({ tasks, cost }: Props) {
+  const { t } = useLocale()
   const totalTokens = cost?.totalTokens || 0
   const taskCount = tasks.filter(t => t.startedAt && t.completedAt).length
   const avgTokensPerTask = taskCount > 0 && totalTokens > 0 ? Math.round(totalTokens / taskCount) : 0
@@ -30,7 +32,7 @@ export function TaskTimeRanking({ tasks, cost }: Props) {
     .slice(0, 10)
 
   if (timed.length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无任务耗时数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoTaskTime}</div>
   }
 
   const reversed = [...timed].reverse()

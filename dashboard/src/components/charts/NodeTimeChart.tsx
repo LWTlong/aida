@@ -1,5 +1,7 @@
 import ReactECharts from 'echarts-for-react'
 import { darkTheme } from './darkTheme'
+import { useLocale } from '../../i18n'
+import { stageLabel } from '../../labelMap'
 import type { RunMetrics, RunCost, TaskItem, BugItem } from '../../types'
 
 interface Props {
@@ -7,15 +9,6 @@ interface Props {
   cost?: RunCost
   tasks?: TaskItem[]
   bugs?: BugItem[]
-}
-
-const nodeLabels: Record<string, string> = {
-  'code-generation': '代码生成',
-  'bug-fix': 'Bug 修复',
-  'deviation-fix': '偏差修复',
-  'self-review': '自检审查',
-  'task-split': '任务拆分',
-  'requirement-analysis': '需求分析',
 }
 
 const colorPool = ['#3b82f6', '#ef4444', '#f59e0b', '#a855f7', '#06b6d4', '#22c55e', '#ec4899', '#f97316']
@@ -33,9 +26,11 @@ function formatTokens(n: number): string {
 }
 
 export function NodeTimeChart({ metrics, cost, tasks, bugs }: Props) {
+  const { t } = useLocale()
+
   const breakdown = metrics.nodeTimeBreakdown
   if (!breakdown || Object.keys(breakdown).length === 0) {
-    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">暂无节点耗时数据</div>
+    return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoNodeTime}</div>
   }
 
   // Build node-level token map from tokenBreakdown
@@ -75,7 +70,7 @@ export function NodeTimeChart({ metrics, cost, tasks, bugs }: Props) {
 
   const sorted = Object.entries(breakdown).sort((a, b) => a[1] - b[1])
   const rawKeys = sorted.map(([k]) => k)
-  const names = sorted.map(([k]) => nodeLabels[k] || k)
+  const names = sorted.map(([k]) => stageLabel(k, t))
   const values = sorted.map(([, v]) => v)
   const tokenValues = rawKeys.map(k => tokenMap[k] || 0)
 
@@ -88,7 +83,7 @@ export function NodeTimeChart({ metrics, cost, tasks, bugs }: Props) {
         const idx = list[0]?.dataIndex
         if (idx == null) return ''
         const name = names[idx]
-        let tip = `<b>${name}</b><br/>耗时: ${formatSeconds(values[idx])}`
+        let tip = `<b>${name}</b><br/>${t.tipDuration}: ${formatSeconds(values[idx])}`
         if (hasTokens && tokenValues[idx] > 0) {
           tip += `<br/>Token: ${formatTokens(tokenValues[idx])}`
         }
@@ -139,7 +134,7 @@ export function NodeTimeChart({ metrics, cost, tasks, bugs }: Props) {
       <ReactECharts option={option} style={{ height: Math.max(200, names.length * 45) }} />
       {totalTokens > 0 && !hasTokens && (
         <div className="text-center text-xs text-[#6b7b8d] mt-1">
-          总 Token 消耗: {totalTokens.toLocaleString()}
+          {t.chartTotalTokens}: {totalTokens.toLocaleString()}
         </div>
       )}
     </div>

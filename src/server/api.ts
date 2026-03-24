@@ -1,6 +1,7 @@
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { IndexData, RequirementData } from '../schemas/run-json.js';
+import { recalcMetrics } from '../utils/run-data.js';
 
 export interface RunSummary {
   runId: string;
@@ -84,6 +85,7 @@ export function getRunData(
   runsDir: string,
   branch: string,
   dev: string,
+  projectRoot?: string,
 ): Record<string, any> | null {
   const runJson = resolve(runsDir, branch, dev, 'run.json');
   if (!existsSync(runJson)) return null;
@@ -109,6 +111,10 @@ export function getRunData(
     // Ensure prdPhaseCount is populated
     if (data.summary.prdPhaseCount == null && data.meta.prdPhases) {
       data.summary.prdPhaseCount = data.meta.prdPhases.length;
+    }
+    // Always recalc metrics with latest formula
+    if (projectRoot) {
+      recalcMetrics(data, projectRoot);
     }
     return data;
   } catch {
@@ -136,6 +142,52 @@ export function getIndexData(projectRoot: string): IndexData | null {
     return JSON.parse(readFileSync(idxPath, 'utf-8'));
   } catch {
     return null;
+  }
+}
+
+export function updateRunCost(
+  runsDir: string,
+  branch: string,
+  dev: string,
+  updates: { estimatedManualHours?: number },
+  projectRoot: string,
+): boolean {
+  const runJson = resolve(runsDir, branch, dev, 'run.json');
+  if (!existsSync(runJson)) return false;
+
+  try {
+    const data = JSON.parse(readFileSync(runJson, 'utf-8'));
+    if (!data.cost) data.cost = {};
+    if (updates.estimatedManualHours != null) {
+      data.cost.estimatedManualHours = updates.estimatedManualHours;
+    }
+    recalcMetrics(data, projectRoot);
+    data.context = data.context || {};
+    data.context.lastUpdated = new Date().toISOString();
+    writeFileSync(runJson, JSON.stringify(data, null, 2), 'utf-8');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function updateProjectConfig(
+  projectRoot: string,
+  updates: { hourlyRate?: number },
+): boolean {
+  const cfgPath = resolve(projectRoot, '.aidevos', 'config.json');
+  try {
+    let cfg: Record<string, any> = {};
+    if (existsSync(cfgPath)) {
+      cfg = JSON.parse(readFileSync(cfgPath, 'utf-8'));
+    }
+    if (updates.hourlyRate != null) {
+      cfg.hourlyRate = updates.hourlyRate;
+    }
+    writeFileSync(cfgPath, JSON.stringify(cfg, null, 2), 'utf-8');
+    return true;
+  } catch {
+    return false;
   }
 }
 
