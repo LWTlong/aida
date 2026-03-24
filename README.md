@@ -18,8 +18,10 @@ One line to integrate. Zero workflow changes.
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#testing)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Interactive%20Dashboard-FF4B4B?style=for-the-badge&logo=react)](https://lwtlong.github.io/ai-dev-analytics/)
+[![Live Demo](https://img.shields.io/badge/🎯_Live_Demo-Interactive_Dashboard-FF4B4B)](https://lwtlong.github.io/ai-dev-analytics/)
 [![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/score.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
+
+[![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/card.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
 [One-Line Setup](#-30-second-setup) · [Data-Driven Loop](#-the-data-driven-loop) · [Dashboard](#-the-dashboard) · [SOP Workflow](#-standardized-ai-development-workflow) · [Data for Reports](#-data-sedimentation--performance-reports) · [中文文档](./README.zh-CN.md)
 
