@@ -36,13 +36,8 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 
 4. **记录反馈（强制，不可跳过）：**
    - 如果此 Bug 源于 AI 生成代码与用户期望的偏差，应建议用户使用 deviation-recorder 记录到 `run.json.deviations[]`。
-   - 执行以下命令记录 Bug 和修复：
-   ```bash
-   # 记录 Bug
-   aida log bug --title "Bug简述" --severity high --source self-review --task TASK-XX --files "file1.ts,file2.ts"
-   # 修复后标记
-   aida log bug-fix --id BUG-XX --fix "修复方案描述"
-   # 记录修改的文件
-   aida log file --path "修改的文件路径" --change-type modified --lines-added XX --lines-removed XX
-   ```
-   CLI 会自动更新 summary 统计和 timeline。
+   - 调用以下 MCP 工具记录 Bug 和修复：
+   - **记录 Bug** → 调用 `aida_log_bug`，传入 `title`、`severity`（critical/high/medium/low）、`source`（self-review/testing/user-report）、`taskId`、`files`
+   - **修复后标记** → 调用 `aida_bug_fix`，传入 `id`（BUG-XX）、`fix`（修复方案描述）
+   - **记录文件变更** → 调用 `aida_log_files`（自动扫描 git diff，无需传参）
+   - 工具会自动更新 summary 统计和 timeline。

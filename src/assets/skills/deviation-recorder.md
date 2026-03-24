@@ -46,13 +46,14 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
    - 严谨地修改偏差代码，使其符合用户期望。
 
 4. **记录偏差（强制，不可跳过）：**
-   执行以下命令记录偏差：
-   ```bash
-   aida log deviation --title "偏差简述" --root-cause rule-missing --category component-usage --ai-output "AI实际生成了什么" --expected "用户实际想要什么" --files "file1.ts,file2.ts"
-   ```
-   `--root-cause` 可选值：`rule-missing`, `context-insufficient`, `hallucination`, `misunderstanding`, `reference-copy`, `process-omission`, `other`
-   `--category` 可选值：`ui-spacing`, `layout`, `component-usage`, `i18n`, `api`, `logic`, `architecture`, `style`, `other`
-   CLI 会自动生成 `DEV-XX` 编号并更新 summary 统计。
+   调用 `aida_log_deviation` MCP 工具，传入以下参数：
+   - `title`：偏差简述
+   - `rootCause`：根因分类，可选值：`rule-missing`, `context-insufficient`, `hallucination`, `misunderstanding`, `reference-copy`, `process-omission`, `other`
+   - `category`：偏差类别，可选值：`ui-spacing`, `layout`, `component-usage`, `i18n`, `api`, `logic`, `architecture`, `style`, `other`
+   - `aiOutput`：AI 实际生成了什么
+   - `expected`：用户实际想要什么
+   - `files`：涉及的文件路径（逗号分隔）
+   工具会自动生成 `DEV-XX` 编号并更新 summary 统计。
 
 5. **规则沉淀（仅限无业务逻辑的技术规范）：**
 

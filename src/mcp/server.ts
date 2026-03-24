@@ -55,10 +55,17 @@ interface JsonRpcResponse {
   error?: { code: number; message: string; data?: any };
 }
 
+// Transport mode: auto-detected from first client message
+let useContentLength = true;
+
 function sendResponse(res: JsonRpcResponse): void {
   const json = JSON.stringify(res);
-  const msg = `Content-Length: ${Buffer.byteLength(json)}\r\n\r\n${json}`;
-  process.stdout.write(msg);
+  if (useContentLength) {
+    const msg = `Content-Length: ${Buffer.byteLength(json)}\r\n\r\n${json}`;
+    process.stdout.write(msg);
+  } else {
+    process.stdout.write(json + '\n');
+  }
 }
 
 function sendResult(id: number | string | null, result: any): void {
@@ -753,44 +760,53 @@ function handleRequest(req: JsonRpcRequest): void {
 
 export function startMcpServer(): void {
   let buffer = '';
+  let transportDetected = false;
 
   process.stdin.setEncoding('utf-8');
   process.stdin.on('data', (chunk: string) => {
     buffer += chunk;
 
-    // Parse Content-Length based messages
     while (true) {
+      // Try Content-Length based messages first
       const headerEnd = buffer.indexOf('\r\n\r\n');
-      if (headerEnd === -1) break;
+      if (headerEnd !== -1) {
+        const header = buffer.substring(0, headerEnd);
+        const match = header.match(/Content-Length:\s*(\d+)/i);
+        if (match) {
+          if (!transportDetected) {
+            useContentLength = true;
+            transportDetected = true;
+          }
+          const contentLength = parseInt(match[1]);
+          const bodyStart = headerEnd + 4;
+          if (buffer.length < bodyStart + contentLength) break;
 
-      const header = buffer.substring(0, headerEnd);
-      const match = header.match(/Content-Length:\s*(\d+)/i);
-      if (!match) {
-        // Try to parse as raw JSON (some clients don't send headers)
-        const nlIdx = buffer.indexOf('\n');
-        if (nlIdx === -1) break;
-        const line = buffer.substring(0, nlIdx).trim();
-        buffer = buffer.substring(nlIdx + 1);
-        if (line) {
+          const body = buffer.substring(bodyStart, bodyStart + contentLength);
+          buffer = buffer.substring(bodyStart + contentLength);
+
           try {
-            const req = JSON.parse(line) as JsonRpcRequest;
+            const req = JSON.parse(body) as JsonRpcRequest;
             handleRequest(req);
           } catch { /* skip malformed */ }
+          continue;
         }
-        continue;
       }
 
-      const contentLength = parseInt(match[1]);
-      const bodyStart = headerEnd + 4;
-      if (buffer.length < bodyStart + contentLength) break;
-
-      const body = buffer.substring(bodyStart, bodyStart + contentLength);
-      buffer = buffer.substring(bodyStart + contentLength);
-
-      try {
-        const req = JSON.parse(body) as JsonRpcRequest;
-        handleRequest(req);
-      } catch { /* skip malformed */ }
+      // Fallback: newline-delimited JSON (e.g. mcp-proxy)
+      const nlIdx = buffer.indexOf('\n');
+      if (nlIdx === -1) break;
+      const line = buffer.substring(0, nlIdx).trim();
+      buffer = buffer.substring(nlIdx + 1);
+      if (line) {
+        if (!transportDetected) {
+          useContentLength = false;
+          transportDetected = true;
+        }
+        try {
+          const req = JSON.parse(line) as JsonRpcRequest;
+          handleRequest(req);
+        } catch { /* skip malformed */ }
+      }
     }
   });
 
