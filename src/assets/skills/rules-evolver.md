@@ -22,13 +22,12 @@ globs: ['.aidevos/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
      - **规则注册表**：`.aidevos/rules.json`（唯一的真相源）
      - **规则视图**：`.aidevos/rules/*.md`（自动生成的分类视图）
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
-   - 将新规则总结、泛化后通过 CLI 写入注册表：
-   ```bash
-   aida log rule --content "规则内容" --category component --source-deviation DEV-XX
-   ```
-   - `--category` 可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`
-   - CLI 会自动检查 fingerprint 去重，如果规则已存在会提示
-   - CLI 会自动重建 `.aidevos/rules/*.md` 视图
+   - 将新规则总结、泛化后，询问用户确认，然后调用 `aida_log_rule` MCP 工具写入注册表：
+     - `content`: 规则内容
+     - `category`: 分类（可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`）
+     - `sourceDeviation`: 关联的偏差 ID
+   - 工具会自动检查 fingerprint 去重，如果规则已存在会提示
+   - 工具会自动重建 `.aidevos/rules/*.md` 视图
    - 检查是否与全局规则文件冲突，如有冲突则提示用户
 3. 确保提炼出的规则具有可被 AI 自动化解析、清晰且强制性的执行标准。
 4. 你的每一次输出都将直接影响后续 code-generator 和 self-reviewer 的行为。

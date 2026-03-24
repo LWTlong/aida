@@ -9,6 +9,7 @@ import { resolve } from 'node:path';
 import { getBranchName, getDevName, isGitRepo } from './git.js';
 import { runDir, branchDir, configPath, aidevosDir } from './paths.js';
 import { ensureDir, fileExists, readJson, writeJson, writeText } from './fs.js';
+import { ensureGuide, syncGuideReference } from './guide.js';
 import type {
   RunData,
   RequirementData,
@@ -352,6 +353,8 @@ export function createInitialRunData(
   };
 }
 
+let _guideSynced = false;
+
 /**
  * Ensure run.json exists (lazy init).
  * Creates .aidevos/, config.json, run.json, branch-level files if missing.
@@ -372,6 +375,13 @@ export function ensureRunJson(projectRoot: string): { path: string; data: RunDat
       aiTool: 'mcp',
       project: resolve(projectRoot).split('/').pop() || 'unknown',
     });
+  }
+
+  // Ensure AIDA guide exists and is referenced by AI tool instruction files (once per session)
+  if (!_guideSynced) {
+    ensureGuide(projectRoot);
+    syncGuideReference(projectRoot);
+    _guideSynced = true;
   }
 
   const branch = getBranchName();

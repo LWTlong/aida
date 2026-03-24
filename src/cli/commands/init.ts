@@ -12,6 +12,7 @@ import {
 } from '../../utils/fs.js';
 import { bold, green, cyan, dim, yellow } from '../../utils/display.js';
 import { addRule, buildRuleViews } from '../../utils/rules.js';
+import { ensureGuide, syncGuideReference } from '../../utils/guide.js';
 
 const QUICK_COMMANDS: { name: string; skill: string }[] = [
   { name: 'workflow', skill: 'workflow-orchestrator' },
@@ -278,7 +279,14 @@ export async function init(): Promise<void> {
     green('  ✓ Created') + ' .aidevos/rules.json       (with 3 iron rules)',
   );
 
-  // 5. Full mode: copy skills + slash commands
+  // 5. Write AIDA guide and sync reference to AI tool instruction files (both modes)
+  ensureGuide(projectRoot);
+  syncGuideReference(projectRoot, selectedTools);
+  console.log(
+    green('  ✓ Created') + ' .aidevos/aida-guide.md    (data collection & rule sedimentation guide)',
+  );
+
+  // 6. Full mode: copy skills + slash commands
   if (mode === 'full') {
     ensureDir(resolve(aidevos, 'skills'));
     for (const skill of ALL_SKILLS) {
@@ -328,7 +336,7 @@ export async function init(): Promise<void> {
     syncIronRules(projectRoot, primaryTool);
   }
 
-  // 6. Write config.json
+  // 7. Write config.json
   const projectName = getProjectName();
   const configData: Record<string, any> = {
     schemaVersion: '1.0',

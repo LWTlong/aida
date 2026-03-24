@@ -190,7 +190,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
 - **Bug 记录**：`run.json.bugs[]`（通过 `aida log bug` / `aida log bug-fix` 写入）
 - **质量自检**：`run.json.reviews[]`（通过 `aida log review` 写入）
 - **偏差记录**：`run.json.deviations[]`（通过 `aida log deviation` 写入，用户手动触发）
-- **规则沉淀**：`run.json.rules[]`（通过 `aida log rule` 写入）
+- **规则沉淀**：`run.json.rules[]`（通过 `aida_log_rule` MCP 工具或 `aida log rule` CLI 写入）
 - **工作流阶段**：`run.json.workflow[]`（记录各阶段执行状态和耗时）
 - **时间线**：`run.json.timeline[]`（记录关键事件时间点）
 - **文件变更**：`run.json.files[]`（记录修改过的文件路径和统计）
