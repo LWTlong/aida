@@ -26,10 +26,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
    - 读取 `run.json.tasks[]`。
    - 寻找**第一个** `status: "pending"` 或 `status: "in-progress"` 的任务作为本次工作的核心目标。
    - 如果所有任务 `status: "done"`，提示工作结束。
-   - **立即执行**（记录任务开始时间，用于耗时统计）：
-   ```bash
-   aida log task-start --id TASK-XX
-   ```
+   - **立即调用** `aida_task_start` MCP 工具，传入 `id`（如 TASK-01）和 `title`，记录任务开始时间用于耗时统计。
 
 2. **强制规则加载与参考文档读取：**
 
@@ -61,20 +58,12 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
    完成当前任务代码后，**必须按顺序**执行以下命令记录：
 
    **a) 记录所有文件变更（必须，不能遗漏）：**
-   ```bash
-   aida log file --path "src/views/xxx.vue" --change-type modified --lines-added 50 --lines-removed 10
-   aida log file --path "src/api/yyy.ts" --change-type created --lines-added 30
-   ```
-   - **对每个修改过的文件都必须执行一次** `aida log file`
-   - `--change-type` 可选值：`created`（新建）、`modified`（修改）、`deleted`（删除）
-   - `--lines-added` 和 `--lines-removed` 从 git diff 或编辑器统计获取
+   调用 `aida_log_files` MCP 工具（自动扫描 git diff 记录所有文件变更，无需传参）。
 
    **b) 标记任务完成：**
-   ```bash
-   aida log task-done --id TASK-XX
-   ```
+   调用 `aida_task_done` MCP 工具，传入 `id`（如 TASK-01）。
 
-   CLI 会自动更新 summary.filesChanged、summary.linesAdded、timeline 和 files[] 数组。
+   工具会自动更新 summary.filesChanged、summary.linesAdded、timeline 和 files[] 数组。
 
    **检查清单**：
    - ✅ 所有新建/修改/删除的文件都已记录

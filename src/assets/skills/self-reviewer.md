@@ -43,11 +43,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 3. **结果输出（强制，不可跳过）：**
    - 如果有任何不合规，返回**未通过**结果与修复建议。
    - 如果完全合规，输出 **Review Passed**。
-   - 执行以下命令记录审查结果：
-   ```bash
-   # 通过时不传 --issues
-   aida log review --task-id TASK-XX --result pass --scope "审查覆盖的文件/模块"
-   # 未通过时，--issues 传逗号分隔的问题描述
-   aida log review --task-id TASK-XX --result fail --scope "审查覆盖的文件/模块" --issues "问题1描述,问题2描述,问题3描述"
-   ```
-   CLI 会自动更新 summary 统计和 timeline。
+   - 调用 `aida_log_review` MCP 工具记录审查结果：
+     - **通过时**：传入 `taskId`、`result: "pass"`、`scope`（审查覆盖的文件/模块）
+     - **未通过时**：传入 `taskId`、`result: "fail"`、`scope`、`issues`（逗号分隔的问题描述）
+   - 工具会自动更新 summary 统计和 timeline。

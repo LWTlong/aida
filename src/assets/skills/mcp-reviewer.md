@@ -30,14 +30,9 @@ globs: ['.aidevos/runs/*/*/run.json']
 1. 该 Skill 需要人工参与并主动触发。
 2. 读取指定的代码变更和结构分析。
 3. 产出详尽的高级审查结果，内容需要包含：安全审查、性能预警和可维护性健康度三块。
-4. 执行以下命令记录审查结果：
-   ```bash
-   aida log review --result pass --scope "审查覆盖的模块" --issues 0
-   # 或
-   aida log review --result fail --scope "审查覆盖的模块" --issues 3
-   ```
+4. 调用 `aida_log_review` MCP 工具记录审查结果：
+   - **通过时**：传入 `result: "pass"`、`scope`（审查覆盖的模块）
+   - **未通过时**：传入 `result: "fail"`、`scope`、`issues`（逗号分隔的问题描述）
 5. 基于审查结果，如需生成改进任务：
-   ```bash
-   aida log task --title "改进任务描述" --stage "安全加固"
-   ```
-   CLI 会自动更新 summary 统计和 timeline。
+   - 调用 `aida_task_start` MCP 工具，传入 `title`（改进任务描述）、`stage`（如 "安全加固"）
+   - 工具会自动更新 summary 统计和 timeline。
