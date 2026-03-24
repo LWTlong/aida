@@ -14,20 +14,20 @@
           "name": "alex-chen",
           "modules": [],
           "tasks": 47,
-          "completedTasks": 47,
+          "completedTasks": 44,
           "bugs": 5,
           "deviations": 23,
           "linesAdded": 4064,
           "linesRemoved": 42,
           "firstPassRate": 0.75,
-          "actualWorkSeconds": 343696,
+          "actualWorkSeconds": 315605,
           "totalTokens": 505885
         }
       ],
       "highlights": [],
       "totals": {
         "tasks": 47,
-        "completedTasks": 47,
+        "completedTasks": 44,
         "bugs": 5,
         "deviations": 23,
         "linesAdded": 4064,
