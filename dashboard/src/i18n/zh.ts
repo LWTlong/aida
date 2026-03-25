@@ -25,8 +25,8 @@ export const zh = {
   sseDisconnected: 'SSE 未连接',
 
   // App
-  noRunData: '暂无运行数据',
-  noRunDataHint: '使用 <code>aida start FEATURE-001</code> 开始一次开发运行',
+  noRunData: '还没有数据',
+  noRunDataHint: '用 AI 工具开始写代码，AIDA 会自动采集数据。<br/><br/>1. 在项目中配置 MCP（<code>.mcp.json</code>）<br/>2. 用 AI 工具正常开发 —— AIDA 自动采集<br/>3. 刷新此页面查看数据',
   noOverviewData: '暂无项目总览数据',
   noOverviewDataHint: '使用 <code>aida reindex</code> 生成项目索引',
   footerDashboard: 'AIDevOS AI 开发质量看板',

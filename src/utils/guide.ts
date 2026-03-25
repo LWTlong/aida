@@ -119,6 +119,15 @@ globs: ['**/*']
 
 `;
 
+// ─── Lingma rule frontmatter ──────────────────────────
+
+const LINGMA_FRONTMATTER = `---
+description: AIDA 数据采集与规则沉淀规范
+globs: ['**/*']
+---
+
+`;
+
 // ─── Public API ─────────────────────────────────────────
 
 export function guidePath(projectRoot: string): string {
@@ -149,6 +158,9 @@ export function syncGuideReference(projectRoot: string, tools?: string[]): void 
       case 'cursor':
         addCursorReference(projectRoot);
         break;
+      case 'lingma':
+        addLingmaReference(projectRoot);
+        break;
     }
   }
 }
@@ -159,6 +171,7 @@ function detectAiTools(projectRoot: string): string[] {
   const tools: string[] = [];
   if (fileExists(resolve(projectRoot, '.mcp.json'))) tools.push('claude-code');
   if (fileExists(resolve(projectRoot, '.cursor', 'mcp.json'))) tools.push('cursor');
+  if (fileExists(resolve(projectRoot, '.lingma', 'mcp.json'))) tools.push('lingma');
   return tools;
 }
 
@@ -179,4 +192,12 @@ function addCursorReference(projectRoot: string): void {
   const file = resolve(rulesDir, 'aida-guide.md');
   if (fileExists(file)) return;
   writeText(file, CURSOR_FRONTMATTER + GUIDE_CONTENT);
+}
+
+function addLingmaReference(projectRoot: string): void {
+  const rulesDir = resolve(projectRoot, '.lingma', 'rules');
+  ensureDir(rulesDir);
+  const file = resolve(rulesDir, 'aida-guide.md');
+  if (fileExists(file)) return;
+  writeText(file, LINGMA_FRONTMATTER + GUIDE_CONTENT);
 }

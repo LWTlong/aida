@@ -18,6 +18,8 @@ export function useRunData() {
     setRuns(list)
     if (list.length > 0 && !currentRunId) {
       setCurrentRunId(list[0].runId)
+    } else if (list.length === 0) {
+      setLoading(false)
     }
   }, [currentRunId])
 

@@ -56,7 +56,7 @@ const IRON_RULES_APPEND = `
 
 // ─── MCP config generation ──────────────────────────────
 
-type AiToolChoice = 'claude-code' | 'cursor' | 'vscode-copilot' | 'windsurf';
+type AiToolChoice = 'claude-code' | 'cursor' | 'vscode-copilot' | 'windsurf' | 'lingma';
 
 const MCP_CONFIG_JSON = JSON.stringify({
   mcpServers: {
@@ -146,6 +146,29 @@ function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
         written.push('(windsurf: manual config needed)');
         break;
       }
+      case 'lingma': {
+        const lingmaDir = resolve(projectRoot, '.lingma');
+        ensureDir(lingmaDir);
+        const mcpPath = resolve(lingmaDir, 'mcp.json');
+        if (fileExists(mcpPath)) {
+          try {
+            const existing = JSON.parse(readText(mcpPath));
+            if (!existing.mcpServers?.aida) {
+              existing.mcpServers = existing.mcpServers || {};
+              existing.mcpServers.aida = { command: 'aida', args: ['mcp'] };
+              writeText(mcpPath, JSON.stringify(existing, null, 2) + '\n');
+              written.push('.lingma/mcp.json');
+            }
+          } catch {
+            writeText(mcpPath, MCP_CONFIG_JSON + '\n');
+            written.push('.lingma/mcp.json');
+          }
+        } else {
+          writeText(mcpPath, MCP_CONFIG_JSON + '\n');
+          written.push('.lingma/mcp.json');
+        }
+        break;
+      }
     }
   }
 
@@ -192,19 +215,21 @@ export async function init(): Promise<void> {
   console.log('    2) Cursor');
   console.log('    3) VS Code + Copilot');
   console.log('    4) Windsurf');
-  console.log('    5) All of the above\n');
+  console.log('    5) Lingma (通义灵码)');
+  console.log('    6) All of the above\n');
 
   const toolMap: Record<string, AiToolChoice> = {
     '1': 'claude-code',
     '2': 'cursor',
     '3': 'vscode-copilot',
     '4': 'windsurf',
+    '5': 'lingma',
   };
   let selectedTools: AiToolChoice[] = [];
   while (selectedTools.length === 0) {
     const answer = (await rl.question('  > ')).trim();
-    if (answer === '5') {
-      selectedTools = ['claude-code', 'cursor', 'vscode-copilot', 'windsurf'];
+    if (answer === '6') {
+      selectedTools = ['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma'];
     } else {
       const nums = answer.split(',').map(s => s.trim());
       for (const n of nums) {
