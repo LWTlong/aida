@@ -133,10 +133,10 @@ AIDA 只往项目里的 `.aidevos/` 目录写 JSON 文件。**整个代码库不
 
 不需要 SDK，不需要包装器，不需要改代码。把这行加到项目根目录的 `.mcp.json`，AI 下次写代码时 AIDA 就开始采集数据。完全静默 —— 零工作流改变。
 
-> *提示：npm 下载慢的话，先 `npm install -g ai-dev-analytics`，然后把 command 改成 `"aida"`。*
+> *提示：如果 `npx` 比较慢，可以先全局安装：`npm install -g ai-dev-analytics`，然后把 command 改成 `"aida"`。全局安装后也可以直接使用 `aida` 命令（如 `aida dashboard`、`aida init`）。*
 
 <details>
-<summary>Cursor / VS Code Copilot / Windsurf 配置</summary>
+<summary>Cursor / VS Code Copilot / Windsurf / Lingma 配置</summary>
 
 **Cursor** `.cursor/mcp.json`：
 ```json
@@ -163,6 +163,18 @@ AIDA 只往项目里的 `.aidevos/` 目录写 JSON 文件。**整个代码库不
 ```
 
 **Windsurf** `~/.codeium/windsurf/mcp_config.json`：
+```json
+{
+  "mcpServers": {
+    "aida": {
+      "command": "npx",
+      "args": ["-y", "ai-dev-analytics", "mcp"]
+    }
+  }
+}
+```
+
+**Lingma（通义灵码）** `.lingma/mcp.json`：
 ```json
 {
   "mcpServers": {

@@ -133,10 +133,10 @@ AIDA writes JSON files to `.aidevos/` in your project directory. **The codebase 
 
 No SDK. No wrapper. No code changes. Add this to your project root `.mcp.json`, and AIDA starts collecting data the next time your AI writes code. It works silently — zero workflow changes.
 
-> *Tip: For faster startup, run `npm install -g ai-dev-analytics` and change the command to `"aida"`.*
+> *Tip: If `npx` is slow, install globally first: `npm install -g ai-dev-analytics`, then change the command to `"aida"`. Global install also gives you the `aida` CLI command (e.g. `aida dashboard`, `aida init`).*
 
 <details>
-<summary>Cursor / VS Code Copilot / Windsurf</summary>
+<summary>Cursor / VS Code Copilot / Windsurf / Lingma</summary>
 
 **Cursor** `.cursor/mcp.json`:
 ```json
@@ -163,6 +163,18 @@ No SDK. No wrapper. No code changes. Add this to your project root `.mcp.json`, 
 ```
 
 **Windsurf** `~/.codeium/windsurf/mcp_config.json`:
+```json
+{
+  "mcpServers": {
+    "aida": {
+      "command": "npx",
+      "args": ["-y", "ai-dev-analytics", "mcp"]
+    }
+  }
+}
+```
+
+**Lingma (通义灵码)** `.lingma/mcp.json`:
 ```json
 {
   "mcpServers": {

@@ -25,8 +25,8 @@ export const en = {
   sseDisconnected: 'SSE Disconnected',
 
   // App
-  noRunData: 'No run data',
-  noRunDataHint: 'Use <code>aida start FEATURE-001</code> to start a development run',
+  noRunData: 'No data yet',
+  noRunDataHint: 'Start a development run with your AI tool to collect data.<br/><br/>1. Add MCP config to your project (<code>.mcp.json</code>)<br/>2. Start coding with your AI tool — AIDA collects data automatically<br/>3. Refresh this page to see your data',
   noOverviewData: 'No project overview data',
   noOverviewDataHint: 'Use <code>aida reindex</code> to generate project index',
   footerDashboard: 'AIDevOS AI Development Quality Dashboard',

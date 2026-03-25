@@ -35,7 +35,7 @@ function App() {
 
   const isOverview = currentRunId === ALL_PROJECT_ID
 
-  if (loading && !runData && !isOverview) {
+  if (loading && !runData && !isOverview && runs.length !== 0) {
     return (
       <LocaleContext.Provider value={{ locale, setLocale, t }}>
         <div className="min-h-screen flex items-center justify-center text-[#6b7b8d]">
