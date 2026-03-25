@@ -1,6 +1,6 @@
 {
   "name": "ai-dev-analytics",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI Development Analytics Platform - Track what AI actually does in your codebase",
   "type": "module",
   "bin": {
