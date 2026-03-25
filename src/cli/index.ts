@@ -1,11 +1,26 @@
 #!/usr/bin/env node
 
 import { argv } from 'node:process';
+import { readFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const command = argv[2];
 
+function getVersion(): string {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const pkg = JSON.parse(readFileSync(resolve(__dirname, '../../package.json'), 'utf-8'));
+  return pkg.version;
+}
+
 async function main() {
   switch (command) {
+    case '-v':
+    case '--version':
+    case 'version': {
+      console.log(`aida v${getVersion()}`);
+      break;
+    }
     case 'init': {
       const { init } = await import('./commands/init.js');
       await init();
@@ -63,7 +78,7 @@ async function main() {
     }
     default: {
       console.log(`
-  AIDA - AI Development Analytics Platform
+  AIDA v${getVersion()} - AI Development Analytics Platform
 
   Usage:
     aida init        Initialize AIDA in current project
@@ -77,6 +92,7 @@ async function main() {
     aida reindex     Rebuild project-level index from all runs
     aida report      Generate performance report data
     aida rules       Manage project rules registry (build/dedupe/merge)
+    aida -v          Show version
 `);
     }
   }

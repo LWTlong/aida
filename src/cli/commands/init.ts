@@ -61,8 +61,8 @@ type AiToolChoice = 'claude-code' | 'cursor' | 'vscode-copilot' | 'windsurf' | '
 const MCP_CONFIG_JSON = JSON.stringify({
   mcpServers: {
     aida: {
-      command: 'aida',
-      args: ['mcp'],
+      command: 'npx',
+      args: ['-y', 'ai-dev-analytics', 'mcp'],
     },
   },
 }, null, 2);
@@ -80,7 +80,7 @@ function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
             const existing = JSON.parse(readText(mcpPath));
             if (!existing.mcpServers?.aida) {
               existing.mcpServers = existing.mcpServers || {};
-              existing.mcpServers.aida = { command: 'aida', args: ['mcp'] };
+              existing.mcpServers.aida = { command: 'npx', args: ['-y', 'ai-dev-analytics', 'mcp'] };
               writeText(mcpPath, JSON.stringify(existing, null, 2) + '\n');
               written.push('.mcp.json');
             }
@@ -104,7 +104,7 @@ function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
             const existing = JSON.parse(readText(mcpPath));
             if (!existing.mcpServers?.aida) {
               existing.mcpServers = existing.mcpServers || {};
-              existing.mcpServers.aida = { command: 'aida', args: ['mcp'] };
+              existing.mcpServers.aida = { command: 'npx', args: ['-y', 'ai-dev-analytics', 'mcp'] };
               writeText(mcpPath, JSON.stringify(existing, null, 2) + '\n');
               written.push('.cursor/mcp.json');
             }
@@ -127,7 +127,7 @@ function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
             const existing = JSON.parse(readText(mcpPath));
             if (!existing.mcpServers?.aida) {
               existing.mcpServers = existing.mcpServers || {};
-              existing.mcpServers.aida = { command: 'aida', args: ['mcp'] };
+              existing.mcpServers.aida = { command: 'npx', args: ['-y', 'ai-dev-analytics', 'mcp'] };
               writeText(mcpPath, JSON.stringify(existing, null, 2) + '\n');
               written.push('.vscode/mcp.json');
             }
@@ -155,7 +155,7 @@ function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
             const existing = JSON.parse(readText(mcpPath));
             if (!existing.mcpServers?.aida) {
               existing.mcpServers = existing.mcpServers || {};
-              existing.mcpServers.aida = { command: 'aida', args: ['mcp'] };
+              existing.mcpServers.aida = { command: 'npx', args: ['-y', 'ai-dev-analytics', 'mcp'] };
               writeText(mcpPath, JSON.stringify(existing, null, 2) + '\n');
               written.push('.lingma/mcp.json');
             }
