@@ -19,14 +19,11 @@ const GUIDE_CONTENT = `# AIDA 数据采集与规则沉淀指南
 > 此文件引导 AI 在开发过程中采集结构化数据并沉淀项目规则。由 AIDA 自动生成，请勿删除。
 > **这是强制规范，不是可选建议。**
 
-## 零、强制前置动作（响应任何任务前必须执行，不得跳过）
+## 零、强制前置动作（严禁跳过）
 
-**在响应任何开发任务之前，必须立即执行，不允许跳过：**
+**⚠️ 严禁跳过：每次开始任务前，必须通过 Read 工具读取本文件（\`.aidevos/aida-guide.md\`）的完整内容，并按下方规定的流程执行数据采集（\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`）。不得以任何理由跳过此流程。**
 
-1. 读取本文件（\`.aidevos/aida-guide.md\`）了解完整的数据采集和规则沉淀规范
-2. 如果存在 \`.aidevos/rules/_all.md\`，必须读取该文件，了解已沉淀的项目规则并在开发中严格遵守
-
-这是强制动作，不是可选建议。未读取文件直接开始开发视为违规。
+如果存在 \`.aidevos/rules/_all.md\`，同样必须在开始开发前读取，了解已沉淀的项目规则。
 
 ## 一、数据采集
 
@@ -114,16 +111,13 @@ const CLAUDE_MARKER = '.aidevos/aida-guide.md';
 
 const CLAUDE_REFERENCE = `
 
-## AIDA（强制执行，不得跳过）
+## AIDA
 
 本项目使用 AIDA 进行开发数据采集与规则沉淀。
 
-**在响应任何开发任务之前，必须立即执行以下两步，不允许跳过：**
+**⚠️ 严禁跳过：每次开始任务前，必须通过 Read 工具读取 \`.aidevos/aida-guide.md\` 的完整内容，并按其中规定的流程执行数据采集（\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`）。不得以任何理由跳过此流程。**
 
-1. 读取 \`.aidevos/aida-guide.md\` 文件，了解数据采集和规则沉淀的完整规范
-2. 如果存在 \`.aidevos/rules/_all.md\`，读取该文件了解已沉淀的项目规则，并在后续开发中严格遵守
-
-以上两步是开发前的强制动作，不是可选建议。未读取文件直接开始开发视为违规。
+如果存在 \`.aidevos/rules/_all.md\`，同样必须在开始开发前读取，了解已沉淀的项目规则。
 `;
 
 // ─── Cursor rule frontmatter ────────────────────────────
