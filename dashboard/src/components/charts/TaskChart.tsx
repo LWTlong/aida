@@ -113,9 +113,14 @@ export function TaskChart({ tasks, prdPhases }: Props) {
     ],
   }
 
+  const chartHeight = Math.max(300, names.length * 40)
+  const needsScroll = chartHeight > 480
+
   return (
     <div>
-      <ReactECharts option={option} style={{ height: Math.max(300, names.length * 40) }} />
+      <div style={needsScroll ? { maxHeight: 480, overflowY: 'auto' } : undefined}>
+          <ReactECharts option={option} style={{ height: chartHeight }} />
+      </div>
       {phases.length > 0 && (
         <div className="flex gap-4 justify-center mt-3">
           {phases.map((prd) => {

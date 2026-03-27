@@ -1,0 +1,1169 @@
+{
+  "meta": {
+    "schemaVersion": "2.0",
+    "runId": "feat/order-management",
+    "project": "saas-crm-platform",
+    "developer": "sarah-johnson",
+    "branch": "feat/order-management",
+    "aiModel": "claude-sonnet-4-6",
+    "aiTool": "claude-code",
+    "startTime": "2026-03-20T09:00:00.000Z",
+    "endTime": "2026-03-20T10:18:20.000Z",
+    "status": "completed",
+    "prdPhases": [
+      "PRD1",
+      "PRD2",
+      "PRD3"
+    ]
+  },
+  "summary": {
+    "totalTasks": 22,
+    "completedTasks": 22,
+    "bugCount": 4,
+    "deviationCount": 6,
+    "reviewCount": 5,
+    "reviewPassCount": 4,
+    "reviewFailCount": 1,
+    "rulesSedimented": 6,
+    "prdPhaseCount": 3,
+    "filesChanged": 20,
+    "linesAdded": 2280,
+    "linesRemoved": 188
+  },
+  "metrics": {
+    "aiDeviationRate": 27.3,
+    "bugRate": 18.2,
+    "reviewPassRate": 80,
+    "rulesSedimentedCount": 6,
+    "averageLinesPerTask": 104,
+    "totalDevelopmentTimeSeconds": 4700,
+    "actualWorkSeconds": 5665,
+    "nodeTimeBreakdown": {
+      "Code Generation": 3955,
+      "Self Review": 680,
+      "Bug Fix": 450,
+      "Deviation Fix": 580,
+      "Requirement Analysis": 240,
+      "Requirement Ingestion": 180,
+      "Task Split": 120,
+      "Build Verification": 245
+    },
+    "efficiencyMultiplier": 10.2,
+    "estimatedManualHours": 16,
+    "tokenCost": 1.84
+  },
+  "context": {
+    "currentStage": "completed",
+    "currentTaskId": "TASK-22",
+    "currentPrdPhase": "PRD3",
+    "lastUpdated": "2026-03-20T10:18:20.000Z"
+  },
+  "tasks": [
+    {
+      "taskId": "TASK-01",
+      "title": "Define order entity types and interfaces",
+      "stageName": "Phase 1: Core Data Layer",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:12:00.000Z",
+      "startedAt": "2026-03-20T09:12:00.000Z",
+      "completedAt": "2026-03-20T09:12:42.000Z"
+    },
+    {
+      "taskId": "TASK-02",
+      "title": "Create order API service with request wrapper",
+      "stageName": "Phase 1: Core Data Layer",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:12:57.000Z",
+      "startedAt": "2026-03-20T09:12:57.000Z",
+      "completedAt": "2026-03-20T09:15:29.000Z"
+    },
+    {
+      "taskId": "TASK-03",
+      "title": "Implement useOrders data fetching hook",
+      "stageName": "Phase 1: Core Data Layer",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:15:42.000Z",
+      "startedAt": "2026-03-20T09:15:42.000Z",
+      "completedAt": "2026-03-20T09:18:57.000Z"
+    },
+    {
+      "taskId": "TASK-04",
+      "title": "Build order list table component",
+      "stageName": "Phase 2: List & Status",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:19:10.000Z",
+      "startedAt": "2026-03-20T09:19:10.000Z",
+      "completedAt": "2026-03-20T09:23:40.000Z"
+    },
+    {
+      "taskId": "TASK-05",
+      "title": "Add order status badge component",
+      "stageName": "Phase 2: List & Status",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:23:55.000Z",
+      "startedAt": "2026-03-20T09:23:55.000Z",
+      "completedAt": "2026-03-20T09:25:00.000Z"
+    },
+    {
+      "taskId": "TASK-06",
+      "title": "Implement order detail slide-over panel",
+      "stageName": "Phase 3: Detail & Actions",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:25:15.000Z",
+      "startedAt": "2026-03-20T09:25:15.000Z",
+      "completedAt": "2026-03-20T09:31:03.000Z"
+    },
+    {
+      "taskId": "TASK-07",
+      "title": "Bulk action toolbar with permission guard",
+      "stageName": "Phase 3: Detail & Actions",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:31:18.000Z",
+      "startedAt": "2026-03-20T09:31:18.000Z",
+      "completedAt": "2026-03-20T09:33:16.000Z"
+    },
+    {
+      "taskId": "TASK-08",
+      "title": "PRD1 Build Verification",
+      "stageName": "Build Verification",
+      "prdPhase": "PRD1",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:33:30.000Z",
+      "startedAt": "2026-03-20T09:33:30.000Z",
+      "completedAt": "2026-03-20T09:34:42.000Z"
+    },
+    {
+      "taskId": "TASK-09",
+      "title": "Create revenue trend ECharts line chart",
+      "stageName": "Phase 4: Chart Components",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:40:00.000Z",
+      "startedAt": "2026-03-20T09:40:00.000Z",
+      "completedAt": "2026-03-20T09:44:15.000Z"
+    },
+    {
+      "taskId": "TASK-10",
+      "title": "Build order status distribution pie chart",
+      "stageName": "Phase 4: Chart Components",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:44:30.000Z",
+      "startedAt": "2026-03-20T09:44:30.000Z",
+      "completedAt": "2026-03-20T09:47:12.000Z"
+    },
+    {
+      "taskId": "TASK-11",
+      "title": "Implement date range filter bar",
+      "stageName": "Phase 5: Filters & Search",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:47:28.000Z",
+      "startedAt": "2026-03-20T09:47:28.000Z",
+      "completedAt": "2026-03-20T09:50:36.000Z"
+    },
+    {
+      "taskId": "TASK-12",
+      "title": "Add keyword search and multi-select filters",
+      "stageName": "Phase 5: Filters & Search",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:50:50.000Z",
+      "startedAt": "2026-03-20T09:50:50.000Z",
+      "completedAt": "2026-03-20T09:54:30.000Z"
+    },
+    {
+      "taskId": "TASK-13",
+      "title": "Create top 10 best-sellers ranking table",
+      "stageName": "Phase 6: Reports",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:54:45.000Z",
+      "startedAt": "2026-03-20T09:54:45.000Z",
+      "completedAt": "2026-03-20T09:57:07.000Z"
+    },
+    {
+      "taskId": "TASK-14",
+      "title": "Implement order data CSV export",
+      "stageName": "Phase 6: Reports",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:57:22.000Z",
+      "startedAt": "2026-03-20T09:57:22.000Z",
+      "completedAt": "2026-03-20T09:59:34.000Z"
+    },
+    {
+      "taskId": "TASK-15",
+      "title": "Add summary stats KPI card row",
+      "stageName": "Phase 6: Reports",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T09:59:50.000Z",
+      "startedAt": "2026-03-20T09:59:50.000Z",
+      "completedAt": "2026-03-20T10:01:28.000Z"
+    },
+    {
+      "taskId": "TASK-16",
+      "title": "PRD2 Build Verification",
+      "stageName": "Build Verification",
+      "prdPhase": "PRD2",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T10:01:45.000Z",
+      "startedAt": "2026-03-20T10:01:45.000Z",
+      "completedAt": "2026-03-20T10:03:33.000Z"
+    },
+    {
+      "taskId": "TASK-17",
+      "title": "Fix order total decimal precision bug",
+      "stageName": "Bug Fixes",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T10:08:20.000Z",
+      "startedAt": "2026-03-20T10:08:20.000Z",
+      "completedAt": "2026-03-20T10:09:50.000Z"
+    },
+    {
+      "taskId": "TASK-18",
+      "title": "Fix date picker timezone conversion error",
+      "stageName": "Bug Fixes",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T10:10:05.000Z",
+      "startedAt": "2026-03-20T10:10:05.000Z",
+      "completedAt": "2026-03-20T10:12:13.000Z"
+    },
+    {
+      "taskId": "TASK-19",
+      "title": "Fix empty state hidden by loading overlay",
+      "stageName": "Bug Fixes",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T10:12:28.000Z",
+      "startedAt": "2026-03-20T10:12:28.000Z",
+      "completedAt": "2026-03-20T10:13:08.000Z"
+    },
+    {
+      "taskId": "TASK-20",
+      "title": "Fix filter state reset on route navigation",
+      "stageName": "Performance & UX",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T10:13:22.000Z",
+      "startedAt": "2026-03-20T10:13:22.000Z",
+      "completedAt": "2026-03-20T10:14:37.000Z"
+    },
+    {
+      "taskId": "TASK-21",
+      "title": "Add skeleton screens for perceived performance",
+      "stageName": "Performance & UX",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T10:14:52.000Z",
+      "startedAt": "2026-03-20T10:14:52.000Z",
+      "completedAt": "2026-03-20T10:16:44.000Z"
+    },
+    {
+      "taskId": "TASK-22",
+      "title": "Final full build and smoke test",
+      "stageName": "Build Verification",
+      "prdPhase": "PRD3",
+      "status": "done",
+      "acceptance": "",
+      "createdAt": "2026-03-20T10:17:00.000Z",
+      "startedAt": "2026-03-20T10:17:00.000Z",
+      "completedAt": "2026-03-20T10:17:55.000Z"
+    }
+  ],
+  "deviations": [
+    {
+      "deviationId": "DEV-01",
+      "title": "Filter state not persisted in URL, lost after navigation",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "logic",
+      "files": [
+        "src/hooks/useOrderFilters.ts",
+        "src/pages/OrderList.tsx"
+      ],
+      "detectedAt": "2026-03-20T09:34:10.000Z",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "ruleSedimented": null,
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-02",
+      "title": "Revenue chart uses hardcoded hex colors instead of design tokens",
+      "rootCauseCategory": "reference-copy",
+      "deviationCategory": "style",
+      "files": [
+        "src/components/charts/RevenueChart.tsx"
+      ],
+      "detectedAt": "2026-03-20T09:45:00.000Z",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "ruleSedimented": null,
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-03",
+      "title": "Date range filter missing timezone conversion for cross-timezone users",
+      "rootCauseCategory": "context-insufficient",
+      "deviationCategory": "i18n",
+      "files": [
+        "src/utils/dateRange.ts",
+        "src/components/DateRangePicker.tsx"
+      ],
+      "detectedAt": "2026-03-20T09:50:00.000Z",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "ruleSedimented": null,
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-04",
+      "title": "CSV export includes internal ID fields not intended for users",
+      "rootCauseCategory": "misunderstanding",
+      "deviationCategory": "logic",
+      "files": [
+        "src/utils/exportOrders.ts"
+      ],
+      "detectedAt": "2026-03-20T09:58:20.000Z",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "ruleSedimented": null,
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-05",
+      "title": "Top products table hardcodes 10 rows instead of configurable pageSize",
+      "rootCauseCategory": "rule-missing",
+      "deviationCategory": "component-usage",
+      "files": [
+        "src/components/TopProductsTable.tsx"
+      ],
+      "detectedAt": "2026-03-20T09:55:50.000Z",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "ruleSedimented": null,
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-06",
+      "title": "Bulk action bar hides button silently instead of showing permission hint",
+      "rootCauseCategory": "misunderstanding",
+      "deviationCategory": "ui-spacing",
+      "files": [
+        "src/components/BulkActionBar.tsx"
+      ],
+      "detectedAt": "2026-03-20T09:31:40.000Z",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "ruleSedimented": null,
+      "fixedAt": null
+    }
+  ],
+  "bugs": [
+    {
+      "bugId": "BUG-01",
+      "title": "Order total shows floating point error with fractional quantities",
+      "severity": "high",
+      "source": "user-feedback",
+      "status": "fixed",
+      "files": [
+        "src/utils/orderCalc.ts"
+      ],
+      "fix": "Replace native float arithmetic with Decimal.js",
+      "reportedAt": "2026-03-20T10:08:00.000Z",
+      "fixedAt": "2026-03-20T10:09:50.000Z"
+    },
+    {
+      "bugId": "BUG-02",
+      "title": "Date picker resets to today at DST boundary",
+      "severity": "high",
+      "source": "testing",
+      "status": "fixed",
+      "files": [
+        "src/components/DateRangePicker.tsx"
+      ],
+      "fix": "Use dayjs UTC mode to handle DST boundary correctly",
+      "reportedAt": "2026-03-20T10:09:50.000Z",
+      "fixedAt": "2026-03-20T10:12:20.000Z"
+    },
+    {
+      "bugId": "BUG-03",
+      "title": "Empty state hidden behind loading spinner",
+      "severity": "medium",
+      "source": "self-review",
+      "status": "fixed",
+      "files": [
+        "src/components/OrderList.tsx"
+      ],
+      "fix": "Move empty state check before loading state render",
+      "reportedAt": "2026-03-20T10:12:20.000Z",
+      "fixedAt": "2026-03-20T10:13:00.000Z"
+    },
+    {
+      "bugId": "BUG-04",
+      "title": "Search bar fires redundant API calls during IME composition",
+      "severity": "medium",
+      "source": "user-feedback",
+      "status": "fixed",
+      "files": [
+        "src/components/SearchBar.tsx"
+      ],
+      "fix": "Listen to compositionend before triggering search debounce",
+      "reportedAt": "2026-03-20T09:53:20.000Z",
+      "fixedAt": "2026-03-20T09:54:38.000Z"
+    }
+  ],
+  "reviews": [
+    {
+      "reviewId": "REV-01",
+      "taskId": "TASK-06",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Order detail slide-over panel",
+      "reviewedAt": "2026-03-20T09:31:22.000Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-02",
+      "taskId": "TASK-09",
+      "result": "fail",
+      "issueCount": 2,
+      "scope": "Revenue trend chart component",
+      "reviewedAt": "2026-03-20T09:45:00.000Z",
+      "issues": [
+        "Axis label color contrast too low",
+        "Missing empty state when no data"
+      ]
+    },
+    {
+      "reviewId": "REV-03",
+      "taskId": "TASK-09",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Revenue trend chart (post-fix review)",
+      "reviewedAt": "2026-03-20T09:46:42.000Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-04",
+      "taskId": "TASK-16",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "PRD2 full self-review",
+      "reviewedAt": "2026-03-20T10:04:00.000Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-05",
+      "taskId": "TASK-22",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "PRD3 final full self-review",
+      "reviewedAt": "2026-03-20T10:18:08.000Z",
+      "issues": []
+    }
+  ],
+  "rules": [
+    {
+      "ruleId": "RULE-01",
+      "category": "process",
+      "sourceDeviation": "DEV-01",
+      "content": "Filter, pagination, and sort state must be persisted via URL SearchParams. Never store only in component state.",
+      "file": "rules.json#RULE-001",
+      "sedimentedAt": "2026-03-20T09:35:52.000Z"
+    },
+    {
+      "ruleId": "RULE-02",
+      "category": "style",
+      "sourceDeviation": "DEV-02",
+      "content": "Never hardcode hex/rgb values in components. Always use project design tokens (CSS variables or semantic Tailwind colors).",
+      "file": "rules.json#RULE-002",
+      "sedimentedAt": "2026-03-20T09:45:52.000Z"
+    },
+    {
+      "ruleId": "RULE-03",
+      "category": "i18n",
+      "sourceDeviation": "DEV-03",
+      "content": "All date comparisons and storage must use UTC. Convert to user timezone only at the display layer. Never use new Date() for direct comparison.",
+      "file": "rules.json#RULE-003",
+      "sedimentedAt": "2026-03-20T09:51:42.000Z"
+    },
+    {
+      "ruleId": "RULE-04",
+      "category": "general",
+      "sourceDeviation": "DEV-04",
+      "content": "Export utilities must maintain an explicit field allowlist. Never spread objects blindly — always pick only explicitly approved fields.",
+      "file": "rules.json#RULE-004",
+      "sedimentedAt": "2026-03-20T10:00:02.000Z"
+    },
+    {
+      "ruleId": "RULE-05",
+      "category": "component",
+      "sourceDeviation": "DEV-05",
+      "content": "List components must accept a pageSize prop, defaulting to the global constant DEFAULT_PAGE_SIZE (currently 20).",
+      "file": "rules.json#RULE-005",
+      "sedimentedAt": "2026-03-20T09:57:02.000Z"
+    },
+    {
+      "ruleId": "RULE-06",
+      "category": "general",
+      "sourceDeviation": null,
+      "content": "After each task, always call aida_log_files to record file changes, then aida_log_review to complete the self-review gate.",
+      "file": "rules.json#RULE-006",
+      "sedimentedAt": "2026-03-20T09:20:02.000Z"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/types/order.ts",
+      "changeType": "created",
+      "linesAdded": 68,
+      "linesRemoved": 0,
+      "changeCount": 2,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/services/orderApi.ts",
+      "changeType": "created",
+      "linesAdded": 142,
+      "linesRemoved": 0,
+      "changeCount": 3,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/hooks/useOrders.ts",
+      "changeType": "created",
+      "linesAdded": 95,
+      "linesRemoved": 0,
+      "changeCount": 4,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/hooks/useOrderFilters.ts",
+      "changeType": "created",
+      "linesAdded": 78,
+      "linesRemoved": 12,
+      "changeCount": 5,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/pages/OrderList.tsx",
+      "changeType": "created",
+      "linesAdded": 245,
+      "linesRemoved": 18,
+      "changeCount": 8,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/OrderTable.tsx",
+      "changeType": "created",
+      "linesAdded": 188,
+      "linesRemoved": 0,
+      "changeCount": 4,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/OrderStatusBadge.tsx",
+      "changeType": "created",
+      "linesAdded": 42,
+      "linesRemoved": 0,
+      "changeCount": 2,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/OrderDetailPanel.tsx",
+      "changeType": "created",
+      "linesAdded": 312,
+      "linesRemoved": 25,
+      "changeCount": 6,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/BulkActionBar.tsx",
+      "changeType": "created",
+      "linesAdded": 96,
+      "linesRemoved": 8,
+      "changeCount": 3,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/charts/RevenueChart.tsx",
+      "changeType": "created",
+      "linesAdded": 178,
+      "linesRemoved": 32,
+      "changeCount": 5,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/charts/StatusPieChart.tsx",
+      "changeType": "created",
+      "linesAdded": 124,
+      "linesRemoved": 0,
+      "changeCount": 3,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/DateRangePicker.tsx",
+      "changeType": "created",
+      "linesAdded": 145,
+      "linesRemoved": 28,
+      "changeCount": 6,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/SearchBar.tsx",
+      "changeType": "created",
+      "linesAdded": 88,
+      "linesRemoved": 15,
+      "changeCount": 4,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/TopProductsTable.tsx",
+      "changeType": "created",
+      "linesAdded": 112,
+      "linesRemoved": 10,
+      "changeCount": 4,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/components/OrderList.tsx",
+      "changeType": "created",
+      "linesAdded": 65,
+      "linesRemoved": 8,
+      "changeCount": 3,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/utils/exportOrders.ts",
+      "changeType": "created",
+      "linesAdded": 82,
+      "linesRemoved": 5,
+      "changeCount": 3,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/utils/orderCalc.ts",
+      "changeType": "created",
+      "linesAdded": 55,
+      "linesRemoved": 12,
+      "changeCount": 3,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/utils/dateRange.ts",
+      "changeType": "created",
+      "linesAdded": 48,
+      "linesRemoved": 10,
+      "changeCount": 4,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/i18n/orders.ts",
+      "changeType": "created",
+      "linesAdded": 95,
+      "linesRemoved": 0,
+      "changeCount": 2,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    },
+    {
+      "path": "src/router/index.ts",
+      "changeType": "modified",
+      "linesAdded": 22,
+      "linesRemoved": 5,
+      "changeCount": 2,
+      "lastModified": "2026-03-20T10:18:00.000Z"
+    }
+  ],
+  "timeline": [
+    {
+      "type": "workflow-start",
+      "title": "Workflow started",
+      "timestamp": "2026-03-20T09:00:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "requirement-analysis",
+      "title": "Requirement analysis in progress",
+      "timestamp": "2026-03-20T09:05:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task",
+      "title": "TASK-01: Define order entity types and interfaces",
+      "timestamp": "2026-03-20T09:12:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-01: Define order entity types and interfaces",
+      "timestamp": "2026-03-20T09:12:42.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task",
+      "title": "TASK-02: Create order API service with request wrapper",
+      "timestamp": "2026-03-20T09:12:57.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-02: Create order API service with request wrapper",
+      "timestamp": "2026-03-20T09:15:29.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task",
+      "title": "TASK-03: Implement useOrders data fetching hook",
+      "timestamp": "2026-03-20T09:15:42.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-03: Implement useOrders data fetching hook",
+      "timestamp": "2026-03-20T09:18:57.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task",
+      "title": "TASK-04: Build order list table component",
+      "timestamp": "2026-03-20T09:19:10.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-06: After each task, always call aida_log_fi",
+      "timestamp": "2026-03-20T09:20:02.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-04: Build order list table component",
+      "timestamp": "2026-03-20T09:23:40.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task",
+      "title": "TASK-05: Add order status badge component",
+      "timestamp": "2026-03-20T09:23:55.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-05: Add order status badge component",
+      "timestamp": "2026-03-20T09:25:00.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task",
+      "title": "TASK-06: Implement order detail slide-over panel",
+      "timestamp": "2026-03-20T09:25:15.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-06: Implement order detail slide-over panel",
+      "timestamp": "2026-03-20T09:31:03.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task",
+      "title": "TASK-07: Bulk action toolbar with permission guard",
+      "timestamp": "2026-03-20T09:31:18.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "review",
+      "title": "REV-01: pass",
+      "timestamp": "2026-03-20T09:31:22.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-06: Bulk action bar hides button silently in",
+      "timestamp": "2026-03-20T09:31:40.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-07: Bulk action toolbar with permission guard",
+      "timestamp": "2026-03-20T09:33:16.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "task",
+      "title": "TASK-08: PRD1 Build Verification",
+      "timestamp": "2026-03-20T09:33:30.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-01: Filter state not persisted in URL, lost ",
+      "timestamp": "2026-03-20T09:34:10.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-08: PRD1 Build Verification",
+      "timestamp": "2026-03-20T09:34:42.000Z",
+      "prdPhase": "PRD1"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-01: Filter, pagination, and sort state must ",
+      "timestamp": "2026-03-20T09:35:52.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-09: Create revenue trend ECharts line chart",
+      "timestamp": "2026-03-20T09:40:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-09: Create revenue trend ECharts line chart",
+      "timestamp": "2026-03-20T09:44:15.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task",
+      "title": "TASK-10: Build order status distribution pie chart",
+      "timestamp": "2026-03-20T09:44:30.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "review",
+      "title": "REV-02: fail",
+      "timestamp": "2026-03-20T09:45:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-02: Revenue chart uses hardcoded hex colors ",
+      "timestamp": "2026-03-20T09:45:00.000Z"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-02: Never hardcode hex/rgb values in compone",
+      "timestamp": "2026-03-20T09:45:52.000Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-03: pass",
+      "timestamp": "2026-03-20T09:46:42.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-10: Build order status distribution pie chart",
+      "timestamp": "2026-03-20T09:47:12.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task",
+      "title": "TASK-11: Implement date range filter bar",
+      "timestamp": "2026-03-20T09:47:28.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-03: Date range filter missing timezone conve",
+      "timestamp": "2026-03-20T09:50:00.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-11: Implement date range filter bar",
+      "timestamp": "2026-03-20T09:50:36.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task",
+      "title": "TASK-12: Add keyword search and multi-select filters",
+      "timestamp": "2026-03-20T09:50:50.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-03: All date comparisons and storage must us",
+      "timestamp": "2026-03-20T09:51:42.000Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-04: Search bar fires redundant API calls dur",
+      "timestamp": "2026-03-20T09:53:20.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-12: Add keyword search and multi-select filters",
+      "timestamp": "2026-03-20T09:54:30.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task",
+      "title": "TASK-13: Create top 10 best-sellers ranking table",
+      "timestamp": "2026-03-20T09:54:45.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-05: Top products table hardcodes 10 rows ins",
+      "timestamp": "2026-03-20T09:55:50.000Z"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-05: List components must accept a pageSize p",
+      "timestamp": "2026-03-20T09:57:02.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-13: Create top 10 best-sellers ranking table",
+      "timestamp": "2026-03-20T09:57:07.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task",
+      "title": "TASK-14: Implement order data CSV export",
+      "timestamp": "2026-03-20T09:57:22.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-04: CSV export includes internal ID fields n",
+      "timestamp": "2026-03-20T09:58:20.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-14: Implement order data CSV export",
+      "timestamp": "2026-03-20T09:59:34.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task",
+      "title": "TASK-15: Add summary stats KPI card row",
+      "timestamp": "2026-03-20T09:59:50.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-04: Export utilities must maintain an explic",
+      "timestamp": "2026-03-20T10:00:02.000Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-15: Add summary stats KPI card row",
+      "timestamp": "2026-03-20T10:01:28.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task",
+      "title": "TASK-16: PRD2 Build Verification",
+      "timestamp": "2026-03-20T10:01:45.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-16: PRD2 Build Verification",
+      "timestamp": "2026-03-20T10:03:33.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "review",
+      "title": "REV-04: pass",
+      "timestamp": "2026-03-20T10:04:00.000Z",
+      "prdPhase": "PRD2"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: Order total shows floating point error w",
+      "timestamp": "2026-03-20T10:08:00.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-17: Fix order total decimal precision bug",
+      "timestamp": "2026-03-20T10:08:20.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-17: Fix order total decimal precision bug",
+      "timestamp": "2026-03-20T10:09:50.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-02: Date picker resets to today at DST bound",
+      "timestamp": "2026-03-20T10:09:50.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-18: Fix date picker timezone conversion error",
+      "timestamp": "2026-03-20T10:10:05.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-18: Fix date picker timezone conversion error",
+      "timestamp": "2026-03-20T10:12:13.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-03: Empty state hidden behind loading spinne",
+      "timestamp": "2026-03-20T10:12:20.000Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-19: Fix empty state hidden by loading overlay",
+      "timestamp": "2026-03-20T10:12:28.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-19: Fix empty state hidden by loading overlay",
+      "timestamp": "2026-03-20T10:13:08.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task",
+      "title": "TASK-20: Fix filter state reset on route navigation",
+      "timestamp": "2026-03-20T10:13:22.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-20: Fix filter state reset on route navigation",
+      "timestamp": "2026-03-20T10:14:37.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task",
+      "title": "TASK-21: Add skeleton screens for perceived performance",
+      "timestamp": "2026-03-20T10:14:52.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-21: Add skeleton screens for perceived performance",
+      "timestamp": "2026-03-20T10:16:44.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task",
+      "title": "TASK-22: Final full build and smoke test",
+      "timestamp": "2026-03-20T10:17:00.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-22: Final full build and smoke test",
+      "timestamp": "2026-03-20T10:17:55.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "review",
+      "title": "REV-05: pass",
+      "timestamp": "2026-03-20T10:18:08.000Z",
+      "prdPhase": "PRD3"
+    },
+    {
+      "type": "workflow-completed",
+      "title": "Workflow completed",
+      "timestamp": "2026-03-20T10:18:20.000Z",
+      "prdPhase": "PRD3"
+    }
+  ],
+  "workflow": [
+    {
+      "stage": "Requirement Ingestion",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-20T09:00:00.000Z",
+      "endTime": "2026-03-20T09:05:00.000Z"
+    },
+    {
+      "stage": "Requirement Analysis",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-20T09:05:00.000Z",
+      "endTime": "2026-03-20T09:11:00.000Z"
+    },
+    {
+      "stage": "Code Generation",
+      "prdPhase": "PRD1",
+      "status": "completed",
+      "startTime": "2026-03-20T09:12:00.000Z",
+      "endTime": "2026-03-20T09:35:00.000Z"
+    },
+    {
+      "stage": "Code Generation",
+      "prdPhase": "PRD2",
+      "status": "completed",
+      "startTime": "2026-03-20T09:40:00.000Z",
+      "endTime": "2026-03-20T10:04:20.000Z"
+    },
+    {
+      "stage": "Bug Fixes",
+      "prdPhase": "PRD3",
+      "status": "completed",
+      "startTime": "2026-03-20T10:08:20.000Z",
+      "endTime": "2026-03-20T10:18:00.000Z"
+    }
+  ],
+  "events": [],
+  "cost": {
+    "totalTokens": 8420000,
+    "estimatedManualHours": 16,
+    "actualHours": 1.6,
+    "tokenDetail": {
+      "inputTokens": 580000,
+      "outputTokens": 1240000,
+      "cacheCreationTokens": 2200000,
+      "cacheReadTokens": 4400000
+    }
+  },
+  "highlights": [
+    {
+      "content": "AI completed 22 tasks in 1.6h. Equivalent manual work estimated at 3 person-days — ~12x efficiency gain",
+      "source": "auto",
+      "createdAt": "2026-03-20T10:18:32.000Z"
+    },
+    {
+      "content": "6 deviations sedimented as project rules covering filter state, color tokens, date timezone — zero recurrence in subsequent PRDs",
+      "source": "manual",
+      "createdAt": "2026-03-20T10:18:42.000Z"
+    },
+    {
+      "content": "Self-review first-pass rate 80%. Revenue chart issues (contrast + empty state) detected and fixed in under 3 minutes",
+      "source": "auto",
+      "createdAt": "2026-03-20T10:18:52.000Z"
+    }
+  ]
+}

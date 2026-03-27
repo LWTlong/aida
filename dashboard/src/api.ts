@@ -4,6 +4,14 @@ const BASE = ''
 export const isDemo = import.meta.env.VITE_DEMO === 'true'
 const DEMO_BASE = `${import.meta.env.BASE_URL}demo`
 
+function getDemoLocale(): string {
+  try { return localStorage.getItem('aida-locale') || 'zh' } catch { return 'zh' }
+}
+
+function getDemoRunFile(): string {
+  return `run.${getDemoLocale()}.json`
+}
+
 async function demoFetch<T>(file: string, fallback: T): Promise<T> {
   try {
     const res = await fetch(`${DEMO_BASE}/${file}`)
@@ -20,14 +28,14 @@ export async function fetchRuns(): Promise<RunSummary[]> {
 }
 
 export async function fetchRunData(runId: string): Promise<RunData | null> {
-  if (isDemo) return demoFetch('run.json', null)
+  if (isDemo) return demoFetch(getDemoRunFile(), null)
   const res = await fetch(`${BASE}/api/runs/${runId}`)
   if (!res.ok) return null
   return res.json()
 }
 
 export async function fetchAggregatedData(): Promise<RunData | null> {
-  if (isDemo) return demoFetch('run.json', null)
+  if (isDemo) return demoFetch(getDemoRunFile(), null)
   const res = await fetch(`${BASE}/api/aggregate`)
   if (!res.ok) return null
   return res.json()
