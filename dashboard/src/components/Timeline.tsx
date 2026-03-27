@@ -1,5 +1,5 @@
 import type { TimelineItem } from '../types'
-import { formatShortDate } from '../utils/date'
+import { formatDateTime } from '../utils/date'
 import { useLocale } from '../i18n'
 
 interface Props {
@@ -41,8 +41,8 @@ export function Timeline({ items, prdPhases }: Props) {
           key={i}
           className="flex items-start gap-4 py-2 border-l-2 border-[#1e2d3d] ml-2 pl-4 relative before:content-[''] before:w-2.5 before:h-2.5 before:rounded-full before:bg-green-500 before:absolute before:left-[-6px] before:top-3"
         >
-          <div className="text-[11px] text-[#6b7b8d] min-w-[46px] shrink-0">
-            {formatShortDate(item.timestamp)}
+          <div className="text-[11px] text-[#6b7b8d] min-w-[80px] shrink-0">
+            {formatDateTime(item.timestamp)}
           </div>
           <div className="text-xs">
             {item.title}

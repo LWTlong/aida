@@ -29,10 +29,12 @@ export function RulesTable({ rules, deviations }: Props) {
       <tbody>
         {sedimented.map((rule) => {
           const dev = deviations.find((d) => d.deviationId === rule.sourceDeviation)
-          const category = dev ? deviationCategoryLabel(dev.deviationCategory, t) : ''
+          const category = rule.category
+            ? deviationCategoryLabel(rule.category, t)
+            : dev ? deviationCategoryLabel(dev.deviationCategory, t) : ''
           return (
             <tr key={rule.ruleId} className="hover:bg-[#1a2e40]">
-              <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{rule.sourceDeviation}</td>
+              <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{rule.sourceDeviation || '-'}</td>
               <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[100px]">
                 {category && (
                   <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-[#1e3a5f] text-[#60a5fa]">
@@ -47,10 +49,12 @@ export function RulesTable({ rules, deviations }: Props) {
         })}
         {pending.map((rule) => {
           const dev = deviations.find((d) => d.deviationId === rule.sourceDeviation)
-          const category = dev ? deviationCategoryLabel(dev.deviationCategory, t) : ''
+          const category = rule.category
+            ? deviationCategoryLabel(rule.category, t)
+            : dev ? deviationCategoryLabel(dev.deviationCategory, t) : ''
           return (
             <tr key={rule.ruleId} className="hover:bg-[#1a2e40] opacity-60">
-              <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{rule.sourceDeviation}</td>
+              <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{rule.sourceDeviation || '-'}</td>
               <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[100px]">
                 <span className="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-[#1e2d3d] text-[#94a3b8]">
                   {category}

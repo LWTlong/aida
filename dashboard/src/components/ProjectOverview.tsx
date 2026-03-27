@@ -19,9 +19,10 @@ function formatSeconds(s: number): string {
 function aggregateDevelopers(runs: IndexRunEntry[]): DeveloperSummary[] {
   const map: Record<string, DeveloperSummary> = {}
   for (const run of runs) {
-    for (const dev of run.developers) {
+    for (const dev of (run.developers || [])) {
+      const devModules = dev.modules || []
       if (!map[dev.name]) {
-        map[dev.name] = { ...dev, modules: [...dev.modules] }
+        map[dev.name] = { ...dev, modules: [...devModules] }
       } else {
         const d = map[dev.name]
         d.tasks += dev.tasks
@@ -32,7 +33,7 @@ function aggregateDevelopers(runs: IndexRunEntry[]): DeveloperSummary[] {
         d.linesRemoved += dev.linesRemoved
         d.actualWorkSeconds += dev.actualWorkSeconds
         d.totalTokens += dev.totalTokens
-        for (const m of dev.modules) {
+        for (const m of devModules) {
           if (!d.modules.includes(m)) d.modules.push(m)
         }
       }

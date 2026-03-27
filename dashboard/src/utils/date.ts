@@ -52,6 +52,21 @@ export function formatDateTime(ts: string | undefined | null): string {
 }
 
 /**
+ * Format date as "MM-DD HH:mm:ss"
+ * Returns empty string if invalid
+ */
+export function formatDateTimeSeconds(ts: string | undefined | null): string {
+  if (!ts) return ''
+  try {
+    const d = new Date(ts)
+    if (!isValidDate(d)) return ''
+    return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+  } catch {
+    return ''
+  }
+}
+
+/**
  * Format date using browser locale
  * Returns empty string if invalid
  */

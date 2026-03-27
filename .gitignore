@@ -11,3 +11,5 @@ skills-lock.json
 DATA_CONTRACT_AUDIT.md
 .aidevos/
 .claude/
+# Auto-generated rule views (source of truth: .aidevos/rules.json)
+.aidevos/rules/*.md
