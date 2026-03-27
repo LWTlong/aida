@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { RunData } from '../types'
 import { Modal } from './Modal'
 import { deviationCategoryLabel, rootCauseLabel } from '../labelMap'
-import { formatLocalDate } from '../utils/date'
+import { formatDateTimeSeconds, formatDateTime } from '../utils/date'
 import { useLocale } from '../i18n'
 
 interface Props {
@@ -23,8 +23,15 @@ export function KpiRow({ data }: Props) {
   const s = data.summary
   const m = data.metrics
 
+  const hasPrdPhases = (data.meta.prdPhases || []).length > 0
+  const prdValue = hasPrdPhases
+    ? `${s.prdPhaseCount}`
+    : s.totalTasks > 0
+      ? `${s.completedTasks}/${s.totalTasks}`
+      : '-'
+
   const qualityCards: { key: ModalType; label: string; color: string; value: string }[] = [
-    { key: 'prd', label: t.kpiPrd, color: 'text-blue-500', value: s.prdPhaseCount ? `${s.prdPhaseCount}` : '-' },
+    { key: hasPrdPhases ? 'prd' : null, label: t.kpiPrd, color: 'text-blue-500', value: prdValue },
     { key: 'tasks', label: t.kpiTasks, color: 'text-green-500', value: `${s.completedTasks}/${s.totalTasks}` },
     { key: 'deviation', label: t.kpiDeviation, color: 'text-amber-500', value: `${s.deviationCount}` },
     { key: 'bug', label: t.kpiBug, color: 'text-red-500', value: `${s.bugCount}` },
@@ -40,9 +47,9 @@ export function KpiRow({ data }: Props) {
     <div className={`grid gap-4 max-lg:grid-cols-2 max-sm:grid-cols-2 ${cards.length > 4 ? 'grid-cols-5' : cards.length === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
       {cards.map((card) => (
         <div
-          key={card.key}
-          onClick={() => setModal(card.key)}
-          className="bg-[#162231] border border-[#1e2d3d] rounded-[10px] px-5 py-[18px] text-center cursor-pointer hover:border-[#2a4a6b] transition-colors"
+          key={String(card.key)}
+          onClick={() => card.key && setModal(card.key)}
+          className={`bg-[#162231] border border-[#1e2d3d] rounded-[10px] px-5 py-[18px] text-center transition-colors ${card.key ? 'cursor-pointer hover:border-[#2a4a6b]' : 'cursor-default'}`}
         >
           <div className={`text-[32px] font-bold mb-1 ${card.color}`}>{card.value}</div>
           <div className="text-xs text-[#6b7b8d] uppercase tracking-wide">{card.label}</div>
@@ -67,11 +74,17 @@ export function KpiRow({ data }: Props) {
               <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[200px]">{t.thTitle}</th>
               <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[100px]">{t.thPhase}</th>
               <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[80px]">{t.thPrd}</th>
+              <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[120px]">{t.thStartTime}</th>
+              <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[80px]">{t.thDuration}</th>
               <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[80px]">{t.thStatus}</th>
             </tr>
           </thead>
           <tbody>
-            {data.tasks.map((task) => (
+            {data.tasks.map((task) => {
+              const durationSec = task.startedAt && task.completedAt
+                ? (new Date(task.completedAt).getTime() - new Date(task.startedAt).getTime()) / 1000
+                : null
+              return (
               <tr key={task.taskId} className="hover:bg-[#1a2e40]">
                 <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{task.taskId}</td>
                 <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[200px]">{task.title}</td>
@@ -79,11 +92,16 @@ export function KpiRow({ data }: Props) {
                 <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">
                   <span className="inline-block px-2 py-0.5 rounded text-[11px] bg-[#1e3a5f] text-[#60a5fa]">{task.prdPhase}</span>
                 </td>
+                <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[120px] text-xs text-[#94a3b8]">{formatDateTime(task.startedAt)}</td>
+                <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px] text-xs text-[#94a3b8]">
+                  {durationSec != null ? formatSeconds(durationSec) : '-'}
+                </td>
                 <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">
                   <span className={task.status === 'done' ? 'text-green-500' : 'text-amber-500'}>{task.status}</span>
                 </td>
               </tr>
-            ))}
+              )
+            })}
           </tbody>
         </table>
       </Modal>
@@ -116,30 +134,34 @@ export function KpiRow({ data }: Props) {
 
       {/* Bug Modal */}
       <Modal title={t.modalBug} open={modal === 'bug'} onClose={() => setModal(null)}>
-        <table className="w-full border-collapse text-[13px]">
-          <thead>
-            <tr>
-              <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[80px]">{t.thId}</th>
-              <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[150px]">{t.thTitle}</th>
-              <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[100px]">{t.thSeverity}</th>
-              <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[80px]">{t.thStatus}</th>
-              <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[150px]">{t.thFix}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.bugs.map((b) => (
-              <tr key={b.bugId} className="hover:bg-[#1a2e40]">
-                <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{b.bugId}</td>
-                <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[150px]">{b.title}</td>
-                <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[100px]">{b.severity}</td>
-                <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">
-                  <span className={b.status === 'fixed' ? 'text-green-500' : 'text-red-500'}>{b.status}</span>
-                </td>
-                <td className="px-3 py-2 border-b border-[#1e2d3d] text-xs text-[#6b7b8d] min-w-[150px]">{b.fix}</td>
+        {data.bugs.length > 0 ? (
+          <table className="w-full border-collapse text-[13px]">
+            <thead>
+              <tr>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[80px]">{t.thId}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[150px]">{t.thTitle}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[100px]">{t.thSeverity}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[80px]">{t.thStatus}</th>
+                <th className="text-left px-3 py-2 text-[#6b7b8d] border-b border-[#1e2d3d] font-medium min-w-[150px]">{t.thFix}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.bugs.map((b) => (
+                <tr key={b.bugId} className="hover:bg-[#1a2e40]">
+                  <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{b.bugId}</td>
+                  <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[150px]">{b.title}</td>
+                  <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[100px]">{b.severity}</td>
+                  <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">
+                    <span className={b.status === 'fixed' ? 'text-green-500' : 'text-red-500'}>{b.status}</span>
+                  </td>
+                  <td className="px-3 py-2 border-b border-[#1e2d3d] text-xs text-[#6b7b8d] min-w-[150px]">{b.fix}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="text-[#6b7b8d] text-sm text-center py-4">{t.noData}</div>
+        )}
       </Modal>
 
       {/* PRD Modal */}
@@ -182,7 +204,7 @@ export function KpiRow({ data }: Props) {
             {data.reviews.map((r) => (
               <tr key={r.reviewId} className="hover:bg-[#1a2e40]">
                 <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{r.reviewId}</td>
-                <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[100px]">{formatLocalDate(r.reviewedAt)}</td>
+                <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[130px] text-xs">{formatDateTimeSeconds(r.reviewedAt)}</td>
                 <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[200px]">{r.scope}</td>
                 <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">{r.issueCount}</td>
                 <td className="px-3 py-2 border-b border-[#1e2d3d] min-w-[80px]">

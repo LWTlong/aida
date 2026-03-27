@@ -290,7 +290,7 @@ function handleTaskStart(args: any): any {
     title: args.title,
     status: 'in-progress',
     stageName: args.stage || 'default',
-    prdPhase: '',
+    prdPhase: args.prdPhase || (data.context.currentPrdPhase as string) || '',
     acceptance: '',
     createdAt: now(),
     startedAt: now(),
@@ -301,7 +301,7 @@ function handleTaskStart(args: any): any {
   data.context.currentTaskId = id;
   addEvent(data, 'task_created', { taskId: id });
   addEvent(data, 'task_started', { taskId: id });
-  addTimeline(data, 'task', `${id}: ${args.title}`);
+  addTimeline(data, 'task', `${id}: ${args.title}`, task.prdPhase || undefined);
   save(path, data);
   return { success: true, taskId: id, message: `${id} 已记录并开始: ${args.title}` };
 }
@@ -333,7 +333,7 @@ function handleTaskDone(args: any): any {
   }
 
   addEvent(data, 'task_completed', { taskId: args.taskId, tokensConsumed: taskTokens });
-  addTimeline(data, 'task-done', `${args.taskId}: ${task.title}`);
+  addTimeline(data, 'task-done', `${args.taskId}: ${task.title}`, task.prdPhase || undefined);
   save(path, data);
 
   // Sync total token usage from session
@@ -354,7 +354,7 @@ function handleLogBug(args: any): any {
     severity: severity as BugItem['severity'],
     source: source as BugItem['source'],
     status: 'open',
-    files: [],
+    files: getChangedFiles(),
     fix: null,
     taskId: data.context.currentTaskId || null,
     reportedAt: now(),
@@ -363,7 +363,7 @@ function handleLogBug(args: any): any {
   data.bugs.push(bug);
   data.summary.bugCount = data.bugs.length;
   addEvent(data, 'bug_created', { bugId: id });
-  addTimeline(data, 'bug', `${id}: ${args.title}`);
+  addTimeline(data, 'bug', `${id}: ${args.title}`, (data.context.currentPrdPhase as string) || undefined);
   save(path, data);
   return { success: true, bugId: id, message: `${id} 已记录: ${args.title} [${severity}]` };
 }
@@ -393,7 +393,7 @@ function handleBugFix(args: any): any {
   }
 
   addEvent(data, 'bug_fixed', { bugId: args.bugId, tokensConsumed: bugTokens });
-  addTimeline(data, 'bug-fix', `${args.bugId}: ${bug.title}`);
+  addTimeline(data, 'bug-fix', `${args.bugId}: ${bug.title}`, (data.context.currentPrdPhase as string) || undefined);
   save(path, data);
   syncTokenUsage(path, data);
 
@@ -404,7 +404,7 @@ function handleBugFix(args: any): any {
 function handleLogReview(args: any): any {
   const result = args.result || 'pass';
   const { path, data } = ensureRunJson();
-  const id = nextId(data.reviews, 'REV');
+  const id = `REV-${String((data.summary.reviewCount || 0) + 1).padStart(2, '0')}`;
   const issues = args.issues ? args.issues.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
   const review: ReviewItem = {
     reviewId: id,
@@ -420,7 +420,7 @@ function handleLogReview(args: any): any {
   data.summary.reviewPassCount = data.reviews.filter(r => r.result === 'pass').length;
   data.summary.reviewFailCount = data.reviews.filter(r => r.result === 'fail').length;
   addEvent(data, 'review_created', { reviewId: id, result });
-  addTimeline(data, 'review', `${id}: ${result}`);
+  addTimeline(data, 'review', `${id}: ${result}`, (data.context.currentPrdPhase as string) || undefined);
   save(path, data);
   syncTokenUsage(path, data);
   return { success: true, reviewId: id, message: `${id}: ${result}` };
@@ -438,7 +438,7 @@ function handleLogDeviation(args: any): any {
     deviationCategory: category as DeviationItem['deviationCategory'],
     aiOutput: '',
     expectedOutput: '',
-    files: [],
+    files: getChangedFiles(),
     ruleSedimented: null,
     detectedAt: now(),
     fixedAt: null,
@@ -446,7 +446,7 @@ function handleLogDeviation(args: any): any {
   data.deviations.push(deviation);
   data.summary.deviationCount = data.deviations.length;
   addEvent(data, 'deviation_created', { deviationId: id });
-  addTimeline(data, 'deviation', `${id}: ${args.title}`);
+  addTimeline(data, 'deviation', `${id}: ${args.title}`, (data.context.currentPrdPhase as string) || undefined);
   save(path, data);
 
   const result: any = { success: true, deviationId: id, message: `${id} 已记录: ${args.title}` };
@@ -465,6 +465,20 @@ function handleLogDeviation(args: any): any {
   }
 
   return result;
+}
+
+function getChangedFiles(): string[] {
+  try {
+    const output = execSync('git diff --name-only HEAD', { cwd: projectRoot, encoding: 'utf-8' });
+    const files = output.split('\n').map((f: string) => f.trim()).filter(Boolean);
+    if (files.length > 0) return files;
+  } catch { /* fall through */ }
+  try {
+    const output = execSync('git diff --name-only --cached', { cwd: projectRoot, encoding: 'utf-8' });
+    return output.split('\n').map((f: string) => f.trim()).filter(Boolean);
+  } catch {
+    return [];
+  }
 }
 
 function handleLogFiles(): any {
@@ -631,6 +645,7 @@ function handleLogRule(args: any): any {
     ruleId: localId,
     file: `rules.json#${entry.id}`,
     content,
+    category,
     sourceDeviation: args.sourceDeviation || null,
     sedimentedAt: now(),
   });

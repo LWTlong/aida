@@ -40,8 +40,10 @@ export function addEvent(data: RunData, type: string, eventData: Record<string, 
   data.events.push({ type, time: now(), data: eventData });
 }
 
-export function addTimeline(data: RunData, type: string, title: string): void {
-  data.timeline.push({ type, title, timestamp: now() });
+export function addTimeline(data: RunData, type: string, title: string, prdPhase?: string): void {
+  const item: { type: string; title: string; timestamp: string; prdPhase?: string } = { type, title, timestamp: now() };
+  if (prdPhase) item.prdPhase = prdPhase;
+  data.timeline.push(item);
 }
 
 // ─── Config ──────────────────────────────────────────────
@@ -101,14 +103,15 @@ export function recalcMetrics(data: RunData, projectRoot?: string): void {
     }
   }
 
-  let codeGenTotal = 0;
-  for (const t of data.tasks) {
-    if (t.startedAt && t.completedAt) {
-      const sec = (new Date(t.completedAt).getTime() - new Date(t.startedAt).getTime()) / 1000;
-      if (sec > 0) codeGenTotal += sec;
-    }
+  // Use span (max completedAt - min startedAt) instead of sum to avoid
+  // overcounting when multiple tasks are started simultaneously during task-splitting.
+  const timedTasks = data.tasks.filter(t => t.startedAt && t.completedAt);
+  if (timedTasks.length > 0) {
+    const minStart = Math.min(...timedTasks.map(t => new Date(t.startedAt!).getTime()));
+    const maxEnd = Math.max(...timedTasks.map(t => new Date(t.completedAt!).getTime()));
+    const codeGenSpan = (maxEnd - minStart) / 1000;
+    if (codeGenSpan > 0) nodeTimes['Code Generation'] = codeGenSpan;
   }
-  if (codeGenTotal > 0) nodeTimes['Code Generation'] = codeGenTotal;
 
   let bugFixTotal = 0;
   for (const b of data.bugs) {
@@ -129,7 +132,15 @@ export function recalcMetrics(data: RunData, projectRoot?: string): void {
   if (devFixTotal > 0) nodeTimes['Deviation Fix'] = devFixTotal;
 
   m.nodeTimeBreakdown = nodeTimes;
-  m.actualWorkSeconds = Math.round(Object.values(nodeTimes).reduce((a, b) => a + b, 0));
+
+  // actualWorkSeconds = only active AI coding stages (excludes requirement/analysis phases
+  // which contain human review wait time)
+  const activeStages = new Set(['Code Generation', 'Bug Fix', 'Deviation Fix', 'Self Review']);
+  m.actualWorkSeconds = Math.round(
+    Object.entries(nodeTimes)
+      .filter(([stage]) => activeStages.has(stage))
+      .reduce((a, [, sec]) => a + sec, 0)
+  );
 
   // Efficiency multiplier
   const actualHours = (m.actualWorkSeconds || 0) / 3600;
