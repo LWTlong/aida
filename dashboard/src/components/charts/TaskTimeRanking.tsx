@@ -21,11 +21,12 @@ export function TaskTimeRanking({ tasks }: Props) {
     .map((t) => ({
       id: t.taskId,
       title: t.title,
+      startedAt: t.startedAt!,
       seconds: (new Date(t.completedAt!).getTime() - new Date(t.startedAt!).getTime()) / 1000,
     }))
     .filter((t) => t.seconds > 0)
-    .sort((a, b) => b.seconds - a.seconds)
-    .slice(0, 10)
+    .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime())
+    .slice(0, 15)
 
   if (timed.length === 0) {
     return <div className="h-80 flex items-center justify-center text-[#6b7b8d] text-sm">{t.chartNoTaskTime}</div>

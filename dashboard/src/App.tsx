@@ -17,7 +17,6 @@ import { ReviewIssueTypes } from './components/charts/ReviewIssueTypes'
 import { BugSeverityChart } from './components/charts/BugSeverityChart'
 import { Timeline } from './components/Timeline'
 import { RulesTable } from './components/RulesTable'
-import { ReviewsTable } from './components/ReviewsTable'
 import { ProjectOverview } from './components/ProjectOverview'
 import { LocaleContext, getTranslations, getStoredLocale, storeLocale, type Locale } from './i18n'
 
@@ -127,61 +126,81 @@ function App() {
         <KpiRow data={runData!} />
 
         <div className="grid grid-cols-2 gap-4 px-8 pb-5 max-md:grid-cols-1">
-          <ChartCard title={t.chartNodeTime}>
-            <NodeTimeChart metrics={runData!.metrics} />
-          </ChartCard>
+          {Object.keys(runData!.metrics.nodeTimeBreakdown || {}).length > 0 && (
+            <ChartCard title={t.chartNodeTime}>
+              <NodeTimeChart metrics={runData!.metrics} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartTaskRanking}>
-            <TaskTimeRanking tasks={runData!.tasks} />
-          </ChartCard>
+          {runData!.tasks.length > 0 && (
+            <ChartCard title={t.chartTaskRanking}>
+              <TaskTimeRanking tasks={runData!.tasks} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartStageTime}>
-            <StageTimeDistribution workflow={runData!.workflow} />
-          </ChartCard>
+          {runData!.workflow.length > 0 && (
+            <ChartCard title={t.chartStageTime}>
+              <StageTimeDistribution workflow={runData!.workflow} />
+            </ChartCard>
+          )}
 
           <ChartCard title={t.chartTimeline}>
             <Timeline items={runData!.timeline} prdPhases={runData!.meta.prdPhases} />
           </ChartCard>
 
-          <ChartCard title={t.chartTaskCompletion}>
-            <TaskChart tasks={runData!.tasks} prdPhases={runData!.meta.prdPhases} />
-          </ChartCard>
+          {runData!.tasks.length > 0 && (
+            <ChartCard title={t.chartTaskCompletion}>
+              <TaskChart tasks={runData!.tasks} prdPhases={runData!.meta.prdPhases} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartFirstPassRate}>
-            <FirstPassRateTrend reviews={runData!.reviews} />
-          </ChartCard>
+          {runData!.reviews.length > 0 && (
+            <ChartCard title={t.chartFirstPassRate}>
+              <FirstPassRateTrend reviews={runData!.reviews} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartDeviationPie}>
-            <DeviationPie deviations={runData!.deviations} />
-          </ChartCard>
+          {runData!.deviations.length > 0 && (
+            <ChartCard title={t.chartDeviationPie}>
+              <DeviationPie deviations={runData!.deviations} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartDeviationBar}>
-            <DeviationBar deviations={runData!.deviations} />
-          </ChartCard>
+          {runData!.deviations.length > 0 && (
+            <ChartCard title={t.chartDeviationBar}>
+              <DeviationBar deviations={runData!.deviations} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartBugSeverity}>
-            <BugSeverityChart bugs={runData!.bugs} />
-          </ChartCard>
+          {runData!.bugs.length > 0 && (
+            <ChartCard title={t.chartBugSeverity}>
+              <BugSeverityChart bugs={runData!.bugs} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartReviewIssues}>
-            <ReviewIssueTypes reviews={runData!.reviews} />
-          </ChartCard>
+          {runData!.reviews.length > 0 && (
+            <ChartCard title={t.chartReviewIssues}>
+              <ReviewIssueTypes reviews={runData!.reviews} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartFileHotspot}>
-            <FileHotspot deviations={runData!.deviations} bugs={runData!.bugs} />
-          </ChartCard>
+          {(runData!.deviations.length > 0 || runData!.bugs.length > 0) && (
+            <ChartCard title={t.chartFileHotspot}>
+              <FileHotspot deviations={runData!.deviations} bugs={runData!.bugs} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartDeviationTrend}>
-            <DeviationTrend deviations={runData!.deviations} rules={runData!.rules} />
-          </ChartCard>
+          {runData!.deviations.length > 0 && (
+            <ChartCard title={t.chartDeviationTrend}>
+              <DeviationTrend deviations={runData!.deviations} rules={runData!.rules} />
+            </ChartCard>
+          )}
 
-          <ChartCard title={t.chartRulesTable} full>
-            <RulesTable rules={runData!.rules} deviations={runData!.deviations} />
-          </ChartCard>
-
-          <ChartCard title={t.chartReviewsTable} full>
-            <ReviewsTable reviews={runData!.reviews} />
-          </ChartCard>
+          {runData!.rules.length > 0 && (
+            <ChartCard title={t.chartRulesTable} full>
+              <RulesTable rules={runData!.rules} deviations={runData!.deviations} />
+            </ChartCard>
+          )}
         </div>
 
         <div className="text-center py-6 text-[#3d4f5f] text-xs border-t border-[#1e2d3d] mt-5">

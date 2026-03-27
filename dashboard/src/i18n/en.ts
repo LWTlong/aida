@@ -34,7 +34,7 @@ export const en = {
 
   // Chart titles (App.tsx)
   chartNodeTime: 'Cumulative Time per Node',
-  chartTaskRanking: 'Task Time Ranking TOP 10',
+  chartTaskRanking: 'Latest 15 Tasks Duration',
   chartStageTime: 'Phase Time Distribution',
   chartTimeline: 'Development Timeline',
   chartTaskCompletion: 'Task Completion by Phase',
@@ -90,6 +90,8 @@ export const en = {
   thOperation: 'Action',
   thLineChanges: '+/-',
   thChangeCount: 'Changes',
+  thDuration: 'Duration',
+  thStartTime: 'Start Time',
 
   // KPI modal: tasks completed
   tasksCompleted: 'tasks completed',

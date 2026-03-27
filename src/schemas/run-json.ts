@@ -118,6 +118,7 @@ export interface ReviewItem {
 export interface RuleItem {
   ruleId: string
   content: string
+  category?: string
   sourceDeviation: string | null
   sedimentedAt: string | null
   file: string

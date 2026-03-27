@@ -34,7 +34,7 @@ export const zh = {
 
   // Chart titles (App.tsx)
   chartNodeTime: '各节点累计耗时',
-  chartTaskRanking: '任务耗时排行 TOP 10',
+  chartTaskRanking: '最新 15 个任务耗时',
   chartStageTime: '阶段时间分布',
   chartTimeline: '开发时间线',
   chartTaskCompletion: '各阶段任务完成情况',
@@ -90,6 +90,8 @@ export const zh = {
   thOperation: '操作',
   thLineChanges: '+/-',
   thChangeCount: '修改次数',
+  thDuration: '耗时',
+  thStartTime: '开始时间',
 
   // KPI modal: tasks completed
   tasksCompleted: '任务完成',
