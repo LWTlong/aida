@@ -373,6 +373,58 @@ AIDA 使用 [Model Context Protocol](https://modelcontextprotocol.io/) —— AI
 
 ---
 
+## 📐 规则系统 —— 团队协作流程
+
+规则是 AIDA 的核心复利资产。以下是团队场景下的完整使用方式。
+
+### 架构设计
+
+```
+.aidevos/rules.json        ← 唯一数据源，提交到 git
+        ↓
+aida rules build
+        ↓
+.aidevos/rules/*.md        ← 自动生成的视图文件，加入 gitignore
+        ↓
+AI 下次读取规则
+```
+
+`aida init` 会自动将 `.aidevos/rules/*.md` 写入 `.gitignore`。不要手动编辑 `.md` 文件——它们始终由 `rules.json` 重新生成。
+
+### 日常流程
+
+拉取了包含新规则的代码后：
+
+```bash
+git pull
+aida rules build   # 从更新后的 rules.json 重新生成本地规则视图
+```
+
+### 合并冲突处理
+
+两位开发者在不同分支各自添加了规则并合并时，`rules.json` 可能产生标准的 git 冲突。一条命令解决：
+
+```bash
+# git merge 在 rules.json 产生冲突后执行：
+aida rules merge   # 按 fingerprint 做并集——不丢规则，不产生重复
+aida rules build   # 重建 .md 视图
+git add .aidevos/rules.json
+git commit -m "merge: resolve rules conflict"
+```
+
+`aida rules merge` 使用指纹去重：内容完全相同只保留一条；内容不同则两条都保留，新规则自动重新编号避免 ID 冲突。
+
+### 规则日常维护
+
+```bash
+aida rules list      # 按分类列出所有规则
+aida rules dedupe    # 找出关键词重叠度 >40% 的相似规则，供手动处理
+```
+
+规则有 `status` 字段（`active` / `deprecated`）。项目规范变化时，将旧规则标记为 `deprecated`——它从 AI 读取的 `.md` 文件里消失，但保留在 `rules.json` 中作为审计记录。
+
+---
+
 ## Roadmap
 
 - [ ] 导出报告为 PDF / HTML（H1/H2 绩效汇报）
