@@ -373,6 +373,58 @@ AIDA uses [Model Context Protocol](https://modelcontextprotocol.io/) — the sta
 
 ---
 
+## 📐 Rules System — Team Workflow
+
+Rules are the compounding asset of AIDA. Here's how they work in a team setting.
+
+### Architecture
+
+```
+.aidevos/rules.json        ← source of truth, committed to git
+        ↓
+aida rules build
+        ↓
+.aidevos/rules/*.md        ← auto-generated views, gitignored
+        ↓
+AI reads rules next session
+```
+
+`aida init` automatically adds `.aidevos/rules/*.md` to your `.gitignore`. Never edit the `.md` files manually — they are always regenerated from `rules.json`.
+
+### Daily workflow
+
+After pulling changes that include new rules:
+
+```bash
+git pull
+aida rules build   # regenerate local rule views from updated rules.json
+```
+
+### Merge conflict resolution
+
+When two developers add rules on separate branches and merge, `rules.json` may get a standard git conflict. Resolve it in one command:
+
+```bash
+# After git merge produces a conflict in rules.json:
+aida rules merge   # fingerprint union — no duplicates, no lost rules
+aida rules build   # rebuild .md views
+git add .aidevos/rules.json
+git commit -m "merge: resolve rules conflict"
+```
+
+`aida rules merge` uses fingerprint deduplication: if two rules have identical content, only one is kept. If they differ, both are kept and the incoming rule is renumbered to avoid ID collisions.
+
+### Managing rules over time
+
+```bash
+aida rules list      # list all rules grouped by category
+aida rules dedupe    # surface rules with >40% keyword overlap for manual review
+```
+
+Rules have a `status` field (`active` / `deprecated`). When project conventions evolve, deprecate old rules — they stop appearing in the `.md` files your AI reads, but remain in `rules.json` as an audit trail.
+
+---
+
 ## Roadmap
 
 - [ ] Export reports as PDF / HTML (H1/H2 performance reviews)
