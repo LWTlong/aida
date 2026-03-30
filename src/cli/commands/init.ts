@@ -361,7 +361,21 @@ export async function init(): Promise<void> {
     syncIronRules(projectRoot, primaryTool);
   }
 
-  // 7. Write config.json
+  // 7. Update .gitignore
+  const gitignorePath = resolve(projectRoot, '.gitignore');
+  const gitignoreEntry = '.aidevos/rules/*.md';
+  if (fileExists(gitignorePath)) {
+    const existing = readText(gitignorePath);
+    if (!existing.includes(gitignoreEntry)) {
+      writeText(gitignorePath, existing.trimEnd() + '\n\n# AIDA - auto-generated rule views (source of truth is rules.json)\n' + gitignoreEntry + '\n');
+      console.log(green('  ✓ Updated') + ' .gitignore           (added .aidevos/rules/*.md)');
+    }
+  } else {
+    writeText(gitignorePath, '# AIDA - auto-generated rule views (source of truth is rules.json)\n' + gitignoreEntry + '\n');
+    console.log(green('  ✓ Created') + ' .gitignore           (added .aidevos/rules/*.md)');
+  }
+
+  // 8. Write config.json
   const projectName = getProjectName();
   const configData: Record<string, any> = {
     schemaVersion: '1.0',
