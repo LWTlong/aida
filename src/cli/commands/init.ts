@@ -185,12 +185,84 @@ export async function init(): Promise<void> {
 
   // Check if already initialized
   if (fileExists(resolve(aidevos, 'config.json'))) {
-    console.log(
-      yellow('  AIDA is already initialized in this project.'),
-    );
-    console.log(
-      dim('  To reinitialize, delete the .aidevos directory first.\n'),
-    );
+    console.log(yellow('  AIDA is already initialized in this project.\n'));
+
+    const rl2 = readline.createInterface({ input: stdin, output: stdout });
+    const answer = (await rl2.question('  Add a new AI tool to this project? (y/n) > ')).trim().toLowerCase();
+    rl2.close();
+
+    if (answer !== 'y' && answer !== 'yes') {
+      console.log(dim('\n  To reinitialize, delete the .aidevos directory first.\n'));
+      return;
+    }
+
+    // Load existing config
+    const existingConfig = JSON.parse(readText(resolve(aidevos, 'config.json')));
+    const existingTools: AiToolChoice[] = existingConfig.aiTools || [];
+
+    const rl3 = readline.createInterface({ input: stdin, output: stdout });
+    console.log('\n  ? Which AI tool do you want to add? (comma-separated numbers):\n');
+    console.log('    1) Claude Code');
+    console.log('    2) Cursor');
+    console.log('    3) VS Code + Copilot');
+    console.log('    4) Windsurf');
+    console.log('    5) Lingma (通义灵码)\n');
+
+    const toolMap2: Record<string, AiToolChoice> = {
+      '1': 'claude-code', '2': 'cursor', '3': 'vscode-copilot', '4': 'windsurf', '5': 'lingma',
+    };
+    let newTools: AiToolChoice[] = [];
+    while (newTools.length === 0) {
+      const ans = (await rl3.question('  > ')).trim();
+      const nums = ans.split(',').map(s => s.trim());
+      for (const n of nums) {
+        if (toolMap2[n] && !existingTools.includes(toolMap2[n])) {
+          newTools.push(toolMap2[n]);
+        } else if (toolMap2[n] && existingTools.includes(toolMap2[n])) {
+          console.log(yellow(`  ${toolMap2[n]} is already configured, skipping.`));
+        }
+      }
+      if (newTools.length === 0) console.log(yellow('  No new tools selected. Please try again.'));
+    }
+    rl3.close();
+
+    // Write MCP config for new tools
+    const mcpWritten = writeMcpConfig(projectRoot, newTools);
+    for (const f of mcpWritten) {
+      if (f.startsWith('(')) {
+        console.log(yellow(`\n  ⚠ Windsurf: add MCP config manually to ~/.codeium/windsurf/mcp_config.json`));
+      } else {
+        console.log(green('\n  ✓ Created') + ` ${f}  (MCP Server config)`);
+      }
+    }
+
+    // Copy skills for new tools if full mode
+    if (existingConfig.mode === 'full') {
+      const allCommands = [...QUICK_COMMANDS];
+      if (newTools.includes('cursor')) {
+        for (const cmd of allCommands) {
+          const src = resolve(SKILLS_DIR, `${cmd.skill}.md`);
+          const destDir = resolve(projectRoot, '.cursor', 'skills', cmd.name);
+          ensureDir(destDir);
+          writeText(resolve(destDir, 'SKILL.md'), readText(src));
+        }
+        console.log(green('  ✓ Copied') + ' skills to .cursor/skills/');
+      }
+      if (newTools.includes('claude-code')) {
+        const cmdDir = resolve(projectRoot, '.claude', 'commands');
+        ensureDir(cmdDir);
+        for (const cmd of allCommands) {
+          const src = resolve(SKILLS_DIR, `${cmd.skill}.md`);
+          writeText(resolve(cmdDir, `${cmd.name}.md`), readText(src));
+        }
+        console.log(green('  ✓ Copied') + ' skills to .claude/commands/');
+      }
+    }
+
+    // Update config.json
+    existingConfig.aiTools = [...existingTools, ...newTools];
+    writeJson(resolve(aidevos, 'config.json'), existingConfig);
+    console.log(green('\n  ✓ Done!') + ' New tool(s) added successfully.\n');
     return;
   }
 
