@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "aida": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "ai-dev-analytics",
+        "mcp"
+      ]
+    }
+  }
+}
