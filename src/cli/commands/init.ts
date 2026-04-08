@@ -227,6 +227,7 @@ export async function init(): Promise<void> {
     rl3.close();
 
     // Write MCP config for new tools
+    syncGuideReference(projectRoot, newTools);
     const mcpWritten = writeMcpConfig(projectRoot, newTools);
     for (const f of mcpWritten) {
       if (f.startsWith('(')) {
