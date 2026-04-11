@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { getBranchName, getDevName, isGitRepo } from '../../utils/git.js';
+import { getBranchName, getDevName } from '../../utils/git.js';
 import { runDir, configPath } from '../../utils/paths.js';
 import { fileExists, readJson } from '../../utils/fs.js';
 import {
@@ -21,11 +21,6 @@ export async function status(): Promise<void> {
     console.log(
       red('\n  AIDA not initialized. Run `npx aida init` first.\n'),
     );
-    return;
-  }
-
-  if (!isGitRepo()) {
-    console.log(red('\n  Not a git repository. AIDevOS requires git.\n'));
     return;
   }
 

@@ -12,7 +12,7 @@ import {
 } from '../../utils/fs.js';
 import { bold, green, cyan, dim, yellow } from '../../utils/display.js';
 import { addRule, buildRuleViews } from '../../utils/rules.js';
-import { ensureGuide, syncGuideReference } from '../../utils/guide.js';
+import { ensureGuide, syncGuideReference, updateGuide, updateGuideReferences } from '../../utils/guide.js';
 
 const QUICK_COMMANDS: { name: string; skill: string }[] = [
   { name: 'workflow', skill: 'workflow-orchestrator' },
@@ -186,13 +186,17 @@ export async function init(): Promise<void> {
   // Check if already initialized
   if (fileExists(resolve(aidevos, 'config.json'))) {
     console.log(yellow('  AIDA is already initialized in this project.\n'));
+    console.log('  ? What would you like to do?\n');
+    console.log('    1) Add a new AI tool');
+    console.log('    2) Repair: fill missing files (guide, MCP config, .gitignore)');
+    console.log('    3) Exit\n');
 
     const rl2 = readline.createInterface({ input: stdin, output: stdout });
-    const answer = (await rl2.question('  Add a new AI tool to this project? (y/n) > ')).trim().toLowerCase();
+    const choice = (await rl2.question('  > ')).trim();
     rl2.close();
 
-    if (answer !== 'y' && answer !== 'yes') {
-      console.log(dim('\n  To reinitialize, delete the .aidevos directory first.\n'));
+    if (choice === '3' || choice === '') {
+      console.log(dim('\n  No changes made.\n'));
       return;
     }
 
@@ -200,6 +204,47 @@ export async function init(): Promise<void> {
     const existingConfig = JSON.parse(readText(resolve(aidevos, 'config.json')));
     const existingTools: AiToolChoice[] = existingConfig.aiTools || [];
 
+    // ── Option 2: Repair missing files ──────────────────
+    if (choice === '2') {
+      console.log('\n  Repairing...\n');
+
+      // Update guide content to latest
+      updateGuide(projectRoot);
+      updateGuideReferences(projectRoot, existingTools);
+      console.log(green('  ✓ Updated') + ' .aidevos/aida-guide.md and AI tool rule files');
+
+      // Ensure MCP configs (create-if-not-exists)
+      const repairMcp = writeMcpConfig(projectRoot, existingTools);
+      for (const f of repairMcp) {
+        if (f.startsWith('(')) {
+          console.log(yellow('  ⚠ Windsurf: add MCP config manually to ~/.codeium/windsurf/mcp_config.json'));
+        } else {
+          console.log(green('  ✓ Ensured') + ` ${f}`);
+        }
+      }
+
+      // Ensure .gitignore entries
+      const gitignorePath = resolve(projectRoot, '.gitignore');
+      const gitignoreEntries = ['.aidevos/rules/*.md', '.aidevos/index.json'];
+      const gitignoreExisting = fileExists(gitignorePath) ? readText(gitignorePath) : '';
+      const toAdd = gitignoreEntries.filter((e) => !gitignoreExisting.includes(e));
+      if (toAdd.length > 0) {
+        writeText(
+          gitignorePath,
+          gitignoreExisting.trimEnd() + '\n\n# AIDA - auto-generated files\n' + toAdd.join('\n') + '\n',
+        );
+        console.log(green('  ✓ Updated') + ` .gitignore (added ${toAdd.join(', ')})`);
+      }
+
+      // Ensure rules directory exists
+      ensureDir(resolve(aidevos, 'rules'));
+      ensureDir(resolve(aidevos, 'runs'));
+
+      console.log(green('\n  ✓ Done!') + ' Missing files have been filled in.\n');
+      return;
+    }
+
+    // ── Option 1: Add a new AI tool ──────────────────────
     const rl3 = readline.createInterface({ input: stdin, output: stdout });
     console.log('\n  ? Which AI tool do you want to add? (comma-separated numbers):\n');
     console.log('    1) Claude Code');
@@ -436,16 +481,17 @@ export async function init(): Promise<void> {
 
   // 7. Update .gitignore
   const gitignorePath = resolve(projectRoot, '.gitignore');
-  const gitignoreEntry = '.aidevos/rules/*.md';
-  if (fileExists(gitignorePath)) {
-    const existing = readText(gitignorePath);
-    if (!existing.includes(gitignoreEntry)) {
-      writeText(gitignorePath, existing.trimEnd() + '\n\n# AIDA - auto-generated rule views (source of truth is rules.json)\n' + gitignoreEntry + '\n');
-      console.log(green('  ✓ Updated') + ' .gitignore           (added .aidevos/rules/*.md)');
-    }
-  } else {
-    writeText(gitignorePath, '# AIDA - auto-generated rule views (source of truth is rules.json)\n' + gitignoreEntry + '\n');
-    console.log(green('  ✓ Created') + ' .gitignore           (added .aidevos/rules/*.md)');
+  // These are derived/auto-generated files that should not be committed
+  const gitignoreEntries = ['.aidevos/rules/*.md', '.aidevos/index.json'];
+  const existed = fileExists(gitignorePath);
+  const existing = existed ? readText(gitignorePath) : '';
+  const toAdd = gitignoreEntries.filter((e) => !existing.includes(e));
+  if (toAdd.length > 0) {
+    writeText(
+      gitignorePath,
+      existing.trimEnd() + '\n\n# AIDA - auto-generated files (source of truth: rules.json / run data)\n' + toAdd.join('\n') + '\n',
+    );
+    console.log(green(existed ? '  ✓ Updated' : '  ✓ Created') + ` .gitignore           (added ${toAdd.join(', ')})`);
   }
 
   // 8. Write config.json

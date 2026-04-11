@@ -6,7 +6,7 @@
  */
 
 import { resolve } from 'node:path';
-import { getBranchName, getDevName, isGitRepo } from './git.js';
+import { getBranchName, getDevName } from './git.js';
 import { runDir, branchDir, configPath, aidevosDir } from './paths.js';
 import { ensureDir, fileExists, readJson, writeJson, writeText } from './fs.js';
 import { ensureGuide, syncGuideReference } from './guide.js';
@@ -284,12 +284,11 @@ export function normalizeRunData(data: RunData): RunData {
 }
 
 /**
- * Load existing run.json for current git branch/dev.
+ * Load existing run.json for current branch/dev.
  * Returns null if not found.
  */
 export function loadRunJson(projectRoot: string): { path: string; data: RunData } | null {
   if (!fileExists(configPath(projectRoot))) return null;
-  if (!isGitRepo()) return null;
 
   const branch = getBranchName();
   const dev = getDevName();
@@ -371,10 +370,6 @@ let _guideSynced = false;
  * Creates .aidevos/, config.json, run.json, branch-level files if missing.
  */
 export function ensureRunJson(projectRoot: string): { path: string; data: RunData } {
-  if (!isGitRepo()) {
-    throw new Error('Not a git repository. AIDevOS requires git.');
-  }
-
   // Ensure .aidevos/config.json exists
   const dir = aidevosDir(projectRoot);
   if (!fileExists(resolve(dir, 'config.json'))) {

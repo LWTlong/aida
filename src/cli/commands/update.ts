@@ -8,6 +8,7 @@ import {
   fileExists,
 } from '../../utils/fs.js';
 import { bold, green, cyan, dim, yellow } from '../../utils/display.js';
+import { updateGuide, updateGuideReferences } from '../../utils/guide.js';
 import * as readline from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 
@@ -173,6 +174,24 @@ export async function update(): Promise<void> {
       }
     }
     console.log(green('  ✓ Updated') + ` ${commandsUpdated} commands in .cursor/skills/`);
+  }
+
+  // Update guide and AI tool rule files
+  updateGuide(projectRoot);
+  updateGuideReferences(projectRoot);
+  console.log(green('  ✓ Updated') + ' .aidevos/aida-guide.md and AI tool rule files');
+
+  // Ensure .gitignore has required entries
+  const gitignorePath = resolve(projectRoot, '.gitignore');
+  const gitignoreEntries = ['.aidevos/rules/*.md', '.aidevos/index.json'];
+  const gitignoreExisting = fileExists(gitignorePath) ? readText(gitignorePath) : '';
+  const toAdd = gitignoreEntries.filter((e) => !gitignoreExisting.includes(e));
+  if (toAdd.length > 0) {
+    writeText(
+      gitignorePath,
+      gitignoreExisting.trimEnd() + '\n\n# AIDA - auto-generated files\n' + toAdd.join('\n') + '\n',
+    );
+    console.log(green('  ✓ Updated') + ` .gitignore (added ${toAdd.join(', ')})`);
   }
 
   console.log(`
