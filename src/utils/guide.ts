@@ -21,9 +21,14 @@ const GUIDE_CONTENT = `# AIDA 数据采集与规则沉淀指南
 
 ## 零、强制前置动作（严禁跳过）
 
-**⚠️ 严禁跳过：每次开始任务前，必须通过 Read 工具读取本文件（\`.aidevos/aida-guide.md\`）的完整内容，并按下方规定的流程执行数据采集（\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`）。不得以任何理由跳过此流程。**
+**⚠️ 你正在读取本文件（aida-guide.md）。这是强制规范，严禁跳过任何步骤。**
 
-如果存在 \`.aidevos/rules/_all.md\`，同样必须在开始开发前读取，了解已沉淀的项目规则。
+**开始任何开发任务前，必须按顺序完成以下两步：**
+
+1. **读取项目规则** → 使用 Read 工具读取 \`.aidevos/rules/_all.md\`，了解已沉淀的项目规则并严格遵守（文件不存在则跳过此步）
+2. **执行数据采集流程** → 严格按照第一节规定的顺序调用 MCP 工具：\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`
+
+不得以任何理由跳过上述步骤。
 
 ## 一、数据采集
 
@@ -110,14 +115,9 @@ category 可选值：
 const CLAUDE_MARKER = '.aidevos/aida-guide.md';
 
 const CLAUDE_REFERENCE = `
-
 ## AIDA
 
-本项目使用 AIDA 进行开发数据采集与规则沉淀。
-
-**⚠️ 严禁跳过：每次开始任务前，必须通过 Read 工具读取 \`.aidevos/aida-guide.md\` 的完整内容，并按其中规定的流程执行数据采集（\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`）。不得以任何理由跳过此流程。**
-
-如果存在 \`.aidevos/rules/_all.md\`，同样必须在开始开发前读取，了解已沉淀的项目规则。
+**⚠️ 严禁跳过：开始任何开发任务前，必须通过 Read 工具读取 \`.aidevos/aida-guide.md\` 的完整内容，并严格按照其中的规范执行。不得以任何理由跳过。**
 `;
 
 // ─── Cursor rule frontmatter ────────────────────────────
@@ -155,7 +155,16 @@ export function ensureGuide(projectRoot: string): void {
 }
 
 /**
- * Add guide reference to AI tool instruction files.
+ * Always overwrite .aidevos/aida-guide.md with the latest template content.
+ * Called by `aida rules build` to keep the guide in sync with the package version.
+ */
+export function updateGuide(projectRoot: string): void {
+  ensureDir(aidevosDir(projectRoot));
+  writeText(guidePath(projectRoot), GUIDE_CONTENT);
+}
+
+/**
+ * Add guide reference to AI tool instruction files (create-if-not-exists).
  * Called by init (with explicit tool list) or ensureRunJson (auto-detect).
  */
 export function syncGuideReference(projectRoot: string, tools?: string[]): void {
@@ -175,6 +184,33 @@ export function syncGuideReference(projectRoot: string, tools?: string[]): void 
   }
 }
 
+/**
+ * Update guide content in all detected AI tool instruction files with latest template.
+ * Called by `aida rules build` — always overwrites so content stays in sync.
+ */
+export function updateGuideReferences(projectRoot: string, tools?: string[]): void {
+  const detected = tools || detectAiTools(projectRoot);
+  for (const tool of detected) {
+    switch (tool) {
+      case 'claude-code':
+        ensureGuideAtTop(projectRoot);
+        break;
+      case 'cursor': {
+        const rulesDir = resolve(projectRoot, '.cursor', 'rules', 'aidevos');
+        ensureDir(rulesDir);
+        writeText(resolve(rulesDir, 'aida-guide.md'), CURSOR_FRONTMATTER + GUIDE_CONTENT);
+        break;
+      }
+      case 'lingma': {
+        const rulesDir = resolve(projectRoot, '.lingma', 'rules');
+        ensureDir(rulesDir);
+        writeText(resolve(rulesDir, 'aida-guide.md'), LINGMA_FRONTMATTER + GUIDE_CONTENT);
+        break;
+      }
+    }
+  }
+}
+
 // ─── Internal ───────────────────────────────────────────
 
 function detectAiTools(projectRoot: string): string[] {
@@ -190,10 +226,66 @@ function addClaudeReference(projectRoot: string): void {
   if (fileExists(file)) {
     const content = readText(file);
     if (content.includes(CLAUDE_MARKER)) return;
-    writeText(file, content + CLAUDE_REFERENCE);
+    writeText(file, insertAtTop(content, CLAUDE_REFERENCE.trimStart()));
   } else {
     writeText(file, CLAUDE_REFERENCE.trim() + '\n');
   }
+}
+
+/**
+ * Ensure the AIDA guide reference sits near the top of CLAUDE.md with up-to-date content.
+ * Moves the section if it's buried lower in the file, and updates stale content.
+ * Called by `aida rules build` so the AI always encounters it first.
+ */
+export function ensureGuideAtTop(projectRoot: string): void {
+  if (!detectAiTools(projectRoot).includes('claude-code')) return;
+
+  const file = resolve(projectRoot, 'CLAUDE.md');
+  if (!fileExists(file)) return;
+
+  const content = readText(file);
+  const newSection = CLAUDE_REFERENCE.trimStart();
+
+  // Not present yet — insert at top
+  if (!content.includes(CLAUDE_MARKER)) {
+    writeText(file, insertAtTop(content, newSection));
+    return;
+  }
+
+  // Find the existing ## AIDA section boundaries
+  const aidaStart = content.indexOf('\n## AIDA\n');
+  if (aidaStart === -1) return;
+  const afterAida = content.indexOf('\n## ', aidaStart + 5);
+  const aidaEnd = afterAida !== -1 ? afterAida : content.length;
+
+  // Check if already in the first 10 lines
+  const lines = content.split('\n');
+  const markerLine = lines.findIndex((l) => l.includes(CLAUDE_MARKER));
+  if (markerLine >= 0 && markerLine <= 10) {
+    // At top already — just update the content in place
+    const before = content.slice(0, aidaStart);
+    const after = content.slice(aidaEnd);
+    writeText(file, (before + '\n' + newSection + after).replace(/\n{3,}/g, '\n\n'));
+    return;
+  }
+
+  // Buried — remove from current position and re-insert at top with latest content
+  const without = (content.slice(0, aidaStart) + content.slice(aidaEnd))
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  writeText(file, insertAtTop(without, newSection) + '\n');
+}
+
+/** Insert a block right after the first heading line of a file. */
+function insertAtTop(content: string, block: string): string {
+  const trimmedBlock = block.trim();
+  const firstNewline = content.indexOf('\n');
+  if (firstNewline !== -1 && content.trimStart().startsWith('#')) {
+    const head = content.slice(0, firstNewline + 1);
+    const rest = content.slice(firstNewline + 1).replace(/^\n+/, '');
+    return head + '\n' + trimmedBlock + '\n\n' + rest;
+  }
+  return trimmedBlock + '\n\n' + content;
 }
 
 function addCursorReference(projectRoot: string): void {

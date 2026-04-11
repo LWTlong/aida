@@ -54,3 +54,41 @@ export function listDirs(dir: string): string[] {
     return statSync(full).isDirectory();
   });
 }
+
+/**
+ * Extract ours/theirs sections from a file with git conflict markers.
+ * Handles standard format and diff3 format (with ||||||| base section).
+ * Returns null if no conflict markers found.
+ */
+export function extractConflictSections(
+  raw: string,
+): { ours: string; theirs: string } | null {
+  const lines = raw.split('\n');
+  type State = 'before' | 'ours' | 'base' | 'theirs';
+  let state: State = 'before';
+  let hasConflict = false;
+  const oursLines: string[] = [];
+  const theirsLines: string[] = [];
+
+  for (const line of lines) {
+    if (line.startsWith('<<<<<<<')) {
+      hasConflict = true;
+      state = 'ours';
+    } else if (line.startsWith('|||||||')) {
+      state = 'base'; // diff3 base section — skip
+    } else if (line.startsWith('=======')) {
+      state = 'theirs';
+    } else if (line.startsWith('>>>>>>>')) {
+      state = 'before'; // reset after conflict block
+    } else {
+      if (state === 'ours') oursLines.push(line);
+      else if (state === 'theirs') theirsLines.push(line);
+    }
+  }
+
+  if (!hasConflict) return null;
+  return {
+    ours: oursLines.join('\n').trim(),
+    theirs: theirsLines.join('\n').trim(),
+  };
+}

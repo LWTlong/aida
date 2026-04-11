@@ -469,13 +469,22 @@ function handleLogDeviation(args: any): any {
 
 function getChangedFiles(): string[] {
   try {
-    const output = execSync('git diff --name-only HEAD', { cwd: projectRoot, encoding: 'utf-8' });
+    const output = execSync('git diff --name-only HEAD', { cwd: projectRoot, encoding: 'utf-8', stdio: 'pipe' });
     const files = output.split('\n').map((f: string) => f.trim()).filter(Boolean);
     if (files.length > 0) return files;
   } catch { /* fall through */ }
   try {
-    const output = execSync('git diff --name-only --cached', { cwd: projectRoot, encoding: 'utf-8' });
-    return output.split('\n').map((f: string) => f.trim()).filter(Boolean);
+    const output = execSync('git diff --name-only --cached', { cwd: projectRoot, encoding: 'utf-8', stdio: 'pipe' });
+    const files = output.split('\n').map((f: string) => f.trim()).filter(Boolean);
+    if (files.length > 0) return files;
+  } catch { /* fall through */ }
+  // SVN fallback
+  try {
+    const output = execSync('svn status', { cwd: projectRoot, encoding: 'utf-8', stdio: 'pipe' });
+    return output.split('\n')
+      .filter((l: string) => /^[MAD]/.test(l))
+      .map((l: string) => l.slice(1).trim())
+      .filter(Boolean);
   } catch {
     return [];
   }
@@ -484,76 +493,95 @@ function getChangedFiles(): string[] {
 function handleLogFiles(): any {
   const { path, data } = ensureRunJson();
 
-  // Auto-scan git diff
+  // Auto-scan VCS diff (git first, SVN fallback)
   let diffOutput = '';
+  let svnFiles: string[] = [];
+
   try {
-    diffOutput = execSync('git diff --stat HEAD', { cwd: projectRoot, encoding: 'utf-8' });
+    diffOutput = execSync('git diff --stat HEAD', { cwd: projectRoot, encoding: 'utf-8', stdio: 'pipe' });
   } catch {
-    // If no HEAD (first commit), try against empty tree
     try {
-      diffOutput = execSync('git diff --stat --cached', { cwd: projectRoot, encoding: 'utf-8' });
-    } catch {
-      return { success: true, message: '没有检测到文件变更', filesLogged: 0 };
-    }
+      diffOutput = execSync('git diff --stat --cached', { cwd: projectRoot, encoding: 'utf-8', stdio: 'pipe' });
+    } catch { /* fall through to SVN */ }
   }
 
+  // SVN fallback: get changed file list (no line counts available from svn status)
   if (!diffOutput.trim()) {
+    try {
+      const svnStatus = execSync('svn status', { cwd: projectRoot, encoding: 'utf-8', stdio: 'pipe' });
+      svnFiles = svnStatus.split('\n')
+        .filter((l: string) => /^[MAD]/.test(l))
+        .map((l: string) => ({ code: l[0], path: l.slice(1).trim() }))
+        .filter((f: { code: string; path: string }) => f.path)
+        .map((f: { code: string; path: string }) => f.path);
+    } catch { /* ignore */ }
+  }
+
+  const filesLogged: string[] = [];
+  let totalAdded = 0;
+  let totalRemoved = 0;
+
+  if (diffOutput.trim()) {
+    // Parse git diff --stat output
+    // Format: " src/foo.ts | 10 ++++------"  or  " src/bar.ts | 5 +++++"
+    const lines = diffOutput.split('\n').filter((l: string) => l.includes('|'));
+
+    for (const line of lines) {
+      const match = line.match(/^\s*(.+?)\s*\|\s*(\d+)\s*([+-]*)/);
+      if (!match) continue;
+
+      const filePath = match[1].trim();
+      const changes = parseInt(match[2]) || 0;
+      const indicators = match[3] || '';
+
+      const plusCount = (indicators.match(/\+/g) || []).length;
+      const minusCount = (indicators.match(/-/g) || []).length;
+      const total = plusCount + minusCount;
+
+      let linesAdded = 0;
+      let linesRemoved = 0;
+      if (total > 0) {
+        linesAdded = Math.round(changes * plusCount / total);
+        linesRemoved = Math.round(changes * minusCount / total);
+      } else {
+        linesAdded = changes;
+      }
+
+      const changeType: 'created' | 'modified' | 'deleted' =
+        linesRemoved === 0 && linesAdded > 0 ? 'created' : 'modified';
+
+      const existing = data.files.find(f => f.path === filePath);
+      if (existing) {
+        existing.changeCount = (existing.changeCount || 1) + 1;
+        existing.linesAdded += linesAdded;
+        existing.linesRemoved += linesRemoved;
+        existing.lastModified = now();
+      } else {
+        data.files.push({ path: filePath, changeType, linesAdded, linesRemoved, changeCount: 1, lastModified: now() });
+      }
+
+      totalAdded += linesAdded;
+      totalRemoved += linesRemoved;
+      filesLogged.push(filePath);
+    }
+  } else if (svnFiles.length > 0) {
+    // SVN: log files without line counts
+    for (const filePath of svnFiles) {
+      const existing = data.files.find(f => f.path === filePath);
+      if (existing) {
+        existing.changeCount = (existing.changeCount || 1) + 1;
+        existing.lastModified = now();
+      } else {
+        data.files.push({ path: filePath, changeType: 'modified', linesAdded: 0, linesRemoved: 0, changeCount: 1, lastModified: now() });
+      }
+      filesLogged.push(filePath);
+    }
+  } else {
     return { success: true, message: '没有检测到文件变更', filesLogged: 0 };
   }
 
-  // Parse git diff --stat output
-  // Format: " src/foo.ts | 10 ++++------"  or  " src/bar.ts | 5 +++++"
-  const lines = diffOutput.split('\n').filter(l => l.includes('|'));
-  let totalAdded = 0;
-  let totalRemoved = 0;
-  const filesLogged: string[] = [];
-
-  for (const line of lines) {
-    const match = line.match(/^\s*(.+?)\s*\|\s*(\d+)\s*([+-]*)/);
-    if (!match) continue;
-
-    const filePath = match[1].trim();
-    const changes = parseInt(match[2]) || 0;
-    const indicators = match[3] || '';
-
-    // Count + and - in the indicators
-    const plusCount = (indicators.match(/\+/g) || []).length;
-    const minusCount = (indicators.match(/-/g) || []).length;
-    const total = plusCount + minusCount;
-
-    let linesAdded = 0;
-    let linesRemoved = 0;
-    if (total > 0) {
-      linesAdded = Math.round(changes * plusCount / total);
-      linesRemoved = Math.round(changes * minusCount / total);
-    } else {
-      linesAdded = changes;
-    }
-
-    // Determine change type
-    let changeType: 'created' | 'modified' | 'deleted' = 'modified';
-    if (linesRemoved === 0 && linesAdded > 0) changeType = 'created';
-
-    const existing = data.files.find(f => f.path === filePath);
-    if (existing) {
-      existing.changeCount = (existing.changeCount || 1) + 1;
-      existing.linesAdded += linesAdded;
-      existing.linesRemoved += linesRemoved;
-      existing.lastModified = now();
-    } else {
-      data.files.push({
-        path: filePath,
-        changeType,
-        linesAdded,
-        linesRemoved,
-        changeCount: 1,
-        lastModified: now(),
-      });
-    }
-
-    totalAdded += linesAdded;
-    totalRemoved += linesRemoved;
-    filesLogged.push(filePath);
+  if (filesLogged.length === 0) {
+    return { success: true, message: '没有检测到文件变更', filesLogged: 0 };
   }
 
   data.summary.filesChanged = data.files.length;

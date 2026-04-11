@@ -1,5 +1,5 @@
 import { configPath } from '../../utils/paths.js';
-import { fileExists, readText, writeText } from '../../utils/fs.js';
+import { fileExists, readText, writeText, extractConflictSections } from '../../utils/fs.js';
 import { green, red, cyan, yellow, dim } from '../../utils/display.js';
 import {
   loadRegistry,
@@ -9,6 +9,7 @@ import {
   mergeRegistries,
   registryPath,
 } from '../../utils/rules.js';
+import { updateGuide, updateGuideReferences } from '../../utils/guide.js';
 import type { RuleRegistryEntry } from '../../schemas/run-json.js';
 
 function subcommand(): string {
@@ -19,6 +20,8 @@ async function rulesBuild(): Promise<void> {
   const projectRoot = process.cwd();
   const count = buildRuleViews(projectRoot);
   const entries = loadRegistry(projectRoot);
+  updateGuide(projectRoot);
+  updateGuideReferences(projectRoot);
   console.log(
     green(`\n  ✓ Rules views rebuilt`) +
     `: ${entries.length} rules → ${count} category files\n`,
@@ -73,13 +76,11 @@ async function rulesMerge(): Promise<void> {
     return;
   }
 
-  // Extract both sides from conflict markers
+  // Extract both sides using line-based parsing (handles diff3 format and edge cases)
   console.log(yellow('\n  Merge conflict detected in rules.json. Resolving...\n'));
 
-  const oursMatch = raw.match(/<<<<<<< .*?\n([\s\S]*?)=======/);
-  const theirsMatch = raw.match(/=======\n([\s\S]*?)>>>>>>> /);
-
-  if (!oursMatch || !theirsMatch) {
+  const sections = extractConflictSections(raw);
+  if (!sections) {
     console.log(red('  Could not parse conflict markers. Please resolve manually.\n'));
     return;
   }
@@ -88,21 +89,21 @@ async function rulesMerge(): Promise<void> {
   let theirs: RuleRegistryEntry[] = [];
 
   try {
-    ours = JSON.parse(oursMatch[1].trim());
+    ours = JSON.parse(sections.ours || '[]');
   } catch {
-    // Ours might be partial, try to wrap in array
-    try { ours = JSON.parse(`[${oursMatch[1].trim()}]`); } catch { /* empty */ }
+    try { ours = JSON.parse(`[${sections.ours}]`); } catch { /* empty */ }
   }
 
   try {
-    theirs = JSON.parse(theirsMatch[1].trim());
+    theirs = JSON.parse(sections.theirs || '[]');
   } catch {
-    try { theirs = JSON.parse(`[${theirsMatch[1].trim()}]`); } catch { /* empty */ }
+    try { theirs = JSON.parse(`[${sections.theirs}]`); } catch { /* empty */ }
   }
 
   const { merged, added } = mergeRegistries(ours, theirs);
   saveRegistry(projectRoot, merged);
   buildRuleViews(projectRoot);
+  updateGuideReferences(projectRoot);
 
   console.log(
     green(`  ✓ Merged successfully`) +
