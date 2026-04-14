@@ -10,8 +10,8 @@ import type { IndexData, RequirementData } from '../src/schemas/run-json.js';
 let tmpRoot: string;
 
 function setupProject(): string {
-  tmpRoot = mkdtempSync(join(tmpdir(), 'aidevos-reindex-'));
-  const aidevos = resolve(tmpRoot, '.aidevos');
+  tmpRoot = mkdtempSync(join(tmpdir(), 'aida-reindex-'));
+  const aidevos = resolve(tmpRoot, '.aida');
   ensureDir(aidevos);
   writeJson(resolve(aidevos, 'config.json'), { project: 'test-proj' });
   ensureDir(resolve(aidevos, 'runs'));
@@ -23,7 +23,7 @@ function addBranch(root: string, branch: string, opts: {
   status?: string;
   title?: string;
 }): void {
-  const branchDir = resolve(root, '.aidevos', 'runs', branch);
+  const branchDir = resolve(root, '.aida', 'runs', branch);
   ensureDir(branchDir);
 
   const devs = opts.developers || [{ name: 'dev-a', tasks: 5, completedTasks: 3, bugs: 1, deviations: 0 }];
@@ -94,7 +94,7 @@ describe('buildIndex', () => {
   });
 
   it('should return -1 when no runs directory exists', () => {
-    const root = mkdtempSync(join(tmpdir(), 'aidevos-empty-'));
+    const root = mkdtempSync(join(tmpdir(), 'aida-empty-'));
     tmpRoot = root;
     const count = buildIndex(root);
     assert.equal(count, -1);
@@ -107,7 +107,7 @@ describe('buildIndex', () => {
     const count = buildIndex(root);
     assert.equal(count, 1);
 
-    const idx = readJson<IndexData>(resolve(root, '.aidevos', 'index.json'));
+    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
     assert.equal(idx.project, 'test-proj');
     assert.equal(idx.runs.length, 1);
     assert.equal(idx.runs[0].branch, 'feat-1');
@@ -125,7 +125,7 @@ describe('buildIndex', () => {
     const count = buildIndex(root);
     assert.equal(count, 3);
 
-    const idx = readJson<IndexData>(resolve(root, '.aidevos', 'index.json'));
+    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
     assert.equal(idx.runs.length, 3);
   });
 
@@ -139,7 +139,7 @@ describe('buildIndex', () => {
     });
 
     buildIndex(root);
-    const idx = readJson<IndexData>(resolve(root, '.aidevos', 'index.json'));
+    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
     const run = idx.runs[0];
 
     assert.equal(run.totals.tasks, 15);
@@ -154,13 +154,13 @@ describe('buildIndex', () => {
     addBranch(root, 'feat-done', { status: 'completed' });
 
     buildIndex(root);
-    const idx = readJson<IndexData>(resolve(root, '.aidevos', 'index.json'));
+    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
     assert.equal(idx.runs[0].status, 'completed');
   });
 
   it('should set status to running when any developer is not completed', () => {
     const root = setupProject();
-    const branchDir = resolve(root, '.aidevos', 'runs', 'feat-mixed');
+    const branchDir = resolve(root, '.aida', 'runs', 'feat-mixed');
     ensureDir(branchDir);
 
     const now = new Date().toISOString();
@@ -181,14 +181,14 @@ describe('buildIndex', () => {
     }
 
     buildIndex(root);
-    const idx = readJson<IndexData>(resolve(root, '.aidevos', 'index.json'));
+    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
     assert.equal(idx.runs[0].status, 'running');
   });
 
   it('should skip branches without requirement.json', () => {
     const root = setupProject();
     // Create a branch directory with only run.json, no requirement.json
-    const branchDir = resolve(root, '.aidevos', 'runs', 'orphan');
+    const branchDir = resolve(root, '.aida', 'runs', 'orphan');
     const devDir = resolve(branchDir, 'dev-a');
     ensureDir(devDir);
     writeJson(resolve(devDir, 'run.json'), { meta: {} });
@@ -202,7 +202,7 @@ describe('buildIndex', () => {
     addBranch(root, 'feat-1', {});
     buildIndex(root);
 
-    const idx = readJson<IndexData>(resolve(root, '.aidevos', 'index.json'));
+    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
     assert.ok(idx.updatedAt);
     // Should be a valid ISO date
     assert.ok(!isNaN(new Date(idx.updatedAt).getTime()));

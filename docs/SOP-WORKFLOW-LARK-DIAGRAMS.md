@@ -1,5 +1,7 @@
 # AIDevOS 流程图（飞书文本绘图格式）
 
+> Historical workflow reference. For the current public CLI and `.aida` asset flow, use [README.md](../README.md) and [COMMANDS.md](../COMMANDS.md) as the canonical docs.
+
 > 以下 Mermaid 代码块可直接粘贴到飞书文档中：
 > 输入 `/` → 选择「绘图」 → 粘贴对应代码即可渲染。
 
@@ -50,10 +52,10 @@ flowchart TD
 
     subgraph TS ["3. task-splitter（任务拆分器）"]
         TS_1["读取 analysis.md"]
-        TS_2["读取 .aidevos/rules/"]
+        TS_2["读取 .aida/rules/"]
         TS_3["识别 PRD 阶段"]
         TS_4["拆分为原子任务"]
-        TS_5["aidevos log task ..."]
+        TS_5["aida log task ..."]
         TS_1 --> TS_2 --> TS_3 --> TS_4 --> TS_5
     end
 
@@ -65,8 +67,8 @@ flowchart TD
         CG_1["读取第一个 pending 任务"]
         CG_2["读取项目规范 + 接口文档"]
         CG_3["严格按规范生成代码"]
-        CG_4["aidevos log file ...（记录文件变更）"]
-        CG_5["aidevos log task-done --id TASK-XX"]
+        CG_4["aida log file ...（记录文件变更）"]
+        CG_5["aida log task-done --id TASK-XX"]
         CG_1 --> CG_2 --> CG_3 --> CG_4 --> CG_5
     end
 
@@ -75,7 +77,7 @@ flowchart TD
     subgraph SR ["5. self-reviewer（质量自检员）"]
         SR_1["读取最近完成的任务"]
         SR_2["执行全维度自检"]
-        SR_3["aidevos log review ..."]
+        SR_3["aida log review ..."]
         SR_1 --> SR_2 --> SR_3
     end
 
@@ -87,8 +89,8 @@ flowchart TD
         BF_1["读取 fail 记录"]
         BF_2["定位问题文件"]
         BF_3["修复代码"]
-        BF_4["aidevos log bug ..."]
-        BF_5["aidevos log bug-fix ..."]
+        BF_4["aida log bug ..."]
+        BF_5["aida log bug-fix ..."]
         BF_1 --> BF_2 --> BF_3 --> BF_4 --> BF_5
     end
 
@@ -108,14 +110,14 @@ flowchart TD
         DR_2["提取偏差描述"]
         DR_3["判断根因"]
         DR_4["修复偏差代码"]
-        DR_5["aidevos log deviation ..."]
+        DR_5["aida log deviation ..."]
         DR_1 --> DR_2 --> DR_3 --> DR_4 --> DR_5
     end
 
     DR --> RULE_JUDGE{"根因是 rule-missing？"}
     RULE_JUDGE -->|"否"| DONE
     RULE_JUDGE -->|"是"| NATURE{"技术规范 or 业务逻辑？"}
-    NATURE -->|"技术规范"| SEDIMENT["创建 pending 规则\n正式沉淀到 .aidevos/rules/"]
+    NATURE -->|"技术规范"| SEDIMENT["创建 pending 规则\n正式沉淀到 .aida/rules/"]
     NATURE -->|"业务逻辑"| NO_SEDIMENT["仅记录偏差，不沉淀"]
     SEDIMENT --> DONE
     NO_SEDIMENT --> DONE
@@ -133,13 +135,13 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["取出第一个 pending 任务"] --> B["code-generator 生成代码"]
-    B --> C["记录文件变更\naidevos log file --path ... --change-type ... --lines-added ... --lines-removed ..."]
-    C --> D["标记任务完成\naidevos log task-done --id TASK-XX"]
-    D --> E["self-reviewer 质量自检\naidevos log review --task-id TASK-XX --result ..."]
+    B --> C["记录文件变更\naida log file --path ... --change-type ... --lines-added ... --lines-removed ..."]
+    C --> D["标记任务完成\naida log task-done --id TASK-XX"]
+    D --> E["self-reviewer 质量自检\naida log review --task-id TASK-XX --result ..."]
     E --> F{"自检结果"}
     F -->|"PASS"| G{"还有待执行任务？"}
-    F -->|"FAIL"| H["bug-fixer 修复\naidevos log bug ...\naidevos log bug-fix ..."]
-    H --> I["记录修复文件变更\naidevos log file ..."]
+    F -->|"FAIL"| H["bug-fixer 修复\naida log bug ...\naida log bug-fix ..."]
+    H --> I["记录修复文件变更\naida log file ..."]
     I -->|"重新自检"| E
     G -->|"是"| A
     G -->|"否"| J["所有任务完成"]
@@ -158,15 +160,15 @@ flowchart TD
     B --> C["提取偏差描述"]
     C --> D["回顾项目规范判断根因"]
     D --> E["修复偏差代码"]
-    E --> F["aidevos log deviation ..."]
+    E --> F["aida log deviation ..."]
     F --> G{"根因类别"}
     G -->|"rule-missing"| H{"技术规范 or 业务逻辑？"}
     G -->|"其他根因"| K["仅记录偏差"]
 
-    H -->|"技术规范\n（无业务逻辑）"| I["创建 pending 规则\naidevos log rule --status pending"]
+    H -->|"技术规范\n（无业务逻辑）"| I["创建 pending 规则\naida log rule --status pending"]
     H -->|"业务逻辑\n（有业务逻辑）"| J["不沉淀规则"]
 
-    I --> L["正式沉淀到 .aidevos/rules/*.md\naidevos log rule --file ..."]
+    I --> L["正式沉淀到 .aida/rules/*.md\naida log rule --file ..."]
 
     subgraph TECH ["技术规范示例"]
         T1["el-dialog 内 Table 需要 min-height"]

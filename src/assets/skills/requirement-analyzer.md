@@ -1,7 +1,7 @@
 ---
 name: requirement-analyzer
 description: 分析需求文档，对比 PRD 与已有代码/规则，提取需实现的功能点及约束。
-globs: ['.aidevos/runs/*/prd.md', '.aidevos/runs/*/prd*.md', '.aidevos/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/prd.md', '.aida/runs/*/prd*.md', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 ---
 
 # requirement-analyzer (需求分析器)
@@ -14,8 +14,8 @@ globs: ['.aidevos/runs/*/prd.md', '.aidevos/runs/*/prd*.md', '.aidevos/rules/*.m
 
 > **[run_id]**：当前需求/功能的唯一标识
 > **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。
-> **分支目录**：`.aidevos/runs/[run_id]/`（共享：prd.md、analysis.md、requirement.json）
-> **开发者目录**：`.aidevos/runs/[run_id]/[dev_name]/`（个人：run.json）
+> **分支目录**：`.aida/runs/[run_id]/`（共享：prd.md、analysis.md、requirement.json）
+> **开发者目录**：`.aida/runs/[run_id]/[dev_name]/`（个人：run.json）
 
 ## 执行步骤
 
@@ -37,7 +37,7 @@ globs: ['.aidevos/runs/*/prd.md', '.aidevos/runs/*/prd*.md', '.aidevos/rules/*.m
 
    **c) 读取项目规范：**
    - 读取项目所有规范，确保分析结果符合项目全局约束：
-     - **AIDevOS 规则**：`.aidevos/rules/` 下的所有 `.md` 文件
+     - **AIDevOS 规则**：`.aida/rules/` 下的所有 `.md` 文件
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
 
 2. **提取核心信息：**

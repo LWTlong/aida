@@ -1,7 +1,7 @@
 ---
 name: dashboard-generator
 description: 根据 run.json 数据自动生成/更新数据看板。现已由 `aida dashboard` CLI 命令替代（实时 Web Dashboard）。
-globs: ['.aidevos/runs/*/*/run.json']
+globs: ['.aida/runs/*/*/run.json']
 ---
 
 # dashboard-generator (数据看板生成器)
@@ -16,7 +16,7 @@ globs: ['.aidevos/runs/*/*/run.json']
 
 > **[run_id]**：当前需求/功能的唯一标识
 > **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。
-> **数据根目录**：`.aidevos/runs/[run_id]/[dev_name]/`
+> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`
 > **数据源**：`run.json`（单一数据源）
 
 ## 数据源 (run.json 字段映射)

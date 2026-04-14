@@ -1,5 +1,7 @@
 # aiDevOS - AI Development SOP
 
+> Historical design reference. The canonical current user-facing docs are [README.md](../README.md) and [COMMANDS.md](../COMMANDS.md). Some workflow artifacts in this file, such as `context.md` and the older `needs/` structure, describe earlier prototypes rather than the current `.aida` CLI flow.
+
 > 基于 frontend-msg-admin 项目真实开发流程提取，所有阶段、文件、数据结构均来自实际运行验证。
 
 ---
@@ -321,7 +323,7 @@ Step 5: 结束
 ## 第三步：通用目录结构设计
 
 ```
-.aidevos/
+.aida/
   config.json                   # 全局配置（项目名、技术栈、默认分支等）
 
   skills/                       # 通用 SOP Skill 定义
@@ -391,17 +393,17 @@ Step 5: 结束
 
 | 目录 | 原项目对应 | 变更原因 |
 |------|-----------|----------|
-| `.aidevos/skills/` | `.cursor/skills/` | 去除 Cursor 绑定，通用化 |
-| `.aidevos/rules/` | `.cursor/rules/` | 同上 |
-| `.aidevos/runs/` | `needs/` | 语义更明确，每次需求是一次 "run" |
+| `.aida/skills/` | `.cursor/skills/` | 去除 Cursor 绑定，通用化 |
+| `.aida/rules/` | `.cursor/rules/` | 同上 |
+| `.aida/runs/` | `needs/` | 语义更明确，每次需求是一次 "run" |
 | `run.json` | 无（新增） | 机器可读的运行元数据 |
-| `.aidevos/templates/` | 无（新增） | 初始化文件模板 |
+| `.aida/templates/` | 无（新增） | 初始化文件模板 |
 
 ---
 
 ## 第四步：开发数据模型 — run.json Schema (v1)
 
-> 文件位置：`.aidevos/runs/{runId}/run.json`
+> 文件位置：`.aida/runs/{runId}/run.json`
 > 该 JSON 文件记录一次 AI 开发运行的完整数据，是 dashboard、CLI 查询、中断恢复的统一数据源。
 
 ### 4.1 Meta（运行元信息）
@@ -581,7 +583,7 @@ Step 5: 结束
       "smsTemplate/form.vue"
     ],
     "ruleSedimented": {
-      "file": ".aidevos/rules/component-usage.md",
+      "file": ".aida/rules/component-usage.md",
       "content": "FormJ 属性必须直接以 attrs 形式传入"
     }
   }
@@ -765,7 +767,7 @@ rule_sedimented | workflow_stage_changed | build_verified
 "rules": [
   {
     "ruleId": "RULE-001",
-    "file": ".aidevos/rules/component-usage.md",
+    "file": ".aida/rules/component-usage.md",
     "content": "编辑页 FormJ 必须 labelPosition: top",
     "sourceDeviation": "DEV-002",
     "sedimentedAt": "2026-03-09T00:00:00Z"
@@ -861,10 +863,10 @@ rule_sedimented | workflow_stage_changed | build_verified
 
 ```bash
 # 初始化 aiDevOS（在项目根目录执行）
-aidevos init
+aida init
 
 # 执行内容：
-# 1. 创建 .aidevos/ 目录结构
+# 1. 创建 .aida/ 目录结构
 # 2. 扫描项目技术栈，生成 config.json
 # 3. 生成通用 skills/ 和 rules/ 占位
 # 4. 提示用户补充项目规范
@@ -875,15 +877,15 @@ aidevos init
 
 ```bash
 # 创建新需求运行
-aidevos run create <feature-id>
+aida run create <feature-id>
 # → 创建 runs/<feature-id>/<developer>/ 目录 + 初始化模板文件
 
 # 查看当前运行状态
-aidevos run status
+aida run status
 # → 读取 context.md + process.md，显示当前阶段和进度
 
 # 恢复中断的运行
-aidevos run resume
+aida run resume
 # → 读取 context.md，从中断点继续执行
 ```
 
@@ -891,50 +893,50 @@ aidevos run resume
 
 ```bash
 # 启动完整工作流（等价于 /workflow-orchestrator）
-aidevos workflow start
+aida workflow start
 # → PRD → Analysis → Task → Code → Review → 循环直到完成
 
 # 执行单个阶段
-aidevos workflow step <stage>
+aida workflow step <stage>
 # stage: analyze | split | code | review | fix
 
 # 示例：
-aidevos workflow step analyze   # 等价于 /analyze
-aidevos workflow step split     # 等价于 /split
-aidevos workflow step code      # 等价于 /gen
-aidevos workflow step review    # 等价于 /self-reviewer
-aidevos workflow step fix       # 等价于 /bug-fixer
+aida workflow step analyze   # 等价于 /analyze
+aida workflow step split     # 等价于 /split
+aida workflow step code      # 等价于 /gen
+aida workflow step review    # 等价于 /self-reviewer
+aida workflow step fix       # 等价于 /bug-fixer
 ```
 
 ### 5.4 辅助命令
 
 ```bash
 # 文档转换
-aidevos convert <file.docx> [output.md]
+aida convert <file.docx> [output.md]
 # 等价于 /docx
 
 # 记录偏差
-aidevos deviation <description>
+aida deviation <description>
 # 等价于 /deviation
 
 # 生成数据看板
-aidevos dashboard
+aida dashboard
 # 等价于 /dashboard
 
 # 提交代码
-aidevos commit
+aida commit
 # 等价于 /commit-code
 
 # MCP 高级审查
-aidevos mcp-review
+aida mcp-review
 # 等价于人工触发 mcp-reviewer
 
 # 规则演进
-aidevos rules evolve
+aida rules evolve
 # 等价于 /evolve
 
 # 项目审计
-aidevos audit
+aida audit
 # 等价于 /audit
 ```
 
@@ -942,39 +944,39 @@ aidevos audit
 
 ```bash
 # 查看任务进度
-aidevos tasks [--stage <n>] [--status pending|completed]
+aida tasks [--stage <n>] [--status pending|completed]
 
 # 查看 Bug 列表
-aidevos bugs [--status open|fixed]
+aida bugs [--status open|fixed]
 
 # 查看偏差统计
-aidevos deviations [--category] [--root-cause]
+aida deviations [--category] [--root-cause]
 
 # 查看自检历史
-aidevos reviews [--result pass|fail]
+aida reviews [--result pass|fail]
 
 # 导出运行数据（JSON）
-aidevos export [--format json|csv]
+aida export [--format json|csv]
 ```
 
 ### 5.6 CLI 与 Skill 的映射关系
 
 | CLI 命令 | 原 Skill | 原触发词 |
 |---------|----------|----------|
-| `aidevos init` | `dev-flower` | `/dev` |
-| `aidevos workflow start` | `workflow-orchestrator` | `/workflow-orchestrator` |
-| `aidevos workflow step analyze` | `requirement-analyzer` | `/analyze` |
-| `aidevos workflow step split` | `task-splitter` | `/split` |
-| `aidevos workflow step code` | `code-generator` | `/gen` |
-| `aidevos workflow step review` | `self-reviewer` | `/self-reviewer` |
-| `aidevos workflow step fix` | `bug-fixer` | `/bug-fixer` |
-| `aidevos convert` | `docx-to-markdown` | `/docx` |
-| `aidevos deviation` | `deviation-recorder` | `/deviation` |
-| `aidevos dashboard` | `dashboard-generator` | `/dashboard` |
-| `aidevos commit` | `commit-code` | `/commit-code` |
-| `aidevos mcp-review` | `mcp-reviewer` | 人工 |
-| `aidevos rules evolve` | `rules-evolver` | `/evolve` |
-| `aidevos audit` | `audit` | `/audit` |
+| `aida init` | `dev-flower` | `/dev` |
+| `aida workflow start` | `workflow-orchestrator` | `/workflow-orchestrator` |
+| `aida workflow step analyze` | `requirement-analyzer` | `/analyze` |
+| `aida workflow step split` | `task-splitter` | `/split` |
+| `aida workflow step code` | `code-generator` | `/gen` |
+| `aida workflow step review` | `self-reviewer` | `/self-reviewer` |
+| `aida workflow step fix` | `bug-fixer` | `/bug-fixer` |
+| `aida convert` | `docx-to-markdown` | `/docx` |
+| `aida deviation` | `deviation-recorder` | `/deviation` |
+| `aida dashboard` | `dashboard-generator` | `/dashboard` |
+| `aida commit` | `commit-code` | `/commit-code` |
+| `aida mcp-review` | `mcp-reviewer` | 人工 |
+| `aida rules evolve` | `rules-evolver` | `/evolve` |
+| `aida audit` | `audit` | `/audit` |
 
 ---
 
@@ -1008,6 +1010,6 @@ aidevos export [--format json|csv]
 9. **commit-code**：git 操作流程（完全通用，无需改造）
 10. **docx-to-markdown**：文档转换（完全通用，无需改造）
 11. **mcp-reviewer**：深度审计框架（输出目录约定不变）
-12. **rules-evolver**：规则维护框架（操作对象从 `.cursor/rules/` 改为 `.aidevos/rules/`）
-13. **dev-flower**：母 Skill → 初始化脚手架（目标目录改为 `.aidevos/`）
-14. **audit**：代码与规则一致性审计（扫描目标改为 `.aidevos/`）
+12. **rules-evolver**：规则维护框架（操作对象从 `.cursor/rules/` 改为 `.aida/rules/`）
+13. **dev-flower**：母 Skill → 初始化脚手架（目标目录改为 `.aida/`）
+14. **audit**：代码与规则一致性审计（扫描目标改为 `.aida/`）

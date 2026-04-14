@@ -19,14 +19,14 @@ export const TEMPLATES_DIR = resolve(ASSETS_DIR, 'templates');
 /** Dashboard HTML file */
 export const DASHBOARD_FILE = resolve(PACKAGE_ROOT, 'src', 'dashboard', 'index.html');
 
-/** .aidevos directory in user's project */
-export function aidevosDir(projectRoot: string = process.cwd()): string {
-  return resolve(projectRoot, '.aidevos');
+/** .aida directory in user's project */
+export function aidaDir(projectRoot: string = process.cwd()): string {
+  return resolve(projectRoot, '.aida');
 }
 
 /** Runs directory */
 export function runsDir(projectRoot: string = process.cwd()): string {
-  return resolve(projectRoot, '.aidevos', 'runs');
+  return resolve(projectRoot, '.aida', 'runs');
 }
 
 /** Run data directory for a specific branch + developer */
@@ -36,7 +36,7 @@ export function runDir(
   devName: string,
 ): string {
   const safeBranch = branchName.replace(/\//g, '-');
-  return resolve(projectRoot, '.aidevos', 'runs', safeBranch, devName);
+  return resolve(projectRoot, '.aida', 'runs', safeBranch, devName);
 }
 
 /** Branch-level directory (shared PRD, analysis, requirement.json) */
@@ -45,7 +45,7 @@ export function branchDir(
   branchName: string,
 ): string {
   const safeBranch = branchName.replace(/\//g, '-');
-  return resolve(projectRoot, '.aidevos', 'runs', safeBranch);
+  return resolve(projectRoot, '.aida', 'runs', safeBranch);
 }
 
 /** Branch-level requirement.json path */
@@ -58,10 +58,10 @@ export function requirementPath(
 
 /** Project-level index.json path */
 export function indexPath(projectRoot: string = process.cwd()): string {
-  return resolve(projectRoot, '.aidevos', 'index.json');
+  return resolve(projectRoot, '.aida', 'index.json');
 }
 
 /** Config file path */
 export function configPath(projectRoot: string = process.cwd()): string {
-  return resolve(projectRoot, '.aidevos', 'config.json');
+  return resolve(projectRoot, '.aida', 'config.json');
 }

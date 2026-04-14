@@ -136,7 +136,7 @@ export function getRequirementData(
 }
 
 export function getIndexData(projectRoot: string): IndexData | null {
-  const idxPath = resolve(projectRoot, '.aidevos', 'index.json');
+  const idxPath = resolve(projectRoot, '.aida', 'index.json');
   if (!existsSync(idxPath)) return null;
   try {
     return JSON.parse(readFileSync(idxPath, 'utf-8'));
@@ -175,7 +175,7 @@ export function updateProjectConfig(
   projectRoot: string,
   updates: { hourlyRate?: number },
 ): boolean {
-  const cfgPath = resolve(projectRoot, '.aidevos', 'config.json');
+  const cfgPath = resolve(projectRoot, '.aida', 'config.json');
   try {
     let cfg: Record<string, any> = {};
     if (existsSync(cfgPath)) {

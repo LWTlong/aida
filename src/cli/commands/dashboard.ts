@@ -11,7 +11,7 @@ function loadDemoData(projectRoot: string): void {
   const demoPath = resolve(ASSETS_DIR, 'templates', 'demo-run.json');
   if (!existsSync(demoPath)) return;
 
-  const demoDir = resolve(projectRoot, '.aidevos', 'runs', 'demo-feature', 'demo-dev');
+  const demoDir = resolve(projectRoot, '.aida', 'runs', 'demo-feature', 'demo-dev');
   ensureDir(demoDir);
   const data = readJson<Record<string, any>>(demoPath);
   writeJson(resolve(demoDir, 'run.json'), data);

@@ -1,7 +1,9 @@
 import { configPath } from '../../utils/paths.js';
-import { fileExists, readText, writeText, extractConflictSections } from '../../utils/fs.js';
+import { fileExists, readText, extractConflictSections, parseConflictJsonArray } from '../../utils/fs.js';
 import { green, red, cyan, yellow, dim } from '../../utils/display.js';
 import {
+  addRule,
+  bootstrapRuleRegistry,
   loadRegistry,
   saveRegistry,
   buildRuleViews,
@@ -10,10 +12,40 @@ import {
   registryPath,
 } from '../../utils/rules.js';
 import { updateGuide, updateGuideReferences } from '../../utils/guide.js';
-import type { RuleRegistryEntry } from '../../schemas/run-json.js';
+import { RULE_CATEGORIES, type RuleRegistryEntry } from '../../schemas/run-json.js';
 
 function subcommand(): string {
   return process.argv[3] || '';
+}
+
+function commandArgs(): string[] {
+  return process.argv.slice(4);
+}
+
+function hasFlag(flag: string): boolean {
+  return commandArgs().includes(flag);
+}
+
+function parseCategory(args: string[]): string {
+  const idx = args.findIndex((arg) => arg === '--category' || arg === '-c');
+  if (idx === -1) return 'general';
+  const value = args[idx + 1];
+  if (!value) return 'general';
+  return value;
+}
+
+function parseContent(args: string[]): string {
+  const parts: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (arg === '--category' || arg === '-c') {
+      i++;
+      continue;
+    }
+    if (arg.startsWith('--category=')) continue;
+    parts.push(arg);
+  }
+  return parts.join(' ').trim();
 }
 
 async function rulesBuild(): Promise<void> {
@@ -30,7 +62,7 @@ async function rulesBuild(): Promise<void> {
 
 async function rulesDedupe(): Promise<void> {
   const projectRoot = process.cwd();
-  const entries = loadRegistry(projectRoot);
+  const entries = bootstrapRuleRegistry(projectRoot);
 
   if (entries.length === 0) {
     console.log(yellow('\n  No rules in registry.\n'));
@@ -55,68 +87,80 @@ async function rulesDedupe(): Promise<void> {
   }
 
   console.log(
-    dim('  To resolve: manually edit .aidevos/rules.json,') +
+    dim('  To resolve: manually edit .aida/rules.json,') +
     dim(' then run `aida rules build`.\n'),
   );
 }
 
-async function rulesMerge(): Promise<void> {
-  const projectRoot = process.cwd();
+export async function mergeRulesRegistry(projectRoot: string): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
   const regPath = registryPath(projectRoot);
 
   if (!fileExists(regPath)) {
-    console.log(yellow('\n  No rules.json found.\n'));
-    return;
+    return { status: 'missing' };
   }
 
-  // Check if the file has git merge conflict markers
   const raw = readText(regPath);
   if (!raw.includes('<<<<<<<') && !raw.includes('>>>>>>>')) {
-    console.log(green('\n  ✓ No merge conflicts detected in rules.json.\n'));
-    return;
+    return { status: 'no-conflict' };
   }
-
-  // Extract both sides using line-based parsing (handles diff3 format and edge cases)
-  console.log(yellow('\n  Merge conflict detected in rules.json. Resolving...\n'));
 
   const sections = extractConflictSections(raw);
   if (!sections) {
-    console.log(red('  Could not parse conflict markers. Please resolve manually.\n'));
-    return;
+    return { status: 'error' };
   }
 
-  let ours: RuleRegistryEntry[] = [];
-  let theirs: RuleRegistryEntry[] = [];
-
-  try {
-    ours = JSON.parse(sections.ours || '[]');
-  } catch {
-    try { ours = JSON.parse(`[${sections.ours}]`); } catch { /* empty */ }
-  }
-
-  try {
-    theirs = JSON.parse(sections.theirs || '[]');
-  } catch {
-    try { theirs = JSON.parse(`[${sections.theirs}]`); } catch { /* empty */ }
-  }
+  const ours = parseConflictJsonArray<RuleRegistryEntry>(sections.ours);
+  const theirs = parseConflictJsonArray<RuleRegistryEntry>(sections.theirs);
 
   const { merged, added } = mergeRegistries(ours, theirs);
   saveRegistry(projectRoot, merged);
   buildRuleViews(projectRoot);
   updateGuideReferences(projectRoot);
 
-  console.log(
-    green(`  ✓ Merged successfully`) +
-    `: ${merged.length} total rules (${added} new from incoming branch)\n`,
-  );
+  return { status: 'merged', added, total: merged.length };
+}
+
+async function rulesMerge(): Promise<void> {
+  const projectRoot = process.cwd();
+  const regPath = registryPath(projectRoot);
+  if (!fileExists(regPath)) {
+    console.log(yellow('\n  No rules.json found.\n'));
+    return;
+  }
+  const raw = readText(regPath);
+  if (!raw.includes('<<<<<<<') && !raw.includes('>>>>>>>')) {
+    console.log(green('\n  ✓ No merge conflicts detected in rules.json.\n'));
+    return;
+  }
+  console.log(yellow('\n  Merge conflict detected in rules.json. Resolving...\n'));
+  const result = await mergeRulesRegistry(projectRoot);
+  if (result.status === 'error') {
+    console.log(red('  Could not parse conflict markers. Please resolve manually.\n'));
+    return;
+  }
+  if (result.status === 'merged') {
+    console.log(
+      green('  ✓ Merged successfully') +
+      `: ${result.total} total rules (${result.added} new from incoming branch)\n`,
+    );
+  }
 }
 
 async function rulesList(): Promise<void> {
   const projectRoot = process.cwd();
-  const entries = loadRegistry(projectRoot);
+  const entries = bootstrapRuleRegistry(projectRoot);
 
   if (entries.length === 0) {
+    if (hasFlag('--json')) {
+      console.log('[]');
+      return;
+    }
     console.log(yellow('\n  No rules in registry.\n'));
+    return;
+  }
+
+  if (hasFlag('--json')) {
+    console.log(JSON.stringify(entries, null, 2));
     return;
   }
 
@@ -140,6 +184,82 @@ async function rulesList(): Promise<void> {
   }
 }
 
+async function rulesAdd(): Promise<void> {
+  const projectRoot = process.cwd();
+  const args = commandArgs();
+  bootstrapRuleRegistry(projectRoot);
+  const content = parseContent(args);
+  const categoryFlag = args.find((arg) => arg.startsWith('--category='));
+  const category = categoryFlag ? categoryFlag.split('=').slice(1).join('=').trim() : parseCategory(args);
+
+  if (!content) {
+    console.log(red('\n  Usage: aida rules add "rule content" [--category <category>]\n'));
+    return;
+  }
+
+  if (!RULE_CATEGORIES.includes(category as typeof RULE_CATEGORIES[number])) {
+    console.log(red(`\n  Invalid category: ${category}\n`));
+    console.log(dim(`  Allowed: ${RULE_CATEGORIES.join(', ')}\n`));
+    return;
+  }
+
+  const { entry, isDuplicate } = addRule(projectRoot, {
+    content,
+    category,
+    branch: 'manual',
+    deviation: null,
+    author: 'manual',
+    status: 'active',
+  });
+
+  buildRuleViews(projectRoot);
+  updateGuide(projectRoot);
+  updateGuideReferences(projectRoot);
+
+  if (isDuplicate) {
+    console.log(yellow(`\n  Rule already exists: ${entry.id}\n`));
+    return;
+  }
+
+  console.log(green(`\n  ✓ Rule added`) + `: ${entry.id} (${entry.category})\n`);
+}
+
+async function rulesDelete(): Promise<void> {
+  const projectRoot = process.cwd();
+  const ruleId = commandArgs()[0];
+
+  if (!ruleId) {
+    console.log(red('\n  Usage: aida rules delete <RULE-ID>\n'));
+    return;
+  }
+
+  const entries = loadRegistry(projectRoot);
+  if (entries.length === 0) {
+    bootstrapRuleRegistry(projectRoot);
+  }
+  const current = loadRegistry(projectRoot);
+  const entry = current.find((item) => item.id === ruleId);
+
+  if (!entry) {
+    console.log(red(`\n  Rule not found: ${ruleId}\n`));
+    return;
+  }
+
+  if (entry.status === 'deprecated') {
+    console.log(yellow(`\n  Rule already deprecated: ${ruleId}\n`));
+    return;
+  }
+
+  entry.status = 'deprecated';
+  saveRegistry(projectRoot, current);
+  buildRuleViews(projectRoot);
+  updateGuide(projectRoot);
+  updateGuideReferences(projectRoot);
+
+  console.log(green(`\n  ✓ Rule deprecated`) + `: ${ruleId}`);
+  console.log(dim('  Re-run `aida rules list` to verify status, or `aida build` to rebuild all targets.\n'));
+}
+
 export async function rules(): Promise<void> {
   const projectRoot = process.cwd();
 
@@ -157,6 +277,12 @@ export async function rules(): Promise<void> {
       return rulesDedupe();
     case 'merge':
       return rulesMerge();
+    case 'add':
+      return rulesAdd();
+    case 'delete':
+    case 'rm':
+    case 'deprecate':
+      return rulesDelete();
     case 'list':
     case 'ls':
       return rulesList();
@@ -165,13 +291,15 @@ export async function rules(): Promise<void> {
   ${cyan('aida rules')} - Manage project rules registry
 
   Subcommands:
-    build     Rebuild .aidevos/rules/*.md views from rules.json
+    add       Add one rule and auto-build views
+    build     Rebuild .aida/rules/*.md views from rules.json
+    delete    Deprecate one rule by ID
     dedupe    Find potential duplicate or conflicting rules
     merge     Auto-resolve git merge conflicts in rules.json
-    list      List all rules grouped by category
+    list      List all rules grouped by category (--json supported)
 
-  The source of truth is .aidevos/rules.json (committed to git).
-  The .aidevos/rules/*.md files are auto-generated views (gitignored).
+  The source of truth is .aida/rules.json (committed to git).
+  The .aida/rules/*.md files are auto-generated views (gitignored).
 `);
   }
 }

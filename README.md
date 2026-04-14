@@ -14,16 +14,16 @@ One line to integrate. Zero workflow changes.
 { "mcpServers": { "aida": { "command": "npx", "args": ["-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-[![npm version](https://img.shields.io/badge/npm-v1.0.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
+[![npm version](https://img.shields.io/badge/npm-v1.1.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
-[![tests](https://img.shields.io/badge/tests-82%20passed-brightgreen)](#testing)
+[![tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
 [![Live Demo](https://img.shields.io/badge/🎯_Live_Demo-Interactive_Dashboard-FF4B4B)](https://lwtlong.github.io/ai-dev-analytics/)
 [![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/score.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
 [![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/card.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
-[One-Line Setup](#-30-second-setup) · [Data-Driven Loop](#-the-data-driven-loop) · [Dashboard](#-the-dashboard) · [SOP Workflow](#-standardized-ai-development-workflow) · [Data for Reports](#-data-sedimentation--performance-reports) · [中文文档](./README.zh-CN.md)
+[One-Line Setup](#-30-second-setup) · [Data-Driven Loop](#-the-data-driven-loop) · [Dashboard](#-the-dashboard) · [SOP Workflow](#-standardized-ai-development-workflow) · [Data for Reports](#-data-sedimentation--performance-reports) · [Commands](./COMMANDS.md) · [Docs](./docs/INDEX.md) · [中文文档](./README.zh-CN.md)
 
 </div>
 
@@ -60,7 +60,7 @@ Vibe Coding Session
    "9 deviations → 56% hallucination, 44% rule-missing"
         ↓
    Deviation patterns identified → AI suggests rules → user confirms → sedimented
-   .aidevos/rules/ ← your AI's growing knowledge base
+   .aida/rules/ ← your AI's growing knowledge base
         ↓
    AI reads rules next session → same mistakes eliminated
         ↓
@@ -86,7 +86,7 @@ Vibe Coding Session
 
 ![Deviation & Rule Trend](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png)
 
-The `.aidevos/rules/` directory is your **project-specific AI knowledge base**. It grows with every run. The more you use AI, the smarter it gets at *your* project.
+The `.aida/rules/` directory is your **project-specific AI knowledge base**. It grows with every run. The more you use AI, the smarter it gets at *your* project.
 
 ---
 
@@ -119,7 +119,15 @@ Run `npx ai-dev-analytics dashboard` to see **your own project's data** in secon
 
 ### 🔒 100% Local. Zero External Requests.
 
-AIDA writes JSON files to `.aidevos/` in your project directory. **The codebase contains zero HTTP calls to external services** — no telemetry, no cloud sync, no analytics, no tracking. Zero runtime dependencies. Your code and data never leave your machine. Period.
+AIDA writes JSON files to `.aida/` in your project directory. **The codebase contains zero HTTP calls to external services** — no telemetry, no cloud sync, no analytics, no tracking. Zero runtime dependencies. Your code and data never leave your machine. Period.
+
+## Command Reference
+
+Detailed CLI usage, command behavior, supported AI tools, merge/import/build flow, and migration notes are documented in [COMMANDS.md](./COMMANDS.md).
+
+## Documentation
+
+For public documentation navigation, schema references, workflow notes, and dashboard-related docs, see [docs/INDEX.md](./docs/INDEX.md).
 
 ---
 
@@ -248,7 +256,7 @@ Quarter: Complete development record — exportable, analyzable, presentable
 | **Team Leader Report** | Per-developer stats, deviation hotspots, which modules need better rules, team-wide AI maturity |
 | **Project Handover** | Full development history — someone new can see exactly what happened, what rules exist, and why |
 
-All data is structured JSON in `.aidevos/`. No vendor lock-in. Export it, query it, pipe it into any reporting tool. Run `aida report` to generate a summary at any time.
+All data is structured JSON in `.aida/`. No vendor lock-in. Export it, query it, pipe it into any reporting tool. Run `aida report` to generate a summary at any time.
 
 ---
 
@@ -257,9 +265,9 @@ All data is structured JSON in `.aidevos/`. No vendor lock-in. Export it, query 
 ```mermaid
 flowchart LR
     A["Your AI Tool\nClaude Code / Cursor"] -->|Vibe Coding| B{"AIDA MCP Server\n10 Tools"}
-    B -->|Silent Data Collection| C[".aidevos/run.json"]
+    B -->|Silent Data Collection| C[".aida/run.json"]
     C -->|Visualization| D["Dashboard\nlocalhost:2375"]
-    C -->|Pattern Analysis| E[".aidevos/rules/"]
+    C -->|Pattern Analysis| E[".aida/rules/"]
     E -->|AI Reads Rules| A
 ```
 
@@ -289,10 +297,10 @@ All data is local JSON. No database, no cloud.
 
 | Level | File | What it contains |
 |-------|------|-----------------|
-| **Run** | `.aidevos/runs/{branch}/{dev}/run.json` | Every task, bug, deviation, review, file change |
-| **Branch** | `.aidevos/runs/{branch}/requirement.json` | Aggregated stats per requirement |
-| **Project** | `.aidevos/index.json` | Cross-branch overview for team leads |
-| **Rules** | `.aidevos/rules/` | Sedimented project rules — your AI's growing knowledge base |
+| **Run** | `.aida/runs/{branch}/{dev}/run.json` | Every task, bug, deviation, review, file change |
+| **Branch** | `.aida/runs/{branch}/requirement.json` | Aggregated stats per requirement |
+| **Project** | `.aida/index.json` | Cross-branch overview for team leads |
+| **Rules** | `.aida/rules/` | Sedimented project rules — your AI's growing knowledge base |
 
 All structured JSON — ready for export, analysis, or feeding into reports.
 
@@ -380,16 +388,16 @@ Rules are the compounding asset of AIDA. Here's how they work in a team setting.
 ### Architecture
 
 ```
-.aidevos/rules.json        ← source of truth, committed to git
+.aida/rules.json        ← source of truth, committed to git
         ↓
 aida rules build
         ↓
-.aidevos/rules/*.md        ← auto-generated views, gitignored
+.aida/rules/*.md        ← auto-generated views, gitignored
         ↓
 AI reads rules next session
 ```
 
-`aida init` automatically adds `.aidevos/rules/*.md` to your `.gitignore`. Never edit the `.md` files manually — they are always regenerated from `rules.json`.
+`aida init` automatically adds `.aida/rules/*.md` to your `.gitignore`. Never edit the `.md` files manually — they are always regenerated from `rules.json`.
 
 ### Daily workflow
 
@@ -408,7 +416,7 @@ When two developers add rules on separate branches and merge, `rules.json` may g
 # After git merge produces a conflict in rules.json:
 aida rules merge   # fingerprint union — no duplicates, no lost rules
 aida rules build   # rebuild .md views
-git add .aidevos/rules.json
+git add .aida/rules.json
 git commit -m "merge: resolve rules conflict"
 ```
 

@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { getBranchName, getDevName } from '../../utils/git.js';
-import { aidevosDir, runDir, branchDir, configPath } from '../../utils/paths.js';
+import { aidaDir, runDir, branchDir, configPath } from '../../utils/paths.js';
 import {
   ensureDir,
   fileExists,
@@ -153,7 +153,7 @@ export async function start(): Promise<void> {
   const safeBranch = branch.replace(/\//g, '-');
 
   // Ensure .gitignore contains rules/*.md (auto-generated views)
-  ensureGitignoreEntry(projectRoot, '.aidevos/rules/*.md');
+  ensureGitignoreEntry(projectRoot, '.aida/rules/*.md');
 
   // Auto-rebuild rule views from registry so AI has fresh rules
   try {
@@ -173,9 +173,9 @@ export async function start(): Promise<void> {
   console.log('');
   console.log(
     green('  ✓ Created') +
-      ` .aidevos/runs/${safeBranch}/${dev}/run.json\n`,
+      ` .aida/runs/${safeBranch}/${dev}/run.json\n`,
   );
-  console.log(`  Shared PRD: .aidevos/runs/${safeBranch}/prd.md`);
+  console.log(`  Shared PRD: .aida/runs/${safeBranch}/prd.md`);
   console.log(
     `\n  Next: Place your PRD in the branch directory, then run ${cyan('/workflow')}\n`,
   );
@@ -196,6 +196,6 @@ function ensureGitignoreEntry(projectRoot: string, entry: string): void {
   const append = content.endsWith('\n') || content === '' ? '' : '\n';
   writeText(
     gitignorePath,
-    content + append + `# Auto-generated rule views (source of truth: .aidevos/rules.json)\n${entry}\n`,
+    content + append + `# Auto-generated rule views (source of truth: .aida/rules.json)\n${entry}\n`,
   );
 }

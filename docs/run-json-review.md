@@ -1,5 +1,7 @@
 # run.json Schema Review
 
+> Historical schema review note. Current runtime and asset-management behavior is documented in [README.md](../README.md) and [COMMANDS.md](../COMMANDS.md).
+
 > 基于 MTR-2995-temporary 真实运行数据（37 tasks / 5 bugs / 23 deviations / 4 reviews）逐字段审查。
 
 ---
@@ -262,7 +264,7 @@ document_conversion | analysis | task_decomposition | coding | review | bug_fix 
       "smsTemplate/form.vue"
     ],
     "ruleSedimented": {
-      "file": ".aidevos/rules/component-usage.md",
+      "file": ".aida/rules/component-usage.md",
       "content": "FormJ 属性必须直接以 attrs 形式传入"
     }
   }
@@ -406,7 +408,7 @@ rule_sedimented | workflow_stage_changed | build_verified
 "rules": [
   {
     "ruleId": "RULE-001",
-    "file": ".aidevos/rules/component-usage.md",
+    "file": ".aida/rules/component-usage.md",
     "content": "编辑页 FormJ 必须 labelPosition: top",
     "sourceDeviation": "DEV-002",
     "sedimentedAt": "2026-03-09T00:00:00Z"

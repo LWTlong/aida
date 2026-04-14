@@ -25,7 +25,7 @@ export function createTestProject(opts?: {
   dev?: string;
   runData?: Record<string, any>;
 }): TestProject {
-  const root = mkdtempSync(join(tmpdir(), 'aidevos-test-'));
+  const root = mkdtempSync(join(tmpdir(), 'aida-test-'));
   const branch = opts?.branch || 'test-branch';
   const dev = opts?.dev || 'test-dev';
   const safeBranch = branch.replace(/\//g, '-');
@@ -37,8 +37,8 @@ export function createTestProject(opts?: {
   // Create a branch with the right name
   execSync(`git checkout -b ${branch}`, { cwd: root, stdio: 'ignore' });
 
-  // Create .aidevos structure
-  const aidevos = resolve(root, '.aidevos');
+  // Create .aida structure
+  const aidevos = resolve(root, '.aida');
   ensureDir(aidevos);
   ensureDir(resolve(aidevos, 'rules'));
   ensureDir(resolve(aidevos, 'runs', safeBranch));
@@ -167,6 +167,24 @@ export function runCliOutput(project: TestProject, args: string): string {
       cwd: project.root,
       encoding: 'utf-8',
       stdio: 'pipe',
+      env: { ...process.env, HOME: project.root },
+    });
+  } catch (e: any) {
+    return e.stdout || '';
+  }
+}
+
+/**
+ * Run CLI with stdin input and return stdout.
+ */
+export function runCliWithInput(project: TestProject, args: string, input: string): string {
+  const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');
+  try {
+    return execSync(`node ${cliPath} ${args}`, {
+      cwd: project.root,
+      encoding: 'utf-8',
+      stdio: 'pipe',
+      input,
       env: { ...process.env, HOME: project.root },
     });
   } catch (e: any) {

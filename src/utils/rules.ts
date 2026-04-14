@@ -1,18 +1,18 @@
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
-import { fileExists, readJson, writeJson, writeText, ensureDir } from './fs.js';
-import { aidevosDir } from './paths.js';
+import { fileExists, readJson, writeJson, writeText, ensureDir, readText } from './fs.js';
+import { aidaDir } from './paths.js';
 import type { RuleRegistryEntry } from '../schemas/run-json.js';
 import { RULE_CATEGORIES } from '../schemas/run-json.js';
 
 // ─── Paths ────────────────────────────────────────────────
 
 export function registryPath(projectRoot: string): string {
-  return resolve(aidevosDir(projectRoot), 'rules.json');
+  return resolve(aidaDir(projectRoot), 'rules.json');
 }
 
 export function rulesViewDir(projectRoot: string): string {
-  return resolve(aidevosDir(projectRoot), 'rules');
+  return resolve(aidaDir(projectRoot), 'rules');
 }
 
 // ─── Fingerprint ──────────────────────────────────────────
@@ -44,6 +44,142 @@ export function loadRegistry(projectRoot: string): RuleRegistryEntry[] {
 
 export function saveRegistry(projectRoot: string, entries: RuleRegistryEntry[]): void {
   writeJson(registryPath(projectRoot), entries);
+}
+
+function categoryFromTitle(title: string): RuleRegistryEntry['category'] {
+  const normalized = title.trim().toLowerCase();
+  const mapping: Record<string, RuleRegistryEntry['category']> = {
+    component: 'component',
+    api: 'api',
+    style: 'style',
+    i18n: 'i18n',
+    architecture: 'architecture',
+    'state management': 'state-management',
+    routing: 'routing',
+    testing: 'testing',
+    process: 'process',
+    general: 'general',
+  };
+  return mapping[normalized] || 'general';
+}
+
+function parseRuleLines(
+  raw: string,
+  categoryHint?: string,
+): Array<Pick<RuleRegistryEntry, 'id' | 'category' | 'content' | 'status'>> {
+  const lines = raw.split('\n');
+  const parsed: Array<Pick<RuleRegistryEntry, 'id' | 'category' | 'content' | 'status'>> = [];
+  let currentCategory = categoryHint || 'general';
+
+  for (const line of lines) {
+    const headingMatch = line.match(/^##\s+(.+?)\s*$/);
+    if (headingMatch) {
+      currentCategory = categoryFromTitle(headingMatch[1].replace(/\s+Rules$/, ''));
+      continue;
+    }
+
+    const ruleMatch = line.match(/^- \[(RULE-\d+)\](?: \[([A-Z]+)\])?\s+(.+)$/);
+    if (ruleMatch) {
+      const status = ruleMatch[2]?.toLowerCase() === 'pending'
+        ? 'pending'
+        : ruleMatch[2]?.toLowerCase() === 'conflict'
+          ? 'conflict'
+          : 'active';
+      parsed.push({
+        id: ruleMatch[1],
+        category: currentCategory as RuleRegistryEntry['category'],
+        content: ruleMatch[3].trim(),
+        status,
+      });
+      continue;
+    }
+
+    const fallbackMatch = line.match(/^- (.+)$/);
+    if (fallbackMatch && !line.startsWith('<!--')) {
+      parsed.push({
+        id: '',
+        category: currentCategory as RuleRegistryEntry['category'],
+        content: fallbackMatch[1].trim(),
+        status: 'active',
+      });
+    }
+  }
+
+  return parsed.filter((entry) => entry.content.length > 0);
+}
+
+export function importRulesFromViews(projectRoot: string): { entries: RuleRegistryEntry[]; imported: number } {
+  const existing = loadRegistry(projectRoot);
+  const byFingerprint = new Map(existing.map((entry) => [entry.fingerprint, entry]));
+  const byId = new Map(existing.map((entry) => [entry.id, entry]));
+  const viewDir = rulesViewDir(projectRoot);
+  const now = new Date().toISOString();
+  const parsed: Array<Pick<RuleRegistryEntry, 'id' | 'category' | 'content' | 'status'>> = [];
+
+  const categoryFiles = ['component', 'api', 'style', 'i18n', 'architecture', 'state-management', 'routing', 'testing', 'process', 'general']
+    .map((category) => ({ category, path: resolve(viewDir, `${category}.md`) }))
+    .filter((entry) => fileExists(entry.path));
+
+  if (categoryFiles.length > 0) {
+    for (const file of categoryFiles) {
+      parsed.push(...parseRuleLines(readText(file.path), file.category));
+    }
+  } else {
+    const allPath = resolve(viewDir, '_all.md');
+    if (fileExists(allPath)) {
+      parsed.push(...parseRuleLines(readText(allPath)));
+    }
+  }
+
+  let imported = 0;
+  const merged = [...existing];
+
+  for (const item of parsed) {
+    const fp = fingerprint(item.content);
+    const existingByFingerprint = byFingerprint.get(fp);
+    if (existingByFingerprint) continue;
+
+    const existingById = item.id ? byId.get(item.id) : undefined;
+    if (existingById) {
+      existingById.category = item.category;
+      existingById.content = item.content;
+      existingById.fingerprint = fp;
+      existingById.status = item.status;
+      imported++;
+      byFingerprint.set(fp, existingById);
+      continue;
+    }
+
+    const entry: RuleRegistryEntry = {
+      id: item.id || nextRuleId(merged),
+      category: item.category,
+      content: item.content,
+      fingerprint: fp,
+      source: {
+        branch: 'imported',
+        deviation: null,
+        author: 'import',
+      },
+      createdAt: now,
+      status: item.status,
+    };
+    merged.push(entry);
+    byFingerprint.set(fp, entry);
+    byId.set(entry.id, entry);
+    imported++;
+  }
+
+  if (imported > 0 || existing.length === 0) {
+    saveRegistry(projectRoot, merged);
+  }
+
+  return { entries: merged, imported };
+}
+
+export function bootstrapRuleRegistry(projectRoot: string): RuleRegistryEntry[] {
+  const existing = loadRegistry(projectRoot);
+  if (existing.length > 0) return existing;
+  return importRulesFromViews(projectRoot).entries;
 }
 
 export function nextRuleId(entries: RuleRegistryEntry[]): string {
@@ -102,11 +238,11 @@ export function addRule(
 // ─── Build Views ──────────────────────────────────────────
 
 /**
- * Rebuild all .aidevos/rules/*.md from rules.json.
+ * Rebuild all .aida/rules/*.md from rules.json.
  * Returns the number of categories written.
  */
 export function buildRuleViews(projectRoot: string): number {
-  const entries = loadRegistry(projectRoot);
+  const entries = bootstrapRuleRegistry(projectRoot);
   const viewDir = rulesViewDir(projectRoot);
   ensureDir(viewDir);
 

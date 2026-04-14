@@ -1,12 +1,12 @@
 ---
 name: bug-fixer
 description: 处理自检不通过或测试产生的 Bug 缺陷。基于 review 结果或用户反馈进行专项修复，并将 Bug 记录写入 run.json.bugs[]。
-globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/*/run.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 ---
 
 # bug-fixer (缺陷修复器)
 
-> **铁律**：1) 修复后必须在 `run.json.bugs[]` 追加 Bug 记录并更新 `summary.bugCount` 2) 写入后输出 `✓ run.json updated: bugs[], summary` 3) 修复前必须回顾项目所有规范（`.aidevos/rules/`、`CLAUDE.md` 或 `.cursor/rules/*/*.md`）判断是否为规范偏离 4) 如属于 AI 偏差（非功能 Bug），建议用户使用 deviation-recorder 记录
+> **铁律**：1) 修复后必须在 `run.json.bugs[]` 追加 Bug 记录并更新 `summary.bugCount` 2) 写入后输出 `✓ run.json updated: bugs[], summary` 3) 修复前必须回顾项目所有规范（`.aida/rules/`、`CLAUDE.md` 或 `.cursor/rules/*/*.md`）判断是否为规范偏离 4) 如属于 AI 偏差（非功能 Bug），建议用户使用 deviation-recorder 记录
 
 ## 角色
 
@@ -16,7 +16,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 
 > **[run_id]**：当前需求/功能的唯一标识
 > **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。
-> **数据根目录**：`.aidevos/runs/[run_id]/[dev_name]/`
+> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`
 > **数据文件**：`run.json`
 
 ## 执行指令
@@ -27,7 +27,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 2. **定位与分析：**
    - 根据 Bug 的描述或错误堆栈，定位到具体的问题文件。
    - 回顾项目所有规范，以识别是不是架构偏离问题导致的：
-     - **AIDevOS 规则**：`.aidevos/rules/` 下的所有 `.md` 文件
+     - **AIDevOS 规则**：`.aida/rules/` 下的所有 `.md` 文件
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
 
 3. **修复策略执行：**

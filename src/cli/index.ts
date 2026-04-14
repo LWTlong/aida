@@ -36,6 +36,16 @@ async function main() {
       await dashboard();
       break;
     }
+    case 'build': {
+      const { build } = await import('./commands/build.js');
+      await build();
+      break;
+    }
+    case 'import': {
+      const { importSources } = await import('./commands/import.js');
+      await importSources();
+      break;
+    }
     case 'status': {
       const { status } = await import('./commands/status.js');
       await status();
@@ -56,6 +66,11 @@ async function main() {
       await migrate();
       break;
     }
+    case 'migrate-dir': {
+      const { migrateDir } = await import('./commands/migrate-dir.js');
+      await migrateDir();
+      break;
+    }
     case 'reindex': {
       const { reindex } = await import('./commands/reindex.js');
       await reindex();
@@ -66,9 +81,19 @@ async function main() {
       await report();
       break;
     }
+    case 'merge': {
+      const { merge } = await import('./commands/merge.js');
+      await merge();
+      break;
+    }
     case 'rules': {
       const { rules } = await import('./commands/rules.js');
       await rules();
+      break;
+    }
+    case 'skills': {
+      const { skills } = await import('./commands/skills.js');
+      await skills();
       break;
     }
     case 'mcp': {
@@ -84,14 +109,19 @@ async function main() {
     aida init        Initialize AIDA in current project
     aida start       Create a new development run
     aida mcp         Start MCP server (stdio mode, for AI tools)
+    aida build       Build rules/skills/tool configs from .aida sources
+    aida import      Reverse-read existing rules/skills/tool configs into JSON sources
     aida log         Write structured data to run.json
     aida dashboard   Launch the visualization dashboard
     aida status      Show current run status
     aida update      Update all skills to latest version
     aida migrate     Migrate old run.json data to new schema
+    aida migrate-dir Rename legacy .aidevos projects to .aida
     aida reindex     Rebuild project-level index from all runs
     aida report      Generate performance report data
+    aida merge       Merge rules.json and skills.json conflicts together
     aida rules       Manage project rules registry (build/dedupe/merge)
+    aida skills      Manage project skills registry (build/merge/list)
     aida -v          Show version
 `);
     }

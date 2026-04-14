@@ -7,7 +7,7 @@
 
 import { resolve } from 'node:path';
 import { getBranchName, getDevName } from './git.js';
-import { runDir, branchDir, configPath, aidevosDir } from './paths.js';
+import { runDir, branchDir, configPath, aidaDir } from './paths.js';
 import { ensureDir, fileExists, readJson, writeJson, writeText } from './fs.js';
 import { ensureGuide, syncGuideReference } from './guide.js';
 import type {
@@ -367,11 +367,11 @@ let _guideSynced = false;
 
 /**
  * Ensure run.json exists (lazy init).
- * Creates .aidevos/, config.json, run.json, branch-level files if missing.
+ * Creates .aida/, config.json, run.json, branch-level files if missing.
  */
 export function ensureRunJson(projectRoot: string): { path: string; data: RunData } {
-  // Ensure .aidevos/config.json exists
-  const dir = aidevosDir(projectRoot);
+  // Ensure .aida/config.json exists
+  const dir = aidaDir(projectRoot);
   if (!fileExists(resolve(dir, 'config.json'))) {
     ensureDir(dir);
     ensureDir(resolve(dir, 'rules'));

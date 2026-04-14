@@ -9,6 +9,8 @@ import {
 } from '../../utils/fs.js';
 import { bold, green, cyan, dim, yellow } from '../../utils/display.js';
 import { updateGuide, updateGuideReferences } from '../../utils/guide.js';
+import { seedBundledSkillRegistry } from '../../utils/skills.js';
+import { buildProjectArtifacts, readConfiguredTools } from '../../utils/ai-build.js';
 import * as readline from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
 
@@ -43,11 +45,12 @@ interface Config {
   aiTool: 'claude-code' | 'cursor';
   project: string;
   aiModel?: string;
+  aiTools?: ('claude-code' | 'cursor' | 'vscode-copilot' | 'windsurf' | 'lingma' | 'codex')[];
 }
 
 export async function update(): Promise<void> {
   const projectRoot = process.cwd();
-  const aidevos = resolve(projectRoot, '.aidevos');
+  const aidevos = resolve(projectRoot, '.aida');
   const configPath = resolve(aidevos, 'config.json');
 
   console.log(`\n  ${bold('AIDA')} - Update Skills\n`);
@@ -97,14 +100,14 @@ export async function update(): Promise<void> {
     }
   }
 
-  console.log(`  Found ${existingSkills.length} skills in .aidevos/skills/`);
+  console.log(`  Found ${existingSkills.length} skills in .aida/skills/`);
   console.log(`  Found ${existingCommands.length} quick commands in ${tool === 'claude-code' ? '.claude/commands/' : '.cursor/skills/'}`);
   console.log('');
 
   // Ask confirmation
   const rl = readline.createInterface({ input: stdin, output: stdout });
   console.log('  This will update all skills to the latest version.');
-  console.log(dim('  Old versions will be backed up to .aidevos/skills-backup/\n'));
+  console.log(dim('  Old versions will be backed up to .aida/skills-backup/\n'));
   const answer = (await rl.question('  Continue? (y/N) > ')).trim().toLowerCase();
   rl.close();
 
@@ -132,7 +135,7 @@ export async function update(): Promise<void> {
     console.log(green('  ✓ Backed up') + ` old skills to skills-backup-${timestamp}/`);
   }
 
-  // Update all skills to .aidevos/skills/
+  // Update all skills to .aida/skills/
   let updatedCount = 0;
   for (const skill of ALL_SKILLS) {
     const src = resolve(SKILLS_DIR, `${skill}.md`);
@@ -145,7 +148,8 @@ export async function update(): Promise<void> {
       updatedCount++;
     }
   }
-  console.log(green('  ✓ Updated') + ` ${updatedCount} skills in .aidevos/skills/`);
+  seedBundledSkillRegistry(projectRoot);
+  console.log(green('  ✓ Updated') + ` ${updatedCount} skills in .aida/skills/`);
 
   // Update quick commands
   let commandsUpdated = 0;
@@ -179,11 +183,16 @@ export async function update(): Promise<void> {
   // Update guide and AI tool rule files
   updateGuide(projectRoot);
   updateGuideReferences(projectRoot);
-  console.log(green('  ✓ Updated') + ' .aidevos/aida-guide.md and AI tool rule files');
+  console.log(green('  ✓ Updated') + ' .aida/aida-guide.md and AI tool rule files');
+
+  const tools = readConfiguredTools(projectRoot);
+  if (tools.length > 0) {
+    buildProjectArtifacts(projectRoot, tools);
+  }
 
   // Ensure .gitignore has required entries
   const gitignorePath = resolve(projectRoot, '.gitignore');
-  const gitignoreEntries = ['.aidevos/rules/*.md', '.aidevos/index.json'];
+  const gitignoreEntries = ['.aida/rules/*.md', '.aida/index.json'];
   const gitignoreExisting = fileExists(gitignorePath) ? readText(gitignorePath) : '';
   const toAdd = gitignoreEntries.filter((e) => !gitignoreExisting.includes(e));
   if (toAdd.length > 0) {

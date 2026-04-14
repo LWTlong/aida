@@ -173,7 +173,7 @@ describe('aidevos log rule', () => {
     assert.equal(data.summary.rulesSedimented, 1);
 
     // Check registry file also exists
-    const registry = readJson<any[]>(project.root + '/.aidevos/rules.json');
+    const registry = readJson<any[]>(project.root + '/.aida/rules.json');
     assert.equal(registry.length, 1);
     assert.equal(registry[0].category, 'component');
   });
@@ -318,7 +318,7 @@ describe('requirement.json sync', () => {
     runCli(project, 'log task-done --id TASK-01');
     runCli(project, 'log bug --title "B1" --severity low');
 
-    const reqPath = project.root + '/.aidevos/runs/' + project.branch + '/requirement.json';
+    const reqPath = project.root + '/.aida/runs/' + project.branch + '/requirement.json';
     const req = readJson<any>(reqPath);
 
     assert.equal(req.developers.length, 1);
