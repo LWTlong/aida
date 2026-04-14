@@ -14,7 +14,7 @@
 { "mcpServers": { "aida": { "command": "npx", "args": ["-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-[![npm version](https://img.shields.io/badge/npm-v1.1.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
+[![npm version](https://img.shields.io/badge/npm-v1.1.1-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen)](#测试)
@@ -345,6 +345,7 @@ PRD 接入 → 需求分析 → 任务拆分
 
 ```bash
 aida init              # 交互式初始化
+aida migrate-legacy    # 一条命令升级旧 .aidevos 项目
 aida start             # 创建新的开发运行
 aida status            # 查看当前运行状态
 aida dashboard         # 启动数据看板（默认端口 2375）
@@ -359,6 +360,8 @@ aida rules merge       # 合并并行分支的规则
 aida update            # 更新 Skills 到最新版本
 aida migrate           # 迁移旧数据到当前 schema
 ```
+
+`aida init` 和 `aida build` 现在在 TTY 终端中使用真正的多选交互；在非交互环境里会自动回退为逗号分隔数字输入，便于脚本和 CI 使用。
 
 </details>
 

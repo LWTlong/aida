@@ -270,7 +270,7 @@ export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[])
     entries.push('.mcp.json', '.claude/commands/*.md');
   }
   if (tools.includes('cursor')) {
-    entries.push('.cursor/mcp.json', '.cursor/skills/', '.cursor/rules/aidevos/');
+    entries.push('.cursor/mcp.json', '.cursor/skills/', '.cursor/rules/aida/');
   }
   if (tools.includes('vscode-copilot')) {
     entries.push('.vscode/mcp.json');

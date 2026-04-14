@@ -14,7 +14,7 @@ One line to integrate. Zero workflow changes.
 { "mcpServers": { "aida": { "command": "npx", "args": ["-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-[![npm version](https://img.shields.io/badge/npm-v1.1.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
+[![npm version](https://img.shields.io/badge/npm-v1.1.1-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
@@ -345,6 +345,7 @@ Every step produces structured data. Every deviation can become a rule. The SOP 
 
 ```bash
 aida init              # Interactive project setup
+aida migrate-legacy    # Upgrade legacy .aidevos project in one command
 aida start             # Create a new development run
 aida status            # Show current run status
 aida dashboard         # Launch dashboard (default port 2375)
@@ -359,6 +360,8 @@ aida rules merge       # Merge rules from parallel branches
 aida update            # Update skills to latest version
 aida migrate           # Migrate old data to current schema
 ```
+
+`aida init` and `aida build` now use interactive multi-select prompts in TTY terminals, with automatic fallback to comma-separated numeric input in non-interactive environments.
 
 </details>
 

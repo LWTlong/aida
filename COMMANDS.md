@@ -40,9 +40,15 @@ aida init
 ### Legacy project
 
 ```bash
+aida migrate-legacy
+```
+
+Or step by step when you want to choose the baseline tool explicitly:
+
+```bash
 aida migrate-dir
-aida import
-aida build
+aida import cursor
+aida migrate
 ```
 
 ### Team collaboration
@@ -74,6 +80,18 @@ Imports:
 - existing `.aida/skills/*/SKILL.md`
 - tool-specific config snapshots
 
+Examples:
+
+```bash
+aida import
+aida import cursor
+```
+
+Behavior:
+- no arg: import existing AIDA sources and discovered tool config snapshots
+- with baseline tool arg: import that tool's rules / skills first, then fold everything into `.aida/*.json`
+- rebuilds tool artifacts after import
+
 ### `aida build`
 
 Build rules, skills, MCP config, and tool-specific local artifacts from `.aida` sources.
@@ -88,10 +106,11 @@ aida build cursor codex
 ```
 
 Behavior:
-- no args: interactive target selection
+- no args: interactive multi-select target selection
 - with args: build selected targets only
 - updates `.gitignore`
 - `codex` build also syncs `~/.codex/config.toml`
+- non-TTY environments fall back to comma-separated number input
 
 ### `aida merge`
 
@@ -125,6 +144,26 @@ Behavior:
 - rewrites common path references in `.aida`, `AGENTS.md`, `CLAUDE.md`, `.gitignore`
 - no-op if project already uses `.aida`
 - aborts if both `.aidevos` and `.aida` exist
+
+### `aida migrate-legacy`
+
+One-shot migration for legacy `.aidevos` projects.
+
+Examples:
+
+```bash
+aida migrate-legacy
+aida migrate-legacy cursor
+```
+
+Behavior:
+- renames `.aidevos` to `.aida`
+- rewrites old path references, including guide paths
+- imports one baseline tool's local rules / skills into `.aida/*.json`
+- snapshots all discovered tool configs
+- rebuilds generated AIDA artifacts and updates `.gitignore`
+- runs `aida migrate` to upgrade historical run data schema
+- if multiple baseline tools are detectable, prompts with interactive single-select
 
 ### `aida start`
 

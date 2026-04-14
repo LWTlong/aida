@@ -217,7 +217,7 @@ export function updateGuideReferences(projectRoot: string, tools?: string[]): vo
         ensureGuideAtTop(projectRoot);
         break;
       case 'cursor': {
-        const rulesDir = resolve(projectRoot, '.cursor', 'rules', 'aidevos');
+        const rulesDir = resolve(projectRoot, '.cursor', 'rules', 'aida');
         ensureDir(rulesDir);
         writeText(resolve(rulesDir, 'aida-guide.md'), CURSOR_FRONTMATTER + GUIDE_CONTENT);
         break;
@@ -359,7 +359,7 @@ function insertAtTop(content: string, block: string): string {
 }
 
 function addCursorReference(projectRoot: string): void {
-  const rulesDir = resolve(projectRoot, '.cursor', 'rules', 'aidevos');
+  const rulesDir = resolve(projectRoot, '.cursor', 'rules', 'aida');
   ensureDir(rulesDir);
   const file = resolve(rulesDir, 'aida-guide.md');
   if (fileExists(file)) return;

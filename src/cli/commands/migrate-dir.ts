@@ -56,27 +56,24 @@ function walkAndReplace(rootDir: string): number {
   return updated;
 }
 
-export async function migrateDir(): Promise<void> {
-  const projectRoot = process.cwd();
+export function migrateLegacyDirectory(projectRoot: string): {
+  status: 'migrated' | 'already-current' | 'missing-legacy' | 'conflict'
+  updatedFiles: number
+} {
   const oldDir = resolve(projectRoot, '.aidevos');
   const newDir = resolve(projectRoot, '.aida');
 
   if (!fileExists(oldDir)) {
     if (fileExists(newDir)) {
-      console.log(green('\n  ✓ Project already uses .aida.\n'));
-      return;
+      return { status: 'already-current', updatedFiles: 0 };
     }
-    console.log(yellow('\n  No .aidevos directory found.\n'));
-    return;
+    return { status: 'missing-legacy', updatedFiles: 0 };
   }
 
   if (fileExists(newDir)) {
-    console.log(red('\n  Cannot migrate: both .aidevos and .aida exist.\n'));
-    console.log('  Resolve the duplicate directories first, then run `aida migrate-dir` again.\n');
-    return;
+    return { status: 'conflict', updatedFiles: 0 };
   }
 
-  console.log(cyan('\n  Migrating project directory: .aidevos -> .aida\n'));
   renameSync(oldDir, newDir);
 
   let updatedFiles = 0;
@@ -89,7 +86,32 @@ export async function migrateDir(): Promise<void> {
     }
   }
 
+  return { status: 'migrated', updatedFiles };
+}
+
+export async function migrateDir(): Promise<void> {
+  const projectRoot = process.cwd();
+  const result = migrateLegacyDirectory(projectRoot);
+
+  if (result.status === 'already-current') {
+    console.log(green('\n  ✓ Project already uses .aida.\n'));
+    return;
+  }
+
+  if (result.status === 'missing-legacy') {
+    console.log(yellow('\n  No .aidevos directory found.\n'));
+    return;
+  }
+
+  if (result.status === 'conflict') {
+    console.log(red('\n  Cannot migrate: both .aidevos and .aida exist.\n'));
+    console.log('  Resolve the duplicate directories first, then run `aida migrate-dir` again.\n');
+    return;
+  }
+
+  console.log(cyan('\n  Migrating project directory: .aidevos -> .aida\n'));
+
   console.log(green('  ✓ Directory renamed') + ': .aida');
-  console.log(green('  ✓ Updated references') + `: ${updatedFiles} text file(s)`);
+  console.log(green('  ✓ Updated references') + `: ${result.updatedFiles} text file(s)`);
   console.log('\n  Next step: run `aida build` to regenerate local AI tool artifacts.\n');
 }
