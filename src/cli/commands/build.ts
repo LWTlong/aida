@@ -1,9 +1,8 @@
-import * as readline from 'node:readline/promises';
-import { stdin, stdout } from 'node:process';
 import { green, red, yellow } from '../../utils/display.js';
 import { buildProjectArtifacts, readConfiguredTools, type AiToolChoice } from '../../utils/ai-build.js';
 import { configPath } from '../../utils/paths.js';
 import { fileExists } from '../../utils/fs.js';
+import { promptMultiSelect } from '../../utils/prompt.js';
 
 function requestedTools(): string[] {
   return process.argv.slice(3);
@@ -12,25 +11,11 @@ function requestedTools(): string[] {
 async function selectTools(configured: AiToolChoice[]): Promise<string[]> {
   const requested = requestedTools();
   if (requested.length > 0) return requested;
-
-  console.log('\n  Select AI tools to build (comma-separated numbers, Enter = all):\n');
-  configured.forEach((tool, index) => {
-    console.log(`    ${index + 1}) ${tool}`);
-  });
-  console.log('');
-
-  const rl = readline.createInterface({ input: stdin, output: stdout });
-  const answer = (await rl.question('  > ')).trim();
-  rl.close();
-
-  if (!answer) return configured;
-
-  const indices = answer
-    .split(',')
-    .map((item) => parseInt(item.trim(), 10))
-    .filter((num) => num >= 1 && num <= configured.length);
-
-  const selected = [...new Set(indices.map((num) => configured[num - 1]))];
+  const selected = await promptMultiSelect(
+    'Select AI tools to build:',
+    configured.map((tool) => ({ value: tool, label: tool })),
+    { required: false },
+  );
   return selected.length > 0 ? selected : configured;
 }
 

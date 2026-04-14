@@ -359,3 +359,25 @@ export function importProjectSources(projectRoot: string): {
     gitignoreAdded,
   };
 }
+
+export function importProjectSourcesWithBaseline(
+  projectRoot: string,
+  baselineTool: AiToolChoice,
+): {
+  rulesImported: number
+  skillsImported: number
+  tools: AiToolChoice[]
+  snapshotPath: string
+  gitignoreAdded: string[]
+  baseline: { rulesImported: number; skillsImported: number }
+} {
+  const baseline = importFromTool(projectRoot, baselineTool);
+  const imported = importProjectSources(projectRoot);
+
+  return {
+    ...imported,
+    rulesImported: imported.rulesImported + baseline.rulesImported,
+    skillsImported: imported.skillsImported + baseline.skillsImported,
+    baseline,
+  };
+}

@@ -16,6 +16,7 @@ import { ensureGuide, syncGuideReference, updateGuide, updateGuideReferences } f
 import { ensureBundledSkills, seedBundledSkillRegistry, getSkillContent } from '../../utils/skills.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { detectImportableTools, importExistingToolConfigs, importFromTool, mergeConfiguredTools } from '../../utils/import.js';
+import { promptMultiSelect, promptSingleSelect } from '../../utils/prompt.js';
 
 const QUICK_COMMANDS: { name: string; skill: string }[] = [
   { name: 'workflow', skill: 'workflow-orchestrator' },
@@ -72,6 +73,10 @@ function toolLabel(tool: AiToolChoice): string {
     codex: 'Codex',
   };
   return labels[tool];
+}
+
+function toolOptions(tools: AiToolChoice[]) {
+  return tools.map((tool) => ({ value: tool, label: toolLabel(tool) }));
 }
 
 function copyOptionalCommands(projectRoot: string, tools: AiToolChoice[], commands: { name: string; skill: string }[]): number {
@@ -146,32 +151,17 @@ export async function init(): Promise<void> {
     }
 
     // ── Option 1: Add a new AI tool ──────────────────────
-    const rl3 = readline.createInterface({ input: stdin, output: stdout });
-    console.log('\n  ? Which AI tool do you want to add? (comma-separated numbers):\n');
-    console.log('    1) Claude Code');
-    console.log('    2) Cursor');
-    console.log('    3) VS Code + Copilot');
-    console.log('    4) Windsurf');
-    console.log('    5) Lingma (通义灵码)\n');
-    console.log('    6) Codex\n');
-
-    const toolMap2: Record<string, AiToolChoice> = {
-      '1': 'claude-code', '2': 'cursor', '3': 'vscode-copilot', '4': 'windsurf', '5': 'lingma', '6': 'codex',
-    };
-    let newTools: AiToolChoice[] = [];
-    while (newTools.length === 0) {
-      const ans = (await rl3.question('  > ')).trim();
-      const nums = ans.split(',').map(s => s.trim());
-      for (const n of nums) {
-        if (toolMap2[n] && !existingTools.includes(toolMap2[n])) {
-          newTools.push(toolMap2[n]);
-        } else if (toolMap2[n] && existingTools.includes(toolMap2[n])) {
-          console.log(yellow(`  ${toolMap2[n]} is already configured, skipping.`));
-        }
-      }
-      if (newTools.length === 0) console.log(yellow('  No new tools selected. Please try again.'));
+    const candidates = (['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex'] as AiToolChoice[])
+      .filter((tool) => !existingTools.includes(tool));
+    if (candidates.length === 0) {
+      console.log(yellow('\n  All supported AI tools are already configured.\n'));
+      return;
     }
-    rl3.close();
+    const newTools = await promptMultiSelect(
+      'Select AI tool(s) to add:',
+      toolOptions(candidates),
+      { required: true },
+    );
 
     // Update config.json
     existingConfig.aiTools = [...existingTools, ...newTools];
@@ -201,54 +191,20 @@ export async function init(): Promise<void> {
   }
 
   // Step 2: Select AI tools (multi-select)
-  console.log('\n  ? Which AI tools do you use? (comma-separated numbers):\n');
-  console.log('    1) Claude Code');
-  console.log('    2) Cursor');
-  console.log('    3) VS Code + Copilot');
-  console.log('    4) Windsurf');
-  console.log('    5) Lingma (通义灵码)');
-  console.log('    6) Codex');
-  console.log('    7) All of the above\n');
-
-  const toolMap: Record<string, AiToolChoice> = {
-    '1': 'claude-code',
-    '2': 'cursor',
-    '3': 'vscode-copilot',
-    '4': 'windsurf',
-    '5': 'lingma',
-    '6': 'codex',
-  };
-  let selectedTools: AiToolChoice[] = [];
-  while (selectedTools.length === 0) {
-    const answer = (await rl.question('  > ')).trim();
-    if (answer === '7') {
-      selectedTools = ['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex'];
-    } else {
-      const nums = answer.split(',').map(s => s.trim());
-      for (const n of nums) {
-        if (toolMap[n]) selectedTools.push(toolMap[n]);
-      }
-    }
-    if (selectedTools.length === 0) console.log(yellow('  Please select at least one tool'));
-  }
+  const selectedTools = await promptMultiSelect(
+    'Which AI tools do you use?',
+    toolOptions(['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex']),
+    { required: true },
+  );
 
   const importableTools = detectImportableTools(projectRoot, selectedTools);
   let baselineTool: AiToolChoice | null = null;
   if (importableTools.length > 0) {
-    console.log('\n  ? Found existing tool rules/skills/config in this project.');
-    console.log('    Choose one baseline tool to import into AIDA JSON (press Enter to skip):\n');
-    importableTools.forEach((tool, index) => {
-      console.log(`    ${index + 1}) ${toolLabel(tool)}`);
-    });
-    console.log('');
-
-    const answer = (await rl.question('  > ')).trim();
-    if (answer) {
-      const idx = parseInt(answer, 10);
-      if (idx >= 1 && idx <= importableTools.length) {
-        baselineTool = importableTools[idx - 1];
-      }
-    }
+    baselineTool = await promptSingleSelect(
+      'Found existing tool rules/skills/config. Choose one baseline tool to import into AIDA JSON:',
+      toolOptions(importableTools),
+      { allowSkip: true },
+    );
   }
 
   // Step 3: AI model (only for full mode)
@@ -262,17 +218,13 @@ export async function init(): Promise<void> {
   // Step 4: Optional tools (only for full mode)
   const selectedOptional: typeof OPTIONAL_COMMANDS = [];
   if (mode === 'full') {
-    console.log('\n  ? Optional tools (comma-separated numbers, or press Enter to skip):\n');
-    OPTIONAL_COMMANDS.forEach((cmd, i) => {
-      console.log(`    ${i + 1}) ${cmd.name} - ${cmd.desc}`);
-    });
-    console.log('');
-    const optionsInput = (await rl.question('  > ')).trim();
-    if (optionsInput) {
-      const indices = optionsInput.split(',').map((s) => parseInt(s.trim())).filter(n => n > 0 && n <= OPTIONAL_COMMANDS.length);
-      for (const idx of indices) {
-        selectedOptional.push(OPTIONAL_COMMANDS[idx - 1]);
-      }
+    const optionalValues = await promptMultiSelect(
+      'Optional tools:',
+      OPTIONAL_COMMANDS.map((cmd) => ({ value: cmd.name, label: cmd.name, hint: cmd.desc })),
+      { required: false },
+    );
+    for (const cmd of OPTIONAL_COMMANDS) {
+      if (optionalValues.includes(cmd.name)) selectedOptional.push(cmd);
     }
   }
 
@@ -407,8 +359,8 @@ function syncIronRules(
       writeText(file, IRON_RULES_APPEND.trim() + '\n');
     }
   } else {
-    // Cursor: write to .cursor/rules/aidevos/iron-rules.md
-    const rulesDir = resolve(projectRoot, '.cursor', 'rules', 'aidevos');
+    // Cursor: write to .cursor/rules/aida/iron-rules.md
+    const rulesDir = resolve(projectRoot, '.cursor', 'rules', 'aida');
     ensureDir(rulesDir);
     const file = resolve(rulesDir, 'iron-rules.md');
     if (fileExists(file)) {

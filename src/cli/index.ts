@@ -71,6 +71,11 @@ async function main() {
       await migrateDir();
       break;
     }
+    case 'migrate-legacy': {
+      const { migrateLegacy } = await import('./commands/migrate-legacy.js');
+      await migrateLegacy();
+      break;
+    }
     case 'reindex': {
       const { reindex } = await import('./commands/reindex.js');
       await reindex();
@@ -117,6 +122,7 @@ async function main() {
     aida update      Update all skills to latest version
     aida migrate     Migrate old run.json data to new schema
     aida migrate-dir Rename legacy .aidevos projects to .aida
+    aida migrate-legacy One-shot legacy migration: rename, import, build, migrate
     aida reindex     Rebuild project-level index from all runs
     aida report      Generate performance report data
     aida merge       Merge rules.json and skills.json conflicts together

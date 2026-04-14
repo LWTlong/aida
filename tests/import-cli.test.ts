@@ -83,4 +83,36 @@ describe('aida import', () => {
       project.cleanup();
     }
   });
+
+  it('should accept a baseline tool argument from the CLI', () => {
+    const project = createTestProject();
+
+    try {
+      ensureDir(resolve(project.root, '.cursor', 'rules'));
+      ensureDir(resolve(project.root, '.cursor', 'skills', 'custom-flow'));
+      ensureDir(resolve(project.root, '.cursor'));
+      writeText(
+        resolve(project.root, '.cursor', 'rules', 'team.md'),
+        '# Team Rules\n\n- Imported cursor rule\n',
+      );
+      writeText(
+        resolve(project.root, '.cursor', 'skills', 'custom-flow', 'SKILL.md'),
+        '# Custom Flow\n\nImported from cursor\n',
+      );
+      writeText(
+        resolve(project.root, '.cursor', 'mcp.json'),
+        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['-y', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
+      );
+
+      const output = runCliOutput(project, 'import cursor');
+      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+
+      assert.ok(output.includes('Baseline: cursor'));
+      assert.ok(rules.some((entry) => entry.content === 'Imported cursor rule'));
+      assert.ok(skills.some((entry) => entry.name === 'custom-flow'));
+    } finally {
+      project.cleanup();
+    }
+  });
 });
