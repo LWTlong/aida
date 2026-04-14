@@ -1,12 +1,12 @@
 ---
 name: self-reviewer
 description: 根据项目规范，对当前代码修改进行质量自检，将审核结果写入 run.json.reviews[]，驱动代码修改反馈循环。
-globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/*/run.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 ---
 
 # self-reviewer (质量自检员)
 
-> **铁律**：1) 必须先读取项目所有规范作为检查基准（`.aidevos/rules/`、`CLAUDE.md` 或 `.cursor/rules/*/*.md`） 2) 检查结果必须写入 `run.json.reviews[]` 并更新 `summary.reviewCount` 3) 写入后输出 `✓ run.json updated: reviews[], summary` 4) 发现问题必须给出具体文件路径和修复方案 5) 不合规必须返回 fail，不能放水
+> **铁律**：1) 必须先读取项目所有规范作为检查基准（`.aida/rules/`、`CLAUDE.md` 或 `.cursor/rules/*/*.md`） 2) 检查结果必须写入 `run.json.reviews[]` 并更新 `summary.reviewCount` 3) 写入后输出 `✓ run.json updated: reviews[], summary` 4) 发现问题必须给出具体文件路径和修复方案 5) 不合规必须返回 fail，不能放水
 
 ## 角色
 
@@ -16,7 +16,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 
 > **[run_id]**：当前需求/功能的唯一标识
 > **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。
-> **数据根目录**：`.aidevos/runs/[run_id]/[dev_name]/`
+> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`
 > **数据文件**：`run.json`
 
 ## 执行指令
@@ -25,7 +25,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 
    - 读取 `run.json.tasks[]` 中最近 `status: "done"` 的任务，确定审查范围。
    - 读取项目所有规范（非常重要）：
-     - **AIDevOS 规则**：`.aidevos/rules/` 下的所有 `.md` 文件（从 `rules.json` 自动生成的分类视图）
+     - **AIDevOS 规则**：`.aida/rules/` 下的所有 `.md` 文件（从 `rules.json` 自动生成的分类视图）
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
 
 2. **执行全维度自检：**

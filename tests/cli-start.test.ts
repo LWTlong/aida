@@ -10,7 +10,7 @@ import type { RunData } from '../src/schemas/run-json.js';
 let tmpRoot: string;
 
 function setupBareProject(opts?: { branch?: string }): string {
-  tmpRoot = mkdtempSync(join(tmpdir(), 'aidevos-start-'));
+  tmpRoot = mkdtempSync(join(tmpdir(), 'aida-start-'));
   const branch = opts?.branch || 'test-branch';
 
   // Init git
@@ -19,8 +19,8 @@ function setupBareProject(opts?: { branch?: string }): string {
   execSync('git config user.email "test@test.com"', { cwd: tmpRoot, stdio: 'ignore' });
   execSync(`git checkout -b ${branch}`, { cwd: tmpRoot, stdio: 'ignore' });
 
-  // Create minimal .aidevos/config.json (project is "initialized")
-  const aidevos = resolve(tmpRoot, '.aidevos');
+  // Create minimal .aida/config.json (project is "initialized")
+  const aidevos = resolve(tmpRoot, '.aida');
   ensureDir(aidevos);
   ensureDir(resolve(aidevos, 'rules'));
   writeJson(resolve(aidevos, 'config.json'), {
@@ -57,7 +57,7 @@ describe('aidevos start', () => {
     const root = setupBareProject();
     runStart(root);
 
-    const runJsonPath = resolve(root, '.aidevos', 'runs', 'test-branch', 'test-dev', 'run.json');
+    const runJsonPath = resolve(root, '.aida', 'runs', 'test-branch', 'test-dev', 'run.json');
     assert.ok(fileExists(runJsonPath), 'run.json should be created');
 
     const data = readJson<Record<string, any>>(runJsonPath);
@@ -78,7 +78,7 @@ describe('aidevos start', () => {
     runStart(root);
 
     const data = readJson<Record<string, any>>(
-      resolve(root, '.aidevos', 'runs', 'test-branch', 'test-dev', 'run.json'),
+      resolve(root, '.aida', 'runs', 'test-branch', 'test-dev', 'run.json'),
     );
 
     assert.equal(data.meta.schemaVersion, '2.0');
@@ -97,7 +97,7 @@ describe('aidevos start', () => {
     runStart(root);
 
     const data = readJson<Record<string, any>>(
-      resolve(root, '.aidevos', 'runs', 'test-branch', 'test-dev', 'run.json'),
+      resolve(root, '.aida', 'runs', 'test-branch', 'test-dev', 'run.json'),
     );
 
     assert.equal(data.summary.totalTasks, 0);
@@ -114,7 +114,7 @@ describe('aidevos start', () => {
     runStart(root);
 
     const data = readJson<Record<string, any>>(
-      resolve(root, '.aidevos', 'runs', 'test-branch', 'test-dev', 'run.json'),
+      resolve(root, '.aida', 'runs', 'test-branch', 'test-dev', 'run.json'),
     );
 
     for (const arr of ['tasks', 'bugs', 'deviations', 'reviews', 'rules', 'files', 'timeline', 'events', 'workflow', 'highlights']) {
@@ -128,7 +128,7 @@ describe('aidevos start', () => {
     runStart(root);
 
     const data = readJson<Record<string, any>>(
-      resolve(root, '.aidevos', 'runs', 'test-branch', 'test-dev', 'run.json'),
+      resolve(root, '.aida', 'runs', 'test-branch', 'test-dev', 'run.json'),
     );
 
     // These were removed in the audit - verify they don't come back
@@ -140,7 +140,7 @@ describe('aidevos start', () => {
     const root = setupBareProject();
     runStart(root);
 
-    const branchDir = resolve(root, '.aidevos', 'runs', 'test-branch');
+    const branchDir = resolve(root, '.aida', 'runs', 'test-branch');
     assert.ok(fileExists(resolve(branchDir, 'prd.md')));
     assert.ok(fileExists(resolve(branchDir, 'requirement.json')));
     assert.ok(fileExists(resolve(branchDir, 'analysis.md')));
@@ -151,7 +151,7 @@ describe('aidevos start', () => {
     runStart(root);
 
     const req = readJson<Record<string, any>>(
-      resolve(root, '.aidevos', 'runs', 'test-branch', 'requirement.json'),
+      resolve(root, '.aida', 'runs', 'test-branch', 'requirement.json'),
     );
 
     assert.equal(req.branch, 'test-branch');
@@ -176,7 +176,7 @@ describe('aidevos start', () => {
     runStart(root, '--model gpt-4o');
 
     const data = readJson<Record<string, any>>(
-      resolve(root, '.aidevos', 'runs', 'test-branch', 'test-dev', 'run.json'),
+      resolve(root, '.aida', 'runs', 'test-branch', 'test-dev', 'run.json'),
     );
     assert.equal(data.meta.aiModel, 'gpt-4o');
   });
@@ -186,7 +186,7 @@ describe('aidevos start', () => {
     runStart(root);
 
     // Branch with slash should be converted to dash in directory name
-    const runJsonPath = resolve(root, '.aidevos', 'runs', 'feature-my-feature', 'test-dev', 'run.json');
+    const runJsonPath = resolve(root, '.aida', 'runs', 'feature-my-feature', 'test-dev', 'run.json');
     assert.ok(fileExists(runJsonPath), 'run.json should be created with sanitized branch dir');
   });
 });
@@ -201,18 +201,18 @@ describe('aidevos start - gitignore', () => {
     const gitignorePath = resolve(root, '.gitignore');
     assert.ok(fileExists(gitignorePath));
     const content = readText(gitignorePath);
-    assert.ok(content.includes('.aidevos/rules/*.md'));
+    assert.ok(content.includes('.aida/rules/*.md'));
   });
 
   it('should not duplicate .gitignore entry on second start', () => {
     const root = setupBareProject();
     // Create a different branch so start creates a new run
     runStart(root);
-    rmSync(resolve(root, '.aidevos', 'runs', 'test-branch', 'test-dev', 'run.json'));
+    rmSync(resolve(root, '.aida', 'runs', 'test-branch', 'test-dev', 'run.json'));
     runStart(root);
 
     const content = readText(resolve(root, '.gitignore'));
-    const matches = content.match(/\.aidevos\/rules\/\*\.md/g);
+    const matches = content.match(/\.aida\/rules\/\*\.md/g);
     assert.equal(matches?.length, 1, 'Should only have one entry');
   });
 });

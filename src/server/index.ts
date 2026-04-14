@@ -36,7 +36,7 @@ export async function startServer(
   port: number,
   projectRoot: string,
 ): Promise<void> {
-  const theRunsDir = resolve(projectRoot, '.aidevos', 'runs');
+  const theRunsDir = resolve(projectRoot, '.aida', 'runs');
 
   const server = createServer((req, res) => {
     const url = req.url || '/';

@@ -239,7 +239,7 @@ export async function report(): Promise<void> {
       return;
   }
 
-  const outputPath = resolve(projectRoot, '.aidevos', `report-${scope}-${period || 'all'}.md`);
+  const outputPath = resolve(projectRoot, '.aida', `report-${scope}-${period || 'all'}.md`);
   writeText(outputPath, content);
 
   console.log(green('\n  ✓ Report generated') + `: ${outputPath}\n`);

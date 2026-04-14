@@ -276,7 +276,7 @@ export interface RunData {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Rules Registry (project-level, .aidevos/rules.json)
+// Rules Registry (project-level, .aida/rules.json)
 // ─────────────────────────────────────────────────────────────
 
 export interface RuleRegistryEntry {

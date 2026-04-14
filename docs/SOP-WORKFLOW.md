@@ -1,5 +1,7 @@
 # AIDevOS SOP 工作流程完整说明
 
+> Historical workflow reference. For the current public CLI and `.aida` asset flow, use [README.md](../README.md) and [COMMANDS.md](../COMMANDS.md) as the canonical docs.
+
 **文档版本：** v1.0
 **最后更新：** 2026-03-13
 
@@ -104,11 +106,11 @@
 ┌───────────────────────────────────────────────┐
 │ 3. task-splitter (任务拆分器)                  │
 │    ✓ 读取 analysis.md                          │
-│    ✓ 读取 .aidevos/rules/ 确保符合规范         │
+│    ✓ 读取 .aida/rules/ 确保符合规范         │
 │    ✓ 从 prd.md/analysis.md 识别 PRD 阶段      │
 │    ✓ 拆分为原子任务（按依赖顺序）               │
 │    ✓ 每个任务执行:                             │
-│      aidevos log task \                        │
+│      aida log task \                        │
 │        --title "..." \                         │
 │        --stage "阶段名" \                       │
 │        --prd-phase "PRD1" \                    │
@@ -123,7 +125,7 @@
 │ 4. code-generator (代码生成器)                 │
 │    ✓ 读取 run.json.tasks[] 找第一个 pending   │
 │    ✓ 读取项目所有规范：                         │
-│      - .aidevos/rules/*.md                    │
+│      - .aida/rules/*.md                    │
 │      - CLAUDE.md (Claude Code)                │
 │      - .cursor/rules/*/*.md (Cursor)          │
 │    ✓ 读取接口文档（如存在且任务涉及 API）：     │
@@ -136,14 +138,14 @@
 │                                                │
 │      【检查清单】                               │
 │      □ 记录所有文件变更                         │
-│        aidevos log file \                      │
+│        aida log file \                      │
 │          --path "src/api/xxx.ts" \            │
 │          --change-type modified \             │
 │          --lines-added 50 \                   │
 │          --lines-removed 10                   │
 │                                                │
 │      □ 标记任务完成                             │
-│        aidevos log task-done --id TASK-XX     │
+│        aida log task-done --id TASK-XX     │
 │                                                │
 │    ✓ CLI 自动更新:                             │
 │      - summary.filesChanged                   │
@@ -166,7 +168,7 @@
 │      - 异常处理                                 │
 │      - 路径别名                                 │
 │    ✓ 记录审查结果：                             │
-│      aidevos log review \                      │
+│      aida log review \                      │
 │        --task-id TASK-XX \                     │
 │        --result pass \                         │
 │        --scope "审查范围" \                     │
@@ -188,18 +190,18 @@
                   │    ✓ 定位问题文件           │
                   │    ✓ 严谨修复代码           │
                   │    ✓ 记录 Bug:             │
-                  │      aidevos log bug \     │
+                  │      aida log bug \     │
                   │        --title "..." \     │
                   │        --severity high \   │
                   │        --source self-review \│
                   │        --task TASK-XX \    │
                   │        --files "..."       │
                   │    ✓ 修复后:               │
-                  │      aidevos log bug-fix \ │
+                  │      aida log bug-fix \ │
                   │        --id BUG-XX \       │
                   │        --fix "修复方案"     │
                   │    ✓ 记录文件变更:          │
-                  │      aidevos log file ...  │
+                  │      aida log file ...  │
                   │    ✓ CLI 自动更新:         │
                   │      - summary.bugCount    │
                   │      - timeline[]          │
@@ -230,7 +232,7 @@
 │    ✓ 回顾项目所有规范判断根因                   │
 │    ✓ 修复偏差代码                               │
 │    ✓ 记录偏差:                                 │
-│      aidevos log deviation \                   │
+│      aida log deviation \                   │
 │        --title "偏差简述" \                     │
 │        --root-cause rule-missing \             │
 │        --category component-usage \            │
@@ -262,16 +264,16 @@
 │                                                │
 │  如果是技术规范：                              │
 │    ✓ 创建 pending 规则:                        │
-│      aidevos log rule \                        │
+│      aida log rule \                        │
 │        --content "[待沉淀] 规则描述" \         │
 │        --source-deviation DEV-XX \             │
 │        --status pending                        │
 │                                                │
 │    ✓ 正式沉淀规则:                             │
-│      aidevos log rule \                        │
+│      aida log rule \                        │
 │        --content "正式规则内容" \              │
 │        --source-deviation DEV-XX \             │
-│        --file ".aidevos/rules/xxx.md"         │
+│        --file ".aida/rules/xxx.md"         │
 │                                                │
 │    ✓ CLI 自动更新 summary.rulesSedimented     │
 └───────────────────────────────────────────────┘
@@ -320,13 +322,13 @@
 1. code-generator 编写代码
    ↓
 2. 强制记录文件变更（每个修改的文件都要记录）
-   aidevos log file --path "..." --change-type modified --lines-added 50 --lines-removed 10
+   aida log file --path "..." --change-type modified --lines-added 50 --lines-removed 10
    ↓
 3. 标记任务完成
-   aidevos log task-done --id TASK-XX
+   aida log task-done --id TASK-XX
    ↓
 4. self-reviewer 质量自检
-   aidevos log review --task-id TASK-XX --result pass/fail --scope "..." --issues 0
+   aida log review --task-id TASK-XX --result pass/fail --scope "..." --issues 0
    ↓
    ┌───────┴────────┐
    ↓                ↓
@@ -334,8 +336,8 @@
    ↓                ↓
 下一个任务      bug-fixer 修复
                     ↓
-              aidevos log bug ...
-              aidevos log bug-fix ...
+              aida log bug ...
+              aida log bug-fix ...
                     ↓
               重新自检（回到步骤4）
 ```
@@ -379,7 +381,7 @@ rootCause = rule-missing
 (pending)   （仅记录偏差）
   ↓
 正式沉淀
-(.aidevos/rules/*.md)
+(.aida/rules/*.md)
 ```
 
 ---
@@ -425,40 +427,40 @@ rootCause = rule-missing
 
 ### 初始化与更新
 ```bash
-aidevos init        # 初始化项目
-aidevos update      # 更新 skills 到最新版本
-aidevos migrate     # 迁移旧数据到新 schema
+aida init        # 初始化项目
+aida update      # 更新 skills 到最新版本
+aida migrate     # 迁移旧数据到新 schema
 ```
 
 ### 工作流命令
 ```bash
-aidevos start       # 创建新的 run
-aidevos status      # 查看当前状态
-aidevos dashboard   # 启动可视化面板
+aida start       # 创建新的 run
+aida status      # 查看当前状态
+aida dashboard   # 启动可视化面板
 ```
 
 ### 数据记录命令
 ```bash
 # 任务
-aidevos log task --title "..." --stage "..." --prd-phase "PRD1" --acceptance "..."
-aidevos log task-done --id TASK-XX
+aida log task --title "..." --stage "..." --prd-phase "PRD1" --acceptance "..."
+aida log task-done --id TASK-XX
 
 # Bug
-aidevos log bug --title "..." --severity high --source self-review --task TASK-XX
-aidevos log bug-fix --id BUG-XX --fix "..."
+aida log bug --title "..." --severity high --source self-review --task TASK-XX
+aida log bug-fix --id BUG-XX --fix "..."
 
 # 偏差
-aidevos log deviation --title "..." --root-cause rule-missing --category component-usage --ai-output "..." --expected "..." --files "..."
+aida log deviation --title "..." --root-cause rule-missing --category component-usage --ai-output "..." --expected "..." --files "..."
 
 # 自检
-aidevos log review --task-id TASK-XX --result pass --scope "..." --issues 0
+aida log review --task-id TASK-XX --result pass --scope "..." --issues 0
 
 # 规则
-aidevos log rule --content "..." --source-deviation DEV-XX --status pending
-aidevos log rule --content "..." --source-deviation DEV-XX --file ".aidevos/rules/xxx.md"
+aida log rule --content "..." --source-deviation DEV-XX --status pending
+aida log rule --content "..." --source-deviation DEV-XX --file ".aida/rules/xxx.md"
 
 # 文件变更
-aidevos log file --path "..." --change-type modified --lines-added 50 --lines-removed 10
+aida log file --path "..." --change-type modified --lines-added 50 --lines-removed 10
 ```
 
 ---
@@ -466,7 +468,7 @@ aidevos log file --path "..." --change-type modified --lines-added 50 --lines-re
 ## 📁 项目目录结构
 
 ```
-.aidevos/
+.aida/
 ├── config.json                 # 配置文件
 ├── rules/                      # 项目规范
 │   ├── component-usage.md

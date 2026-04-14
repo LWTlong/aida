@@ -2,7 +2,7 @@
   "meta": {
     "schemaVersion": "1.0",
     "runId": "demo-feature",
-    "project": "aidevos-demo",
+    "project": "aida-demo",
     "developer": "demo-dev",
     "branch": "demo-feature",
     "aiModel": "claude-sonnet-4",
@@ -230,7 +230,7 @@
         "src/views/user/UserDetail.vue"
       ],
       "ruleSedimented": {
-        "file": ".aidevos/rules/component-usage.md",
+        "file": ".aida/rules/component-usage.md",
         "content": "Detail views must use Drawer component, not Dialog"
       },
       "detectedAt": "2026-03-01T12:30:00.000Z",
@@ -247,7 +247,7 @@
         "src/views/user/UserList.vue"
       ],
       "ruleSedimented": {
-        "file": ".aidevos/rules/i18n-rule.md",
+        "file": ".aida/rules/i18n-rule.md",
         "content": "All user-facing text must use $t() i18n calls, no hardcoded strings"
       },
       "detectedAt": "2026-03-01T11:30:00.000Z",
@@ -292,7 +292,7 @@
         "src/views/user/UserForm.vue"
       ],
       "ruleSedimented": {
-        "file": ".aidevos/rules/coding-style.md",
+        "file": ".aida/rules/coding-style.md",
         "content": "Always use @/ path alias for imports, never relative paths with ../"
       },
       "detectedAt": "2026-03-01T13:05:00.000Z",
@@ -880,21 +880,21 @@
   "rules": [
     {
       "ruleId": "RULE-01",
-      "file": ".aidevos/rules/component-usage.md",
+      "file": ".aida/rules/component-usage.md",
       "content": "Detail views must use Drawer component, not Dialog",
       "sourceDeviation": "DEV-01",
       "sedimentedAt": "2026-03-01T12:35:00.000Z"
     },
     {
       "ruleId": "RULE-02",
-      "file": ".aidevos/rules/coding-style.md",
+      "file": ".aida/rules/coding-style.md",
       "content": "Always use @/ path alias for imports, never relative paths with ../",
       "sourceDeviation": "DEV-05",
       "sedimentedAt": "2026-03-01T13:08:00.000Z"
     },
     {
       "ruleId": "RULE-03",
-      "file": ".aidevos/rules/i18n-rule.md",
+      "file": ".aida/rules/i18n-rule.md",
       "content": "All user-facing text must use $t() i18n calls, no hardcoded strings",
       "sourceDeviation": "DEV-02",
       "sedimentedAt": "2026-03-01T11:35:00.000Z"

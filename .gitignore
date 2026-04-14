@@ -7,9 +7,17 @@ demo-dist/
 .agent/
 .agents/
 skills-lock.json
-.aidevos/skills-backup-*/
-DATA_CONTRACT_AUDIT.md
 .aidevos/
+.aida/skills-backup-*/
+DATA_CONTRACT_AUDIT.md
+.aida/
 .claude/
-# Auto-generated rule views (source of truth: .aidevos/rules.json)
-.aidevos/rules/*.md
+# Auto-generated rule views (source of truth: .aida/rules.json)
+.aida/rules/*.md
+
+# AIDA - generated local AI tool artifacts
+.aida/skills/*/SKILL.md
+.aida/index.json
+.aida/tool-configs.json
+.mcp.json
+.claude/commands/*.md

@@ -2,13 +2,13 @@
  * AIDA Guide — ensures data collection and rule sedimentation guidance
  * is written to AI tool instruction files.
  *
- * Single source of truth: .aidevos/aida-guide.md
- * References: CLAUDE.md (Claude Code) / .cursor/rules/ (Cursor)
+ * Single source of truth: .aida/aida-guide.md
+ * References: CLAUDE.md (Claude Code) / AGENTS.md (Codex) / .cursor/rules/ (Cursor)
  */
 
 import { resolve } from 'node:path';
 import { fileExists, readText, writeText, ensureDir } from './fs.js';
-import { aidevosDir } from './paths.js';
+import { aidaDir } from './paths.js';
 
 // ─── Guide Content ──────────────────────────────────────
 
@@ -25,10 +25,12 @@ const GUIDE_CONTENT = `# AIDA 数据采集与规则沉淀指南
 
 **开始任何开发任务前，必须按顺序完成以下两步：**
 
-1. **读取项目规则** → 使用 Read 工具读取 \`.aidevos/rules/_all.md\`，了解已沉淀的项目规则并严格遵守（文件不存在则跳过此步）
+1. **读取项目规则** → 使用 Read 工具读取 \`.aida/rules/_all.md\`，了解已沉淀的项目规则并严格遵守（文件不存在则跳过此步）
 2. **执行数据采集流程** → 严格按照第一节规定的顺序调用 MCP 工具：\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`
 
 不得以任何理由跳过上述步骤。
+
+**当用户直接口述要沉淀某条项目级技术规范，或你识别到 \`rule-missing\` 类型偏差需要沉淀规则时，不要只修改本地说明文件，必须通过 AIDA MCP 的 \`aida_log_rule\` 工具写入 \`.aida/rules.json\`。**
 
 ## 一、数据采集
 
@@ -102,6 +104,14 @@ category 可选值：
    - category: 分类（可选值：component, api, style, i18n, architecture, state-management, routing, testing, process, general）
    - sourceDeviation: 关联的偏差 ID（如 DEV-01）
 
+### 用户直接口述规则
+
+如果用户明确口述一条应长期生效的项目级技术规范，也应按同样原则处理：
+1. 判断它是否属于项目级技术规范，而不是业务逻辑
+2. 如有歧义先确认
+3. 确认后调用 \`aida_log_rule\` 写入 \`.aida/rules.json\`
+4. 不要只把它写进某个 AI 工具自己的本地规则文件
+
 ### 阶段性回顾
 
 完成一轮开发（多个任务完成）后：
@@ -112,12 +122,20 @@ category 可选值：
 
 // ─── CLAUDE.md reference ────────────────────────────────
 
-const CLAUDE_MARKER = '.aidevos/aida-guide.md';
+const CLAUDE_MARKER = '.aida/aida-guide.md';
 
 const CLAUDE_REFERENCE = `
 ## AIDA
 
-**⚠️ 严禁跳过：开始任何开发任务前，必须通过 Read 工具读取 \`.aidevos/aida-guide.md\` 的完整内容，并严格按照其中的规范执行。不得以任何理由跳过。**
+**⚠️ 严禁跳过：开始任何开发任务前，必须通过 Read 工具读取 \`.aida/aida-guide.md\` 的完整内容，并严格按照其中的规范执行。不得以任何理由跳过。**
+**当用户直接要求沉淀规则，或你识别到需要沉淀项目级技术规范时，必须使用 AIDA MCP 的 \`aida_log_rule\` 工具写入 \`.aida/rules.json\`，不要只修改本地规则说明文件。**
+`;
+
+const CODEX_REFERENCE = `
+## AIDA
+
+**⚠️ 严禁跳过：开始任何开发任务前，必须先读取 \`.aida/aida-guide.md\`，并严格执行其中的数据采集与规则沉淀规范。**
+**当用户直接要求沉淀规则，或你识别到需要沉淀项目级技术规范时，必须调用 \`aida_log_rule\` 写入 \`.aida/rules.json\`，不要只修改 AGENTS 或其他本地说明文件。**
 `;
 
 // ─── Cursor rule frontmatter ────────────────────────────
@@ -141,25 +159,25 @@ globs: ['**/*']
 // ─── Public API ─────────────────────────────────────────
 
 export function guidePath(projectRoot: string): string {
-  return resolve(aidevosDir(projectRoot), GUIDE_FILENAME);
+  return resolve(aidaDir(projectRoot), GUIDE_FILENAME);
 }
 
 /**
- * Write .aidevos/aida-guide.md if it doesn't exist.
+ * Write .aida/aida-guide.md if it doesn't exist.
  */
 export function ensureGuide(projectRoot: string): void {
   const p = guidePath(projectRoot);
   if (fileExists(p)) return;
-  ensureDir(aidevosDir(projectRoot));
+  ensureDir(aidaDir(projectRoot));
   writeText(p, GUIDE_CONTENT);
 }
 
 /**
- * Always overwrite .aidevos/aida-guide.md with the latest template content.
+ * Always overwrite .aida/aida-guide.md with the latest template content.
  * Called by `aida rules build` to keep the guide in sync with the package version.
  */
 export function updateGuide(projectRoot: string): void {
-  ensureDir(aidevosDir(projectRoot));
+  ensureDir(aidaDir(projectRoot));
   writeText(guidePath(projectRoot), GUIDE_CONTENT);
 }
 
@@ -176,6 +194,9 @@ export function syncGuideReference(projectRoot: string, tools?: string[]): void 
         break;
       case 'cursor':
         addCursorReference(projectRoot);
+        break;
+      case 'codex':
+        addCodexReference(projectRoot);
         break;
       case 'lingma':
         addLingmaReference(projectRoot);
@@ -201,6 +222,9 @@ export function updateGuideReferences(projectRoot: string, tools?: string[]): vo
         writeText(resolve(rulesDir, 'aida-guide.md'), CURSOR_FRONTMATTER + GUIDE_CONTENT);
         break;
       }
+      case 'codex':
+        ensureCodexGuideAtTop(projectRoot);
+        break;
       case 'lingma': {
         const rulesDir = resolve(projectRoot, '.lingma', 'rules');
         ensureDir(rulesDir);
@@ -217,6 +241,7 @@ function detectAiTools(projectRoot: string): string[] {
   const tools: string[] = [];
   if (fileExists(resolve(projectRoot, '.mcp.json'))) tools.push('claude-code');
   if (fileExists(resolve(projectRoot, '.cursor', 'mcp.json'))) tools.push('cursor');
+  if (fileExists(resolve(projectRoot, 'AGENTS.md'))) tools.push('codex');
   if (fileExists(resolve(projectRoot, '.lingma', 'mcp.json'))) tools.push('lingma');
   return tools;
 }
@@ -229,6 +254,17 @@ function addClaudeReference(projectRoot: string): void {
     writeText(file, insertAtTop(content, CLAUDE_REFERENCE.trimStart()));
   } else {
     writeText(file, CLAUDE_REFERENCE.trim() + '\n');
+  }
+}
+
+function addCodexReference(projectRoot: string): void {
+  const file = resolve(projectRoot, 'AGENTS.md');
+  if (fileExists(file)) {
+    const content = readText(file);
+    if (content.includes(CLAUDE_MARKER)) return;
+    writeText(file, insertAtTop(content, CODEX_REFERENCE.trimStart()));
+  } else {
+    writeText(file, CODEX_REFERENCE.trim() + '\n');
   }
 }
 
@@ -270,6 +306,40 @@ export function ensureGuideAtTop(projectRoot: string): void {
   }
 
   // Buried — remove from current position and re-insert at top with latest content
+  const without = (content.slice(0, aidaStart) + content.slice(aidaEnd))
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  writeText(file, insertAtTop(without, newSection) + '\n');
+}
+
+export function ensureCodexGuideAtTop(projectRoot: string): void {
+  if (!detectAiTools(projectRoot).includes('codex')) return;
+
+  const file = resolve(projectRoot, 'AGENTS.md');
+  if (!fileExists(file)) return;
+
+  const content = readText(file);
+  const newSection = CODEX_REFERENCE.trimStart();
+
+  if (!content.includes(CLAUDE_MARKER)) {
+    writeText(file, insertAtTop(content, newSection));
+    return;
+  }
+
+  const aidaStart = content.indexOf('\n## AIDA\n');
+  if (aidaStart === -1) return;
+  const afterAida = content.indexOf('\n## ', aidaStart + 5);
+  const aidaEnd = afterAida !== -1 ? afterAida : content.length;
+
+  const lines = content.split('\n');
+  const markerLine = lines.findIndex((l) => l.includes(CLAUDE_MARKER));
+  if (markerLine >= 0 && markerLine <= 10) {
+    const before = content.slice(0, aidaStart);
+    const after = content.slice(aidaEnd);
+    writeText(file, (before + '\n' + newSection + after).replace(/\n{3,}/g, '\n\n'));
+    return;
+  }
+
   const without = (content.slice(0, aidaStart) + content.slice(aidaEnd))
     .replace(/\n{3,}/g, '\n\n')
     .trim();

@@ -1,10 +1,12 @@
 # aiDevOS Run JSON Schema (v1)
 
+> Historical schema note. Current runtime and asset-management behavior is documented in [README.md](../README.md) and [COMMANDS.md](../COMMANDS.md). This file is kept as a detailed schema reference.
+
 该 JSON 文件记录一次 AI 开发运行的完整数据。
 
 文件位置：
 
-.aidevos/runs/{runId}/run.json
+.aida/runs/{runId}/run.json
 
 ---
 
@@ -169,7 +171,7 @@ AI 偏差记录，aiDevOS 的核心差异化数据。
       "smsTemplate/form.vue"
     ],
     "ruleSedimented": {
-      "file": ".aidevos/rules/component-usage.md",
+      "file": ".aida/rules/component-usage.md",
       "content": "FormJ 属性必须直接以 attrs 形式传入"
     }
   }
@@ -338,7 +340,7 @@ rule_sedimented | workflow_stage_changed | build_verified
 "rules": [
   {
     "ruleId": "RULE-001",
-    "file": ".aidevos/rules/component-usage.md",
+    "file": ".aida/rules/component-usage.md",
     "content": "编辑页 FormJ 必须 labelPosition: top",
     "sourceDeviation": "DEV-002",
     "sedimentedAt": ""

@@ -92,3 +92,33 @@ export function extractConflictSections(
     theirs: theirsLines.join('\n').trim(),
   };
 }
+
+/**
+ * Parse one side of a JSON merge-conflict section into a normalized array payload.
+ * Supports:
+ * - full arrays: `[{}, {}]`
+ * - single objects: `{}`
+ * - empty object / null / empty string => `[]`
+ * - array fragments extracted from inside a larger array: `{...}, {...}`
+ */
+export function parseConflictJsonArray<T = Record<string, unknown>>(raw: string): T[] {
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed === 'null' || trimmed === '{}') return [];
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (Array.isArray(parsed)) return parsed as T[];
+    if (parsed && typeof parsed === 'object') {
+      return Object.keys(parsed as object).length === 0 ? [] : [parsed as T];
+    }
+  } catch {
+    // Fall through to fragment parsing.
+  }
+
+  try {
+    const parsed = JSON.parse(`[${trimmed}]`);
+    return Array.isArray(parsed) ? parsed as T[] : [];
+  } catch {
+    return [];
+  }
+}

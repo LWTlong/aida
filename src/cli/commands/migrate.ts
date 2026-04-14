@@ -305,16 +305,16 @@ function findAllRunJsonFiles(baseDir: string): string[] {
 
 export async function migrate(): Promise<void> {
   const projectRoot = process.cwd();
-  const aidevosDir = resolve(projectRoot, '.aidevos/runs');
+  const aidaDir = resolve(projectRoot, '.aida/runs');
 
-  if (!fileExists(aidevosDir)) {
-    console.log(yellow('\n  No .aidevos/runs directory found.\n'));
+  if (!fileExists(aidaDir)) {
+    console.log(yellow('\n  No .aida/runs directory found.\n'));
     return;
   }
 
   // Read project name from config
   let projectName = '';
-  const configPath = resolve(projectRoot, '.aidevos/config.json');
+  const configPath = resolve(projectRoot, '.aida/config.json');
   if (fileExists(configPath)) {
     try {
       const cfg = readJson<any>(configPath);
@@ -325,7 +325,7 @@ export async function migrate(): Promise<void> {
   console.log(cyan('\n  AIDevo Data Migration\n'));
   console.log('  Searching for run.json files...\n');
 
-  const runJsonFiles = findAllRunJsonFiles(aidevosDir);
+  const runJsonFiles = findAllRunJsonFiles(aidaDir);
 
   if (runJsonFiles.length === 0) {
     console.log(yellow('  No run.json files found.\n'));

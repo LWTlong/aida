@@ -39,13 +39,13 @@ globs: []
 - audit
 
 遍历列表：
-- 如果 `.aidevos/skills/[skill_name]/SKILL.md` 已存在 -> 跳过
+- 如果 `.aida/skills/[skill_name]/SKILL.md` 已存在 -> 跳过
 - 如果不存在 -> 创建
 
 ### 3. 创建目录结构
 
 ```
-.aidevos/
+.aida/
   skills/               # Skill 定义（14 个）
   rules/                # 项目规范
     iron-rules.md       # 铁律（不可违反）
@@ -60,7 +60,7 @@ globs: []
 
 ### 4. 初始化 Rules 文件
 
-在 `.aidevos/rules/` 下生成 `iron-rules.md`，包含 3 条铁律。
+在 `.aida/rules/` 下生成 `iron-rules.md`，包含 3 条铁律。
 
 ### 5. 初始化需求文件夹
 

@@ -1,7 +1,7 @@
 ---
 name: mcp-reviewer
 description: 使用外部审查工具或人类代码审查结果进行更高安全级别的审计，结果写入 run.json.reviews[]。
-globs: ['.aidevos/runs/*/*/run.json']
+globs: ['.aida/runs/*/*/run.json']
 ---
 
 # mcp-reviewer (高级审查员)
@@ -22,7 +22,7 @@ globs: ['.aidevos/runs/*/*/run.json']
 
 ## 路径约定
 
-> **数据根目录**：`.aidevos/runs/[run_id]/[dev_name]/`
+> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`
 > **数据文件**：`run.json`
 
 ## 执行说明

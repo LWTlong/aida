@@ -20,8 +20,8 @@ import type { RuleRegistryEntry } from '../src/schemas/run-json.js';
 let tmpRoot: string;
 
 beforeEach(() => {
-  tmpRoot = mkdtempSync(join(tmpdir(), 'aidevos-rules-'));
-  ensureDir(resolve(tmpRoot, '.aidevos', 'rules'));
+  tmpRoot = mkdtempSync(join(tmpdir(), 'aida-rules-'));
+  ensureDir(resolve(tmpRoot, '.aida', 'rules'));
 });
 
 afterEach(() => {
@@ -202,7 +202,7 @@ describe('buildRuleViews', () => {
     // 2 categories + 1 _all.md = 3
     assert.equal(count, 3);
 
-    const rulesDir = resolve(tmpRoot, '.aidevos', 'rules');
+    const rulesDir = resolve(tmpRoot, '.aida', 'rules');
     assert.ok(fileExists(resolve(rulesDir, 'api.md')));
     assert.ok(fileExists(resolve(rulesDir, 'style.md')));
     assert.ok(fileExists(resolve(rulesDir, '_all.md')));
@@ -212,7 +212,7 @@ describe('buildRuleViews', () => {
     addRule(tmpRoot, { content: 'Test rule', category: 'general', branch: 'a', deviation: null, author: 'x' });
     buildRuleViews(tmpRoot);
 
-    const content = readText(resolve(tmpRoot, '.aidevos', 'rules', 'general.md'));
+    const content = readText(resolve(tmpRoot, '.aida', 'rules', 'general.md'));
     assert.ok(content.includes('AUTO-GENERATED'));
     assert.ok(content.includes('RULE-001'));
     assert.ok(content.includes('Test rule'));
@@ -228,7 +228,7 @@ describe('buildRuleViews', () => {
 
     buildRuleViews(tmpRoot);
 
-    const allPath = resolve(tmpRoot, '.aidevos', 'rules', '_all.md');
+    const allPath = resolve(tmpRoot, '.aida', 'rules', '_all.md');
     // _all.md should not be generated since all rules are deprecated
     assert.equal(fileExists(allPath), false);
   });

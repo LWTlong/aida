@@ -1,7 +1,7 @@
 ---
 name: workflow-orchestrator
 description: 编排需求分析 -> 任务拆分 -> 代码生成 -> 自检的完整 AI 开发流程，支持中断恢复。所有状态数据读写 run.json。
-globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/*/run.json', '.aida/runs/*/requirement.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 ---
 
 # workflow-orchestrator (流程编排器)
@@ -16,22 +16,22 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/runs/*/requirement.json', '.aide
 
 > **[run_id]**：当前需求/功能的唯一标识（如分支名、JIRA 号）
 > **[dev_name]**：通过 `git config user.name` 获取当前开发者姓名，转全小写并用 `-` 替换空格。
-> **分支目录**：`.aidevos/runs/[run_id]/`（共享：prd.md、analysis.md、requirement.json）
-> **开发者目录**：`.aidevos/runs/[run_id]/[dev_name]/`（个人：run.json）
+> **分支目录**：`.aida/runs/[run_id]/`（共享：prd.md、analysis.md、requirement.json）
+> **开发者目录**：`.aida/runs/[run_id]/[dev_name]/`（个人：run.json）
 > **核心数据文件**：`run.json`（单一数据源，所有结构化数据的唯一读写目标）
 > **分支共享数据**：`requirement.json`（需求摘要、功能模块、亮点、开发者汇总）
 
 ## Skill 调用方式
 
 通过文件路径引用调用原子 Skill，AI 在执行时读取对应 Skill 文件：
-- `.aidevos/skills/requirement-analyzer/SKILL.md`
-- `.aidevos/skills/task-splitter/SKILL.md`
-- `.aidevos/skills/code-generator/SKILL.md`
-- `.aidevos/skills/self-reviewer/SKILL.md`
-- `.aidevos/skills/bug-fixer/SKILL.md`
-- `.aidevos/skills/docx-to-markdown/SKILL.md`
-- `.aidevos/skills/mcp-reviewer/SKILL.md`
-- `.aidevos/skills/dashboard-generator/SKILL.md`
+- `.aida/skills/requirement-analyzer/SKILL.md`
+- `.aida/skills/task-splitter/SKILL.md`
+- `.aida/skills/code-generator/SKILL.md`
+- `.aida/skills/self-reviewer/SKILL.md`
+- `.aida/skills/bug-fixer/SKILL.md`
+- `.aida/skills/docx-to-markdown/SKILL.md`
+- `.aida/skills/mcp-reviewer/SKILL.md`
+- `.aida/skills/dashboard-generator/SKILL.md`
 
 ## 执行逻辑 (工作流生命周期)
 

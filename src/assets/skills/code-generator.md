@@ -1,12 +1,12 @@
 ---
 name: code-generator
 description: 严格按照 run.json.tasks[] 和项目规范生成业务代码，并更新任务状态。
-globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/*/run.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 ---
 
 # code-generator (代码生成器)
 
-> **铁律**：1) 必须先读取项目所有规范再写代码（`.aidevos/rules/`、`CLAUDE.md` 或 `.cursor/rules/*/*.md`） 2) 完成后必须更新 `run.json.tasks[].status` 和 `summary.completedTasks` 3) 写入后输出 `✓ run.json updated: tasks[], summary, files[]` 4) 禁止臆想不存在的 API / 组件 5) 禁止魔法字符串，文案必须走 i18n
+> **铁律**：1) 必须先读取项目所有规范再写代码（`.aida/rules/`、`CLAUDE.md` 或 `.cursor/rules/*/*.md`） 2) 完成后必须更新 `run.json.tasks[].status` 和 `summary.completedTasks` 3) 写入后输出 `✓ run.json updated: tasks[], summary, files[]` 4) 禁止臆想不存在的 API / 组件 5) 禁止魔法字符串，文案必须走 i18n
 
 ## 角色
 
@@ -16,7 +16,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 
 > **[run_id]**：当前需求/功能的唯一标识
 > **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。
-> **数据根目录**：`.aidevos/runs/[run_id]/[dev_name]/`
+> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`
 > **数据文件**：`run.json`
 
 ## 执行指令
@@ -32,7 +32,7 @@ globs: ['.aidevos/runs/*/*/run.json', '.aidevos/rules/*.md', 'CLAUDE.md', '.curs
 
    **a) 读取项目规范（必须）：**
    - 仔细阅读项目所有规范：
-     - **AIDevOS 规则**：`.aidevos/rules/` 下的所有 `.md` 文件（从 `rules.json` 自动生成的分类视图）
+     - **AIDevOS 规则**：`.aida/rules/` 下的所有 `.md` 文件（从 `rules.json` 自动生成的分类视图）
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
    - 规范包括：编码风格、组件使用、API 封装、i18n、状态管理、架构约束等。
 
