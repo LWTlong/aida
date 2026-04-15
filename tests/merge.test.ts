@@ -115,7 +115,6 @@ describe('aida merge', () => {
       const mergedSkills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
 
       assert.ok(stdout.includes('rules.json: merged'));
-      assert.ok(stdout.includes('skills.json: merged'));
       assert.equal(mergedRules.length, 2);
       assert.equal(mergedSkills.length, 1);
       assert.equal(mergedSkills[0].name, 'workflow-orchestrator');

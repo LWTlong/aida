@@ -39,7 +39,7 @@ globs: []
 - audit
 
 遍历列表：
-- 如果 `.aida/skills/[skill_name]/SKILL.md` 已存在 -> 跳过
+- 如果 `.aida/skills.json` 中已存在同名 skill -> 跳过
 - 如果不存在 -> 创建
 
 ### 3. 创建目录结构
@@ -60,7 +60,7 @@ globs: []
 
 ### 4. 初始化 Rules 文件
 
-在 `.aida/rules/` 下生成 `iron-rules.md`，包含 3 条铁律。
+在 `.aida/rules.json` 中生成初始铁律，再通过 `aida build` 分发到各 AI 工具目录。
 
 ### 5. 初始化需求文件夹
 

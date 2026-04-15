@@ -22,7 +22,6 @@ function setupBareProject(opts?: { branch?: string }): string {
   // Create minimal .aida/config.json (project is "initialized")
   const aidevos = resolve(tmpRoot, '.aida');
   ensureDir(aidevos);
-  ensureDir(resolve(aidevos, 'rules'));
   writeJson(resolve(aidevos, 'config.json'), {
     schemaVersion: '1.0',
     aiTool: 'claude-code',
@@ -194,17 +193,18 @@ describe('aidevos start', () => {
 // ─── .gitignore management ────────────────────────────────
 
 describe('aidevos start - gitignore', () => {
-  it('should add rules/*.md to .gitignore', () => {
+  it('should add generated AI tool artifacts to .gitignore', () => {
     const root = setupBareProject();
     runStart(root);
 
     const gitignorePath = resolve(root, '.gitignore');
     assert.ok(fileExists(gitignorePath));
     const content = readText(gitignorePath);
-    assert.ok(content.includes('.aida/rules/*.md'));
+    assert.ok(content.includes('.claude/rules/'));
+    assert.ok(content.includes('.claude/skills/'));
   });
 
-  it('should not duplicate .gitignore entry on second start', () => {
+  it('should not duplicate generated artifact entries on second start', () => {
     const root = setupBareProject();
     // Create a different branch so start creates a new run
     runStart(root);
@@ -212,7 +212,7 @@ describe('aidevos start - gitignore', () => {
     runStart(root);
 
     const content = readText(resolve(root, '.gitignore'));
-    const matches = content.match(/\.aida\/rules\/\*\.md/g);
+    const matches = content.match(/\.claude\/rules\//g);
     assert.equal(matches?.length, 1, 'Should only have one entry');
   });
 });

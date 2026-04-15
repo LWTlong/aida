@@ -5,12 +5,12 @@ import { readJson, readText } from '../src/utils/fs.js';
 import { createTestProject, runCliOutput } from './helpers.js';
 
 describe('aida rules add/delete', () => {
-  it('should add a rule with default category and rebuild views', () => {
+  it('should add a rule with default category and rebuild tool rule files', () => {
     const project = createTestProject();
     try {
       const stdout = runCliOutput(project, 'rules add "禁止直接修改生成产物文件"');
       const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
-      const allRules = readText(resolve(project.root, '.aida', 'rules', '_all.md'));
+      const allRules = readText(resolve(project.root, '.claude', 'rules', 'aida', '_all.md'));
 
       assert.ok(stdout.includes('Rule added'));
       assert.equal(rules.length, 1);

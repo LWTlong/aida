@@ -60,7 +60,7 @@ Vibe Coding Session
    "9 deviations → 56% hallucination, 44% rule-missing"
         ↓
    Deviation patterns identified → AI suggests rules → user confirms → sedimented
-   .aida/rules/ ← your AI's growing knowledge base
+   .aida/rules.json ← your AI's growing knowledge base
         ↓
    AI reads rules next session → same mistakes eliminated
         ↓
@@ -86,7 +86,7 @@ Vibe Coding Session
 
 ![Deviation & Rule Trend](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png)
 
-The `.aida/rules/` directory is your **project-specific AI knowledge base**. It grows with every run. The more you use AI, the smarter it gets at *your* project.
+The `.aida/rules.json` file is your **project-specific AI knowledge base**. It grows with every run. The more you use AI, the smarter it gets at *your* project.
 
 ---
 
@@ -267,7 +267,7 @@ flowchart LR
     A["Your AI Tool\nClaude Code / Cursor"] -->|Vibe Coding| B{"AIDA MCP Server\n10 Tools"}
     B -->|Silent Data Collection| C[".aida/run.json"]
     C -->|Visualization| D["Dashboard\nlocalhost:2375"]
-    C -->|Pattern Analysis| E[".aida/rules/"]
+    C -->|Pattern Analysis| E[".aida/rules.json"]
     E -->|AI Reads Rules| A
 ```
 
@@ -300,7 +300,7 @@ All data is local JSON. No database, no cloud.
 | **Run** | `.aida/runs/{branch}/{dev}/run.json` | Every task, bug, deviation, review, file change |
 | **Branch** | `.aida/runs/{branch}/requirement.json` | Aggregated stats per requirement |
 | **Project** | `.aida/index.json` | Cross-branch overview for team leads |
-| **Rules** | `.aida/rules/` | Sedimented project rules — your AI's growing knowledge base |
+| **Rules** | `.aida/rules.json` | Sedimented project rules — your AI's growing knowledge base |
 
 All structured JSON — ready for export, analysis, or feeding into reports.
 
@@ -352,6 +352,7 @@ aida dashboard         # Launch dashboard (default port 2375)
 aida dashboard --port 3000 # Custom port
 aida mcp               # Start MCP server (for AI tool config)
 aida log <subcommand>  # Write structured data (task, bug, review, etc.)
+aida memory <subcommand> # Rebuild/search/show project memory
 aida reindex           # Rebuild project-level index
 aida report            # Generate performance report
 aida rules build       # Generate rule view files from registry
@@ -372,7 +373,7 @@ AIDA uses [Model Context Protocol](https://modelcontextprotocol.io/) — the sta
 
 **What happens when you add the config:**
 
-1. Your AI tool discovers AIDA's 10 tools via MCP
+1. Your AI tool discovers AIDA's data + memory tools via MCP
 2. As the AI works, it naturally calls `aida_task_start`, `aida_log_files`, etc.
 3. Data flows into `run.json` silently
 4. Deviation patterns emerge → AI suggests rules → user confirms → sedimented
@@ -392,15 +393,29 @@ Rules are the compounding asset of AIDA. Here's how they work in a team setting.
 
 ```
 .aida/rules.json        ← source of truth, committed to git
+.aida/skills.json       ← source of truth, committed to git
+.aida/tool-configs.json ← source of truth for imported tool configs, gitignored
+.aida/memories/index.json      ← module memory index, committed to git
+.aida/memories/modules/*.json  ← module memory source, committed to git
+.aida/runs/*/context.json      ← branch context source, committed to git
         ↓
-aida rules build
+aida build
         ↓
-.aida/rules/*.md        ← auto-generated views, gitignored
+.aida/memories/modules/*.md + .aida/runs/*/context.md ← generated views, gitignored
+.claude/.cursor/.codex/.lingma tool artifacts ← generated locally, gitignored
         ↓
-AI reads rules next session
+AI reads its own tool files next session
 ```
 
-`aida init` automatically adds `.aida/rules/*.md` to your `.gitignore`. Never edit the `.md` files manually — they are always regenerated from `rules.json`.
+`aida build` writes generated rules, skills, memory views, and MCP config into each configured AI tool directory or AIDA view directory. Never edit generated `.md` files manually.
+
+Legacy migration note:
+- `aida migrate-legacy` now also migrates historical `run.json`, `requirement.json`, and `analysis.md` into `.aida/runs/*/context.json` and `.aida/memories/modules/*.json`
+- old `report` files remain derived output; new context recovery uses the migrated JSON memory source
+
+Runtime recovery note:
+- before coding, search module memory and prefer the branch-level `.aida/runs/*/memory.md` pack or MCP `aida_memory_pack`
+- if the branch context is missing or stale, rebuild it with `aida memory rebuild` or MCP `aida_context_rebuild`
 
 ### Daily workflow
 
@@ -408,7 +423,7 @@ After pulling changes that include new rules:
 
 ```bash
 git pull
-aida rules build   # regenerate local rule views from updated rules.json
+aida build   # regenerate local AI tool artifacts from updated JSON sources
 ```
 
 ### Merge conflict resolution
@@ -418,7 +433,7 @@ When two developers add rules on separate branches and merge, `rules.json` may g
 ```bash
 # After git merge produces a conflict in rules.json:
 aida rules merge   # fingerprint union — no duplicates, no lost rules
-aida rules build   # rebuild .md views
+aida build         # rebuild local AI tool artifacts
 git add .aida/rules.json
 git commit -m "merge: resolve rules conflict"
 ```

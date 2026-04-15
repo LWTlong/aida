@@ -31,7 +31,7 @@ describe('aida skills list/edit', () => {
     }
   });
 
-  it('should apply edited skill content back to skills.json and rebuild views', () => {
+  it('should apply edited skill content back to skills.json and rebuild tool skill files', () => {
     const project = createTestProject();
     try {
       writeText(
@@ -53,7 +53,7 @@ describe('aida skills list/edit', () => {
 
       const stdout = runCliOutput(project, 'skills edit workflow-orchestrator --apply');
       const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
-      const skillView = readText(resolve(project.root, '.aida', 'skills', 'workflow-orchestrator', 'SKILL.md'));
+      const skillView = readText(resolve(project.root, '.claude', 'skills', 'workflow-orchestrator.md'));
 
       assert.ok(stdout.includes('Skill updated'));
       assert.equal(skills[0].content, 'New workflow content');

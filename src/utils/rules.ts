@@ -42,6 +42,61 @@ export function loadRegistry(projectRoot: string): RuleRegistryEntry[] {
   }
 }
 
+export function activeRules(entries: RuleRegistryEntry[]): RuleRegistryEntry[] {
+  return entries.filter((entry) => entry.status !== 'deprecated');
+}
+
+export function groupActiveRulesByCategory(entries: RuleRegistryEntry[]): Record<string, RuleRegistryEntry[]> {
+  const groups: Record<string, RuleRegistryEntry[]> = {};
+  for (const entry of activeRules(entries)) {
+    const category = entry.category || 'general';
+    if (!groups[category]) groups[category] = [];
+    groups[category].push(entry);
+  }
+  return groups;
+}
+
+export function renderRuleMarkdownFiles(entries: RuleRegistryEntry[]): Map<string, string> {
+  const groups = groupActiveRulesByCategory(entries);
+  const files = new Map<string, string>();
+
+  for (const [cat, rules] of Object.entries(groups)) {
+    const lines: string[] = [];
+    lines.push(`<!-- AUTO-GENERATED from rules.json - DO NOT EDIT -->`);
+    lines.push(`# ${categoryTitle(cat)} Rules`);
+    lines.push('');
+
+    for (const rule of rules) {
+      const statusTag = rule.status === 'pending' ? ' [PENDING]' :
+        rule.status === 'conflict' ? ' [CONFLICT]' : '';
+      lines.push(`- [${rule.id}]${statusTag} ${rule.content}`);
+    }
+    lines.push('');
+    files.set(`${cat}.md`, lines.join('\n'));
+  }
+
+  if (Object.keys(groups).length > 0) {
+    const allLines: string[] = [];
+    allLines.push(`<!-- AUTO-GENERATED from rules.json - DO NOT EDIT -->`);
+    allLines.push(`# All Project Rules`);
+    allLines.push('');
+
+    for (const [cat, rules] of Object.entries(groups)) {
+      allLines.push(`## ${categoryTitle(cat)}`);
+      allLines.push('');
+      for (const rule of rules) {
+        const statusTag = rule.status === 'pending' ? ' [PENDING]' :
+          rule.status === 'conflict' ? ' [CONFLICT]' : '';
+        allLines.push(`- [${rule.id}]${statusTag} ${rule.content}`);
+      }
+      allLines.push('');
+    }
+    files.set('_all.md', allLines.join('\n'));
+  }
+
+  return files;
+}
+
 export function saveRegistry(projectRoot: string, entries: RuleRegistryEntry[]): void {
   writeJson(registryPath(projectRoot), entries);
 }
@@ -238,67 +293,18 @@ export function addRule(
 // ─── Build Views ──────────────────────────────────────────
 
 /**
- * Rebuild all .aida/rules/*.md from rules.json.
- * Returns the number of categories written.
+ * Legacy compatibility: rebuild .aida/rules/*.md from rules.json.
+ * Returns the number of files written.
  */
 export function buildRuleViews(projectRoot: string): number {
   const entries = bootstrapRuleRegistry(projectRoot);
   const viewDir = rulesViewDir(projectRoot);
   ensureDir(viewDir);
-
-  // Group by category
-  const groups: Record<string, RuleRegistryEntry[]> = {};
-  for (const e of entries) {
-    if (e.status === 'deprecated') continue;
-    const cat = e.category || 'general';
-    if (!groups[cat]) groups[cat] = [];
-    groups[cat].push(e);
+  const files = renderRuleMarkdownFiles(entries);
+  for (const [name, content] of files) {
+    writeText(resolve(viewDir, name), content);
   }
-
-  // Always include iron-rules if they exist in registry
-  let written = 0;
-
-  for (const [cat, rules] of Object.entries(groups)) {
-    const lines: string[] = [];
-    lines.push(`<!-- AUTO-GENERATED from rules.json - DO NOT EDIT -->`);
-    lines.push(`# ${categoryTitle(cat)} Rules`);
-    lines.push('');
-
-    for (const r of rules) {
-      const statusTag = r.status === 'pending' ? ' [PENDING]' :
-                         r.status === 'conflict' ? ' [CONFLICT]' : '';
-      lines.push(`- [${r.id}]${statusTag} ${r.content}`);
-    }
-    lines.push('');
-
-    writeText(resolve(viewDir, `${cat}.md`), lines.join('\n'));
-    written++;
-  }
-
-  // Write a combined all-rules.md for easy AI consumption
-  const activeCount = Object.keys(groups).length;
-  if (activeCount > 0) {
-    const allLines: string[] = [];
-    allLines.push(`<!-- AUTO-GENERATED from rules.json - DO NOT EDIT -->`);
-    allLines.push(`# All Project Rules`);
-    allLines.push('');
-
-    for (const [cat, rules] of Object.entries(groups)) {
-      allLines.push(`## ${categoryTitle(cat)}`);
-      allLines.push('');
-      for (const r of rules) {
-        const statusTag = r.status === 'pending' ? ' [PENDING]' :
-                           r.status === 'conflict' ? ' [CONFLICT]' : '';
-        allLines.push(`- [${r.id}]${statusTag} ${r.content}`);
-      }
-      allLines.push('');
-    }
-
-    writeText(resolve(viewDir, '_all.md'), allLines.join('\n'));
-    written++;
-  }
-
-  return written;
+  return files.size;
 }
 
 function categoryTitle(cat: string): string {

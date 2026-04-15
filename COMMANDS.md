@@ -17,12 +17,15 @@ Source of truth:
 - `.aida/rules.json`
 - `.aida/skills.json`
 - `.aida/config.json`
+- `.aida/tool-configs.json`
+- `.aida/memories/index.json`
+- `.aida/memories/modules/*.json`
+- `.aida/runs/*/context.json`
 
 Generated artifacts:
 
-- `.aida/rules/*.md`
-- `.aida/skills/*/SKILL.md`
-- `.aida/tool-configs.json`
+- `.aida/memories/modules/*.md`
+- `.aida/runs/*/context.md`
 - `.mcp.json`
 - `.cursor/**`
 - `.claude/commands/*.md`
@@ -49,6 +52,7 @@ Or step by step when you want to choose the baseline tool explicitly:
 aida migrate-dir
 aida import cursor
 aida migrate
+aida memory rebuild
 ```
 
 ### Team collaboration
@@ -76,8 +80,9 @@ Behavior:
 Reverse-read existing project assets into AIDA JSON, then rebuild.
 
 Imports:
-- existing `.aida/rules/*.md` or `.aida/rules/_all.md`
-- existing `.aida/skills/*/SKILL.md`
+- existing legacy `.aida/rules/*.md` or `.aida/rules/_all.md`
+- existing legacy `.aida/skills/*/SKILL.md`
+- existing AI tool rules / skills / MCP configs
 - tool-specific config snapshots
 
 Examples:
@@ -110,6 +115,7 @@ Behavior:
 - with args: build selected targets only
 - updates `.gitignore`
 - `codex` build also syncs `~/.codex/config.toml`
+- renders memory markdown views from context/module JSON source
 - non-TTY environments fall back to comma-separated number input
 
 ### `aida merge`
@@ -160,10 +166,16 @@ Behavior:
 - renames `.aidevos` to `.aida`
 - rewrites old path references, including guide paths
 - imports one baseline tool's local rules / skills into `.aida/*.json`
+- migrates legacy run / requirement / analysis data into branch context and module memory JSON
 - snapshots all discovered tool configs
 - rebuilds generated AIDA artifacts and updates `.gitignore`
 - runs `aida migrate` to upgrade historical run data schema
 - if multiple baseline tools are detectable, prompts with interactive single-select
+
+Legacy data note:
+- old `report` output is derived data, not the migration source of truth
+- memory migration primarily uses historical `run.json`, `requirement.json`, and `analysis.md`
+- existing reports remain readable, but new context recovery relies on `.aida/memories/*.json` and `.aida/runs/*/context.json`
 
 ### `aida start`
 
@@ -180,6 +192,31 @@ Start the local dashboard server.
 ### `aida report`
 
 Generate report data from recorded runs.
+
+### `aida memory`
+
+Manage branch context and module memory.
+
+Examples:
+
+```bash
+aida memory rebuild
+aida memory rebuild feature/profile
+aida memory migrate-legacy
+aida memory search "个人中心"
+aida memory show profile
+aida memory context
+aida memory pack
+```
+
+Behavior:
+- `rebuild`: derive current branch context + module memory from `run.json`, `requirement.json`, `analysis.md`
+- `migrate-legacy`: batch-migrate existing branch history into memory JSON source
+- `build`: regenerate `.md` views from memory JSON source
+- `pack`: inspect the aggregated runtime memory pack built from branch context + related modules
+- `search`: query the module memory index before coding
+- `show` / `context`: inspect the rendered memory/context view
+- `upsert` / `context-update`: write back structured memory when MCP is unavailable
 
 ### `aida reindex`
 
@@ -205,7 +242,7 @@ aida rules add "API 请求必须走统一封装" --category api
 Behavior:
 - auto-generates rule ID
 - default category is `general`
-- rebuilds rule views after add
+- rebuilds AI tool artifacts after add
 
 ### `aida rules list`
 
@@ -231,11 +268,11 @@ aida rules delete RULE-001
 Behavior:
 - does not hard delete
 - marks the rule `deprecated`
-- rebuilds rule views
+- rebuilds AI tool artifacts
 
 ### `aida rules build`
 
-Rebuild `.aida/rules/*.md` from `.aida/rules.json`.
+Rebuild AI tool rule files from `.aida/rules.json`.
 
 ### `aida rules merge`
 
@@ -278,7 +315,7 @@ Behavior:
 
 ### `aida skills build`
 
-Rebuild `.aida/skills/*/SKILL.md` from `.aida/skills.json`.
+Rebuild AI tool skill files from `.aida/skills.json`.
 
 ### `aida skills merge`
 

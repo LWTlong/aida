@@ -6,11 +6,11 @@ import {
   bootstrapRuleRegistry,
   loadRegistry,
   saveRegistry,
-  buildRuleViews,
   findSimilarRules,
   mergeRegistries,
   registryPath,
 } from '../../utils/rules.js';
+import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { updateGuide, updateGuideReferences } from '../../utils/guide.js';
 import { RULE_CATEGORIES, type RuleRegistryEntry } from '../../schemas/run-json.js';
 
@@ -50,13 +50,13 @@ function parseContent(args: string[]): string {
 
 async function rulesBuild(): Promise<void> {
   const projectRoot = process.cwd();
-  const count = buildRuleViews(projectRoot);
+  const result = buildProjectArtifacts(projectRoot);
   const entries = loadRegistry(projectRoot);
   updateGuide(projectRoot);
   updateGuideReferences(projectRoot);
   console.log(
-    green(`\n  ✓ Rules views rebuilt`) +
-    `: ${entries.length} rules → ${count} category files\n`,
+    green(`\n  ✓ Rules rebuilt`) +
+    `: ${entries.length} rules → ${result.ruleFiles} generated tool rule files\n`,
   );
 }
 
@@ -114,8 +114,6 @@ export async function mergeRulesRegistry(projectRoot: string): Promise<{ status:
 
   const { merged, added } = mergeRegistries(ours, theirs);
   saveRegistry(projectRoot, merged);
-  buildRuleViews(projectRoot);
-  updateGuideReferences(projectRoot);
 
   return { status: 'merged', added, total: merged.length };
 }
@@ -139,6 +137,8 @@ async function rulesMerge(): Promise<void> {
     return;
   }
   if (result.status === 'merged') {
+    buildProjectArtifacts(projectRoot);
+    updateGuideReferences(projectRoot);
     console.log(
       green('  ✓ Merged successfully') +
       `: ${result.total} total rules (${result.added} new from incoming branch)\n`,
@@ -212,9 +212,7 @@ async function rulesAdd(): Promise<void> {
     status: 'active',
   });
 
-  buildRuleViews(projectRoot);
-  updateGuide(projectRoot);
-  updateGuideReferences(projectRoot);
+  buildProjectArtifacts(projectRoot);
 
   if (isDuplicate) {
     console.log(yellow(`\n  Rule already exists: ${entry.id}\n`));
@@ -252,9 +250,7 @@ async function rulesDelete(): Promise<void> {
 
   entry.status = 'deprecated';
   saveRegistry(projectRoot, current);
-  buildRuleViews(projectRoot);
-  updateGuide(projectRoot);
-  updateGuideReferences(projectRoot);
+  buildProjectArtifacts(projectRoot);
 
   console.log(green(`\n  ✓ Rule deprecated`) + `: ${ruleId}`);
   console.log(dim('  Re-run `aida rules list` to verify status, or `aida build` to rebuild all targets.\n'));
@@ -291,15 +287,15 @@ export async function rules(): Promise<void> {
   ${cyan('aida rules')} - Manage project rules registry
 
   Subcommands:
-    add       Add one rule and auto-build views
-    build     Rebuild .aida/rules/*.md views from rules.json
+    add       Add one rule and auto-build AI tool artifacts
+    build     Rebuild AI tool rule files from rules.json
     delete    Deprecate one rule by ID
     dedupe    Find potential duplicate or conflicting rules
     merge     Auto-resolve git merge conflicts in rules.json
     list      List all rules grouped by category (--json supported)
 
   The source of truth is .aida/rules.json (committed to git).
-  The .aida/rules/*.md files are auto-generated views (gitignored).
+  aida build distributes generated rule files into each configured AI tool directory.
 `);
   }
 }

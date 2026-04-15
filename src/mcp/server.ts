@@ -37,7 +37,9 @@ import {
 } from '../utils/run-data.js';
 import { collectClaudeTokens, collectClaudeTokensBetween } from '../utils/tokens.js';
 import { getBranchName, getDevName } from '../utils/git.js';
-import { addRule, buildRuleViews } from '../utils/rules.js';
+import { addRule } from '../utils/rules.js';
+import { buildProjectArtifacts } from '../utils/ai-build.js';
+import { buildMemoryViews, loadModuleMemory, loadRunContext, loadRunMemoryPack, rebuildCurrentBranchMemory, searchModuleMemories, updateRunContext, upsertModuleMemory } from '../utils/memory.js';
 
 // ─── JSON-RPC / MCP Protocol ─────────────────────────────
 
@@ -250,6 +252,109 @@ const TOOLS = [
       required: ['content', 'category'],
     },
   },
+  {
+    name: 'aida_memory_search',
+    description: '按模块名称、关键字或路径提示检索项目模块记忆目录。开始编码前应优先调用，用于判断是否存在可复用的模块上下文。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: '要检索的模块名、需求关键词或功能名称' },
+        pathHints: {
+          type: 'array',
+          items: { type: 'string' },
+          description: '可选的路径提示，如 src/pages/profile, src/modules/order',
+        },
+      },
+      required: ['query'],
+    },
+  },
+  {
+    name: 'aida_memory_get',
+    description: '读取指定模块的长期记忆，包括摘要、关键文件、设计决策、约束和历史工单。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        moduleKey: { type: 'string', description: '模块 key，例如 profile, order-detail' },
+      },
+      required: ['moduleKey'],
+    },
+  },
+  {
+    name: 'aida_memory_upsert',
+    description: '更新模块记忆 JSON 真源。用于在完成一个阶段后沉淀模块职责、关键文件、决策、约束和坑点。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        moduleKey: { type: 'string', description: '模块 key，例如 profile, order-detail' },
+        title: { type: 'string', description: '模块标题' },
+        summary: { type: 'string', description: '模块摘要' },
+        keywords: { type: 'array', items: { type: 'string' } },
+        entryFiles: { type: 'array', items: { type: 'string' } },
+        relatedPaths: { type: 'array', items: { type: 'string' } },
+        dataFlow: { type: 'array', items: { type: 'string' } },
+        decisions: { type: 'array', items: { type: 'string' } },
+        constraints: { type: 'array', items: { type: 'string' } },
+        pitfalls: { type: 'array', items: { type: 'string' } },
+        relatedRules: { type: 'array', items: { type: 'string' } },
+        ticket: { type: 'string', description: '关联工单，如 MTR-001' },
+        branch: { type: 'string', description: '关联分支，默认当前分支' },
+        referenceSummary: { type: 'string', description: '本次工单在该模块上的简要说明' },
+      },
+      required: ['moduleKey'],
+    },
+  },
+  {
+    name: 'aida_context_get',
+    description: '读取当前分支或指定分支的上下文摘要，用于恢复本次需求的近期工作记忆。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        branch: { type: 'string', description: '分支名，默认当前分支' },
+      },
+    },
+  },
+  {
+    name: 'aida_context_update',
+    description: '更新当前分支上下文 JSON 真源。用于沉淀本次需求的当前阶段、已完成项、下一步、关键文件和风险。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        branch: { type: 'string', description: '分支名，默认当前分支' },
+        ticket: { type: 'string', description: '关联工单' },
+        title: { type: 'string', description: '需求标题' },
+        summary: { type: 'string', description: '需求摘要' },
+        currentPhase: { type: 'string', description: '当前阶段，例如 In Progress / Completed' },
+        modules: { type: 'array', items: { type: 'string' } },
+        completed: { type: 'array', items: { type: 'string' } },
+        inProgress: { type: 'array', items: { type: 'string' } },
+        next: { type: 'array', items: { type: 'string' } },
+        decisions: { type: 'array', items: { type: 'string' } },
+        constraints: { type: 'array', items: { type: 'string' } },
+        keyFiles: { type: 'array', items: { type: 'string' } },
+        risks: { type: 'array', items: { type: 'string' } },
+      },
+    },
+  },
+  {
+    name: 'aida_context_rebuild',
+    description: '根据当前分支已有的 run.json、requirement.json、analysis.md 自动重建上下文和模块记忆。适合换机器、长时间中断后恢复记忆。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        branch: { type: 'string', description: '分支名，默认当前分支' },
+      },
+    },
+  },
+  {
+    name: 'aida_memory_pack',
+    description: '读取当前分支的聚合记忆包，包含分支上下文和命中的模块记忆，适合在编码前一次性恢复工作记忆。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        branch: { type: 'string', description: '分支名，默认当前分支' },
+      },
+    },
+  },
 ];
 
 // ─── MCP Prompts ─────────────────────────────────────────
@@ -303,7 +408,18 @@ function handleTaskStart(args: any): any {
   addEvent(data, 'task_started', { taskId: id });
   addTimeline(data, 'task', `${id}: ${args.title}`, task.prdPhase || undefined);
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
   return { success: true, taskId: id, message: `${id} 已记录并开始: ${args.title}` };
+}
+
+function refreshCurrentBranchMemory(branchName?: string): void {
+  const branch = `${branchName || getBranchName()}`.trim();
+  if (!branch) return;
+  try {
+    rebuildCurrentBranchMemory(projectRoot, branch);
+  } catch {
+    // Best-effort only; memory refresh must not block primary logging flow.
+  }
 }
 
 function handleTaskDone(args: any): any {
@@ -335,6 +451,7 @@ function handleTaskDone(args: any): any {
   addEvent(data, 'task_completed', { taskId: args.taskId, tokensConsumed: taskTokens });
   addTimeline(data, 'task-done', `${args.taskId}: ${task.title}`, task.prdPhase || undefined);
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
 
   // Sync total token usage from session
   syncTokenUsage(path, data);
@@ -365,6 +482,7 @@ function handleLogBug(args: any): any {
   addEvent(data, 'bug_created', { bugId: id });
   addTimeline(data, 'bug', `${id}: ${args.title}`, (data.context.currentPrdPhase as string) || undefined);
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
   return { success: true, bugId: id, message: `${id} 已记录: ${args.title} [${severity}]` };
 }
 
@@ -395,6 +513,7 @@ function handleBugFix(args: any): any {
   addEvent(data, 'bug_fixed', { bugId: args.bugId, tokensConsumed: bugTokens });
   addTimeline(data, 'bug-fix', `${args.bugId}: ${bug.title}`, (data.context.currentPrdPhase as string) || undefined);
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
   syncTokenUsage(path, data);
 
   const tokenMsg = bugTokens > 0 ? ` (${bugTokens} tokens)` : '';
@@ -422,6 +541,7 @@ function handleLogReview(args: any): any {
   addEvent(data, 'review_created', { reviewId: id, result });
   addTimeline(data, 'review', `${id}: ${result}`, (data.context.currentPrdPhase as string) || undefined);
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
   syncTokenUsage(path, data);
   return { success: true, reviewId: id, message: `${id}: ${result}` };
 }
@@ -448,6 +568,7 @@ function handleLogDeviation(args: any): any {
   addEvent(data, 'deviation_created', { deviationId: id });
   addTimeline(data, 'deviation', `${id}: ${args.title}`, (data.context.currentPrdPhase as string) || undefined);
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
 
   const result: any = { success: true, deviationId: id, message: `${id} 已记录: ${args.title}` };
 
@@ -589,6 +710,7 @@ function handleLogFiles(): any {
   data.summary.linesRemoved = data.files.reduce((s, f) => s + (f.linesRemoved || 0), 0);
   addEvent(data, 'files_scanned', { count: filesLogged.length });
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
 
   return {
     success: true,
@@ -609,6 +731,7 @@ function handleHighlight(args: any): any {
   data.highlights.push(highlight);
   addEvent(data, 'highlight_added', { content: args.content });
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
   return { success: true, message: `亮点已记录: ${args.content}` };
 }
 
@@ -681,11 +804,138 @@ function handleLogRule(args: any): any {
   addEvent(data, 'rule_sedimented', { ruleId: localId, registryId: entry.id });
   addTimeline(data, 'rule', `${localId}: ${content.substring(0, 50)}`);
   save(path, data);
+  refreshCurrentBranchMemory(data.meta.branch);
 
-  // Rebuild markdown views so AI can read rules next session
-  buildRuleViews(projectRoot);
+  // Rebuild AI tool artifacts from JSON source
+  buildProjectArtifacts(projectRoot);
 
   return { success: true, ruleId: entry.id, message: `规则已沉淀: ${entry.id} [${category}] ${content.substring(0, 60)}` };
+}
+
+function handleMemorySearch(args: any): any {
+  const query = `${args.query || ''}`.trim();
+  if (!query) {
+    return { success: false, message: 'query is required' };
+  }
+  const hits = searchModuleMemories(projectRoot, query, Array.isArray(args.pathHints) ? args.pathHints : []);
+  return {
+    success: true,
+    query,
+    hits,
+  };
+}
+
+function handleMemoryGet(args: any): any {
+  const moduleKey = `${args.moduleKey || ''}`.trim();
+  if (!moduleKey) {
+    return { success: false, message: 'moduleKey is required' };
+  }
+  const record = loadModuleMemory(projectRoot, moduleKey);
+  if (!record) {
+    return { success: false, message: `module memory not found: ${moduleKey}` };
+  }
+  return {
+    success: true,
+    memory: record,
+  };
+}
+
+function handleMemoryUpsert(args: any): any {
+  const moduleKey = `${args.moduleKey || ''}`.trim();
+  if (!moduleKey) {
+    return { success: false, message: 'moduleKey is required' };
+  }
+
+  const record = upsertModuleMemory(projectRoot, {
+    moduleKey,
+    title: args.title,
+    summary: args.summary,
+    keywords: Array.isArray(args.keywords) ? args.keywords : [],
+    entryFiles: Array.isArray(args.entryFiles) ? args.entryFiles : [],
+    relatedPaths: Array.isArray(args.relatedPaths) ? args.relatedPaths : [],
+    dataFlow: Array.isArray(args.dataFlow) ? args.dataFlow : [],
+    decisions: Array.isArray(args.decisions) ? args.decisions : [],
+    constraints: Array.isArray(args.constraints) ? args.constraints : [],
+    pitfalls: Array.isArray(args.pitfalls) ? args.pitfalls : [],
+    relatedRules: Array.isArray(args.relatedRules) ? args.relatedRules : [],
+    tickets: [{
+      ticket: args.ticket || undefined,
+      branch: args.branch || getBranchName(),
+      summary: args.referenceSummary || args.summary || '',
+      updatedAt: now(),
+    }],
+  });
+  buildMemoryViews(projectRoot);
+
+  return {
+    success: true,
+    moduleKey: record.moduleKey,
+    updatedAt: record.updatedAt,
+  };
+}
+
+function handleContextGet(args: any): any {
+  const branch = `${args.branch || getBranchName()}`.trim();
+  const record = loadRunContext(projectRoot, branch);
+  if (!record) {
+    return { success: false, message: `context not found for branch: ${branch}` };
+  }
+  return {
+    success: true,
+    context: record,
+  };
+}
+
+function handleContextRebuild(args: any): any {
+  const branch = `${args.branch || getBranchName()}`.trim();
+  const result = rebuildCurrentBranchMemory(projectRoot, branch);
+  if (!result.context) {
+    return { success: false, message: `no branch data found for ${branch}` };
+  }
+  return {
+    success: true,
+    branch,
+    modules: result.modules.map((item) => item.moduleKey),
+    contextUpdatedAt: result.context.updatedAt,
+  };
+}
+
+function handleMemoryPack(args: any): any {
+  const branch = `${args.branch || getBranchName()}`.trim();
+  const pack = loadRunMemoryPack(projectRoot, branch);
+  if (!pack) {
+    return { success: false, message: `memory pack not found for branch: ${branch}` };
+  }
+  return {
+    success: true,
+    branch,
+    pack,
+  };
+}
+
+function handleContextUpdate(args: any): any {
+  const branch = `${args.branch || getBranchName()}`.trim();
+  const record = updateRunContext(projectRoot, {
+    branch,
+    ticket: args.ticket,
+    title: args.title,
+    summary: args.summary,
+    currentPhase: args.currentPhase,
+    modules: Array.isArray(args.modules) ? args.modules : [],
+    completed: Array.isArray(args.completed) ? args.completed : [],
+    inProgress: Array.isArray(args.inProgress) ? args.inProgress : [],
+    next: Array.isArray(args.next) ? args.next : [],
+    decisions: Array.isArray(args.decisions) ? args.decisions : [],
+    constraints: Array.isArray(args.constraints) ? args.constraints : [],
+    keyFiles: Array.isArray(args.keyFiles) ? args.keyFiles : [],
+    risks: Array.isArray(args.risks) ? args.risks : [],
+  });
+  buildMemoryViews(projectRoot);
+  return {
+    success: true,
+    branch: record.branch,
+    updatedAt: record.updatedAt,
+  };
 }
 
 // ─── MCP Request Router ─────────────────────────────────
@@ -752,6 +1002,27 @@ function handleRequest(req: JsonRpcRequest): void {
             break;
           case 'aida_log_rule':
             result = handleLogRule(args);
+            break;
+          case 'aida_memory_search':
+            result = handleMemorySearch(args);
+            break;
+          case 'aida_memory_get':
+            result = handleMemoryGet(args);
+            break;
+          case 'aida_memory_upsert':
+            result = handleMemoryUpsert(args);
+            break;
+          case 'aida_context_get':
+            result = handleContextGet(args);
+            break;
+          case 'aida_context_update':
+            result = handleContextUpdate(args);
+            break;
+          case 'aida_context_rebuild':
+            result = handleContextRebuild(args);
+            break;
+          case 'aida_memory_pack':
+            result = handleMemoryPack(args);
             break;
           default:
             sendError(id!, -32601, `Unknown tool: ${toolName}`);

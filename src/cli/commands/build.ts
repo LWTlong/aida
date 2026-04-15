@@ -1,8 +1,9 @@
 import { green, red, yellow } from '../../utils/display.js';
-import { buildProjectArtifacts, readConfiguredTools, type AiToolChoice } from '../../utils/ai-build.js';
+import { buildProjectArtifacts, readConfiguredTools } from '../../utils/ai-build.js';
 import { configPath } from '../../utils/paths.js';
 import { fileExists } from '../../utils/fs.js';
 import { promptMultiSelect } from '../../utils/prompt.js';
+import type { AiToolChoice } from '../../schemas/aida-project.js';
 
 function requestedTools(): string[] {
   return process.argv.slice(3);
@@ -38,7 +39,7 @@ export async function build(): Promise<void> {
 
   console.log(
     green('\n  ✓ AIDA build completed') +
-    `: ${result.ruleViews} rule views, ${result.skillViews} skill views, ${result.commandFiles} tool command files\n`,
+    `: ${result.ruleFiles} rule files, ${result.skillFiles} skill files, ${result.commandFiles} tool command files\n`,
   );
 
   if (result.tools.length > 0) {

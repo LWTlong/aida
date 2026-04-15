@@ -11,12 +11,13 @@ import {
   writeJson,
 } from '../../utils/fs.js';
 import { bold, green, cyan, dim, yellow } from '../../utils/display.js';
-import { addRule, buildRuleViews } from '../../utils/rules.js';
+import { addRule } from '../../utils/rules.js';
 import { ensureGuide, syncGuideReference, updateGuide, updateGuideReferences } from '../../utils/guide.js';
 import { ensureBundledSkills, seedBundledSkillRegistry, getSkillContent } from '../../utils/skills.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { detectImportableTools, importExistingToolConfigs, importFromTool, mergeConfiguredTools } from '../../utils/import.js';
 import { promptMultiSelect, promptSingleSelect } from '../../utils/prompt.js';
+import type { AiToolChoice } from '../../schemas/aida-project.js';
 
 const QUICK_COMMANDS: { name: string; skill: string }[] = [
   { name: 'workflow', skill: 'workflow-orchestrator' },
@@ -58,10 +59,6 @@ const IRON_RULES_APPEND = `
 3. 生成测试脚本，在测试验证通过后必须删除测试脚本，保持项目清爽
 4. 当用户直接要求沉淀项目级技术规范，或识别到 rule-missing 需要沉淀规则时，必须通过 AIDA MCP 的 aida_log_rule 写入 .aida/rules.json，不要只修改本地规则说明文件
 `;
-
-// ─── MCP config generation ──────────────────────────────
-
-type AiToolChoice = 'claude-code' | 'cursor' | 'vscode-copilot' | 'windsurf' | 'lingma' | 'codex';
 
 function toolLabel(tool: AiToolChoice): string {
   const labels: Record<AiToolChoice, string> = {
@@ -139,7 +136,6 @@ export async function init(): Promise<void> {
     // ── Option 2: Repair missing files ──────────────────
     if (choice === '2') {
       console.log('\n  Repairing...\n');
-      ensureDir(resolve(aidevos, 'rules'));
       ensureDir(resolve(aidevos, 'runs'));
       const repaired = buildProjectArtifacts(projectRoot, existingTools);
       updateGuide(projectRoot);
@@ -233,7 +229,6 @@ export async function init(): Promise<void> {
   console.log(`\n  Initializing AIDevOS...\n`);
 
   // 1. Create directory structure
-  ensureDir(resolve(aidevos, 'rules'));
   ensureDir(resolve(aidevos, 'runs'));
   console.log(green('  ✓ Created') + ' .aida/');
 

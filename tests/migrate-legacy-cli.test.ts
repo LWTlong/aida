@@ -48,11 +48,28 @@ describe('aida migrate-legacy', () => {
         deviations: [],
         reviews: [],
         rules: [],
-        files: [],
+        files: [
+          { path: 'src/features/big/index.tsx', changeType: 'modified', linesAdded: 30, linesRemoved: 8, changeCount: 1 },
+        ],
         timeline: [],
         workflow: [],
         events: [],
       });
+      writeJson(resolve(root, '.aidevos', 'runs', 'feature-big', 'requirement.json'), {
+        branch: 'feature-big',
+        title: 'MTR-001 大需求改造',
+        summary: '沉淀旧项目大需求的上下文信息。',
+        prdPhases: [],
+        modules: [
+          { id: 'MOD-01', name: '首页', description: '首页聚合区改造', assignee: 'tester' },
+        ],
+        highlights: [],
+        developers: [],
+        totals: { tasks: 0, completedTasks: 0, bugs: 0, deviations: 0, linesAdded: 0, linesRemoved: 0, totalTokens: 0 },
+        createdAt: '2026-04-01T00:00:00.000Z',
+        updatedAt: '2026-04-01T00:00:00.000Z',
+      });
+      writeText(resolve(root, '.aidevos', 'runs', 'feature-big', 'analysis.md'), '# 需求概述\n\n沉淀旧首页模块上下文。\n');
 
       const output = execSync(`node ${cliPath} migrate-legacy cursor`, {
         cwd: root,
@@ -76,7 +93,36 @@ describe('aida migrate-legacy', () => {
       assert.ok(skills.some((entry) => entry.name === 'custom-flow'));
       assert.equal(migratedRun.meta.schemaVersion, '2.0');
       assert.ok(Array.isArray(migratedRun.highlights));
-      assert.ok(fileExists(resolve(root, '.aida', 'rules', '_all.md')));
+      assert.ok(fileExists(resolve(root, '.cursor', 'rules', 'aida', '_all.md')));
+      assert.ok(fileExists(resolve(root, '.aida', 'runs', 'feature-big', 'context.json')));
+      assert.ok(fileExists(resolve(root, '.aida', 'runs', 'feature-big', 'context.md')));
+      assert.ok(fileExists(resolve(root, '.aida', 'memories', 'modules', '首页.json')));
+      assert.ok(fileExists(resolve(root, '.aida', 'memories', 'modules', '首页.md')));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('should fail fast on an invalid baseline tool argument', () => {
+    const root = mkdtempSync(join(tmpdir(), 'aida-migrate-legacy-'));
+    const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');
+
+    try {
+      ensureDir(resolve(root, '.aidevos'));
+      writeJson(resolve(root, '.aidevos', 'config.json'), {
+        schemaVersion: '1.0',
+        project: 'legacy-project',
+        aiTools: ['cursor'],
+      });
+
+      const output = execSync(`node ${cliPath} migrate-legacy unknown-tool`, {
+        cwd: root,
+        encoding: 'utf-8',
+        stdio: 'pipe',
+        env: { ...process.env, HOME: root },
+      });
+
+      assert.ok(output.includes('Unknown baseline tool'));
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

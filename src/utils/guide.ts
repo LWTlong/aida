@@ -23,14 +23,16 @@ const GUIDE_CONTENT = `# AIDA 数据采集与规则沉淀指南
 
 **⚠️ 你正在读取本文件（aida-guide.md）。这是强制规范，严禁跳过任何步骤。**
 
-**开始任何开发任务前，必须按顺序完成以下两步：**
+**开始任何开发任务前，必须按顺序完成以下三步：**
 
-1. **读取项目规则** → 使用 Read 工具读取 \`.aida/rules/_all.md\`，了解已沉淀的项目规则并严格遵守（文件不存在则跳过此步）
-2. **执行数据采集流程** → 严格按照第一节规定的顺序调用 MCP 工具：\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`
+1. **读取项目规则** → 读取当前 AI 工具目录下由 \`aida build\` 生成的规则文件（例如 \`.claude/rules/aida/_all.md\`、\`.cursor/rules/aida/_all.md\`、\`.codex/rules/aida/_all.md\`、\`.lingma/rules/aida/_all.md\`；不存在则跳过）
+2. **恢复模块上下文** → 如果已配置 AIDA MCP，先调用 \`aida_memory_search\` 检索当前需求对应模块，再调用 \`aida_memory_pack\` 或 \`aida_memory_get\` / \`aida_context_get\` 读取命中的模块记忆与当前分支上下文；如果当前分支上下文缺失，先调用 \`aida_context_rebuild\`；若未配置 MCP，则按需读取 \`.aida/memories/index.json\`、\`.aida/memories/modules/*.md\`、\`.aida/runs/*/context.md\`、\`.aida/runs/*/memory.md\`
+3. **执行数据采集流程** → 严格按照第一节规定的顺序调用 MCP 工具：\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`
 
-不得以任何理由跳过上述步骤。
+不得以任何理由跳过上述步骤。若 \`aida_memory_search\` 没有命中模块记忆，可退回正常代码分析流程，但必须先完成检索动作。
 
-**当用户直接口述要沉淀某条项目级技术规范，或你识别到 \`rule-missing\` 类型偏差需要沉淀规则时，不要只修改本地说明文件，必须通过 AIDA MCP 的 \`aida_log_rule\` 工具写入 \`.aida/rules.json\`。**
+**当用户直接口述要沉淀某条项目级技术规范，或你识别到 \`rule-missing\` 类型偏差需要沉淀规则时，不要只修改本地说明文件。若已配置 AIDA MCP，必须调用 \`aida_log_rule\` 写入 \`.aida/rules.json\`；若未配置 MCP，则使用 CLI \`aida rules add\` 写入 \`.aida/rules.json\`。**
+**当需求推进后需要沉淀模块记忆或更新当前分支上下文时，若已配置 AIDA MCP，优先调用 \`aida_memory_upsert\` / \`aida_context_update\`；若未配置 MCP，则使用 CLI \`aida memory upsert\` / \`aida memory context-update\`。不要直接手改生成的 \`.md\` 视图文件。**
 
 ## 一、数据采集
 
@@ -99,7 +101,7 @@ category 可选值：
 
 1. 修复偏差代码后，判断修复方案是否属于上述"需要沉淀"的范围
 2. 如果是，**必须询问用户**："这个偏差的修复方案属于项目级规范，沉淀为规则后可以防止同类问题复现。是否沉淀为项目规则？"
-3. 用户同意后，调用 \`aida_log_rule\` 工具，传入参数：
+3. 用户同意后，如果已配置 AIDA MCP，则调用 \`aida_log_rule\` 工具；否则调用 CLI \`aida rules add\`。两者都必须写入 \`.aida/rules.json\`，再通过 \`aida build\` 分发到各 AI 工具目录
    - content: 规则描述
    - category: 分类（可选值：component, api, style, i18n, architecture, state-management, routing, testing, process, general）
    - sourceDeviation: 关联的偏差 ID（如 DEV-01）
@@ -109,7 +111,7 @@ category 可选值：
 如果用户明确口述一条应长期生效的项目级技术规范，也应按同样原则处理：
 1. 判断它是否属于项目级技术规范，而不是业务逻辑
 2. 如有歧义先确认
-3. 确认后调用 \`aida_log_rule\` 写入 \`.aida/rules.json\`
+3. 确认后调用 \`aida_log_rule\` 或 CLI \`aida rules add\` 写入 \`.aida/rules.json\`
 4. 不要只把它写进某个 AI 工具自己的本地规则文件
 
 ### 阶段性回顾
@@ -128,14 +130,18 @@ const CLAUDE_REFERENCE = `
 ## AIDA
 
 **⚠️ 严禁跳过：开始任何开发任务前，必须通过 Read 工具读取 \`.aida/aida-guide.md\` 的完整内容，并严格按照其中的规范执行。不得以任何理由跳过。**
-**当用户直接要求沉淀规则，或你识别到需要沉淀项目级技术规范时，必须使用 AIDA MCP 的 \`aida_log_rule\` 工具写入 \`.aida/rules.json\`，不要只修改本地规则说明文件。**
+**开始编码前，读取 \`.claude/rules/aida/_all.md\`（如果存在）以获取当前项目规则。**
+**开始编码前，先调用 AIDA MCP 的 \`aida_memory_search\` 检索当前功能模块；命中后优先调用 \`aida_memory_pack\`，或继续调用 \`aida_memory_get\` / \`aida_context_get\` 恢复上下文。若当前分支上下文不存在，先调用 \`aida_context_rebuild\`。**
+**当用户直接要求沉淀规则，或你识别到需要沉淀项目级技术规范时，优先使用 AIDA MCP 的 \`aida_log_rule\`；若当前会话未配置 AIDA MCP，则使用 CLI \`aida rules add\` 写入 \`.aida/rules.json\`。**
 `;
 
 const CODEX_REFERENCE = `
 ## AIDA
 
 **⚠️ 严禁跳过：开始任何开发任务前，必须先读取 \`.aida/aida-guide.md\`，并严格执行其中的数据采集与规则沉淀规范。**
-**当用户直接要求沉淀规则，或你识别到需要沉淀项目级技术规范时，必须调用 \`aida_log_rule\` 写入 \`.aida/rules.json\`，不要只修改 AGENTS 或其他本地说明文件。**
+**开始编码前，读取 \`.codex/rules/aida/_all.md\`（如果存在）以获取当前项目规则。**
+**开始编码前，先调用 \`aida_memory_search\` 检索当前功能模块；命中后优先调用 \`aida_memory_pack\`，或继续调用 \`aida_memory_get\` / \`aida_context_get\` 恢复上下文。若当前分支上下文不存在，先调用 \`aida_context_rebuild\`。**
+**当用户直接要求沉淀规则，或你识别到需要沉淀项目级技术规范时，优先调用 \`aida_log_rule\`；若当前会话未配置 AIDA MCP，则使用 CLI \`aida rules add\` 写入 \`.aida/rules.json\`。**
 `;
 
 // ─── Cursor rule frontmatter ────────────────────────────

@@ -1,4 +1,4 @@
-import { readdirSync, renameSync, statSync } from 'node:fs';
+import { readdirSync, renameSync, rmSync, statSync } from 'node:fs';
 import { resolve, extname, basename } from 'node:path';
 import { cyan, green, red, yellow } from '../../utils/display.js';
 import { fileExists, readText, writeText } from '../../utils/fs.js';
@@ -56,6 +56,33 @@ function walkAndReplace(rootDir: string): number {
   return updated;
 }
 
+function normalizeLegacyToolArtifactDirs(projectRoot: string): number {
+  let updated = 0;
+
+  const oldCursorRulesDir = resolve(projectRoot, '.cursor', 'rules', 'aidevos');
+  const newCursorRulesDir = resolve(projectRoot, '.cursor', 'rules', 'aida');
+
+  if (fileExists(oldCursorRulesDir)) {
+    if (!fileExists(newCursorRulesDir)) {
+      renameSync(oldCursorRulesDir, newCursorRulesDir);
+      updated++;
+    } else {
+      for (const name of readdirSync(oldCursorRulesDir)) {
+        const source = resolve(oldCursorRulesDir, name);
+        const target = resolve(newCursorRulesDir, name);
+        if (!fileExists(target)) {
+          renameSync(source, target);
+          updated++;
+        }
+      }
+      rmSync(oldCursorRulesDir, { recursive: true, force: true });
+      updated++;
+    }
+  }
+
+  return updated;
+}
+
 export function migrateLegacyDirectory(projectRoot: string): {
   status: 'migrated' | 'already-current' | 'missing-legacy' | 'conflict'
   updatedFiles: number
@@ -65,7 +92,7 @@ export function migrateLegacyDirectory(projectRoot: string): {
 
   if (!fileExists(oldDir)) {
     if (fileExists(newDir)) {
-      return { status: 'already-current', updatedFiles: 0 };
+      return { status: 'already-current', updatedFiles: normalizeLegacyToolArtifactDirs(projectRoot) };
     }
     return { status: 'missing-legacy', updatedFiles: 0 };
   }
@@ -85,6 +112,8 @@ export function migrateLegacyDirectory(projectRoot: string): {
       updatedFiles++;
     }
   }
+
+  updatedFiles += normalizeLegacyToolArtifactDirs(projectRoot);
 
   return { status: 'migrated', updatedFiles };
 }

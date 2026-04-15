@@ -10,7 +10,8 @@ import type {
   FileItem,
   HighlightItem,
 } from '../../schemas/run-json.js';
-import { addRule, buildRuleViews } from '../../utils/rules.js';
+import { addRule } from '../../utils/rules.js';
+import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import {
   SEVERITY_VALUES,
   BUG_SOURCE_VALUES,
@@ -316,8 +317,8 @@ function logRule(flags: Record<string, string>): void {
   addTimeline(data, 'rule', `${localId}: ${content.substring(0, 50)}`);
   save(path, data);
 
-  // Auto-rebuild markdown views
-  buildRuleViews(projectRoot);
+  // Auto-rebuild AI tool artifacts from JSON source
+  buildProjectArtifacts(projectRoot);
 
   if (!isDuplicate) {
     console.log(green(`\n  ✓ ${entry.id}`) + ` [${category}]: ${content.substring(0, 60)}\n`);

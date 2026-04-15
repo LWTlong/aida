@@ -58,6 +58,14 @@ export function loadSkillRegistry(projectRoot: string): SkillRegistryEntry[] {
   }
 }
 
+export function activeSkills(entries: SkillRegistryEntry[]): SkillRegistryEntry[] {
+  return entries.filter((entry) => entry.status === 'active');
+}
+
+export function skillFiles(entries: SkillRegistryEntry[]): Array<{ name: string; content: string }> {
+  return activeSkills(entries).map((entry) => ({ name: entry.name, content: entry.content }));
+}
+
 export function saveSkillRegistry(projectRoot: string, entries: SkillRegistryEntry[]): void {
   writeJson(skillsRegistryPath(projectRoot), entries);
 }
@@ -67,6 +75,10 @@ function bundledSkillNames(): string[] {
     .filter((name) => name.endsWith('.md'))
     .map((name) => name.replace(/\.md$/, ''))
     .sort();
+}
+
+export function isBundledSkillName(name: string): boolean {
+  return bundledSkillNames().includes(name);
 }
 
 export function bundledSkillEntries(): SkillRegistryEntry[] {
@@ -205,8 +217,7 @@ export function buildSkillViews(projectRoot: string): number {
   ensureDir(viewDir);
 
   let written = 0;
-  for (const entry of entries) {
-    if (entry.status === 'deprecated') continue;
+  for (const entry of skillFiles(entries)) {
     const destDir = resolve(viewDir, entry.name);
     ensureDir(destDir);
     writeText(resolve(destDir, 'SKILL.md'), entry.content);

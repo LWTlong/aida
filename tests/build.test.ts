@@ -12,7 +12,7 @@ let tmpRoot: string;
 
 beforeEach(() => {
   tmpRoot = mkdtempSync(join(tmpdir(), 'aida-build-'));
-  ensureDir(resolve(tmpRoot, '.aida', 'rules'));
+  ensureDir(resolve(tmpRoot, '.aida'));
   writeJson(resolve(tmpRoot, '.aida', 'config.json'), {
     schemaVersion: '1.0',
     project: 'build-test',
@@ -40,6 +40,7 @@ describe('bootstrapSkillRegistry', () => {
 
 describe('bootstrapRuleRegistry', () => {
   it('should create rules.json from existing generated rule views', () => {
+    ensureDir(resolve(tmpRoot, '.aida', 'rules'));
     writeText(resolve(tmpRoot, '.aida', 'rules', '_all.md'), `<!-- AUTO-GENERATED from rules.json - DO NOT EDIT -->
 # All Project Rules
 
@@ -74,15 +75,16 @@ describe('buildProjectArtifacts', () => {
     const result = buildProjectArtifacts(tmpRoot);
 
     assert.deepEqual(result.tools, ['claude-code', 'cursor']);
-    assert.ok(fileExists(resolve(tmpRoot, '.aida', 'rules', '_all.md')));
-    assert.ok(fileExists(resolve(tmpRoot, '.aida', 'skills', 'workflow-orchestrator', 'SKILL.md')));
+    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'rules', 'aida', '_all.md')));
+    assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'rules', 'aida', '_all.md')));
+    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'skills', 'workflow-orchestrator.md')));
     assert.ok(fileExists(resolve(tmpRoot, '.mcp.json')));
     assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'mcp.json')));
     assert.ok(fileExists(resolve(tmpRoot, '.claude', 'commands', 'workflow.md')));
     assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'workflow', 'SKILL.md')));
 
     const gitignore = readText(resolve(tmpRoot, '.gitignore'));
-    assert.ok(gitignore.includes('.aida/skills/*/SKILL.md'));
+    assert.ok(gitignore.includes('.claude/skills/'));
     assert.ok(gitignore.includes('.claude/commands/*.md'));
     assert.ok(gitignore.includes('.cursor/skills/'));
   });

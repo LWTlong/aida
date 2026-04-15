@@ -1,6 +1,7 @@
 import { green, red, yellow } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
 import { fileExists } from '../../utils/fs.js';
+import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { mergeRulesRegistry } from './rules.js';
 import { mergeSkillsRegistry } from './skills.js';
 
@@ -43,6 +44,8 @@ export async function merge(): Promise<void> {
     console.log(yellow('\n  No registry conflicts detected.\n'));
     return;
   }
+
+  buildProjectArtifacts(projectRoot);
 
   console.log(green('\n  ✓ Registry merge completed\n'));
   for (const line of lines) console.log(line);

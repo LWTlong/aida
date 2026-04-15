@@ -59,4 +59,27 @@ describe('aida migrate-dir', () => {
       rmSync(root, { recursive: true, force: true });
     }
   });
+
+  it('should normalize legacy cursor generated rule directory names', () => {
+    const root = mkdtempSync(join(tmpdir(), 'aida-migrate-dir-'));
+    const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');
+
+    try {
+      ensureDir(resolve(root, '.aida'));
+      ensureDir(resolve(root, '.cursor', 'rules', 'aidevos'));
+      writeText(resolve(root, '.cursor', 'rules', 'aidevos', 'team.md'), '# Team\n');
+
+      execSync(`node ${cliPath} migrate-dir`, {
+        cwd: root,
+        encoding: 'utf-8',
+        stdio: 'pipe',
+        env: { ...process.env, HOME: root },
+      });
+
+      assert.equal(fileExists(resolve(root, '.cursor', 'rules', 'aidevos')), false);
+      assert.equal(fileExists(resolve(root, '.cursor', 'rules', 'aida', 'team.md')), true);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
 });

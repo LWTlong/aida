@@ -148,28 +148,67 @@ describe('MCP Server - initialize', () => {
 // ─── tools/list ───────────────────────────────────────────
 
 describe('MCP Server - tools/list', () => {
-  it('should return all 10 tools', async () => {
+  it('should return all registered tools', async () => {
     await client.initialize();
 
     const resp = await client.rpc('tools/list');
     assert.ok(resp.result);
     const tools = resp.result.tools;
-    assert.equal(tools.length, 10);
+    assert.equal(tools.length, 17);
 
     const names = tools.map((t: any) => t.name).sort();
     const expected = [
       'aida_bug_fix',
+      'aida_context_get',
+      'aida_context_rebuild',
+      'aida_context_update',
       'aida_highlight',
       'aida_log_bug',
       'aida_log_deviation',
       'aida_log_files',
       'aida_log_review',
       'aida_log_rule',
+      'aida_memory_get',
+      'aida_memory_pack',
+      'aida_memory_search',
+      'aida_memory_upsert',
       'aida_status',
       'aida_task_done',
       'aida_task_start',
     ];
     assert.deepEqual(names, expected);
+  });
+});
+
+describe('MCP Server - memory tools', () => {
+  it('should rebuild branch memory and return an aggregated memory pack', async () => {
+    await client.initialize();
+
+    const branchDir = resolve(project.root, '.aida', 'runs', project.branch);
+    const { writeJson, writeText } = await import('../src/utils/fs.js');
+    writeJson(resolve(branchDir, 'requirement.json'), {
+      branch: project.branch,
+      title: 'MTR-001 Profile',
+      summary: 'Profile rebuild',
+      prdPhases: [],
+      modules: [
+        { id: 'MOD-01', name: 'Profile', description: 'User profile module', assignee: project.dev },
+      ],
+      highlights: [],
+      developers: [],
+      totals: { tasks: 0, completedTasks: 0, bugs: 0, deviations: 0, linesAdded: 0, linesRemoved: 0, totalTokens: 0 },
+      createdAt: '2026-04-15T12:00:00.000Z',
+      updatedAt: '2026-04-15T12:00:00.000Z',
+    });
+    writeText(resolve(branchDir, 'analysis.md'), '# Summary\n\nProfile rebuild.\n');
+
+    const rebuild = await client.callTool('aida_context_rebuild', {});
+    assert.equal(rebuild.success, true);
+
+    const pack = await client.callTool('aida_memory_pack', {});
+    assert.equal(pack.success, true);
+    assert.equal(pack.pack.context.branch, project.branch);
+    assert.ok(Array.isArray(pack.pack.modules));
   });
 });
 

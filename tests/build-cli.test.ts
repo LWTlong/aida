@@ -51,12 +51,15 @@ describe('aida build', () => {
       assert.ok(readText(resolve(project.root, '.aida', 'codex', 'config.toml')).includes('[mcp_servers.aida]'));
       assert.ok(readText(resolve(project.root, '.codex', 'config.toml')).includes('[mcp_servers.aida]'));
       assert.ok(readText(resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md')).includes('Workflow content'));
-      assert.ok(readText(resolve(project.root, '.aida', 'rules', '_all.md')).includes('Rule A'));
+      assert.ok(readText(resolve(project.root, '.cursor', 'rules', 'aida', '_all.md')).includes('Rule A'));
+      assert.ok(readText(resolve(project.root, '.codex', 'rules', 'aida', '_all.md')).includes('Rule A'));
       const snapshot = readJson<any>(resolve(project.root, '.aida', 'tool-configs.json'));
       assert.ok(Array.isArray(snapshot.snapshots));
       assert.ok(snapshot.snapshots.some((item: any) => item.tool === 'codex'));
       const gitignore = readText(resolve(project.root, '.gitignore'));
       assert.ok(gitignore.includes('.aida/tool-configs.json'));
+      assert.ok(gitignore.includes('.aida/memories/modules/*.md'));
+      assert.ok(gitignore.includes('.aida/runs/*/context.md'));
     } finally {
       project.cleanup();
     }
@@ -105,6 +108,7 @@ describe('aida build', () => {
 
       assert.ok(stdout.includes('Select AI tools to build'));
       assert.ok(readText(resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md')).includes('Workflow content'));
+      assert.ok(readText(resolve(project.root, '.cursor', 'rules', 'aida', '_all.md')).includes('Rule A'));
     } finally {
       project.cleanup();
     }

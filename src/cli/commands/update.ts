@@ -1,44 +1,15 @@
 import { resolve } from 'node:path';
-import { existsSync, readdirSync, statSync } from 'node:fs';
-import { SKILLS_DIR } from '../../utils/paths.js';
 import {
-  ensureDir,
   writeText,
   readText,
   fileExists,
 } from '../../utils/fs.js';
 import { bold, green, cyan, dim, yellow } from '../../utils/display.js';
 import { updateGuide, updateGuideReferences } from '../../utils/guide.js';
-import { seedBundledSkillRegistry } from '../../utils/skills.js';
+import { loadSkillRegistry, seedBundledSkillRegistry } from '../../utils/skills.js';
 import { buildProjectArtifacts, readConfiguredTools } from '../../utils/ai-build.js';
 import * as readline from 'node:readline/promises';
 import { stdin, stdout } from 'node:process';
-
-const ALL_SKILLS = [
-  'workflow-orchestrator',
-  'requirement-analyzer',
-  'task-splitter',
-  'code-generator',
-  'self-reviewer',
-  'bug-fixer',
-  'deviation-recorder',
-  'dashboard-generator',
-  'commit-code',
-  'docx-to-markdown',
-  'mcp-reviewer',
-  'rules-evolver',
-  'dev-flower',
-  'audit',
-];
-
-const QUICK_COMMANDS: { name: string; skill: string }[] = [
-  { name: 'workflow', skill: 'workflow-orchestrator' },
-  { name: 'audit', skill: 'audit' },
-  { name: 'deviation', skill: 'deviation-recorder' },
-  { name: 'self-reviewer', skill: 'self-reviewer' },
-  { name: 'bug-fixer', skill: 'bug-fixer' },
-  { name: 'rules-evolver', skill: 'rules-evolver' },
-];
 
 interface Config {
   schemaVersion: string;
@@ -74,40 +45,15 @@ export async function update(): Promise<void> {
   console.log(`  AI Tool: ${cyan(tool)}`);
   console.log('');
 
-  // Detect which skills/commands exist
-  const skillsDir = resolve(aidevos, 'skills');
-  const existingSkills: string[] = [];
-  if (existsSync(skillsDir)) {
-    existingSkills.push(...readdirSync(skillsDir).filter((f) =>
-      statSync(resolve(skillsDir, f)).isDirectory()
-    ));
-  }
+  const existingSkills = loadSkillRegistry(projectRoot);
 
-  const existingCommands: string[] = [];
-  if (tool === 'claude-code') {
-    const cmdDir = resolve(projectRoot, '.claude', 'commands');
-    if (existsSync(cmdDir)) {
-      existingCommands.push(...readdirSync(cmdDir)
-        .filter((f) => f.endsWith('.md'))
-        .map((f) => f.replace('.md', '')));
-    }
-  } else {
-    const skillsDir = resolve(projectRoot, '.cursor', 'skills');
-    if (existsSync(skillsDir)) {
-      existingCommands.push(...readdirSync(skillsDir).filter((f) =>
-        statSync(resolve(skillsDir, f)).isDirectory()
-      ));
-    }
-  }
-
-  console.log(`  Found ${existingSkills.length} skills in .aida/skills/`);
-  console.log(`  Found ${existingCommands.length} quick commands in ${tool === 'claude-code' ? '.claude/commands/' : '.cursor/skills/'}`);
+  console.log(`  Found ${existingSkills.length} skills in .aida/skills.json`);
   console.log('');
 
   // Ask confirmation
   const rl = readline.createInterface({ input: stdin, output: stdout });
-  console.log('  This will update all skills to the latest version.');
-  console.log(dim('  Old versions will be backed up to .aida/skills-backup/\n'));
+  console.log('  This will replace skills.json with the latest bundled skill set and rebuild local AI tool artifacts.');
+  console.log(dim('  Old skills.json will be backed up to .aida/skills-backup-*.json\n'));
   const answer = (await rl.question('  Continue? (y/N) > ')).trim().toLowerCase();
   rl.close();
 
@@ -118,67 +64,16 @@ export async function update(): Promise<void> {
 
   console.log('');
 
-  // Backup existing skills
+  // Backup existing skills.json
   if (existingSkills.length > 0) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0];
-    const backupDir = resolve(aidevos, `skills-backup-${timestamp}`);
-    ensureDir(backupDir);
-
-    for (const skill of existingSkills) {
-      const src = resolve(skillsDir, skill);
-      const dest = resolve(backupDir, skill);
-      if (existsSync(resolve(src, 'SKILL.md'))) {
-        ensureDir(dest);
-        writeText(resolve(dest, 'SKILL.md'), readText(resolve(src, 'SKILL.md')));
-      }
-    }
-    console.log(green('  ✓ Backed up') + ` old skills to skills-backup-${timestamp}/`);
+    const backupPath = resolve(aidevos, `skills-backup-${timestamp}.json`);
+    writeText(backupPath, JSON.stringify(existingSkills, null, 2) + '\n');
+    console.log(green('  ✓ Backed up') + ` current skills.json to ${backupPath.replace(`${projectRoot}/`, '')}`);
   }
 
-  // Update all skills to .aida/skills/
-  let updatedCount = 0;
-  for (const skill of ALL_SKILLS) {
-    const src = resolve(SKILLS_DIR, `${skill}.md`);
-    const destDir = resolve(aidevos, 'skills', skill);
-    const destFile = resolve(destDir, 'SKILL.md');
-
-    if (fileExists(src)) {
-      ensureDir(destDir);
-      writeText(destFile, readText(src));
-      updatedCount++;
-    }
-  }
-  seedBundledSkillRegistry(projectRoot);
-  console.log(green('  ✓ Updated') + ` ${updatedCount} skills in .aida/skills/`);
-
-  // Update quick commands
-  let commandsUpdated = 0;
-  if (tool === 'claude-code') {
-    const cmdDir = resolve(projectRoot, '.claude', 'commands');
-    ensureDir(cmdDir);
-
-    for (const cmd of QUICK_COMMANDS) {
-      const src = resolve(SKILLS_DIR, `${cmd.skill}.md`);
-      const dest = resolve(cmdDir, `${cmd.name}.md`);
-      if (fileExists(src)) {
-        writeText(dest, readText(src));
-        commandsUpdated++;
-      }
-    }
-    console.log(green('  ✓ Updated') + ` ${commandsUpdated} commands in .claude/commands/`);
-  } else {
-    for (const cmd of QUICK_COMMANDS) {
-      const src = resolve(SKILLS_DIR, `${cmd.skill}.md`);
-      const destDir = resolve(projectRoot, '.cursor', 'skills', cmd.name);
-      const destFile = resolve(destDir, 'SKILL.md');
-      if (fileExists(src)) {
-        ensureDir(destDir);
-        writeText(destFile, readText(src));
-        commandsUpdated++;
-      }
-    }
-    console.log(green('  ✓ Updated') + ` ${commandsUpdated} commands in .cursor/skills/`);
-  }
+  const seeded = seedBundledSkillRegistry(projectRoot);
+  console.log(green('  ✓ Updated') + ` ${seeded.length} bundled skills in .aida/skills.json`);
 
   // Update guide and AI tool rule files
   updateGuide(projectRoot);
@@ -187,12 +82,13 @@ export async function update(): Promise<void> {
 
   const tools = readConfiguredTools(projectRoot);
   if (tools.length > 0) {
-    buildProjectArtifacts(projectRoot, tools);
+    const built = buildProjectArtifacts(projectRoot, tools);
+    console.log(green('  ✓ Rebuilt') + ` ${built.ruleFiles} rule files, ${built.skillFiles} skill files, ${built.commandFiles} tool command files`);
   }
 
   // Ensure .gitignore has required entries
   const gitignorePath = resolve(projectRoot, '.gitignore');
-  const gitignoreEntries = ['.aida/rules/*.md', '.aida/index.json'];
+  const gitignoreEntries = ['.aida/index.json', '.aida/tool-configs.json'];
   const gitignoreExisting = fileExists(gitignorePath) ? readText(gitignorePath) : '';
   const toAdd = gitignoreEntries.filter((e) => !gitignoreExisting.includes(e));
   if (toAdd.length > 0) {
