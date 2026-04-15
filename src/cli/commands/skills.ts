@@ -4,7 +4,6 @@ import { green, red, yellow, cyan, dim } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
 import { extractConflictSections, fileExists, readText, parseConflictJsonArray, ensureDir, writeText } from '../../utils/fs.js';
 import {
-  buildSkillViews,
   loadSkillRegistry,
   mergeSkillRegistries,
   saveSkillRegistry,
@@ -34,11 +33,11 @@ function editBufferPath(projectRoot: string, skillName: string): string {
 async function skillsBuild(): Promise<void> {
   const projectRoot = process.cwd();
   bootstrapSkillRegistry(projectRoot);
-  const count = buildSkillViews(projectRoot);
+  const result = buildProjectArtifacts(projectRoot);
   const entries = loadSkillRegistry(projectRoot);
   console.log(
-    green('\n  ✓ Skill views rebuilt') +
-    `: ${entries.length} skills → ${count} view directories\n`,
+    green('\n  ✓ Skills rebuilt') +
+    `: ${entries.length} skills → ${result.skillFiles} generated tool skill files\n`,
   );
 }
 
@@ -63,7 +62,6 @@ export async function mergeSkillsRegistry(projectRoot: string): Promise<{ status
   const theirs = parseConflictJsonArray<SkillRegistryEntry>(sections.theirs);
   const { merged, added } = mergeSkillRegistries(ours, theirs);
   saveSkillRegistry(projectRoot, merged);
-  buildSkillViews(projectRoot);
 
   return { status: 'merged', added, total: merged.length };
 }
@@ -90,6 +88,7 @@ async function skillsMerge(): Promise<void> {
     return;
   }
   if (result.status === 'merged') {
+    buildProjectArtifacts(projectRoot);
     console.log(
       green('  ✓ Merged successfully') +
       `: ${result.total} total skills (${result.added} new from incoming branch)\n`,
@@ -212,13 +211,13 @@ export async function skills(): Promise<void> {
   ${cyan('aida skills')} - Manage project skills registry
 
   Subcommands:
-    build     Rebuild .aida/skills/*/SKILL.md views from skills.json
+    build     Rebuild AI tool skill files from skills.json
     edit      Edit one skill and save back to skills.json
     merge     Auto-resolve git merge conflicts in skills.json
     list      List all skills in the registry (--json supported)
 
   The source of truth is .aida/skills.json (committed to git).
-  The .aida/skills/*/SKILL.md files are generated views.
+  aida build distributes generated skill files into each configured AI tool directory.
 `);
   }
 }

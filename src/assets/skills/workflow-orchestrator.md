@@ -1,7 +1,7 @@
 ---
 name: workflow-orchestrator
 description: 编排需求分析 -> 任务拆分 -> 代码生成 -> 自检的完整 AI 开发流程，支持中断恢复。所有状态数据读写 run.json。
-globs: ['.aida/runs/*/*/run.json', '.aida/runs/*/requirement.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/*/run.json', '.aida/runs/*/requirement.json', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']
 ---
 
 # workflow-orchestrator (流程编排器)
@@ -24,14 +24,14 @@ globs: ['.aida/runs/*/*/run.json', '.aida/runs/*/requirement.json', '.aida/rules
 ## Skill 调用方式
 
 通过文件路径引用调用原子 Skill，AI 在执行时读取对应 Skill 文件：
-- `.aida/skills/requirement-analyzer/SKILL.md`
-- `.aida/skills/task-splitter/SKILL.md`
-- `.aida/skills/code-generator/SKILL.md`
-- `.aida/skills/self-reviewer/SKILL.md`
-- `.aida/skills/bug-fixer/SKILL.md`
-- `.aida/skills/docx-to-markdown/SKILL.md`
-- `.aida/skills/mcp-reviewer/SKILL.md`
-- `.aida/skills/dashboard-generator/SKILL.md`
+- `.aida/skills.json` 中的 requirement-analyzer
+- `.aida/skills.json` 中的 task-splitter
+- `.aida/skills.json` 中的 code-generator
+- `.aida/skills.json` 中的 self-reviewer
+- `.aida/skills.json` 中的 bug-fixer
+- `.aida/skills.json` 中的 docx-to-markdown
+- `.aida/skills.json` 中的 mcp-reviewer
+- `.aida/skills.json` 中的 dashboard-generator
 
 ## 执行逻辑 (工作流生命周期)
 

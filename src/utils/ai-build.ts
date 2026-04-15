@@ -1,12 +1,12 @@
 import { dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
-import { buildRuleViews } from './rules.js';
-import { bootstrapSkillRegistry, buildSkillViews, getSkillContent } from './skills.js';
+import { bootstrapRuleRegistry, renderRuleMarkdownFiles } from './rules.js';
+import { activeSkills, bootstrapSkillRegistry, getSkillContent } from './skills.js';
 import { ensureGuide, updateGuide, updateGuideReferences } from './guide.js';
-import { configPath } from './paths.js';
+import { buildMemoryViews } from './memory.js';
+import { configPath, toolConfigStorePath } from './paths.js';
 import { ensureDir, fileExists, readJson, readText, writeJson, writeText } from './fs.js';
-
-export type AiToolChoice = 'claude-code' | 'cursor' | 'vscode-copilot' | 'windsurf' | 'lingma' | 'codex';
+import type { AiToolChoice, AidaConfig, ToolConfigSnapshot, ToolConfigStore } from '../schemas/aida-project.js';
 
 export const QUICK_COMMANDS: { name: string; skill: string }[] = [
   { name: 'workflow', skill: 'workflow-orchestrator' },
@@ -28,21 +28,66 @@ const MCP_CONFIG_JSON = JSON.stringify({
   },
 }, null, 2);
 
-interface AidaConfig {
-  aiTool?: AiToolChoice
-  aiTools?: AiToolChoice[]
-}
-
 const CODEX_CONFIG_TOML = `[mcp_servers.aida]
 command = "npx"
 args = ["-y", "ai-dev-analytics", "mcp"]
 `;
 
-interface ToolConfigSnapshot {
-  tool: AiToolChoice
-  path: string
-  format: 'json' | 'toml' | 'text'
-  content: unknown
+function writeRuleBundle(dir: string, files: Map<string, string>): number {
+  ensureDir(dir);
+  for (const [name, content] of files) {
+    writeText(resolve(dir, name), content);
+  }
+  return files.size;
+}
+
+function buildClaudeRules(projectRoot: string, files: Map<string, string>): number {
+  return writeRuleBundle(resolve(projectRoot, '.claude', 'rules', 'aida'), files);
+}
+
+function buildCursorRules(projectRoot: string, files: Map<string, string>): number {
+  return writeRuleBundle(resolve(projectRoot, '.cursor', 'rules', 'aida'), files);
+}
+
+function buildLingmaRules(projectRoot: string, files: Map<string, string>): number {
+  return writeRuleBundle(resolve(projectRoot, '.lingma', 'rules', 'aida'), files);
+}
+
+function buildCodexRules(projectRoot: string, files: Map<string, string>): number {
+  return writeRuleBundle(resolve(projectRoot, '.codex', 'rules', 'aida'), files);
+}
+
+function buildClaudeSkills(projectRoot: string): number {
+  const dir = resolve(projectRoot, '.claude', 'skills');
+  ensureDir(dir);
+  let written = 0;
+  for (const entry of activeSkills(bootstrapSkillRegistry(projectRoot))) {
+    writeText(resolve(dir, `${entry.name}.md`), entry.content);
+    written++;
+  }
+  return written;
+}
+
+function buildCursorSkills(projectRoot: string): number {
+  let written = 0;
+  for (const entry of activeSkills(bootstrapSkillRegistry(projectRoot))) {
+    const dir = resolve(projectRoot, '.cursor', 'skills', entry.name);
+    ensureDir(dir);
+    writeText(resolve(dir, 'SKILL.md'), entry.content);
+    written++;
+  }
+  return written;
+}
+
+function buildCodexSkills(projectRoot: string): number {
+  const dir = resolve(projectRoot, '.codex', 'skills');
+  ensureDir(dir);
+  let written = 0;
+  for (const entry of activeSkills(bootstrapSkillRegistry(projectRoot))) {
+    writeText(resolve(dir, `${entry.name}.md`), entry.content);
+    written++;
+  }
+  return written;
 }
 
 export function readConfiguredTools(projectRoot: string): AiToolChoice[] {
@@ -81,6 +126,46 @@ function writeJsonMerge(filePath: string): void {
   writeText(filePath, MCP_CONFIG_JSON + '\n');
 }
 
+function readToolConfigStore(projectRoot: string): ToolConfigStore {
+  const path = toolConfigStorePath(projectRoot);
+  if (!fileExists(path)) return { snapshots: [] };
+  try {
+    return readJson<ToolConfigStore>(path);
+  } catch {
+    return { snapshots: [] };
+  }
+}
+
+function findStoredSnapshot(projectRoot: string, tool: AiToolChoice, path: string): ToolConfigSnapshot | null {
+  const store = readToolConfigStore(projectRoot);
+  const snapshots = Array.isArray(store.snapshots) ? store.snapshots : [];
+  return snapshots.find((snapshot) => snapshot.tool === tool && snapshot.path === path) || null;
+}
+
+function renderJsonConfig(content: unknown): string {
+  let config: Record<string, unknown> = {};
+
+  if (content && typeof content === 'object' && !Array.isArray(content)) {
+    config = { ...(content as Record<string, unknown>) };
+  } else if (typeof content === 'string' && content.trim().length > 0) {
+    try {
+      const parsed = JSON.parse(content);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        config = { ...(parsed as Record<string, unknown>) };
+      }
+    } catch {
+      config = {};
+    }
+  }
+
+  const mcpServers = (config.mcpServers && typeof config.mcpServers === 'object' && !Array.isArray(config.mcpServers))
+    ? { ...(config.mcpServers as Record<string, unknown>) }
+    : {};
+  mcpServers.aida = MCP_SERVER_ENTRY;
+  config.mcpServers = mcpServers;
+  return `${JSON.stringify(config, null, 2)}\n`;
+}
+
 function mergeCodexToml(raw: string): string {
   const trimmed = raw.trim();
   const block = CODEX_CONFIG_TOML.trim();
@@ -93,19 +178,19 @@ function mergeCodexToml(raw: string): string {
   return `${trimmed}\n\n${block}\n`;
 }
 
-function syncCodexGlobalConfig(): string {
+function syncCodexGlobalConfig(content: string): string {
   const home = process.env.HOME || homedir();
   const codexDir = resolve(home, '.codex');
   const codexConfigPath = resolve(codexDir, 'config.toml');
   ensureDir(dirname(codexConfigPath));
 
   const existing = fileExists(codexConfigPath) ? readText(codexConfigPath) : '';
-  writeText(codexConfigPath, mergeCodexToml(existing));
+  writeText(codexConfigPath, mergeCodexToml(content.trim() ? content : existing));
   return codexConfigPath;
 }
 
 function toolConfigSnapshotPath(projectRoot: string): string {
-  return resolve(projectRoot, '.aida', 'tool-configs.json');
+  return toolConfigStorePath(projectRoot);
 }
 
 function readJsonIfExists(filePath: string): unknown {
@@ -185,35 +270,49 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
   for (const tool of tools) {
     switch (tool) {
       case 'claude-code':
-        writeJsonMerge(resolve(projectRoot, '.mcp.json'));
+        writeText(
+          resolve(projectRoot, '.mcp.json'),
+          renderJsonConfig(findStoredSnapshot(projectRoot, tool, '.mcp.json')?.content),
+        );
         written.push('.mcp.json');
         break;
       case 'cursor': {
         const dir = resolve(projectRoot, '.cursor');
         ensureDir(dir);
-        writeJsonMerge(resolve(dir, 'mcp.json'));
+        writeText(
+          resolve(dir, 'mcp.json'),
+          renderJsonConfig(findStoredSnapshot(projectRoot, tool, '.cursor/mcp.json')?.content),
+        );
         written.push('.cursor/mcp.json');
         break;
       }
       case 'vscode-copilot': {
         const dir = resolve(projectRoot, '.vscode');
         ensureDir(dir);
-        writeJsonMerge(resolve(dir, 'mcp.json'));
+        writeText(
+          resolve(dir, 'mcp.json'),
+          renderJsonConfig(findStoredSnapshot(projectRoot, tool, '.vscode/mcp.json')?.content),
+        );
         written.push('.vscode/mcp.json');
         break;
       }
       case 'lingma': {
         const dir = resolve(projectRoot, '.lingma');
         ensureDir(dir);
-        writeJsonMerge(resolve(dir, 'mcp.json'));
+        writeText(
+          resolve(dir, 'mcp.json'),
+          renderJsonConfig(findStoredSnapshot(projectRoot, tool, '.lingma/mcp.json')?.content),
+        );
         written.push('.lingma/mcp.json');
         break;
       }
       case 'codex': {
         const dir = resolve(projectRoot, '.aida', 'codex');
         ensureDir(dir);
-        writeText(resolve(dir, 'config.toml'), CODEX_CONFIG_TOML);
-        const globalPath = syncCodexGlobalConfig();
+        const base = findStoredSnapshot(projectRoot, tool, '.aida/codex/config.toml')?.content;
+        const content = mergeCodexToml(typeof base === 'string' ? base : '');
+        writeText(resolve(dir, 'config.toml'), content);
+        const globalPath = syncCodexGlobalConfig(content);
         written.push(`.aida/codex/config.toml (synced to ${globalPath})`);
         break;
       }
@@ -260,14 +359,14 @@ export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[])
   const gitignorePath = resolve(projectRoot, '.gitignore');
   const existing = fileExists(gitignorePath) ? readText(gitignorePath) : '';
   const entries = [
-    '.aida/rules/*.md',
-    '.aida/skills/*/SKILL.md',
     '.aida/index.json',
     '.aida/tool-configs.json',
+    '.aida/memories/modules/*.md',
+    '.aida/runs/*/context.md',
   ];
 
   if (tools.includes('claude-code')) {
-    entries.push('.mcp.json', '.claude/commands/*.md');
+    entries.push('.mcp.json', '.claude/commands/*.md', '.claude/rules/', '.claude/skills/');
   }
   if (tools.includes('cursor')) {
     entries.push('.cursor/mcp.json', '.cursor/skills/', '.cursor/rules/aida/');
@@ -276,10 +375,10 @@ export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[])
     entries.push('.vscode/mcp.json');
   }
   if (tools.includes('lingma')) {
-    entries.push('.lingma/mcp.json', '.lingma/rules/');
+    entries.push('.lingma/mcp.json', '.lingma/rules/aida/');
   }
   if (tools.includes('codex')) {
-    entries.push('.aida/codex/config.toml');
+    entries.push('.aida/codex/config.toml', '.codex/rules/', '.codex/skills/');
   }
 
   const toAdd = entries.filter((entry) => !existing.includes(entry));
@@ -297,38 +396,59 @@ export function buildProjectArtifacts(
   requestedTools: string[] = [],
 ): {
   tools: AiToolChoice[]
-  ruleViews: number
-  skillViews: number
+  ruleFiles: number
+  skillFiles: number
   mcpFiles: string[]
   commandFiles: number
   gitignoreAdded: string[]
   toolConfigSnapshot: string
+  memoryViews: {
+    moduleViews: number
+    contextViews: number
+  }
 } {
   const tools = normalizeRequestedTools(projectRoot, requestedTools);
+  const rules = renderRuleMarkdownFiles(bootstrapRuleRegistry(projectRoot));
   bootstrapSkillRegistry(projectRoot);
-
-  const ruleViews = buildRuleViews(projectRoot);
-  const skillViews = buildSkillViews(projectRoot);
   const mcpFiles = writeMcpConfig(projectRoot, tools);
 
+  let ruleFiles = 0;
+  let skillFiles = 0;
   let commandFiles = 0;
-  if (tools.includes('claude-code')) commandFiles += buildClaudeCommands(projectRoot);
-  if (tools.includes('cursor')) commandFiles += buildCursorCommands(projectRoot);
+  if (tools.includes('claude-code')) {
+    ruleFiles += buildClaudeRules(projectRoot, rules);
+    skillFiles += buildClaudeSkills(projectRoot);
+    commandFiles += buildClaudeCommands(projectRoot);
+  }
+  if (tools.includes('cursor')) {
+    ruleFiles += buildCursorRules(projectRoot, rules);
+    skillFiles += buildCursorSkills(projectRoot);
+    commandFiles += buildCursorCommands(projectRoot);
+  }
+  if (tools.includes('lingma')) {
+    ruleFiles += buildLingmaRules(projectRoot, rules);
+  }
+  if (tools.includes('codex')) {
+    ruleFiles += buildCodexRules(projectRoot, rules);
+    skillFiles += buildCodexSkills(projectRoot);
+  }
 
   ensureGuide(projectRoot);
   updateGuide(projectRoot);
   updateGuideReferences(projectRoot, tools);
+  const memoryViews = buildMemoryViews(projectRoot);
 
   const toolConfigSnapshot = writeToolConfigSnapshot(projectRoot, tools);
   const gitignoreAdded = ensureBuildGitignore(projectRoot, tools);
 
   return {
     tools,
-    ruleViews,
-    skillViews,
+    ruleFiles,
+    skillFiles,
     mcpFiles,
     commandFiles,
     gitignoreAdded,
     toolConfigSnapshot,
+    memoryViews,
   };
 }

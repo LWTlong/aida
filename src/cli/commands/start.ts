@@ -10,7 +10,7 @@ import {
   writeText,
 } from '../../utils/fs.js';
 import { bold, green, cyan, yellow, red, dim } from '../../utils/display.js';
-import { buildRuleViews, loadRegistry } from '../../utils/rules.js';
+import { buildProjectArtifacts, readConfiguredTools } from '../../utils/ai-build.js';
 
 export async function start(): Promise<void> {
   const projectRoot = process.cwd();
@@ -152,15 +152,14 @@ export async function start(): Promise<void> {
 
   const safeBranch = branch.replace(/\//g, '-');
 
-  // Ensure .gitignore contains rules/*.md (auto-generated views)
-  ensureGitignoreEntry(projectRoot, '.aida/rules/*.md');
-
-  // Auto-rebuild rule views from registry so AI has fresh rules
+  // Best-effort rebuild so configured AI tools have fresh generated artifacts
   try {
-    const registry = loadRegistry(projectRoot);
-    if (registry.length > 0) {
-      const count = buildRuleViews(projectRoot);
-      console.log(dim(`  ✓ Rules views rebuilt (${registry.length} rules → ${count} files)`));
+    const tools = readConfiguredTools(projectRoot);
+    if (tools.length > 0) {
+      const result = buildProjectArtifacts(projectRoot, tools);
+      if (result.ruleFiles > 0 || result.skillFiles > 0 || result.mcpFiles.length > 0) {
+        console.log(dim(`  ✓ Rebuilt AI tool artifacts (${result.ruleFiles} rule files, ${result.skillFiles} skill files)`));
+      }
     }
   } catch { /* best-effort */ }
 
@@ -178,24 +177,5 @@ export async function start(): Promise<void> {
   console.log(`  Shared PRD: .aida/runs/${safeBranch}/prd.md`);
   console.log(
     `\n  Next: Place your PRD in the branch directory, then run ${cyan('/workflow')}\n`,
-  );
-}
-
-function ensureGitignoreEntry(projectRoot: string, entry: string): void {
-  const gitignorePath = resolve(projectRoot, '.gitignore');
-  let content = '';
-  if (fileExists(gitignorePath)) {
-    content = readText(gitignorePath);
-  }
-
-  // Check if entry already present
-  const lines = content.split('\n');
-  if (lines.some((l) => l.trim() === entry)) return;
-
-  // Append with a comment
-  const append = content.endsWith('\n') || content === '' ? '' : '\n';
-  writeText(
-    gitignorePath,
-    content + append + `# Auto-generated rule views (source of truth: .aida/rules.json)\n${entry}\n`,
   );
 }

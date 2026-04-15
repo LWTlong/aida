@@ -84,6 +84,44 @@ describe('aida import', () => {
     }
   });
 
+  it('should ignore generated cursor rule files and map quick commands back to bundled skills', () => {
+    const project = createTestProject();
+
+    try {
+      ensureDir(resolve(project.root, '.cursor', 'rules', 'aidevos'));
+      ensureDir(resolve(project.root, '.cursor', 'skills', 'workflow'));
+      writeText(
+        resolve(project.root, '.cursor', 'rules', 'aidevos', 'aida-guide.md'),
+        `---
+description: AIDA 数据采集与规则沉淀规范
+---
+
+# AIDA 数据采集与规则沉淀指南
+`,
+      );
+      writeText(
+        resolve(project.root, '.cursor', 'rules', 'team.md'),
+        '# Team Rules\n\n- Imported cursor rule\n',
+      );
+      writeText(
+        resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md'),
+        '# Workflow\n\nGenerated workflow command content\n',
+      );
+
+      const result = importFromTool(project.root, 'cursor');
+      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+
+      assert.equal(result.rulesImported, 1);
+      assert.ok(rules.some((entry) => entry.content === 'Imported cursor rule'));
+      assert.ok(!rules.some((entry) => String(entry.content).includes('AIDA 数据采集与规则沉淀指南')));
+      assert.ok(skills.some((entry) => entry.name === 'workflow-orchestrator'));
+      assert.ok(!skills.some((entry) => entry.name === 'workflow'));
+    } finally {
+      project.cleanup();
+    }
+  });
+
   it('should accept a baseline tool argument from the CLI', () => {
     const project = createTestProject();
 

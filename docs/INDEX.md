@@ -12,6 +12,8 @@ This page is the entry point for public project documentation.
 
 - [Run JSON Schema](./run-json-schema.md)
 - [Run JSON Review Notes](./run-json-review.md)
+- [Memory Runtime PRD](./PRD-MEMORY-RUNTIME.md)
+- [Memory Runtime Technical Design](./TECH-DESIGN-MEMORY-RUNTIME.md)
 - [SOP](./SOP.md)
 - [SOP Workflow](./SOP-WORKFLOW.md)
 - [SOP Workflow Lark](./SOP-WORKFLOW-LARK.md)

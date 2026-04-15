@@ -2,7 +2,8 @@ import { green, red, yellow } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
 import { fileExists } from '../../utils/fs.js';
 import { importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
-import { buildProjectArtifacts, type AiToolChoice } from '../../utils/ai-build.js';
+import { buildProjectArtifacts } from '../../utils/ai-build.js';
+import type { AiToolChoice } from '../../schemas/aida-project.js';
 
 function requestedBaseline(): AiToolChoice | null | 'invalid' {
   const value = process.argv[3]?.trim();
@@ -11,6 +12,14 @@ function requestedBaseline(): AiToolChoice | null | 'invalid' {
     return value as AiToolChoice;
   }
   return 'invalid';
+}
+
+function importOptions(): { includeExternalSkills: boolean; includeExternalMcp: boolean } {
+  const args = process.argv.slice(3);
+  return {
+    includeExternalSkills: !args.includes('--skip-external-skills'),
+    includeExternalMcp: !args.includes('--skip-external-mcp'),
+  };
 }
 
 export async function importSources(): Promise<void> {
@@ -22,12 +31,13 @@ export async function importSources(): Promise<void> {
   }
 
   const baseline = requestedBaseline();
+  const options = importOptions();
   if (baseline === 'invalid') {
     console.log(red(`\n  Unknown baseline tool: ${process.argv[3]?.trim()}\n`));
     return;
   }
   if (baseline) {
-    const imported = importProjectSourcesWithBaseline(projectRoot, baseline);
+    const imported = importProjectSourcesWithBaseline(projectRoot, baseline, options);
     const result = buildProjectArtifacts(projectRoot, imported.tools);
 
     console.log(
@@ -44,7 +54,7 @@ export async function importSources(): Promise<void> {
     console.log(`  Tools: ${imported.tools.join(', ')}`);
     console.log(`  Tool config snapshot: ${imported.snapshotPath}`);
     console.log(
-      `  Rebuilt: ${result.ruleViews} rule views, ${result.skillViews} skill views, ${result.commandFiles} tool command files`,
+      `  Rebuilt: ${result.ruleFiles} rule files, ${result.skillFiles} skill files, ${result.commandFiles} tool command files`,
     );
     if (imported.gitignoreAdded.length > 0) {
       console.log(`  .gitignore: added ${imported.gitignoreAdded.join(', ')}`);
@@ -53,7 +63,7 @@ export async function importSources(): Promise<void> {
     return;
   }
 
-  const imported = importProjectSources(projectRoot);
+  const imported = importProjectSources(projectRoot, options);
   const result = buildProjectArtifacts(projectRoot, imported.tools);
 
   console.log(
@@ -69,7 +79,7 @@ export async function importSources(): Promise<void> {
   console.log(`  Tools: ${imported.tools.join(', ')}`);
   console.log(`  Tool config snapshot: ${imported.snapshotPath}`);
   console.log(
-    `  Rebuilt: ${result.ruleViews} rule views, ${result.skillViews} skill views, ${result.commandFiles} tool command files`,
+    `  Rebuilt: ${result.ruleFiles} rule files, ${result.skillFiles} skill files, ${result.commandFiles} tool command files`,
   );
   if (imported.gitignoreAdded.length > 0) {
     console.log(`  .gitignore: added ${imported.gitignoreAdded.join(', ')}`);

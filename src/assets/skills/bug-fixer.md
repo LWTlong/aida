@@ -1,12 +1,12 @@
 ---
 name: bug-fixer
 description: 处理自检不通过或测试产生的 Bug 缺陷。基于 review 结果或用户反馈进行专项修复，并将 Bug 记录写入 run.json.bugs[]。
-globs: ['.aida/runs/*/*/run.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/*/run.json', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']
 ---
 
 # bug-fixer (缺陷修复器)
 
-> **铁律**：1) 修复后必须在 `run.json.bugs[]` 追加 Bug 记录并更新 `summary.bugCount` 2) 写入后输出 `✓ run.json updated: bugs[], summary` 3) 修复前必须回顾项目所有规范（`.aida/rules/`、`CLAUDE.md` 或 `.cursor/rules/*/*.md`）判断是否为规范偏离 4) 如属于 AI 偏差（非功能 Bug），建议用户使用 deviation-recorder 记录
+> **铁律**：1) 修复后必须在 `run.json.bugs[]` 追加 Bug 记录并更新 `summary.bugCount` 2) 写入后输出 `✓ run.json updated: bugs[], summary` 3) 修复前必须回顾当前 AI 工具目录下的规则文件判断是否为规范偏离 4) 如属于 AI 偏差（非功能 Bug），建议用户使用 deviation-recorder 记录
 
 ## 角色
 
@@ -27,7 +27,7 @@ globs: ['.aida/runs/*/*/run.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rul
 2. **定位与分析：**
    - 根据 Bug 的描述或错误堆栈，定位到具体的问题文件。
    - 回顾项目所有规范，以识别是不是架构偏离问题导致的：
-     - **AIDevOS 规则**：`.aida/rules/` 下的所有 `.md` 文件
+     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
 
 3. **修复策略执行：**

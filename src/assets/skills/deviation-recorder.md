@@ -1,12 +1,12 @@
 ---
 name: deviation-recorder
 description: 记录 AI 代码生成产出与用户实际期望之间的偏差，修复代码并写入 run.json.deviations[]，用于后续数据分析和规则优化。
-globs: ['.aida/runs/*/*/run.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/*/run.json', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']
 ---
 
 # deviation-recorder (偏差记录器)
 
-> **铁律**：1) 必须在 `run.json.deviations[]` 追加偏差记录并更新 `summary.deviationCount`（不可跳过） 2) 写入后输出 `✓ run.json updated: deviations[], summary` 3) 偏差是无业务逻辑的技术规范时必须沉淀规则到 `.aida/rules/` 并记录到 `run.json.rules[]` 4) 必须明确 rootCauseCategory 和 deviationCategory（不能留空）
+> **铁律**：1) 必须在 `run.json.deviations[]` 追加偏差记录并更新 `summary.deviationCount`（不可跳过） 2) 写入后输出 `✓ run.json updated: deviations[], summary` 3) 偏差是无业务逻辑的技术规范时必须沉淀规则到 `.aida/rules.json` 并记录到 `run.json.rules[]` 4) 必须明确 rootCauseCategory 和 deviationCategory（不能留空）
 
 ## 角色
 
@@ -39,7 +39,7 @@ globs: ['.aida/runs/*/*/run.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rul
 2. **定位与分析：**
    - 根据偏差描述，定位到具体的问题文件。
    - 回顾项目所有规范，判断是否为规则缺失或 AI 臆想导致：
-     - **AIDevOS 规则**：`.aida/rules/` 下的所有 `.md` 文件
+     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
 
 3. **修复代码：**
@@ -75,9 +75,9 @@ globs: ['.aida/runs/*/*/run.json', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rul
      - `category`: 分类（可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`）
      - `sourceDeviation`: 关联的偏差 ID（如 DEV-XX）
    - 规则会自动写入 `.aida/rules.json`（项目级注册表），并通过 fingerprint 自动去重
-   - 工具会自动重建 `.aida/rules/*.md` 视图文件
+   - 工具会自动重建各 AI 工具目录下的规则文件
 
    **c) 带业务逻辑 → 不创建规则：**
    - 如果是**业务逻辑**（特定功能需求），不创建规则，只记录偏差即可。
 
-   **注意**：规则的 source of truth 是 `.aida/rules.json`（提交到 git），`.aida/rules/*.md` 是自动生成的只读视图（已 gitignore）。并行分支的规则通过 fingerprint 自动去重，合并冲突可用 `aida rules merge` 解决。
+   **注意**：规则的 source of truth 是 `.aida/rules.json`（提交到 git），各 AI 工具目录下的规则文件是自动生成的分发产物（已 gitignore）。并行分支的规则通过 fingerprint 自动去重，合并冲突可用 `aida rules merge` 解决。

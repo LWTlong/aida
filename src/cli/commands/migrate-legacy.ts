@@ -1,17 +1,19 @@
 import { cyan, green, red, yellow } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
 import { fileExists } from '../../utils/fs.js';
-import { buildProjectArtifacts, type AiToolChoice } from '../../utils/ai-build.js';
+import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { detectImportableTools, importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
+import { migrateLegacyMemories } from '../../utils/memory.js';
 import { promptSingleSelect, type PromptOption } from '../../utils/prompt.js';
 import { migrate } from './migrate.js';
 import { migrateLegacyDirectory } from './migrate-dir.js';
+import type { AiToolChoice } from '../../schemas/aida-project.js';
 
-function requestedBaseline(): AiToolChoice | null {
+function requestedBaseline(): AiToolChoice | null | 'invalid' {
   const value = process.argv[3]?.trim();
   if (!value) return null;
   const valid = new Set<AiToolChoice>(['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex']);
-  return valid.has(value as AiToolChoice) ? value as AiToolChoice : null;
+  return valid.has(value as AiToolChoice) ? value as AiToolChoice : 'invalid';
 }
 
 function toolLabel(tool: AiToolChoice): string {
@@ -30,6 +32,9 @@ async function resolveBaselineTool(projectRoot: string): Promise<AiToolChoice | 
   const requested = requestedBaseline();
   const importable = detectImportableTools(projectRoot, ['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex']);
 
+  if (requested === 'invalid') {
+    throw new Error(`Unknown baseline tool: ${process.argv[3]?.trim()}`);
+  }
   if (requested) return requested;
   if (importable.length === 0) return null;
   if (importable.length === 1) return importable[0];
@@ -70,9 +75,17 @@ export async function migrateLegacy(): Promise<void> {
     return;
   }
 
-  const baselineTool = await resolveBaselineTool(projectRoot);
+  let baselineTool: AiToolChoice | null;
+  try {
+    baselineTool = await resolveBaselineTool(projectRoot);
+  } catch (error) {
+    console.log(red(`\n  ${error instanceof Error ? error.message : String(error)}\n`));
+    return;
+  }
   if (baselineTool) {
     const imported = importProjectSourcesWithBaseline(projectRoot, baselineTool);
+    await migrate();
+    const memory = migrateLegacyMemories(projectRoot);
     const built = buildProjectArtifacts(projectRoot, imported.tools);
 
     console.log(green('\n  ✓ Imported baseline') + ` ${toolLabel(baselineTool)}`);
@@ -80,6 +93,8 @@ export async function migrateLegacy(): Promise<void> {
     console.log(`    Skills: ${imported.baseline.skillsImported}`);
     console.log(`    Tool configs discovered: ${imported.tools.join(', ') || '-'}`);
     console.log(`    Tool config snapshot: ${imported.snapshotPath}`);
+    console.log(`    Memory contexts: ${memory.contextsWritten}`);
+    console.log(`    Module memories: ${memory.moduleMemoriesWritten}`);
 
     console.log(green('\n  ✓ Rebuilt artifacts') + ` ${built.tools.join(', ')}`);
     if (built.gitignoreAdded.length > 0) {
@@ -87,19 +102,21 @@ export async function migrateLegacy(): Promise<void> {
     }
   } else {
     const imported = importProjectSources(projectRoot);
+    await migrate();
+    const memory = migrateLegacyMemories(projectRoot);
     const built = buildProjectArtifacts(projectRoot, imported.tools);
 
     console.log(yellow('\n  No baseline tool detected. Imported structured AIDA sources only.'));
     console.log(`    Tool configs discovered: ${imported.tools.join(', ') || '-'}`);
     console.log(`    Tool config snapshot: ${imported.snapshotPath}`);
+    console.log(`    Memory contexts: ${memory.contextsWritten}`);
+    console.log(`    Module memories: ${memory.moduleMemoriesWritten}`);
 
     console.log(green('\n  ✓ Rebuilt artifacts') + ` ${built.tools.join(', ')}`);
     if (built.gitignoreAdded.length > 0) {
       console.log(`    .gitignore: added ${built.gitignoreAdded.join(', ')}`);
     }
   }
-
-  await migrate();
 
   console.log(green('  ✓ Legacy migration completed\n'));
 }

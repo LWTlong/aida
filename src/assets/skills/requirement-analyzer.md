@@ -1,7 +1,7 @@
 ---
 name: requirement-analyzer
 description: 分析需求文档，对比 PRD 与已有代码/规则，提取需实现的功能点及约束。
-globs: ['.aida/runs/*/prd.md', '.aida/runs/*/prd*.md', '.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+globs: ['.aida/runs/*/prd.md', '.aida/runs/*/prd*.md', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']
 ---
 
 # requirement-analyzer (需求分析器)
@@ -37,7 +37,7 @@ globs: ['.aida/runs/*/prd.md', '.aida/runs/*/prd*.md', '.aida/rules/*.md', 'CLAU
 
    **c) 读取项目规范：**
    - 读取项目所有规范，确保分析结果符合项目全局约束：
-     - **AIDevOS 规则**：`.aida/rules/` 下的所有 `.md` 文件
+     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件
      - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）
 
 2. **提取核心信息：**

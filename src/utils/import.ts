@@ -2,23 +2,25 @@ import { readdirSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { ensureDir, fileExists, readJson, readText, writeJson } from './fs.js';
-import { configPath } from './paths.js';
-import { ensureBuildGitignore, type AiToolChoice } from './ai-build.js';
+import { configPath, toolConfigStorePath } from './paths.js';
+import { QUICK_COMMANDS, ensureBuildGitignore } from './ai-build.js';
 import { importRulesFromViews, loadRegistry, saveRegistry, fingerprint, nextRuleId } from './rules.js';
-import { importSkillsFromViews, loadSkillRegistry, saveSkillRegistry, skillFingerprint, nextSkillId, type SkillRegistryEntry } from './skills.js';
+import { importSkillsFromViews, isBundledSkillName, loadSkillRegistry, saveSkillRegistry, skillFingerprint, nextSkillId, type SkillRegistryEntry } from './skills.js';
+import type { AidaConfig, AiToolChoice, ToolConfigSnapshot } from '../schemas/aida-project.js';
 
-interface AidaConfig {
-  aiTool?: AiToolChoice
-  aiTools?: AiToolChoice[]
-  [key: string]: unknown
+interface ImportOptions {
+  includeExternalSkills?: boolean
+  includeExternalMcp?: boolean
 }
 
-interface ToolConfigSnapshot {
-  tool: AiToolChoice
-  path: string
-  format: 'json' | 'toml' | 'text'
-  content: unknown
-}
+const GENERATED_CURSOR_RULE_SEGMENTS = new Set(['aida', 'aidevos']);
+const GENERATED_RULE_FILENAMES = new Set(['aida-guide.md', 'iron-rules.md']);
+const GENERATED_RULE_MARKERS = [
+  'AUTO-GENERATED from rules.json',
+  'AIDA 数据采集与规则沉淀指南',
+  'AIDevOS Iron Rules',
+];
+const QUICK_COMMAND_NAME_TO_SKILL = new Map(QUICK_COMMANDS.map((cmd) => [cmd.name, cmd.skill]));
 
 const TOOL_SOURCES: Array<{
   tool: AiToolChoice
@@ -33,7 +35,7 @@ const TOOL_SOURCES: Array<{
 ];
 
 function toolConfigSnapshotPath(projectRoot: string): string {
-  return resolve(projectRoot, '.aida', 'tool-configs.json');
+  return toolConfigStorePath(projectRoot);
 }
 
 function walkMarkdownFiles(rootDir: string): string[] {
@@ -83,6 +85,22 @@ function parseMarkdownRuleCandidates(raw: string): string[] {
   }
 
   return results.filter((item) => item.length > 0);
+}
+
+function isGeneratedRuleFile(filePath: string, raw: string): boolean {
+  const normalized = filePath.replace(/\\/g, '/');
+  const name = normalized.split('/').pop() || '';
+  const segments = normalized.split('/');
+
+  if (GENERATED_RULE_FILENAMES.has(name)) return true;
+  if (segments.some((segment) => GENERATED_CURSOR_RULE_SEGMENTS.has(segment))) {
+    if (GENERATED_RULE_MARKERS.some((marker) => raw.includes(marker))) return true;
+  }
+  return GENERATED_RULE_MARKERS.some((marker) => raw.includes(marker));
+}
+
+function normalizeImportedSkillName(originalName: string): string {
+  return QUICK_COMMAND_NAME_TO_SKILL.get(originalName) || originalName;
 }
 
 function mergeImportedRules(
@@ -184,6 +202,8 @@ export function detectImportableTools(projectRoot: string, tools: AiToolChoice[]
       case 'claude-code':
         return fileExists(resolve(projectRoot, 'CLAUDE.md'))
           || fileExists(resolve(projectRoot, '.claude', 'commands'))
+          || fileExists(resolve(projectRoot, '.claude', 'rules'))
+          || fileExists(resolve(projectRoot, '.claude', 'skills'))
           || fileExists(resolve(projectRoot, '.mcp.json'));
       case 'cursor':
         return fileExists(resolve(projectRoot, '.cursor', 'rules'))
@@ -194,6 +214,8 @@ export function detectImportableTools(projectRoot: string, tools: AiToolChoice[]
           || fileExists(resolve(projectRoot, '.lingma', 'mcp.json'));
       case 'codex':
         return fileExists(resolve(projectRoot, 'AGENTS.md'))
+          || fileExists(resolve(projectRoot, '.codex', 'rules'))
+          || fileExists(resolve(projectRoot, '.codex', 'skills'))
           || fileExists(resolve(process.env.HOME || homedir(), '.codex', 'config.toml'));
       case 'vscode-copilot':
         return fileExists(resolve(projectRoot, '.vscode', 'mcp.json'));
@@ -207,6 +229,18 @@ export function importFromTool(projectRoot: string, tool: AiToolChoice): {
   rulesImported: number
   skillsImported: number
 } {
+  return importFromToolWithOptions(projectRoot, tool, {});
+}
+
+export function importFromToolWithOptions(
+  projectRoot: string,
+  tool: AiToolChoice,
+  options: ImportOptions = {},
+): {
+  rulesImported: number
+  skillsImported: number
+} {
+  const includeExternalSkills = options.includeExternalSkills !== false;
   const ruleContents: string[] = [];
   const skills: Array<{ name: string; content: string; sourcePath: string }> = [];
 
@@ -216,9 +250,24 @@ export function importFromTool(projectRoot: string, tool: AiToolChoice): {
       if (fileExists(claude)) {
         ruleContents.push(...parseMarkdownRuleCandidates(readText(claude)));
       }
+      const rulesDir = resolve(projectRoot, '.claude', 'rules');
+      for (const file of walkMarkdownFiles(rulesDir)) {
+        const raw = readText(file);
+        if (isGeneratedRuleFile(file, raw)) continue;
+        ruleContents.push(...parseMarkdownRuleCandidates(raw));
+      }
+      const skillsDir = resolve(projectRoot, '.claude', 'skills');
+      for (const file of walkMarkdownFiles(skillsDir)) {
+        const name = normalizeImportedSkillName(file.split('/').pop()!.replace(/\.md$/, ''));
+        skills.push({
+          name,
+          content: readText(file),
+          sourcePath: file.replace(`${projectRoot}/`, ''),
+        });
+      }
       const commandDir = resolve(projectRoot, '.claude', 'commands');
       for (const file of walkMarkdownFiles(commandDir)) {
-        const name = file.split('/').pop()!.replace(/\.md$/, '');
+        const name = normalizeImportedSkillName(file.split('/').pop()!.replace(/\.md$/, ''));
         skills.push({
           name,
           content: readText(file),
@@ -230,12 +279,14 @@ export function importFromTool(projectRoot: string, tool: AiToolChoice): {
     case 'cursor': {
       const rulesDir = resolve(projectRoot, '.cursor', 'rules');
       for (const file of walkMarkdownFiles(rulesDir)) {
-        ruleContents.push(...parseMarkdownRuleCandidates(readText(file)));
+        const raw = readText(file);
+        if (isGeneratedRuleFile(file, raw)) continue;
+        ruleContents.push(...parseMarkdownRuleCandidates(raw));
       }
       const skillsDir = resolve(projectRoot, '.cursor', 'skills');
       for (const file of walkMarkdownFiles(skillsDir).filter((path) => path.endsWith('SKILL.md'))) {
         const parts = file.split('/');
-        const name = parts[parts.length - 2];
+        const name = normalizeImportedSkillName(parts[parts.length - 2]);
         skills.push({
           name,
           content: readText(file),
@@ -247,7 +298,9 @@ export function importFromTool(projectRoot: string, tool: AiToolChoice): {
     case 'lingma': {
       const rulesDir = resolve(projectRoot, '.lingma', 'rules');
       for (const file of walkMarkdownFiles(rulesDir)) {
-        ruleContents.push(...parseMarkdownRuleCandidates(readText(file)));
+        const raw = readText(file);
+        if (isGeneratedRuleFile(file, raw)) continue;
+        ruleContents.push(...parseMarkdownRuleCandidates(raw));
       }
       break;
     }
@@ -256,6 +309,21 @@ export function importFromTool(projectRoot: string, tool: AiToolChoice): {
       if (fileExists(agents)) {
         ruleContents.push(...parseMarkdownRuleCandidates(readText(agents)));
       }
+      const rulesDir = resolve(projectRoot, '.codex', 'rules');
+      for (const file of walkMarkdownFiles(rulesDir)) {
+        const raw = readText(file);
+        if (isGeneratedRuleFile(file, raw)) continue;
+        ruleContents.push(...parseMarkdownRuleCandidates(raw));
+      }
+      const skillsDir = resolve(projectRoot, '.codex', 'skills');
+      for (const file of walkMarkdownFiles(skillsDir)) {
+        const name = normalizeImportedSkillName(file.split('/').pop()!.replace(/\.md$/, ''));
+        skills.push({
+          name,
+          content: readText(file),
+          sourcePath: file.replace(`${projectRoot}/`, ''),
+        });
+      }
       break;
     }
     case 'vscode-copilot':
@@ -263,8 +331,12 @@ export function importFromTool(projectRoot: string, tool: AiToolChoice): {
       break;
   }
 
+  const selectedSkills = includeExternalSkills
+    ? skills
+    : skills.filter((entry) => isBundledSkillName(entry.name));
+
   const rulesResult = mergeImportedRules(projectRoot, [...new Set(ruleContents)], tool);
-  const skillResult = mergeImportedSkills(projectRoot, skills, tool);
+  const skillResult = mergeImportedSkills(projectRoot, selectedSkills, tool);
   return { rulesImported: rulesResult.imported, skillsImported: skillResult.imported };
 }
 
@@ -280,11 +352,12 @@ function readStructured(filePath: string): unknown {
   return readText(filePath);
 }
 
-export function importExistingToolConfigs(projectRoot: string): {
+export function importExistingToolConfigs(projectRoot: string, options: ImportOptions = {}): {
   tools: AiToolChoice[]
   snapshots: ToolConfigSnapshot[]
   snapshotPath: string
 } {
+  const includeExternalMcp = options.includeExternalMcp !== false;
   const snapshots: ToolConfigSnapshot[] = [];
 
   for (const source of TOOL_SOURCES) {
@@ -294,7 +367,7 @@ export function importExistingToolConfigs(projectRoot: string): {
       tool: source.tool,
       path: path.replace(`${projectRoot}/`, ''),
       format: source.format,
-      content: readStructured(path),
+      content: includeExternalMcp ? readStructured(path) : null,
     });
   }
 
@@ -305,7 +378,7 @@ export function importExistingToolConfigs(projectRoot: string): {
       tool: 'codex',
       path: codexGlobalPath,
       format: 'toml',
-      content: readText(codexGlobalPath),
+      content: includeExternalMcp ? readText(codexGlobalPath) : '',
     });
   }
 
@@ -338,7 +411,7 @@ export function mergeConfiguredTools(projectRoot: string, tools: AiToolChoice[])
   return merged;
 }
 
-export function importProjectSources(projectRoot: string): {
+export function importProjectSources(projectRoot: string, options: ImportOptions = {}): {
   rulesImported: number
   skillsImported: number
   tools: AiToolChoice[]
@@ -346,8 +419,10 @@ export function importProjectSources(projectRoot: string): {
   gitignoreAdded: string[]
 } {
   const rules = importRulesFromViews(projectRoot);
-  const skills = importSkillsFromViews(projectRoot);
-  const toolConfigs = importExistingToolConfigs(projectRoot);
+  const skills = options.includeExternalSkills === false
+    ? { entries: loadSkillRegistry(projectRoot), imported: 0 }
+    : importSkillsFromViews(projectRoot);
+  const toolConfigs = importExistingToolConfigs(projectRoot, options);
   const tools = mergeConfiguredTools(projectRoot, toolConfigs.tools);
   const gitignoreAdded = ensureBuildGitignore(projectRoot, tools);
 
@@ -363,6 +438,7 @@ export function importProjectSources(projectRoot: string): {
 export function importProjectSourcesWithBaseline(
   projectRoot: string,
   baselineTool: AiToolChoice,
+  options: ImportOptions = {},
 ): {
   rulesImported: number
   skillsImported: number
@@ -371,8 +447,8 @@ export function importProjectSourcesWithBaseline(
   gitignoreAdded: string[]
   baseline: { rulesImported: number; skillsImported: number }
 } {
-  const baseline = importFromTool(projectRoot, baselineTool);
-  const imported = importProjectSources(projectRoot);
+  const baseline = importFromToolWithOptions(projectRoot, baselineTool, options);
+  const imported = importProjectSources(projectRoot, options);
 
   return {
     ...imported,

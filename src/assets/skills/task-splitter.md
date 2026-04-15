@@ -6,7 +6,7 @@ globs: ['.aida/runs/*/*/run.json', '.aida/runs/*/analysis.md', '.aida/runs/*/req
 
 # task-splitter (任务拆分器)
 
-> **铁律**：1) 拆解后必须写入 `run.json.tasks[]` 并更新 `summary.totalTasks`（不可跳过） 2) 写入后输出 `✓ run.json updated: tasks[], summary, workflow[]` 3) 每个任务必须有 taskId, title, stageName, acceptance 4) 必须先读取 `.aida/rules/` 确保任务符合项目规范 5) 只为当前开发者认领的模块拆分任务
+> **铁律**：1) 拆解后必须写入 `run.json.tasks[]` 并更新 `summary.totalTasks`（不可跳过） 2) 写入后输出 `✓ run.json updated: tasks[], summary, workflow[]` 3) 每个任务必须有 taskId, title, stageName, acceptance 4) 必须先读取当前 AI 工具目录下的规则文件确保任务符合项目规范 5) 只为当前开发者认领的模块拆分任务
 
 ## 角色
 
@@ -33,7 +33,7 @@ globs: ['.aida/runs/*/*/run.json', '.aida/runs/*/analysis.md', '.aida/runs/*/req
 
    - **原子性：** 每个任务应尽可能小，且能独立验证。
    - **逻辑顺序：** 任务必须按照合理的开发依赖顺序排列。通常顺序为：类型定义 -> API 接口层 -> 公共组件/Hooks -> i18n 字典 -> 视图层组装 -> 联调测试。
-   - **规范化：** 必须体现出项目规范中的组件和模式要求（从 `.aida/rules/` 读取）。
+   - **规范化：** 必须体现出项目规范中的组件和模式要求（从当前 AI 工具目录下的规则文件读取）。
    - **可追踪：** 每个任务使用结构化 JSON 格式。
 
 3. **写入任务清单（强制，不可跳过）：**

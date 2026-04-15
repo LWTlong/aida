@@ -91,6 +91,11 @@ async function main() {
       await merge();
       break;
     }
+    case 'memory': {
+      const { memory } = await import('./commands/memory.js');
+      await memory();
+      break;
+    }
     case 'rules': {
       const { rules } = await import('./commands/rules.js');
       await rules();
@@ -125,6 +130,7 @@ async function main() {
     aida migrate-legacy One-shot legacy migration: rename, import, build, migrate
     aida reindex     Rebuild project-level index from all runs
     aida report      Generate performance report data
+    aida memory      Manage branch context and module memory
     aida merge       Merge rules.json and skills.json conflicts together
     aida rules       Manage project rules registry (build/dedupe/merge)
     aida skills      Manage project skills registry (build/merge/list)

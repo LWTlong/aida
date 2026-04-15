@@ -1,7 +1,7 @@
 ---
 name: audit
-description: 扫描项目代码，生成与项目完全匹配的 AI 开发规范，直接写入 .aida/rules/。
-globs: ['.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
+description: 扫描项目代码，生成与项目完全匹配的 AI 开发规范，写入 .aida/rules.json 并通过 build 分发。
+globs: ['.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']
 ---
 
 # audit (项目审计)
@@ -23,7 +23,7 @@ globs: ['.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 ### 阶段一：加载现有规则
 
 读取并理解项目现有的所有规则来源：
-1. **AIDevOS 规则**：`.aida/rules/*.md`
+1. **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件
 2. **全局规则文件**：
    - Claude Code 用户：`CLAUDE.md`
    - Cursor 用户：`.cursor/rules/*/*.md`
@@ -43,7 +43,7 @@ globs: ['.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 
 ### 阶段三：规则审计
 
-对现有 `.aida/rules/` 进行审计：
+对现有 `.aida/rules.json` 与工具分发规则进行审计：
 - **重复检测**：语义重复、约束重复
 - **冲突检测**：A 强制 vs B 禁止
 - **失配检测**：引用不存在的组件/API
@@ -51,7 +51,7 @@ globs: ['.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 
 ### 阶段四：生成规则并直接写入
 
-基于真实代码生成或更新 `.aida/rules/` 下的规则文件：
+基于真实代码生成或更新 `.aida/rules.json` 中的规则：
 
 | 文件 | 内容 |
 |------|------|
@@ -73,7 +73,7 @@ globs: ['.aida/rules/*.md', 'CLAUDE.md', '.cursor/rules/*/*.md']
 
 生成完成后输出：
 ```
-✓ 已生成/更新 .aida/rules/ 下的规则文件：
+✓ 已生成/更新 .aida/rules.json 中的规则，并可通过 aida build 分发：
   - code-style.md
   - component-usage.md
   - api-patterns.md
