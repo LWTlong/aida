@@ -116,4 +116,54 @@ describe('aida build', () => {
       project.cleanup();
     }
   });
+
+  it('should allow selecting supported targets even when they are not configured yet', () => {
+    const project = createTestProject();
+    try {
+      writeText(resolve(project.root, '.aida', 'config.json'), JSON.stringify({
+        schemaVersion: '1.0',
+        project: 'test-project',
+        aiTools: ['claude-code'],
+      }, null, 2));
+      writeText(
+        resolve(project.root, '.aida', 'rules.json'),
+        JSON.stringify([
+          {
+            id: 'RULE-001',
+            category: 'process',
+            content: 'Rule A',
+            fingerprint: 'fp-rule-a',
+            source: { branch: 'main', deviation: null, author: 'test' },
+            createdAt: '2026-04-13T00:00:00.000Z',
+            status: 'active',
+          },
+        ], null, 2),
+      );
+      writeText(
+        resolve(project.root, '.aida', 'skills.json'),
+        JSON.stringify([
+          {
+            id: 'SKILL-001',
+            name: 'workflow-orchestrator',
+            content: 'Workflow content',
+            fingerprint: 'fp-skill-a',
+            source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+            updatedAt: '2026-04-13T00:00:00.000Z',
+            status: 'active',
+          },
+        ], null, 2),
+      );
+      writeText(resolve(project.root, 'AGENTS.md'), '# Agents\n');
+
+      const stdout = runCliWithInput(project, 'build', '2,6\n');
+
+      assert.ok(stdout.includes('Select AI tools to build'));
+      assert.ok(stdout.includes('cursor'));
+      assert.ok(stdout.includes('codex'));
+      assert.ok(readText(resolve(project.root, '.cursor', 'rules', 'aida', '_all.md')).includes('Rule A'));
+      assert.ok(readText(resolve(project.root, '.codex', 'config.toml')).includes('[mcp_servers.aida]'));
+    } finally {
+      project.cleanup();
+    }
+  });
 });
