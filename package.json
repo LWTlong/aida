@@ -4,7 +4,7 @@
   "description": "AI Development Analytics Platform - Track what AI actually does in your codebase",
   "type": "module",
   "bin": {
-    "aida": "./dist/cli/index.js"
+    "aida": "dist/cli/index.js"
   },
   "scripts": {
     "build": "tsc",
