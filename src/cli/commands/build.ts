@@ -5,6 +5,15 @@ import { fileExists } from '../../utils/fs.js';
 import { promptMultiSelect } from '../../utils/prompt.js';
 import type { AiToolChoice } from '../../schemas/aida-project.js';
 
+const SUPPORTED_BUILD_TOOLS: AiToolChoice[] = [
+  'claude-code',
+  'cursor',
+  'vscode-copilot',
+  'windsurf',
+  'lingma',
+  'codex',
+];
+
 function requestedTools(): string[] {
   return process.argv.slice(3);
 }
@@ -12,9 +21,14 @@ function requestedTools(): string[] {
 async function selectTools(configured: AiToolChoice[]): Promise<string[]> {
   const requested = requestedTools();
   if (requested.length > 0) return requested;
+  const configuredSet = new Set(configured);
   const selected = await promptMultiSelect(
     'Select AI tools to build:',
-    configured.map((tool) => ({ value: tool, label: tool })),
+    SUPPORTED_BUILD_TOOLS.map((tool) => ({
+      value: tool,
+      label: tool,
+      hint: configuredSet.has(tool) ? 'configured' : 'not yet configured',
+    })),
     { required: false },
   );
   return selected.length > 0 ? selected : configured;
