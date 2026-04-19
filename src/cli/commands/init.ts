@@ -60,6 +60,11 @@ const IRON_RULES_APPEND = `
 4. 当用户直接要求沉淀项目级技术规范，或识别到 rule-missing 需要沉淀规则时，必须通过 AIDA MCP 的 aida_log_rule 写入 .aida/rules.json，不要只修改本地规则说明文件
 `;
 
+function printManualUntrackNotice(): void {
+  console.log(dim('  Note: If any ignored AI files were already tracked by git before init, untrack them manually.'));
+  console.log(dim('        Example: git rm --cached .mcp.json AGENTS.md CLAUDE.md\n'));
+}
+
 function toolLabel(tool: AiToolChoice): string {
   const labels: Record<AiToolChoice, string> = {
     'claude-code': 'Claude Code',
@@ -326,6 +331,7 @@ export async function init(): Promise<void> {
 
     View data anytime: ${cyan('aida dashboard')}
 `);
+    printManualUntrackNotice();
   } else {
     console.log(`
   ${green('✓ Done!')} Next steps:
@@ -335,6 +341,7 @@ export async function init(): Promise<void> {
     3. Run ${cyan('/workflow')} for the full AI development loop
     4. View data: ${cyan('aida dashboard')}
 `);
+    printManualUntrackNotice();
   }
 }
 

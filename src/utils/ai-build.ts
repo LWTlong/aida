@@ -1,5 +1,4 @@
-import { dirname, resolve } from 'node:path';
-import { homedir } from 'node:os';
+import { resolve } from 'node:path';
 import { bootstrapRuleRegistry, renderRuleMarkdownFiles } from './rules.js';
 import { activeSkills, bootstrapSkillRegistry, getSkillContent } from './skills.js';
 import { ensureGuide, updateGuide, updateGuideReferences } from './guide.js';
@@ -178,17 +177,6 @@ function mergeCodexToml(raw: string): string {
   return `${trimmed}\n\n${block}\n`;
 }
 
-function syncCodexGlobalConfig(content: string): string {
-  const home = process.env.HOME || homedir();
-  const codexDir = resolve(home, '.codex');
-  const codexConfigPath = resolve(codexDir, 'config.toml');
-  ensureDir(dirname(codexConfigPath));
-
-  const existing = fileExists(codexConfigPath) ? readText(codexConfigPath) : '';
-  writeText(codexConfigPath, mergeCodexToml(content.trim() ? content : existing));
-  return codexConfigPath;
-}
-
 function toolConfigSnapshotPath(projectRoot: string): string {
   return toolConfigStorePath(projectRoot);
 }
@@ -202,7 +190,7 @@ function readJsonIfExists(filePath: string): unknown {
   }
 }
 
-function writeToolConfigSnapshot(projectRoot: string, tools: AiToolChoice[], codexGlobalPath?: string): string {
+function writeToolConfigSnapshot(projectRoot: string, tools: AiToolChoice[]): string {
   const snapshots: ToolConfigSnapshot[] = [];
 
   if (tools.includes('claude-code')) {
@@ -240,20 +228,12 @@ function writeToolConfigSnapshot(projectRoot: string, tools: AiToolChoice[], cod
   if (tools.includes('codex')) {
     snapshots.push({
       tool: 'codex',
-      path: '.aida/codex/config.toml',
+      path: '.codex/config.toml',
       format: 'toml',
-      content: fileExists(resolve(projectRoot, '.aida', 'codex', 'config.toml'))
-        ? readText(resolve(projectRoot, '.aida', 'codex', 'config.toml'))
+      content: fileExists(resolve(projectRoot, '.codex', 'config.toml'))
+        ? readText(resolve(projectRoot, '.codex', 'config.toml'))
         : '',
     });
-    if (codexGlobalPath) {
-      snapshots.push({
-        tool: 'codex',
-        path: codexGlobalPath,
-        format: 'toml',
-        content: readText(codexGlobalPath),
-      });
-    }
   }
 
   writeJson(toolConfigSnapshotPath(projectRoot), {
@@ -307,13 +287,12 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
         break;
       }
       case 'codex': {
-        const dir = resolve(projectRoot, '.aida', 'codex');
+        const dir = resolve(projectRoot, '.codex');
         ensureDir(dir);
-        const base = findStoredSnapshot(projectRoot, tool, '.aida/codex/config.toml')?.content;
+        const base = findStoredSnapshot(projectRoot, tool, '.codex/config.toml')?.content;
         const content = mergeCodexToml(typeof base === 'string' ? base : '');
         writeText(resolve(dir, 'config.toml'), content);
-        const globalPath = syncCodexGlobalConfig(content);
-        written.push(`.aida/codex/config.toml (synced to ${globalPath})`);
+        written.push('.codex/config.toml');
         break;
       }
       case 'windsurf':
@@ -359,26 +338,43 @@ export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[])
   const gitignorePath = resolve(projectRoot, '.gitignore');
   const existing = fileExists(gitignorePath) ? readText(gitignorePath) : '';
   const entries = [
+    '.agent/',
+    '.agents/',
+    '.augment/',
+    '.claude/',
+    '.codex/',
+    '.continue/',
+    '.cursor/',
+    '.gemini/',
+    '.kiro/',
+    '.lingma/',
+    '.qodo/',
+    '.roo/',
+    '.roo-code/',
+    '.trae/',
+    '.windsurf/',
+    '.vscode/mcp.json',
+    'AGENTS.md',
+    'CLAUDE.md',
+    '.mcp.json',
+    '.aida/**',
+    '!.aida/**/',
+    '!.aida/**/*.json',
     '.aida/index.json',
     '.aida/tool-configs.json',
-    '.aida/memories/modules/*.md',
-    '.aida/runs/*/context.md',
   ];
 
-  if (tools.includes('claude-code')) {
-    entries.push('.mcp.json', '.claude/commands/*.md', '.claude/rules/', '.claude/skills/');
-  }
   if (tools.includes('cursor')) {
-    entries.push('.cursor/mcp.json', '.cursor/skills/', '.cursor/rules/aida/');
+    entries.push('.cursor/mcp.json');
   }
   if (tools.includes('vscode-copilot')) {
     entries.push('.vscode/mcp.json');
   }
   if (tools.includes('lingma')) {
-    entries.push('.lingma/mcp.json', '.lingma/rules/aida/');
+    entries.push('.lingma/mcp.json');
   }
   if (tools.includes('codex')) {
-    entries.push('.aida/codex/config.toml', '.codex/rules/', '.codex/skills/');
+    entries.push('.codex/config.toml');
   }
 
   const toAdd = entries.filter((entry) => !existing.includes(entry));

@@ -30,6 +30,7 @@ describe('aida migrate-dir', () => {
       });
 
       assert.ok(output.includes('Directory renamed'));
+      assert.ok(output.includes('git rm --cached .mcp.json AGENTS.md CLAUDE.md'));
       assert.equal(fileExists(resolve(root, '.aidevos')), false);
       assert.equal(fileExists(resolve(root, '.aida')), true);
       assert.equal(readJson<any>(resolve(root, '.aida', 'config.json')).project, 'legacy-project');

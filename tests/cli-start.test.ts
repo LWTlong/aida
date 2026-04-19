@@ -200,8 +200,9 @@ describe('aidevos start - gitignore', () => {
     const gitignorePath = resolve(root, '.gitignore');
     assert.ok(fileExists(gitignorePath));
     const content = readText(gitignorePath);
-    assert.ok(content.includes('.claude/rules/'));
-    assert.ok(content.includes('.claude/skills/'));
+    assert.ok(content.includes('.claude/'));
+    assert.ok(content.includes('.aida/**'));
+    assert.ok(content.includes('!.aida/**/*.json'));
   });
 
   it('should not duplicate generated artifact entries on second start', () => {
@@ -212,7 +213,7 @@ describe('aidevos start - gitignore', () => {
     runStart(root);
 
     const content = readText(resolve(root, '.gitignore'));
-    const matches = content.match(/\.claude\/rules\//g);
+    const matches = content.match(/\.claude\//g);
     assert.equal(matches?.length, 1, 'Should only have one entry');
   });
 });

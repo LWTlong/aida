@@ -84,9 +84,13 @@ describe('buildProjectArtifacts', () => {
     assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'workflow', 'SKILL.md')));
 
     const gitignore = readText(resolve(tmpRoot, '.gitignore'));
-    assert.ok(gitignore.includes('.claude/skills/'));
-    assert.ok(gitignore.includes('.claude/commands/*.md'));
-    assert.ok(gitignore.includes('.cursor/skills/'));
+    assert.ok(gitignore.includes('.claude/'));
+    assert.ok(gitignore.includes('.cursor/'));
+    assert.ok(gitignore.includes('.aida/**'));
+    assert.ok(gitignore.includes('!.aida/**/*.json'));
+    assert.ok(gitignore.includes('.kiro/'));
+    assert.ok(gitignore.includes('AGENTS.md'));
+    assert.ok(gitignore.includes('CLAUDE.md'));
   });
 
   it('should use configured tools when build is called with all', () => {
@@ -112,6 +116,7 @@ describe('buildProjectArtifacts', () => {
 
   it('should generate Codex config snippet when codex is configured', () => {
     const originalHome = process.env.HOME;
+    const fakeHome = mkdtempSync(join(tmpdir(), 'aida-home-'));
     writeJson(resolve(tmpRoot, '.aida', 'config.json'), {
       schemaVersion: '1.0',
       project: 'build-test',
@@ -121,19 +126,21 @@ describe('buildProjectArtifacts', () => {
     ensureDir(skillDir);
     writeText(resolve(skillDir, 'SKILL.md'), '# Workflow\n\nTest content\n');
     writeText(resolve(tmpRoot, 'AGENTS.md'), '# Project Agents\n');
-    process.env.HOME = tmpRoot;
+    process.env.HOME = fakeHome;
 
     try {
       const result = buildProjectArtifacts(tmpRoot);
-      const codexConfig = readText(resolve(tmpRoot, '.aida', 'codex', 'config.toml'));
+      const codexConfig = readText(resolve(tmpRoot, '.codex', 'config.toml'));
       const agents = readText(resolve(tmpRoot, 'AGENTS.md'));
 
       assert.deepEqual(result.tools, ['codex']);
       assert.ok(codexConfig.includes('[mcp_servers.aida]'));
       assert.ok(agents.includes('.aida/aida-guide.md'));
       assert.ok(readText(resolve(tmpRoot, '.codex', 'config.toml')).includes('[mcp_servers.aida]'));
+      assert.equal(fileExists(resolve(fakeHome, '.codex', 'config.toml')), false);
     } finally {
       process.env.HOME = originalHome;
+      rmSync(fakeHome, { recursive: true, force: true });
     }
   });
 });

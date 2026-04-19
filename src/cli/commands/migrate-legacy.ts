@@ -1,12 +1,12 @@
 import { cyan, green, red, yellow } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
-import { fileExists } from '../../utils/fs.js';
+import { fileExists, readJson } from '../../utils/fs.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { detectImportableTools, importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
 import { migrateLegacyMemories } from '../../utils/memory.js';
-import { promptSingleSelect, type PromptOption } from '../../utils/prompt.js';
 import { migrate } from './migrate.js';
 import { migrateLegacyDirectory } from './migrate-dir.js';
+import type { AidaConfig } from '../../schemas/aida-project.js';
 import type { AiToolChoice } from '../../schemas/aida-project.js';
 
 function requestedBaseline(): AiToolChoice | null | 'invalid' {
@@ -28,24 +28,48 @@ function toolLabel(tool: AiToolChoice): string {
   return labels[tool];
 }
 
-async function resolveBaselineTool(projectRoot: string): Promise<AiToolChoice | null> {
+function printManualUntrackNotice(): void {
+  console.log('  Note: if ignored AI files were already tracked by git before migration, untrack them manually.');
+  console.log('        Example: git rm --cached .mcp.json AGENTS.md CLAUDE.md\n');
+}
+
+function configuredToolOrder(projectRoot: string): AiToolChoice[] {
+  if (!fileExists(configPath(projectRoot))) return [];
+  try {
+    const config = readJson<AidaConfig>(configPath(projectRoot));
+    if (Array.isArray(config.aiTools) && config.aiTools.length > 0) return config.aiTools;
+    return config.aiTool ? [config.aiTool] : [];
+  } catch {
+    return [];
+  }
+}
+
+function chooseBaselineTool(projectRoot: string, importable: AiToolChoice[]): AiToolChoice | null {
+  if (importable.length === 0) return null;
+  const configured = configuredToolOrder(projectRoot);
+  for (const tool of configured) {
+    if (importable.includes(tool)) return tool;
+  }
+
+  const priority: AiToolChoice[] = ['claude-code', 'cursor', 'codex', 'lingma', 'vscode-copilot', 'windsurf'];
+  for (const tool of priority) {
+    if (importable.includes(tool)) return tool;
+  }
+
+  return importable[0] || null;
+}
+
+async function resolveBaselineTool(projectRoot: string): Promise<{ tool: AiToolChoice | null; autoSelected: boolean }> {
   const requested = requestedBaseline();
   const importable = detectImportableTools(projectRoot, ['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex']);
 
   if (requested === 'invalid') {
     throw new Error(`Unknown baseline tool: ${process.argv[3]?.trim()}`);
   }
-  if (requested) return requested;
-  if (importable.length === 0) return null;
-  if (importable.length === 1) return importable[0];
-
-  const options: PromptOption<AiToolChoice>[] = importable.map((tool) => ({
-    value: tool,
-    label: toolLabel(tool),
-    hint: 'Use this tool as the baseline source for rules/skills import',
-  }));
-
-  return promptSingleSelect('Choose one baseline AI tool to import legacy rules/skills from:', options);
+  if (requested) return { tool: requested, autoSelected: false };
+  if (importable.length === 0) return { tool: null, autoSelected: false };
+  if (importable.length === 1) return { tool: importable[0], autoSelected: false };
+  return { tool: chooseBaselineTool(projectRoot, importable), autoSelected: true };
 }
 
 export async function migrateLegacy(): Promise<void> {
@@ -76,8 +100,11 @@ export async function migrateLegacy(): Promise<void> {
   }
 
   let baselineTool: AiToolChoice | null;
+  let autoSelectedBaseline = false;
   try {
-    baselineTool = await resolveBaselineTool(projectRoot);
+    const resolved = await resolveBaselineTool(projectRoot);
+    baselineTool = resolved.tool;
+    autoSelectedBaseline = resolved.autoSelected;
   } catch (error) {
     console.log(red(`\n  ${error instanceof Error ? error.message : String(error)}\n`));
     return;
@@ -89,6 +116,9 @@ export async function migrateLegacy(): Promise<void> {
     const built = buildProjectArtifacts(projectRoot, imported.tools);
 
     console.log(green('\n  ✓ Imported baseline') + ` ${toolLabel(baselineTool)}`);
+    if (autoSelectedBaseline) {
+      console.log(`    Auto-selected baseline: ${toolLabel(baselineTool)}`);
+    }
     console.log(`    Rules: ${imported.baseline.rulesImported}`);
     console.log(`    Skills: ${imported.baseline.skillsImported}`);
     console.log(`    Tool configs discovered: ${imported.tools.join(', ') || '-'}`);
@@ -119,4 +149,5 @@ export async function migrateLegacy(): Promise<void> {
   }
 
   console.log(green('  ✓ Legacy migration completed\n'));
+  printManualUntrackNotice();
 }

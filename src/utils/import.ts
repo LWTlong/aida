@@ -1,5 +1,4 @@
 import { readdirSync, statSync } from 'node:fs';
-import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { ensureDir, fileExists, readJson, readText, writeJson } from './fs.js';
 import { configPath, toolConfigStorePath } from './paths.js';
@@ -31,7 +30,7 @@ const TOOL_SOURCES: Array<{
   { tool: 'cursor', path: (projectRoot) => resolve(projectRoot, '.cursor', 'mcp.json'), format: 'json' },
   { tool: 'vscode-copilot', path: (projectRoot) => resolve(projectRoot, '.vscode', 'mcp.json'), format: 'json' },
   { tool: 'lingma', path: (projectRoot) => resolve(projectRoot, '.lingma', 'mcp.json'), format: 'json' },
-  { tool: 'codex', path: (projectRoot) => resolve(projectRoot, '.aida', 'codex', 'config.toml'), format: 'toml' },
+  { tool: 'codex', path: (projectRoot) => resolve(projectRoot, '.codex', 'config.toml'), format: 'toml' },
 ];
 
 function toolConfigSnapshotPath(projectRoot: string): string {
@@ -216,7 +215,7 @@ export function detectImportableTools(projectRoot: string, tools: AiToolChoice[]
         return fileExists(resolve(projectRoot, 'AGENTS.md'))
           || fileExists(resolve(projectRoot, '.codex', 'rules'))
           || fileExists(resolve(projectRoot, '.codex', 'skills'))
-          || fileExists(resolve(process.env.HOME || homedir(), '.codex', 'config.toml'));
+          || fileExists(resolve(projectRoot, '.codex', 'config.toml'));
       case 'vscode-copilot':
         return fileExists(resolve(projectRoot, '.vscode', 'mcp.json'));
       case 'windsurf':
@@ -370,18 +369,6 @@ export function importExistingToolConfigs(projectRoot: string, options: ImportOp
       content: includeExternalMcp ? readStructured(path) : null,
     });
   }
-
-  const home = process.env.HOME || homedir();
-  const codexGlobalPath = resolve(home, '.codex', 'config.toml');
-  if (fileExists(codexGlobalPath)) {
-    snapshots.push({
-      tool: 'codex',
-      path: codexGlobalPath,
-      format: 'toml',
-      content: includeExternalMcp ? readText(codexGlobalPath) : '',
-    });
-  }
-
   const tools = [...new Set(snapshots.map((item) => item.tool))];
   const snapshotPath = toolConfigSnapshotPath(projectRoot);
   ensureDir(dirname(snapshotPath));
