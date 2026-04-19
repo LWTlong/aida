@@ -21,6 +21,11 @@ function isInteractiveTty(): boolean {
   return Boolean(stdin.isTTY && stdout.isTTY);
 }
 
+function restoreInputState(previousRawMode: boolean | undefined, wasPaused: boolean): void {
+  stdin.setRawMode?.(previousRawMode ?? false);
+  if (wasPaused) stdin.pause();
+}
+
 function clearRenderedLines(lines: number): void {
   for (let i = 0; i < lines; i++) {
     stdout.write('\x1b[2K');
@@ -127,6 +132,7 @@ export async function promptMultiSelect<T extends string>(
 
   readline.emitKeypressEvents(stdin);
   const previousRawMode = stdin.isRaw;
+  const wasPaused = stdin.isPaused();
   stdin.setRawMode?.(true);
   stdin.resume();
 
@@ -169,14 +175,14 @@ export async function promptMultiSelect<T extends string>(
 
       const cleanup = () => {
         stdin.off('keypress', onKeypress);
-        stdin.setRawMode?.(previousRawMode ?? false);
+        restoreInputState(previousRawMode, wasPaused);
         clearRenderedLines(renderedLines);
       };
 
       stdin.on('keypress', onKeypress);
     });
   } finally {
-    stdin.setRawMode?.(previousRawMode ?? false);
+    restoreInputState(previousRawMode, wasPaused);
   }
 }
 
@@ -192,6 +198,7 @@ export async function promptSingleSelect<T extends string>(
 
   readline.emitKeypressEvents(stdin);
   const previousRawMode = stdin.isRaw;
+  const wasPaused = stdin.isPaused();
   stdin.setRawMode?.(true);
   stdin.resume();
 
@@ -232,13 +239,13 @@ export async function promptSingleSelect<T extends string>(
 
       const cleanup = () => {
         stdin.off('keypress', onKeypress);
-        stdin.setRawMode?.(previousRawMode ?? false);
+        restoreInputState(previousRawMode, wasPaused);
         clearRenderedLines(renderedLines);
       };
 
       stdin.on('keypress', onKeypress);
     });
   } finally {
-    stdin.setRawMode?.(previousRawMode ?? false);
+    restoreInputState(previousRawMode, wasPaused);
   }
 }
