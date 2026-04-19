@@ -26,13 +26,13 @@ const GUIDE_CONTENT = `# AIDA 数据采集与规则沉淀指南
 **开始任何开发任务前，必须按顺序完成以下三步：**
 
 1. **读取项目规则** → 读取当前 AI 工具目录下由 \`aida build\` 生成的规则文件（例如 \`.claude/rules/aida/_all.md\`、\`.cursor/rules/aida/_all.md\`、\`.codex/rules/aida/_all.md\`、\`.lingma/rules/aida/_all.md\`；不存在则跳过）
-2. **恢复模块上下文** → 如果已配置 AIDA MCP，先调用 \`aida_memory_search\` 检索当前需求对应模块，再调用 \`aida_memory_pack\` 或 \`aida_memory_get\` / \`aida_context_get\` 读取命中的模块记忆与当前分支上下文；如果当前分支上下文缺失，先调用 \`aida_context_rebuild\`；若未配置 MCP，则按需读取 \`.aida/memories/index.json\`、\`.aida/memories/modules/*.md\`、\`.aida/runs/*/context.md\`、\`.aida/runs/*/memory.md\`
+2. **恢复模块上下文** → 如果已配置 AIDA MCP，先调用 \`aida_memory_search\` 检索当前需求对应模块，再调用 \`aida_memory_pack\` 或 \`aida_memory_get\` / \`aida_context_get\` 读取命中的模块记忆与当前分支上下文；如果当前分支上下文缺失，先调用 \`aida_context_rebuild\`；若未配置 MCP，则优先读取 JSON 源数据：\`.aida/memories/index.json\`、\`.aida/memories/modules/*.json\`、\`.aida/runs/*/requirement.json\`、\`.aida/runs/*/context.json\`；如需可读视图，再读取由 \`aida memory build\` / \`aida memory rebuild\` 生成的 \`.aida/memories/modules/*.md\`、\`.aida/runs/*/context.md\`、\`.aida/runs/*/memory.md\`
 3. **执行数据采集流程** → 严格按照第一节规定的顺序调用 MCP 工具：\`aida_task_start\` → \`aida_log_files\` → \`aida_log_review\` → \`aida_task_done\`
 
 不得以任何理由跳过上述步骤。若 \`aida_memory_search\` 没有命中模块记忆，可退回正常代码分析流程，但必须先完成检索动作。
 
 **当用户直接口述要沉淀某条项目级技术规范，或你识别到 \`rule-missing\` 类型偏差需要沉淀规则时，不要只修改本地说明文件。若已配置 AIDA MCP，必须调用 \`aida_log_rule\` 写入 \`.aida/rules.json\`；若未配置 MCP，则使用 CLI \`aida rules add\` 写入 \`.aida/rules.json\`。**
-**当需求推进后需要沉淀模块记忆或更新当前分支上下文时，若已配置 AIDA MCP，优先调用 \`aida_memory_upsert\` / \`aida_context_update\`；若未配置 MCP，则使用 CLI \`aida memory upsert\` / \`aida memory context-update\`。不要直接手改生成的 \`.md\` 视图文件。**
+**当需求推进后需要沉淀模块记忆或更新当前分支上下文时，若已配置 AIDA MCP，优先调用 \`aida_memory_upsert\` / \`aida_context_update\`；若未配置 MCP，则使用 CLI \`aida memory upsert\` / \`aida memory context-update\` 更新 JSON 源数据，再按需执行 \`aida memory build\` / \`aida memory rebuild\` 生成 \`.md\` 视图。不要直接手改生成的 \`.md\` 视图文件。**
 
 ## 一、数据采集
 

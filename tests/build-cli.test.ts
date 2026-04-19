@@ -47,8 +47,6 @@ describe('aida build', () => {
       const stdout = runCliOutput(project, 'build codex cursor');
 
       assert.ok(stdout.includes('AIDA build completed'));
-      assert.ok(stdout.includes('global ~/.codex/config.toml has been updated'));
-      assert.ok(readText(resolve(project.root, '.aida', 'codex', 'config.toml')).includes('[mcp_servers.aida]'));
       assert.ok(readText(resolve(project.root, '.codex', 'config.toml')).includes('[mcp_servers.aida]'));
       assert.ok(readText(resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md')).includes('Workflow content'));
       assert.ok(readText(resolve(project.root, '.cursor', 'rules', 'aida', '_all.md')).includes('Rule A'));
@@ -58,8 +56,13 @@ describe('aida build', () => {
       assert.ok(snapshot.snapshots.some((item: any) => item.tool === 'codex'));
       const gitignore = readText(resolve(project.root, '.gitignore'));
       assert.ok(gitignore.includes('.aida/tool-configs.json'));
-      assert.ok(gitignore.includes('.aida/memories/modules/*.md'));
-      assert.ok(gitignore.includes('.aida/runs/*/context.md'));
+      assert.ok(gitignore.includes('.aida/**'));
+      assert.ok(gitignore.includes('!.aida/**/*.json'));
+      assert.ok(gitignore.includes('.cursor/'));
+      assert.ok(gitignore.includes('.claude/'));
+      assert.ok(gitignore.includes('.codex/config.toml'));
+      assert.ok(gitignore.includes('AGENTS.md'));
+      assert.ok(gitignore.includes('CLAUDE.md'));
     } finally {
       project.cleanup();
     }

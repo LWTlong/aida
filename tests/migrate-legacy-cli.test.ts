@@ -79,10 +79,12 @@ describe('aida migrate-legacy', () => {
       });
 
       assert.ok(output.includes('Legacy migration completed'));
+      assert.ok(output.includes('git rm --cached .mcp.json AGENTS.md CLAUDE.md'));
       assert.equal(fileExists(resolve(root, '.aidevos')), false);
       assert.equal(fileExists(resolve(root, '.aida')), true);
       assert.ok(readText(resolve(root, 'AGENTS.md')).includes('.aida/aida-guide.md'));
-      assert.ok(readText(resolve(root, '.gitignore')).includes('.cursor/skills/'));
+      assert.ok(readText(resolve(root, '.gitignore')).includes('.cursor/'));
+      assert.ok(readText(resolve(root, '.gitignore')).includes('.codex/config.toml'));
       assert.ok(fileExists(resolve(root, '.cursor', 'rules', 'aida', 'aida-guide.md')));
 
       const rules = readJson<any[]>(resolve(root, '.aida', 'rules.json'));
@@ -123,6 +125,43 @@ describe('aida migrate-legacy', () => {
       });
 
       assert.ok(output.includes('Unknown baseline tool'));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('should auto-select a baseline tool without waiting for interactive input', () => {
+    const root = mkdtempSync(join(tmpdir(), 'aida-migrate-legacy-'));
+    const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');
+
+    try {
+      ensureDir(resolve(root, '.aidevos', 'rules'));
+      ensureDir(resolve(root, '.cursor', 'rules'));
+      ensureDir(resolve(root, '.codex', 'rules'));
+      writeJson(resolve(root, '.aidevos', 'config.json'), {
+        schemaVersion: '1.0',
+        project: 'legacy-project',
+        aiTools: ['cursor', 'codex'],
+      });
+      writeText(resolve(root, 'AGENTS.md'), 'Read .aidevos/aida-guide.md first\n');
+      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Imported cursor rule\n');
+      writeText(resolve(root, '.codex', 'rules', 'team.md'), '# Codex Rules\n\n- Imported codex rule\n');
+      writeText(
+        resolve(root, '.cursor', 'mcp.json'),
+        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['-y', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
+      );
+
+      const output = execSync(`node ${cliPath} migrate-legacy`, {
+        cwd: root,
+        encoding: 'utf-8',
+        stdio: 'pipe',
+        timeout: 10000,
+        env: { ...process.env, HOME: root },
+      });
+
+      assert.ok(output.includes('Legacy migration completed'));
+      assert.ok(output.includes('Auto-selected baseline: Cursor'));
+      assert.ok(output.includes('git rm --cached .mcp.json AGENTS.md CLAUDE.md'));
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

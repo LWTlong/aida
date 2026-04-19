@@ -142,5 +142,7 @@ export async function migrateDir(): Promise<void> {
 
   console.log(green('  ✓ Directory renamed') + ': .aida');
   console.log(green('  ✓ Updated references') + `: ${result.updatedFiles} text file(s)`);
-  console.log('\n  Next step: run `aida build` to regenerate local AI tool artifacts.\n');
+  console.log('\n  Next step: run `aida build` to regenerate local AI tool artifacts.');
+  console.log('  Note: if ignored AI files were already tracked by git before migration, untrack them manually.');
+  console.log('        Example: git rm --cached .mcp.json AGENTS.md CLAUDE.md\n');
 }

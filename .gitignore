@@ -4,20 +4,36 @@ dist-test/
 demo-dist/
 *.tsbuildinfo
 .DS_Store
+
+# AI tool local directories
 .agent/
 .agents/
+.augment/
+.claude/
+.codex/
+.continue/
+.cursor/
+.gemini/
+.kiro/
+.lingma/
+.qodo/
+.roo/
+.roo-code/
+.trae/
+.windsurf/
+.vscode/mcp.json
+AGENTS.md
+CLAUDE.md
+.mcp.json
+
 skills-lock.json
 .aidevos/
 .aida/skills-backup-*/
 DATA_CONTRACT_AUDIT.md
-.aida/
-.claude/
-# Auto-generated rule views (source of truth: .aida/rules.json)
-.aida/rules/*.md
 
-# AIDA - generated local AI tool artifacts
-.aida/skills/*/SKILL.md
+# AIDA source-of-truth lives in JSON; ignore all derived/local files by default
+.aida/**
+!.aida/**/
+!.aida/**/*.json
 .aida/index.json
 .aida/tool-configs.json
-.mcp.json
-.claude/commands/*.md
