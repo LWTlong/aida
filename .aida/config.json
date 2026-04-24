@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "mode": "full",
+  "aiTools": [
+    "codex",
+    "claude-code"
+  ],
+  "project": "ai-dev-analytics",
+  "aiModel": "gpt-5.4",
+  "baselineTool": "codex",
+  "aiTool": "codex"
+}

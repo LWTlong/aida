@@ -1,0 +1,265 @@
+{
+  "meta": {
+    "schemaVersion": "2.0",
+    "runId": "main",
+    "project": "ai-dev-analytics",
+    "developer": "vito-long",
+    "branch": "main",
+    "aiModel": "gpt-5.4",
+    "aiTool": "codex",
+    "startTime": "2026-04-24T02:00:11.286Z",
+    "status": "running",
+    "prdPhases": []
+  },
+  "summary": {
+    "totalTasks": 3,
+    "completedTasks": 2,
+    "bugCount": 0,
+    "deviationCount": 0,
+    "reviewCount": 2,
+    "reviewPassCount": 2,
+    "reviewFailCount": 0,
+    "rulesSedimented": 0,
+    "prdPhaseCount": 0,
+    "filesChanged": 4,
+    "linesAdded": 3,
+    "linesRemoved": 152
+  },
+  "workflow": [],
+  "tasks": [
+    {
+      "taskId": "TASK-01",
+      "title": "取消跟踪已被 .gitignore 忽略的文件",
+      "status": "done",
+      "stageName": "Git",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-24T02:00:11.288Z",
+      "startedAt": "2026-04-24T02:00:11.288Z",
+      "completedAt": "2026-04-24T02:40:14.195Z"
+    },
+    {
+      "taskId": "TASK-02",
+      "title": "提交并推送忽略文件取消跟踪改动",
+      "status": "done",
+      "stageName": "Git",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-24T03:22:02.116Z",
+      "startedAt": "2026-04-24T03:22:02.117Z",
+      "completedAt": "2026-04-24T03:22:49.313Z"
+    },
+    {
+      "taskId": "TASK-03",
+      "title": "提交并推送剩余可提交改动",
+      "status": "in-progress",
+      "stageName": "Git",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-24T03:24:05.073Z",
+      "startedAt": "2026-04-24T03:24:05.075Z",
+      "completedAt": null
+    }
+  ],
+  "bugs": [],
+  "deviations": [],
+  "reviews": [
+    {
+      "reviewId": "REV-01",
+      "taskId": "TASK-01",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Git index cleanup for ignored tracked files",
+      "reviewedAt": "2026-04-24T02:00:55.527Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-02",
+      "taskId": "TASK-02",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Git commit and push for ignored-file untracking changes",
+      "reviewedAt": "2026-04-24T03:22:46.541Z",
+      "issues": []
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitignore",
+      "changeType": "created",
+      "linesAdded": 3,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-04-24T02:00:36.265Z"
+    },
+    {
+      "path": ".mcp.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 12,
+      "changeCount": 1,
+      "lastModified": "2026-04-24T02:00:36.265Z"
+    },
+    {
+      "path": "AGENTS.md",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 72,
+      "changeCount": 1,
+      "lastModified": "2026-04-24T02:00:36.265Z"
+    },
+    {
+      "path": "CLAUDE.md",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 68,
+      "changeCount": 1,
+      "lastModified": "2026-04-24T02:00:36.265Z"
+    }
+  ],
+  "metrics": {
+    "aiDeviationRate": 0,
+    "bugRate": 0,
+    "reviewPassRate": 100,
+    "rulesSedimentedCount": 0,
+    "averageLinesPerTask": 52,
+    "totalDevelopmentTimeSeconds": 5034,
+    "developmentVelocity": 1.43,
+    "nodeTimeBreakdown": {
+      "Code Generation": 4958.025
+    },
+    "actualWorkSeconds": 4958
+  },
+  "timeline": [
+    {
+      "type": "task",
+      "title": "TASK-01: 取消跟踪已被 .gitignore 忽略的文件",
+      "timestamp": "2026-04-24T02:00:11.288Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-01: pass",
+      "timestamp": "2026-04-24T02:00:55.527Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-01: 取消跟踪已被 .gitignore 忽略的文件",
+      "timestamp": "2026-04-24T02:40:14.197Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-02: 提交并推送忽略文件取消跟踪改动",
+      "timestamp": "2026-04-24T03:22:02.118Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-02: pass",
+      "timestamp": "2026-04-24T03:22:46.543Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-02: 提交并推送忽略文件取消跟踪改动",
+      "timestamp": "2026-04-24T03:22:49.313Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-03: 提交并推送剩余可提交改动",
+      "timestamp": "2026-04-24T03:24:05.075Z"
+    }
+  ],
+  "events": [
+    {
+      "type": "task_created",
+      "time": "2026-04-24T02:00:11.288Z",
+      "data": {
+        "taskId": "TASK-01"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-24T02:00:11.288Z",
+      "data": {
+        "taskId": "TASK-01"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-24T02:00:36.265Z",
+      "data": {
+        "count": 4
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-24T02:00:55.527Z",
+      "data": {
+        "reviewId": "REV-01",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-24T02:40:14.197Z",
+      "data": {
+        "taskId": "TASK-01",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-24T03:22:02.118Z",
+      "data": {
+        "taskId": "TASK-02"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-24T03:22:02.118Z",
+      "data": {
+        "taskId": "TASK-02"
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-24T03:22:46.542Z",
+      "data": {
+        "reviewId": "REV-02",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-24T03:22:49.313Z",
+      "data": {
+        "taskId": "TASK-02",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-24T03:24:05.075Z",
+      "data": {
+        "taskId": "TASK-03"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-24T03:24:05.075Z",
+      "data": {
+        "taskId": "TASK-03"
+      }
+    }
+  ],
+  "rules": [],
+  "context": {
+    "currentTaskId": "TASK-03",
+    "lastUpdated": "2026-04-24T03:24:05.075Z"
+  },
+  "cost": {
+    "totalTokens": 0,
+    "estimatedManualHours": 0,
+    "actualHours": 0,
+    "tokenBreakdown": []
+  },
+  "highlights": []
+}

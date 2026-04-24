@@ -1,0 +1,27 @@
+{
+  "branch": "main",
+  "title": "main",
+  "summary": "main",
+  "currentPhase": "In Progress",
+  "modules": [
+    "Git"
+  ],
+  "completed": [
+    "取消跟踪已被 .gitignore 忽略的文件",
+    "提交并推送忽略文件取消跟踪改动"
+  ],
+  "inProgress": [
+    "提交并推送剩余可提交改动"
+  ],
+  "next": [],
+  "decisions": [],
+  "constraints": [],
+  "keyFiles": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".mcp.json",
+    ".gitignore"
+  ],
+  "risks": [],
+  "updatedAt": "2026-04-24T03:24:05.079Z"
+}

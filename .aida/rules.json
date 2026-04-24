@@ -1,0 +1,483 @@
+[
+  {
+    "id": "RULE-001",
+    "category": "process",
+    "content": "禁止任何形式的臆想，不清楚必须询问",
+    "fingerprint": "89c721ff0bb1",
+    "source": {
+      "branch": "init",
+      "deviation": null,
+      "author": "system"
+    },
+    "createdAt": "2026-04-24T01:53:14.329Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-002",
+    "category": "process",
+    "content": "禁止随意生成文档，如需生成文档，必须询问用户是否需要",
+    "fingerprint": "fea40b64c4e3",
+    "source": {
+      "branch": "init",
+      "deviation": null,
+      "author": "system"
+    },
+    "createdAt": "2026-04-24T01:53:14.341Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-003",
+    "category": "process",
+    "content": "生成测试脚本，在测试验证通过后必须删除测试脚本，保持项目清爽",
+    "fingerprint": "c50c3446829b",
+    "source": {
+      "branch": "init",
+      "deviation": null,
+      "author": "system"
+    },
+    "createdAt": "2026-04-24T01:53:14.342Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-004",
+    "category": "general",
+    "content": "Purpose: collect structured data from AI-assisted development sessions, sediment project rules, and visualize the full process in a dashboard.",
+    "fingerprint": "635b1dddd874",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-005",
+    "category": "general",
+    "content": "Core capabilities: MCP server, CLI, rules registry/build flow, run data collection, dashboard.",
+    "fingerprint": "23f278ee1121",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-006",
+    "category": "general",
+    "content": "Main stack: Node.js + TypeScript, React 19, Tailwind CSS 4, MCP over stdio.",
+    "fingerprint": "edcd9d48cff9",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-007",
+    "category": "general",
+    "content": "Read `.aida/aida-guide.md`",
+    "fingerprint": "ff2c64d61ea7",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-008",
+    "category": "general",
+    "content": "Read `.aida/rules/_all.md` if it exists",
+    "fingerprint": "c2745e09f8fa",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-009",
+    "category": "general",
+    "content": "Follow the AIDA data collection flow for each actual implementation task",
+    "fingerprint": "864da65498a7",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-010",
+    "category": "general",
+    "content": "`aida_task_start`",
+    "fingerprint": "221f12dfd61f",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-011",
+    "category": "general",
+    "content": "implement the change",
+    "fingerprint": "7d90b9dce303",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-012",
+    "category": "general",
+    "content": "`aida_log_files`",
+    "fingerprint": "9e7e73ad212c",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-013",
+    "category": "general",
+    "content": "`aida_log_review`",
+    "fingerprint": "ea7bf64bc944",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-014",
+    "category": "general",
+    "content": "`aida_task_done`",
+    "fingerprint": "fa0a39fc30f0",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-015",
+    "category": "general",
+    "content": "Log bugs with `aida_log_bug`",
+    "fingerprint": "1d9a2776900b",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-016",
+    "category": "general",
+    "content": "Mark bug fixes with `aida_bug_fix`",
+    "fingerprint": "6ea6fc2f059a",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-017",
+    "category": "general",
+    "content": "Log deviations with `aida_log_deviation`",
+    "fingerprint": "5b7637cd35da",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-018",
+    "category": "general",
+    "content": "Log notable improvements with `aida_highlight`",
+    "fingerprint": "7191a9282d3c",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-019",
+    "category": "general",
+    "content": "Do not hallucinate. If something is unclear, ask or verify.",
+    "fingerprint": "0ce733c4b52d",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.354Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-020",
+    "category": "general",
+    "content": "Do not generate extra documentation unless the user asks for it.",
+    "fingerprint": "7e18dcaa7030",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-021",
+    "category": "general",
+    "content": "If you create temporary test scripts for verification, remove them after verification.",
+    "fingerprint": "7e4394762361",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-022",
+    "category": "general",
+    "content": "After each code change delivery, explicitly state:",
+    "fingerprint": "fd5f8432dc44",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-023",
+    "category": "general",
+    "content": "impacted files/modules",
+    "fingerprint": "29aec7b8b986",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-024",
+    "category": "general",
+    "content": "whether any data structure changed",
+    "fingerprint": "1300f6c541ff",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-025",
+    "category": "general",
+    "content": "whether existing data remains backward compatible",
+    "fingerprint": "8eab589ec346",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-026",
+    "category": "general",
+    "content": "whether migration or reindex is required",
+    "fingerprint": "c01f7b4ae2f1",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-027",
+    "category": "general",
+    "content": "During task splitting, do not pre-register all tasks with `aida_task_start`. Only call `aida_task_start` immediately before starting real implementation work for that task.",
+    "fingerprint": "5b1467717c89",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-028",
+    "category": "general",
+    "content": "`workflow-orchestrator`",
+    "fingerprint": "a3201c6b60c2",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-029",
+    "category": "general",
+    "content": "`requirement-analyzer`",
+    "fingerprint": "d10fb8d12792",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-030",
+    "category": "general",
+    "content": "`task-splitter`",
+    "fingerprint": "29622cf135e8",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-031",
+    "category": "general",
+    "content": "`code-generator`",
+    "fingerprint": "d6ac80860bda",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-032",
+    "category": "general",
+    "content": "`self-reviewer`",
+    "fingerprint": "46acb0441a89",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-033",
+    "category": "general",
+    "content": "`bug-fixer`",
+    "fingerprint": "3966a640e24e",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-034",
+    "category": "general",
+    "content": "`deviation-recorder`",
+    "fingerprint": "fe554473a0c9",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-035",
+    "category": "general",
+    "content": "`rules-evolver`",
+    "fingerprint": "efcf00b1c1c7",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-036",
+    "category": "general",
+    "content": "`mcp-reviewer`",
+    "fingerprint": "ab7ac8d0a3b1",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-037",
+    "category": "general",
+    "content": "`audit`",
+    "fingerprint": "9f785d37fb21",
+    "source": {
+      "branch": "import:codex",
+      "deviation": null,
+      "author": "import"
+    },
+    "createdAt": "2026-04-24T01:53:14.355Z",
+    "status": "active"
+  }
+]
