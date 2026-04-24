@@ -37,3 +37,6 @@ DATA_CONTRACT_AUDIT.md
 !.aida/**/*.json
 .aida/index.json
 .aida/tool-configs.json
+
+# AIDA - generated local AI tool artifacts
+.codex/config.toml
