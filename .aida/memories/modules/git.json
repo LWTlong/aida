@@ -1,0 +1,35 @@
+{
+  "moduleKey": "git",
+  "title": "Git",
+  "summary": "main",
+  "keywords": [
+    "Git",
+    "main",
+    "git"
+  ],
+  "entryFiles": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".gitignore",
+    ".mcp.json"
+  ],
+  "relatedPaths": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".gitignore",
+    ".mcp.json"
+  ],
+  "dataFlow": [],
+  "decisions": [],
+  "constraints": [],
+  "pitfalls": [],
+  "relatedRules": [],
+  "tickets": [
+    {
+      "branch": "main",
+      "summary": "main",
+      "updatedAt": "2026-04-24T02:00:11.291Z"
+    }
+  ],
+  "updatedAt": "2026-04-24T03:24:05.081Z"
+}

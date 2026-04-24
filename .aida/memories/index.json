@@ -1,0 +1,22 @@
+{
+  "updatedAt": "2026-04-24T03:24:05.082Z",
+  "modules": [
+    {
+      "key": "git",
+      "title": "Git",
+      "summary": "main",
+      "keywords": [
+        "git",
+        "Git",
+        "main"
+      ],
+      "paths": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".gitignore",
+        ".mcp.json"
+      ],
+      "updatedAt": "2026-04-24T03:24:05.081Z"
+    }
+  ]
+}
