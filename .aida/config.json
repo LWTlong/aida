@@ -3,7 +3,9 @@
   "mode": "full",
   "aiTools": [
     "codex",
-    "claude-code"
+    "claude-code",
+    "cursor",
+    "vscode-copilot"
   ],
   "project": "ai-dev-analytics",
   "aiModel": "gpt-5.4",

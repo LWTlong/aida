@@ -1,14 +1,20 @@
 import { createHash } from 'node:crypto';
-import { readdirSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { ensureDir, fileExists, listDirs, readJson, readText, writeJson, writeText } from './fs.js';
+import { readdirSync, statSync } from 'node:fs';
+import { relative, resolve } from 'node:path';
+import { ensureDir, fileExists, listDirs, readJson, readText, resetDir, writeJson, writeText } from './fs.js';
 import { aidaDir, SKILLS_DIR } from './paths.js';
+
+export interface SkillCompanionFile {
+  path: string
+  content: string
+}
 
 export interface SkillRegistryEntry {
   id: string
   name: string
   content: string
   fingerprint: string
+  files?: SkillCompanionFile[]
   source: {
     kind: 'bundled' | 'local'
     path?: string
@@ -32,8 +38,71 @@ function normalize(content: string): string {
     .trim();
 }
 
-export function skillFingerprint(content: string): string {
-  return createHash('sha256').update(normalize(content)).digest('hex').substring(0, 12);
+function normalizeSkillFiles(files: SkillCompanionFile[] = []): SkillCompanionFile[] {
+  return [...files]
+    .filter((file) => file.path && !file.path.startsWith('../'))
+    .sort((a, b) => a.path.localeCompare(b.path))
+    .map((file) => ({ path: file.path.replace(/\\/g, '/'), content: file.content }));
+}
+
+function isSupportedSkillAsset(path: string): boolean {
+  const lowered = path.toLowerCase();
+  return lowered.endsWith('.md')
+    || lowered.endsWith('.txt')
+    || lowered.endsWith('.py')
+    || lowered.endsWith('.sh')
+    || lowered.endsWith('.js')
+    || lowered.endsWith('.ts')
+    || lowered.endsWith('.cjs')
+    || lowered.endsWith('.mjs')
+    || lowered.endsWith('.json')
+    || lowered.endsWith('.yaml')
+    || lowered.endsWith('.yml')
+    || lowered.endsWith('.toml');
+}
+
+function collectSkillPackage(skillDir: string): { content: string; files: SkillCompanionFile[] } | null {
+  const mainFile = resolve(skillDir, 'SKILL.md');
+  if (!fileExists(mainFile)) return null;
+
+  const content = readText(mainFile);
+  const files: SkillCompanionFile[] = [];
+  const stack = [skillDir];
+
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    for (const name of readdirSync(current)) {
+      const fullPath = resolve(current, name);
+      const stat = statSync(fullPath);
+      if (stat.isDirectory()) {
+        stack.push(fullPath);
+        continue;
+      }
+      if (fullPath === mainFile) continue;
+      const relPath = relative(skillDir, fullPath).replace(/\\/g, '/');
+      if (!isSupportedSkillAsset(relPath)) continue;
+      files.push({
+        path: relPath,
+        content: readText(fullPath),
+      });
+    }
+  }
+
+  return {
+    content,
+    files: normalizeSkillFiles(files),
+  };
+}
+
+export function skillFingerprint(content: string, files: SkillCompanionFile[] = []): string {
+  const payload = JSON.stringify({
+    content: normalize(content),
+    files: normalizeSkillFiles(files).map((file) => ({
+      path: file.path,
+      content: normalize(file.content),
+    })),
+  });
+  return createHash('sha256').update(payload).digest('hex').substring(0, 12);
 }
 
 export function nextSkillId(entries: SkillRegistryEntry[]): string {
@@ -89,7 +158,7 @@ export function bundledSkillEntries(): SkillRegistryEntry[] {
       id: `SKILL-${String(index + 1).padStart(3, '0')}`,
       name,
       content,
-      fingerprint: skillFingerprint(content),
+      fingerprint: skillFingerprint(content, []),
       source: {
         kind: 'bundled' as const,
         path: `src/assets/skills/${name}.md`,
@@ -126,12 +195,15 @@ export function bootstrapSkillRegistry(projectRoot: string): SkillRegistryEntry[
   const entries = localSkills
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((entry, index) => {
-      const content = readText(entry.path);
+      const collected = collectSkillPackage(resolve(localSkillDir, entry.name));
+      const content = collected?.content || readText(entry.path);
+      const files = collected?.files || [];
       return {
         id: `SKILL-${String(index + 1).padStart(3, '0')}`,
         name: entry.name,
         content,
-        fingerprint: skillFingerprint(content),
+        files,
+        fingerprint: skillFingerprint(content, files),
         source: {
           kind: 'local' as const,
           path: `.aida/skills/${entry.name}/SKILL.md`,
@@ -163,13 +235,16 @@ export function importSkillsFromViews(projectRoot: string): { entries: SkillRegi
   const merged = [...existing];
 
   for (const skill of localSkills) {
-    const content = readText(skill.path);
-    const fp = skillFingerprint(content);
+    const collected = collectSkillPackage(resolve(localSkillDir, skill.name));
+    const content = collected?.content || readText(skill.path);
+    const files = collected?.files || [];
+    const fp = skillFingerprint(content, files);
     const named = byName.get(skill.name);
 
     if (named) {
-      if (named.fingerprint !== fp || named.content !== content || named.status !== 'active') {
+      if (named.fingerprint !== fp || named.content !== content || JSON.stringify(named.files || []) !== JSON.stringify(files) || named.status !== 'active') {
         named.content = content;
+        named.files = files;
         named.fingerprint = fp;
         named.updatedAt = now;
         named.status = 'active';
@@ -190,6 +265,7 @@ export function importSkillsFromViews(projectRoot: string): { entries: SkillRegi
       id: nextSkillId(merged),
       name: skill.name,
       content,
+      files,
       fingerprint: fp,
       source: {
         kind: 'local',
@@ -214,13 +290,19 @@ export function importSkillsFromViews(projectRoot: string): { entries: SkillRegi
 export function buildSkillViews(projectRoot: string): number {
   const entries = bootstrapSkillRegistry(projectRoot);
   const viewDir = skillsViewDir(projectRoot);
-  ensureDir(viewDir);
+  resetDir(viewDir);
 
   let written = 0;
-  for (const entry of skillFiles(entries)) {
+  for (const entry of activeSkills(entries)) {
     const destDir = resolve(viewDir, entry.name);
     ensureDir(destDir);
     writeText(resolve(destDir, 'SKILL.md'), entry.content);
+    for (const file of normalizeSkillFiles(entry.files || [])) {
+      const fullPath = resolve(destDir, file.path);
+      ensureDir(resolve(fullPath, '..'));
+      writeText(fullPath, file.content);
+      written++;
+    }
     written++;
   }
 
@@ -242,7 +324,7 @@ export function updateSkillContent(
   if (!entry) return null;
 
   entry.content = content;
-  entry.fingerprint = skillFingerprint(content);
+  entry.fingerprint = skillFingerprint(content, entry.files || []);
   entry.updatedAt = new Date().toISOString();
   saveSkillRegistry(projectRoot, entries);
   return entry;

@@ -1,9 +1,10 @@
 import { configPath } from '../../utils/paths.js';
-import { fileExists, readText, extractConflictSections, parseConflictJsonArray } from '../../utils/fs.js';
+import { fileExists, readText, extractConflictSections, parseConflictJsonArray, writeText } from '../../utils/fs.js';
 import { green, red, cyan, yellow, dim } from '../../utils/display.js';
 import {
   addRule,
   bootstrapRuleRegistry,
+  dedupeExactRules,
   loadRegistry,
   saveRegistry,
   findSimilarRules,
@@ -62,17 +63,33 @@ async function rulesBuild(): Promise<void> {
 
 async function rulesDedupe(): Promise<void> {
   const projectRoot = process.cwd();
-  const entries = bootstrapRuleRegistry(projectRoot);
+  const existing = bootstrapRuleRegistry(projectRoot);
 
-  if (entries.length === 0) {
+  if (existing.length === 0) {
     console.log(yellow('\n  No rules in registry.\n'));
     return;
   }
 
+  const { entries, removed } = dedupeExactRules(existing);
+  if (removed.length > 0) {
+    saveRegistry(projectRoot, entries);
+    buildProjectArtifacts(projectRoot);
+    console.log(green(`\n  ✓ Removed ${removed.length} exact duplicate(s):\n`));
+    for (const entry of removed) {
+      console.log(`  - ${cyan(entry.id)} ${entry.content.substring(0, 80)}`);
+    }
+    console.log('');
+  }
+
   const similar = findSimilarRules(entries);
 
-  if (similar.length === 0) {
+  if (removed.length === 0 && similar.length === 0) {
     console.log(green('\n  ✓ No potential duplicates found.\n'));
+    return;
+  }
+
+  if (similar.length === 0) {
+    console.log(green('  ✓ No near-duplicate rules remain.\n'));
     return;
   }
 
@@ -92,14 +109,12 @@ async function rulesDedupe(): Promise<void> {
   );
 }
 
-export async function mergeRulesRegistry(projectRoot: string): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
-  const regPath = registryPath(projectRoot);
-
-  if (!fileExists(regPath)) {
+export async function mergeRuleRegistryFile(filePath: string): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
+  if (!fileExists(filePath)) {
     return { status: 'missing' };
   }
 
-  const raw = readText(regPath);
+  const raw = readText(filePath);
   if (!raw.includes('<<<<<<<') && !raw.includes('>>>>>>>')) {
     return { status: 'no-conflict' };
   }
@@ -111,11 +126,19 @@ export async function mergeRulesRegistry(projectRoot: string): Promise<{ status:
 
   const ours = parseConflictJsonArray<RuleRegistryEntry>(sections.ours);
   const theirs = parseConflictJsonArray<RuleRegistryEntry>(sections.theirs);
+  if (ours.length === 0 && theirs.length === 0) {
+    return { status: 'error' };
+  }
 
   const { merged, added } = mergeRegistries(ours, theirs);
-  saveRegistry(projectRoot, merged);
+  const sorted = merged.sort((a, b) => a.id.localeCompare(b.id));
+  writeText(filePath, `${JSON.stringify(sorted, null, 2)}\n`);
 
-  return { status: 'merged', added, total: merged.length };
+  return { status: 'merged', added, total: sorted.length };
+}
+
+export async function mergeRulesRegistry(projectRoot: string): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
+  return mergeRuleRegistryFile(registryPath(projectRoot));
 }
 
 async function rulesMerge(): Promise<void> {
@@ -145,6 +168,7 @@ async function rulesMerge(): Promise<void> {
     );
   }
 }
+
 
 async function rulesList(): Promise<void> {
   const projectRoot = process.cwd();

@@ -179,4 +179,80 @@ describe('aida memory', () => {
       project.cleanup();
     }
   });
+
+  it('should rebuild module memory and views when the module key contains a slash', () => {
+    const project = createTestProject({
+      branch: 'main',
+      runData: {
+        meta: {
+          schemaVersion: '2.0',
+          runId: 'main',
+          project: 'test-project',
+          developer: 'test-dev',
+          branch: 'main',
+          aiModel: 'claude',
+          aiTool: 'claude-code',
+          startTime: '2026-04-15T10:00:00.000Z',
+          status: 'running',
+          prdPhases: [],
+        },
+        summary: {
+          totalTasks: 1,
+          completedTasks: 0,
+          bugCount: 0,
+          deviationCount: 0,
+          reviewCount: 0,
+          reviewPassCount: 0,
+          reviewFailCount: 0,
+          rulesSedimented: 0,
+          prdPhaseCount: 0,
+          filesChanged: 1,
+          linesAdded: 10,
+          linesRemoved: 0,
+        },
+        workflow: [],
+        tasks: [
+          { taskId: 'TASK-01', title: 'Validate MCP flow', stageName: 'CLI/MCP', prdPhase: '', status: 'in-progress' },
+        ],
+        bugs: [],
+        deviations: [],
+        reviews: [],
+        files: [
+          { path: 'src/mcp/server.ts', changeType: 'modified', linesAdded: 10, linesRemoved: 0, changeCount: 1 },
+        ],
+        metrics: {},
+        timeline: [],
+        events: [],
+        rules: [],
+        context: { currentStage: 'CLI/MCP', currentTaskId: 'TASK-01', lastUpdated: '2026-04-15T11:30:00.000Z' },
+        cost: { totalTokens: 0, estimatedManualHours: 0, actualHours: 0, tokenBreakdown: [] },
+        highlights: [],
+      },
+    });
+
+    try {
+      writeJson(resolve(project.root, '.aida', 'runs', 'main', 'requirement.json'), {
+        branch: 'main',
+        title: 'MTR-002 CLI MCP',
+        summary: 'Validate CLI/MCP integration.',
+        prdPhases: [],
+        modules: [
+          { id: 'MOD-01', name: 'CLI/MCP', description: 'CLI and MCP bridge', assignee: 'test-dev' },
+        ],
+        highlights: [],
+        developers: [],
+        totals: { tasks: 0, completedTasks: 0, bugs: 0, deviations: 0, linesAdded: 0, linesRemoved: 0, totalTokens: 0 },
+        createdAt: '2026-04-15T10:00:00.000Z',
+        updatedAt: '2026-04-15T10:00:00.000Z',
+      });
+
+      const stdout = runCliOutput(project, 'memory rebuild main');
+
+      assert.ok(stdout.includes('Rebuilt memory'));
+      assert.equal(readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.json')).moduleKey, 'cli/mcp');
+      assert.ok(readText(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.md')).includes('CLI/MCP'));
+    } finally {
+      project.cleanup();
+    }
+  });
 });

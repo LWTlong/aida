@@ -1,14 +1,14 @@
 import { green, red, yellow } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
 import { fileExists } from '../../utils/fs.js';
-import { importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
+import { CLOSED_LOOP_BASELINE_TOOLS, importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import type { AiToolChoice } from '../../schemas/aida-project.js';
 
 function requestedBaseline(): AiToolChoice | null | 'invalid' {
   const value = process.argv[3]?.trim();
   if (!value) return null;
-  if (['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex'].includes(value)) {
+  if (CLOSED_LOOP_BASELINE_TOOLS.includes(value as AiToolChoice)) {
     return value as AiToolChoice;
   }
   return 'invalid';
@@ -33,7 +33,8 @@ export async function importSources(): Promise<void> {
   const baseline = requestedBaseline();
   const options = importOptions();
   if (baseline === 'invalid') {
-    console.log(red(`\n  Unknown baseline tool: ${process.argv[3]?.trim()}\n`));
+    console.log(red(`\n  Unsupported baseline tool for import: ${process.argv[3]?.trim()}\n`));
+    console.log(`  Supported baseline tools: ${CLOSED_LOOP_BASELINE_TOOLS.join(', ')}\n`);
     return;
   }
   if (baseline) {

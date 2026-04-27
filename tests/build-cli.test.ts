@@ -51,6 +51,7 @@ describe('aida build', () => {
       assert.ok(readText(resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md')).includes('Workflow content'));
       assert.ok(readText(resolve(project.root, '.cursor', 'rules', 'aida', '_all.md')).includes('Rule A'));
       assert.ok(readText(resolve(project.root, '.codex', 'rules', 'aida', '_all.md')).includes('Rule A'));
+      assert.ok(readText(resolve(project.root, '.aida', 'rules', '_all.md')).includes('Rule A'));
       const snapshot = readJson<any>(resolve(project.root, '.aida', 'tool-configs.json'));
       assert.ok(Array.isArray(snapshot.snapshots));
       assert.ok(snapshot.snapshots.some((item: any) => item.tool === 'codex'));
@@ -162,6 +163,40 @@ describe('aida build', () => {
       assert.ok(stdout.includes('codex'));
       assert.ok(readText(resolve(project.root, '.cursor', 'rules', 'aida', '_all.md')).includes('Rule A'));
       assert.ok(readText(resolve(project.root, '.codex', 'config.toml')).includes('[mcp_servers.aida]'));
+      assert.ok(readText(resolve(project.root, 'AGENTS.md')).includes('.aida/aida-guide.md'));
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should create top-level guide references during build when missing', () => {
+    const project = createTestProject();
+    try {
+      writeText(resolve(project.root, '.aida', 'config.json'), JSON.stringify({
+        schemaVersion: '1.0',
+        project: 'test-project',
+        aiTools: ['claude-code', 'codex'],
+      }, null, 2));
+      writeText(
+        resolve(project.root, '.aida', 'rules.json'),
+        JSON.stringify([
+          {
+            id: 'RULE-001',
+            category: 'process',
+            content: 'Rule A',
+            fingerprint: 'fp-rule-a',
+            source: { branch: 'main', deviation: null, author: 'test' },
+            createdAt: '2026-04-13T00:00:00.000Z',
+            status: 'active',
+          },
+        ], null, 2),
+      );
+
+      runCliOutput(project, 'build claude-code codex');
+
+      assert.ok(readText(resolve(project.root, 'CLAUDE.md')).includes('.aida/aida-guide.md'));
+      assert.ok(readText(resolve(project.root, 'AGENTS.md')).includes('.aida/aida-guide.md'));
+      assert.ok(readText(resolve(project.root, 'AGENTS.md')).includes('.aida/rules/_all.md'));
     } finally {
       project.cleanup();
     }

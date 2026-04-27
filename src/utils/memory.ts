@@ -1,5 +1,5 @@
 import { readdirSync, statSync } from 'node:fs';
-import { basename, resolve } from 'node:path';
+import { basename, dirname, resolve } from 'node:path';
 import { ensureDir, fileExists, readJson, readText, writeJson, writeText } from './fs.js';
 import {
   branchDir,
@@ -339,8 +339,9 @@ function upsertMemoryIndexEntry(projectRoot: string, record: ModuleMemoryRecord)
 }
 
 export function saveModuleMemory(projectRoot: string, record: ModuleMemoryRecord): void {
-  ensureDir(moduleMemoriesDir(projectRoot));
-  writeJson(moduleMemoryPath(projectRoot, record.moduleKey), record);
+  const path = moduleMemoryPath(projectRoot, record.moduleKey);
+  ensureDir(dirname(path));
+  writeJson(path, record);
   upsertMemoryIndexEntry(projectRoot, record);
 }
 
@@ -455,7 +456,9 @@ export function buildMemoryViews(projectRoot: string): BuildMemoryViewsResult {
   for (const file of walkJsonFiles(moduleMemoriesDir(projectRoot))) {
     if (basename(file) === 'index.json') continue;
     const record = readJson<ModuleMemoryRecord>(file);
-    writeText(moduleMemoryViewPath(projectRoot, record.moduleKey), renderModuleMemoryMarkdown(record));
+    const viewPath = moduleMemoryViewPath(projectRoot, record.moduleKey);
+    ensureDir(dirname(viewPath));
+    writeText(viewPath, renderModuleMemoryMarkdown(record));
     moduleViews++;
   }
 

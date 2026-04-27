@@ -40,3 +40,19 @@ DATA_CONTRACT_AUDIT.md
 
 # AIDA - generated local AI tool artifacts
 .codex/config.toml
+
+# AIDA - generated local AI tool artifacts
+.aida/memories/modules/*.md
+.aida/runs/*/context.md
+.claude/commands/*.md
+.claude/rules/
+.claude/skills/
+.aida/codex/config.toml
+.codex/rules/
+.codex/skills/
+
+# AIDA - generated local AI tool artifacts
+.cursor/mcp.json
+
+# AIDA - generated local AI tool artifacts
+.aida/bootstrap-state.local.json

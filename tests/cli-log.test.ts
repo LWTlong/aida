@@ -62,6 +62,18 @@ describe('aidevos log task-start / task-done', () => {
     const data = runCli(project, 'log task-done --id TASK-01');
     assert.ok(data.tasks[0].startedAt, 'startedAt should be backfilled');
   });
+
+  it('should fall back currentTaskId to another in-progress task when marking one done', () => {
+    runCli(project, 'log task --title "Task A" --stage "API"');
+    runCli(project, 'log task --title "Task B" --stage "UI"');
+    runCli(project, 'log task-start --id TASK-01');
+    runCli(project, 'log task-start --id TASK-02');
+
+    const data = runCli(project, 'log task-done --id TASK-02');
+    assert.equal(data.context.currentTaskId, 'TASK-01');
+    assert.equal(data.tasks[0].status, 'in-progress');
+    assert.equal(data.tasks[1].status, 'done');
+  });
 });
 
 // ─── log bug / bug-fix ────────────────────────────────────

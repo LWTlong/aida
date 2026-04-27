@@ -4,31 +4,52 @@
   "summary": "",
   "prdPhases": [],
   "modules": [],
-  "highlights": [],
+  "highlights": [
+    {
+      "content": "`aida build` now generates repo-level `.aida/rules/_all.md` alongside tool-specific artifacts and auto-creates missing AGENTS.md / CLAUDE.md guide references.",
+      "source": "auto",
+      "createdAt": "2026-04-24T03:52:36.685Z"
+    },
+    {
+      "content": "Verified the migration chain end-to-end and aligned rule references so `.aida/rules/_all.md` now exists as the repo-level fallback while tool-specific `_all.md` files remain the primary entrypoint.",
+      "source": "auto",
+      "createdAt": "2026-04-24T06:02:57.419Z"
+    },
+    {
+      "content": "Validated bootstrap status/manifest/complete flow plus aggregated aida_task/aida_record/aida_memory behavior against real-project wiring; targeted MCP/init/build/migrate tests and full npm test suite now pass end-to-end.",
+      "source": "auto",
+      "createdAt": "2026-04-27T07:17:32.241Z"
+    },
+    {
+      "content": "Release-path validation now includes real built-command execution inside the AIDA repo itself, root-level rules conflict sample verification, MCP bootstrap/task/record/memory handshake, package dry-run, and a slash-module memory-path regression fix proven by real migrate-legacy rerun.",
+      "source": "auto",
+      "createdAt": "2026-04-27T08:09:59.537Z"
+    }
+  ],
   "developers": [
     {
       "name": "vito-long",
       "modules": [],
-      "tasks": 3,
-      "completedTasks": 2,
-      "bugs": 0,
+      "tasks": 29,
+      "completedTasks": 26,
+      "bugs": 7,
       "deviations": 0,
-      "linesAdded": 3,
-      "linesRemoved": 152,
+      "linesAdded": 44929,
+      "linesRemoved": 21692,
       "firstPassRate": 1,
-      "actualWorkSeconds": 4958,
+      "actualWorkSeconds": 556570,
       "totalTokens": 0
     }
   ],
   "totals": {
-    "tasks": 3,
-    "completedTasks": 2,
-    "bugs": 0,
+    "tasks": 29,
+    "completedTasks": 26,
+    "bugs": 7,
     "deviations": 0,
-    "linesAdded": 3,
-    "linesRemoved": 152,
+    "linesAdded": 44929,
+    "linesRemoved": 21692,
     "totalTokens": 0
   },
   "createdAt": "2026-04-24T02:00:11.287Z",
-  "updatedAt": "2026-04-24T03:24:05.077Z"
+  "updatedAt": "2026-04-27T08:21:54.275Z"
 }

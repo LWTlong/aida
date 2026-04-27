@@ -15,6 +15,7 @@ import type {
   RequirementData,
   DeveloperSummary,
   HighlightItem,
+  TaskItem,
 } from '../schemas/run-json.js';
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -44,6 +45,19 @@ export function addTimeline(data: RunData, type: string, title: string, prdPhase
   const item: { type: string; title: string; timestamp: string; prdPhase?: string } = { type, title, timestamp: now() };
   if (prdPhase) item.prdPhase = prdPhase;
   data.timeline.push(item);
+}
+
+export function resolveCurrentTaskId(tasks: TaskItem[]): string | undefined {
+  const inProgress = tasks.filter((task) => task.status === 'in-progress');
+  if (inProgress.length === 0) return undefined;
+
+  inProgress.sort((a, b) => {
+    const aTime = new Date(a.startedAt || a.createdAt || 0).getTime();
+    const bTime = new Date(b.startedAt || b.createdAt || 0).getTime();
+    return bTime - aTime;
+  });
+
+  return inProgress[0]?.taskId;
 }
 
 // ─── Config ──────────────────────────────────────────────

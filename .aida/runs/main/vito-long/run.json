@@ -12,18 +12,18 @@
     "prdPhases": []
   },
   "summary": {
-    "totalTasks": 3,
-    "completedTasks": 2,
-    "bugCount": 0,
+    "totalTasks": 29,
+    "completedTasks": 26,
+    "bugCount": 7,
     "deviationCount": 0,
-    "reviewCount": 2,
-    "reviewPassCount": 2,
+    "reviewCount": 21,
+    "reviewPassCount": 21,
     "reviewFailCount": 0,
-    "rulesSedimented": 0,
+    "rulesSedimented": 1,
     "prdPhaseCount": 0,
-    "filesChanged": 4,
-    "linesAdded": 3,
-    "linesRemoved": 152
+    "filesChanged": 44,
+    "linesAdded": 44929,
+    "linesRemoved": 21692
   },
   "workflow": [],
   "tasks": [
@@ -52,16 +52,525 @@
     {
       "taskId": "TASK-03",
       "title": "提交并推送剩余可提交改动",
-      "status": "in-progress",
+      "status": "done",
       "stageName": "Git",
       "prdPhase": "",
       "acceptance": "",
       "createdAt": "2026-04-24T03:24:05.073Z",
       "startedAt": "2026-04-24T03:24:05.075Z",
+      "completedAt": "2026-04-24T03:24:54.511Z"
+    },
+    {
+      "taskId": "TASK-04",
+      "title": "修复 init/build 交互与规则生成链路",
+      "status": "done",
+      "stageName": "CLI",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-24T03:44:43.941Z",
+      "startedAt": "2026-04-24T03:44:43.942Z",
+      "completedAt": "2026-04-24T03:53:20.904Z"
+    },
+    {
+      "taskId": "TASK-05",
+      "title": "验证并优化迁移、init 交互与规则链路",
+      "status": "done",
+      "stageName": "CLI",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-24T05:56:21.282Z",
+      "startedAt": "2026-04-24T05:56:21.284Z",
+      "completedAt": "2026-04-24T06:03:09.770Z"
+    },
+    {
+      "taskId": "TASK-06",
+      "title": "修复自定义 *.rules.json 冲突合并被清空的问题",
+      "status": "done",
+      "stageName": "CLI",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-24T09:11:01.122Z",
+      "startedAt": "2026-04-24T09:11:01.124Z",
+      "completedAt": "2026-04-24T09:27:17.090Z"
+    },
+    {
+      "taskId": "TASK-07",
+      "title": "移除误加的自定义 rules 文件扫描合并逻辑",
+      "status": "done",
+      "stageName": "CLI",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-24T09:33:21.371Z",
+      "startedAt": "2026-04-24T09:33:21.373Z",
+      "completedAt": "2026-04-24T09:38:02.278Z"
+    },
+    {
+      "taskId": "TASK-08",
+      "title": "检查 CLI 交互、迁移幂等性与规则去重机制",
+      "status": "in-progress",
+      "stageName": "CLI",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T01:59:25.724Z",
+      "startedAt": "2026-04-27T01:59:25.725Z",
+      "completedAt": null
+    },
+    {
+      "taskId": "TASK-09",
+      "title": "补充 init / migrate-legacy 可反复执行补全的回归验证",
+      "status": "done",
+      "stageName": "CLI",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T02:01:22.579Z",
+      "startedAt": "2026-04-27T02:01:22.580Z",
+      "completedAt": "2026-04-27T02:05:57.806Z"
+    },
+    {
+      "taskId": "TASK-10",
+      "title": "调整中文主 README 并补充规则去重与重复执行覆盖说明",
+      "status": "done",
+      "stageName": "Docs",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T02:23:37.441Z",
+      "startedAt": "2026-04-27T02:23:37.442Z",
+      "completedAt": "2026-04-27T02:27:39.922Z"
+    },
+    {
+      "taskId": "TASK-11",
+      "title": "修复 Codex config.toml 重复追加 AIDA MCP 配置",
+      "status": "done",
+      "stageName": "CLI",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T02:31:28.039Z",
+      "startedAt": "2026-04-27T02:31:28.040Z",
+      "completedAt": "2026-04-27T02:33:09.561Z"
+    },
+    {
+      "taskId": "TASK-12",
+      "title": "补齐 skill 伴生文件的收录与分发能力",
+      "status": "done",
+      "stageName": "Skills",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T03:05:16.283Z",
+      "startedAt": "2026-04-27T03:05:16.286Z",
+      "completedAt": "2026-04-27T03:07:32.779Z"
+    },
+    {
+      "taskId": "TASK-13",
+      "title": "补齐 Claude/Codex skill 伴生文件的闭环支持并明确未闭环边界",
+      "status": "done",
+      "stageName": "Skills",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T03:14:14.437Z",
+      "startedAt": "2026-04-27T03:14:14.437Z",
+      "completedAt": "2026-04-27T03:16:26.471Z"
+    },
+    {
+      "taskId": "TASK-14",
+      "title": "收紧 import 仅暴露已闭环的工具选项",
+      "status": "done",
+      "stageName": "Import",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T03:21:24.924Z",
+      "startedAt": "2026-04-27T03:21:24.924Z",
+      "completedAt": "2026-04-27T03:23:16.029Z"
+    },
+    {
+      "taskId": "TASK-15",
+      "title": "自检迁移到构建全链路闭环与幂等行为",
+      "status": "in-progress",
+      "stageName": "QA",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T03:27:37.409Z",
+      "startedAt": "2026-04-27T03:27:37.410Z",
+      "completedAt": null
+    },
+    {
+      "taskId": "TASK-16",
+      "title": "Self-review and close idempotence gaps in import/build chain",
+      "status": "done",
+      "stageName": "QA",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T03:30:07.598Z",
+      "startedAt": "2026-04-27T03:30:07.598Z",
+      "completedAt": "2026-04-27T03:33:26.948Z"
+    },
+    {
+      "taskId": "TASK-17",
+      "title": "Pin MCP install source to public npm registry and assess pre-authorization limits",
+      "status": "done",
+      "stageName": "CLI/MCP",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T03:37:52.472Z",
+      "startedAt": "2026-04-27T03:37:52.472Z",
+      "completedAt": "2026-04-27T03:39:25.097Z"
+    },
+    {
+      "taskId": "TASK-18",
+      "title": "Add MCP bootstrap checks, local auth cache, and plan tool consolidation",
+      "status": "done",
+      "stageName": "MCP/Rules",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T05:56:25.075Z",
+      "startedAt": "2026-04-27T05:56:25.076Z",
+      "completedAt": "2026-04-27T06:05:32.404Z"
+    },
+    {
+      "taskId": "TASK-19",
+      "title": "Real-project linked validation for bootstrap and AIDA workflow changes",
+      "status": "done",
+      "stageName": "QA/Manual Verification",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T06:46:39.407Z",
+      "startedAt": "2026-04-27T06:46:39.409Z",
+      "completedAt": "2026-04-27T07:17:49.376Z"
+    },
+    {
+      "taskId": "TASK-20",
+      "title": "Fix currentTaskId fallback when completing tasks",
+      "status": "done",
+      "stageName": "Run Data / MCP",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T07:21:09.778Z",
+      "startedAt": "2026-04-27T07:21:09.778Z",
+      "completedAt": "2026-04-27T07:24:39.596Z"
+    },
+    {
+      "taskId": "TASK-21",
+      "title": "Real-command validation in current AIDA project",
+      "status": "done",
+      "stageName": "QA / Manual Verification",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T07:36:35.704Z",
+      "startedAt": "2026-04-27T07:36:35.705Z",
+      "completedAt": "2026-04-27T08:10:36.651Z"
+    },
+    {
+      "taskId": "TASK-22",
+      "title": "Validation task A for currentTaskId",
+      "status": "done",
+      "stageName": "QA",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T08:06:57.311Z",
+      "completedAt": "2026-04-27T08:09:40.542Z",
+      "startedAt": "2026-04-27T08:06:57.311Z"
+    },
+    {
+      "taskId": "TASK-23",
+      "title": "Validation task B for currentTaskId",
+      "status": "done",
+      "stageName": "QA",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T08:06:57.411Z",
+      "completedAt": "2026-04-27T08:07:14.359Z",
+      "startedAt": "2026-04-27T08:07:06.529Z"
+    },
+    {
+      "taskId": "TASK-24",
+      "title": "Validation task C for currentTaskId",
+      "status": "done",
+      "stageName": "QA",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T08:07:40.230Z",
+      "completedAt": "2026-04-27T08:09:40.657Z",
+      "startedAt": "2026-04-27T08:07:45.094Z"
+    },
+    {
+      "taskId": "TASK-25",
+      "title": "Validation task D for currentTaskId",
+      "status": "done",
+      "stageName": "QA",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T08:07:49.888Z",
+      "completedAt": "2026-04-27T08:07:59.264Z",
+      "startedAt": "2026-04-27T08:07:54.201Z"
+    },
+    {
+      "taskId": "TASK-26",
+      "title": "MCP validation task",
+      "status": "done",
+      "stageName": "QA/MCP",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T08:08:29.010Z",
+      "startedAt": "2026-04-27T08:08:29.010Z",
+      "completedAt": "2026-04-27T08:08:29.134Z"
+    },
+    {
+      "taskId": "TASK-27",
+      "title": "Update docs for init/migrate/build/import and conflict workflows",
+      "status": "done",
+      "stageName": "Docs",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T08:14:51.602Z",
+      "startedAt": "2026-04-27T08:14:51.605Z",
+      "completedAt": "2026-04-27T08:16:34.936Z"
+    },
+    {
+      "taskId": "TASK-28",
+      "title": "Add per-scenario deep links from README to COMMANDS",
+      "status": "done",
+      "stageName": "Docs",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T08:18:11.932Z",
+      "startedAt": "2026-04-27T08:18:11.933Z",
+      "completedAt": "2026-04-27T08:18:46.847Z"
+    },
+    {
+      "taskId": "TASK-29",
+      "title": "Commit, push, and publish validated release",
+      "status": "in-progress",
+      "stageName": "Release",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T08:21:54.272Z",
+      "startedAt": "2026-04-27T08:21:54.273Z",
       "completedAt": null
     }
   ],
-  "bugs": [],
+  "bugs": [
+    {
+      "bugId": "BUG-01",
+      "title": "CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
+      "severity": "high",
+      "source": "user-feedback",
+      "status": "fixed",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/git.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        "src/cli/commands/init.ts",
+        "src/utils/ai-build.ts",
+        "src/utils/guide.ts",
+        "src/utils/prompt.ts",
+        "tests/build-cli.test.ts"
+      ],
+      "fix": "Ensure module memory JSON/Markdown writes create nested directories for slash-containing module keys, e.g. cli/mcp, so migrate-legacy and memory rebuild can complete in real projects.",
+      "taskId": "TASK-04",
+      "reportedAt": "2026-04-24T03:52:34.931Z",
+      "fixedAt": "2026-04-27T08:10:09.348Z"
+    },
+    {
+      "bugId": "BUG-01",
+      "title": "Build flow skipped top-level guide/rule artifacts for migration compatibility",
+      "severity": "high",
+      "source": "user-feedback",
+      "status": "open",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/git.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        "src/cli/commands/init.ts",
+        "src/utils/ai-build.ts",
+        "src/utils/guide.ts",
+        "src/utils/prompt.ts",
+        "tests/build-cli.test.ts"
+      ],
+      "fix": null,
+      "taskId": "TASK-04",
+      "reportedAt": "2026-04-24T03:52:35.039Z",
+      "fixedAt": null
+    },
+    {
+      "bugId": "BUG-01",
+      "title": "Non-interactive init fallback dropped subsequent answers across multi-step prompts",
+      "severity": "high",
+      "source": "testing",
+      "status": "open",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/git.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        "src/cli/commands/init.ts",
+        "src/utils/ai-build.ts",
+        "src/utils/guide.ts",
+        "src/utils/prompt.ts",
+        "tests/build-cli.test.ts",
+        "tests/build.test.ts",
+        "tests/migrate-legacy-cli.test.ts"
+      ],
+      "fix": null,
+      "taskId": "TASK-05",
+      "reportedAt": "2026-04-24T06:02:57.244Z",
+      "fixedAt": null
+    },
+    {
+      "bugId": "BUG-01",
+      "title": "Legacy AGENTS.md marker was not upgraded to full AIDA guidance during migration/build",
+      "severity": "high",
+      "source": "testing",
+      "status": "open",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/git.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        "src/cli/commands/init.ts",
+        "src/utils/ai-build.ts",
+        "src/utils/guide.ts",
+        "src/utils/prompt.ts",
+        "tests/build-cli.test.ts",
+        "tests/build.test.ts",
+        "tests/migrate-legacy-cli.test.ts"
+      ],
+      "fix": null,
+      "taskId": "TASK-05",
+      "reportedAt": "2026-04-24T06:02:57.360Z",
+      "fixedAt": null
+    },
+    {
+      "bugId": "BUG-01",
+      "title": "Indented conflict markers in custom *.rules.json caused merge parsing failure or empty-array fallback",
+      "severity": "high",
+      "source": "user-feedback",
+      "status": "open",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/git.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        "src/cli/commands/init.ts",
+        "src/cli/commands/merge.ts",
+        "src/cli/commands/rules.ts",
+        "src/utils/ai-build.ts",
+        "src/utils/fs.ts",
+        "src/utils/guide.ts",
+        "src/utils/prompt.ts",
+        "tests/build-cli.test.ts",
+        "tests/build.test.ts",
+        "tests/merge.test.ts",
+        "tests/migrate-legacy-cli.test.ts"
+      ],
+      "fix": null,
+      "taskId": "TASK-06",
+      "reportedAt": "2026-04-24T09:26:21.817Z",
+      "fixedAt": null
+    },
+    {
+      "bugId": "BUG-01",
+      "title": "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
+      "severity": "medium",
+      "source": "testing",
+      "status": "open",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/git.json",
+        ".aida/rules.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        ".gitignore",
+        "COMMANDS.md",
+        "README.md",
+        "README.zh-CN.md",
+        "docs/INDEX.md",
+        "src/cli/commands/import.ts",
+        "src/cli/commands/init.ts",
+        "src/cli/commands/migrate-legacy.ts",
+        "src/cli/commands/rules.ts",
+        "src/mcp/server.ts",
+        "src/utils/ai-build.ts",
+        "src/utils/fs.ts",
+        "src/utils/guide.ts",
+        "src/utils/import.ts",
+        "src/utils/paths.ts",
+        "src/utils/prompt.ts",
+        "src/utils/rules.ts",
+        "src/utils/skills.ts",
+        "tests/build-cli.test.ts",
+        "tests/build.test.ts",
+        "tests/cli-start.test.ts",
+        "tests/import-cli.test.ts",
+        "tests/mcp-server.test.ts",
+        "tests/merge.test.ts",
+        "tests/migrate-legacy-cli.test.ts",
+        "tests/rules-cli.test.ts",
+        "tests/rules.test.ts"
+      ],
+      "fix": null,
+      "taskId": "TASK-20",
+      "reportedAt": "2026-04-27T07:21:15.477Z",
+      "fixedAt": null
+    },
+    {
+      "bugId": "BUG-01",
+      "title": "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP",
+      "severity": "high",
+      "source": "testing",
+      "status": "open",
+      "files": [
+        ".aida/config.json",
+        ".aida/memories/index.json",
+        ".aida/memories/modules/git.json",
+        ".aida/rules.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        ".aida/skills.json",
+        ".gitignore",
+        "COMMANDS.md",
+        "README.md",
+        "README.zh-CN.md",
+        "docs/INDEX.md",
+        "src/cli/commands/import.ts",
+        "src/cli/commands/init.ts",
+        "src/cli/commands/log.ts",
+        "src/cli/commands/migrate-legacy.ts",
+        "src/cli/commands/rules.ts",
+        "src/mcp/server.ts",
+        "src/utils/ai-build.ts",
+        "src/utils/fs.ts",
+        "src/utils/guide.ts",
+        "src/utils/import.ts",
+        "src/utils/paths.ts",
+        "src/utils/prompt.ts",
+        "src/utils/rules.ts",
+        "src/utils/run-data.ts",
+        "src/utils/skills.ts",
+        "tests/build-cli.test.ts",
+        "tests/build.test.ts",
+        "tests/cli-log.test.ts",
+        "tests/cli-start.test.ts",
+        "tests/import-cli.test.ts",
+        "tests/mcp-server.test.ts",
+        "tests/merge.test.ts",
+        "tests/migrate-legacy-cli.test.ts",
+        "tests/rules-cli.test.ts",
+        "tests/rules.test.ts"
+      ],
+      "fix": null,
+      "taskId": "TASK-21",
+      "reportedAt": "2026-04-27T07:56:11.253Z",
+      "fixedAt": null
+    }
+  ],
   "deviations": [],
   "reviews": [
     {
@@ -81,16 +590,220 @@
       "scope": "Git commit and push for ignored-file untracking changes",
       "reviewedAt": "2026-04-24T03:22:46.541Z",
       "issues": []
+    },
+    {
+      "reviewId": "REV-03",
+      "taskId": "TASK-03",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Commit and push of remaining tracked AIDA JSON files",
+      "reviewedAt": "2026-04-24T03:24:50.695Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-04",
+      "taskId": "TASK-04",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "CLI init/build interaction and rule artifact generation",
+      "reviewedAt": "2026-04-24T03:53:17.738Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-05",
+      "taskId": "TASK-05",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Migration flow, init interaction fallback, and rule reference chain",
+      "reviewedAt": "2026-04-24T06:03:04.739Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-06",
+      "taskId": "TASK-06",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Custom *.rules.json merge handling and conflict parsing",
+      "reviewedAt": "2026-04-24T09:26:58.108Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-07",
+      "taskId": "TASK-07",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Removed unintended extra *.rules.json merge behavior while preserving conflict parsing fixes",
+      "reviewedAt": "2026-04-24T09:37:46.969Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-08",
+      "taskId": "TASK-09",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "CLI interaction, migration rerun behavior, exact rule dedupe",
+      "reviewedAt": "2026-04-27T02:05:54.730Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-09",
+      "taskId": "TASK-10",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "README/COMMANDS/docs index doc updates for Chinese primary entry, rule dedupe semantics, rerun overwrite semantics",
+      "reviewedAt": "2026-04-27T02:27:35.978Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-10",
+      "taskId": "TASK-11",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Codex MCP config dedupe and current-file merge precedence",
+      "reviewedAt": "2026-04-27T02:33:06.420Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-11",
+      "taskId": "TASK-12",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Skill companion file model, import, and cursor build distribution",
+      "reviewedAt": "2026-04-27T03:07:29.511Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-12",
+      "taskId": "TASK-13",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Claude/Codex skill companion file round-trip closure",
+      "reviewedAt": "2026-04-27T03:16:23.264Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-13",
+      "taskId": "TASK-14",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "Restrict import/migrate baseline exposure to closed-loop tools only",
+      "reviewedAt": "2026-04-27T03:23:13.061Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-14",
+      "taskId": "TASK-16",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "import/build idempotence, managed rules/skills rebuild, merge/init/migrate regression",
+      "reviewedAt": "2026-04-27T03:33:24.709Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-15",
+      "taskId": "TASK-17",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "MCP public registry pinning and docs/tests sync",
+      "reviewedAt": "2026-04-27T03:39:22.465Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-16",
+      "taskId": "TASK-18",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "MCP bootstrap cache, aggregated tools, guide/rule enforcement, gitignore local cache",
+      "reviewedAt": "2026-04-27T06:05:29.215Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-17",
+      "taskId": "TASK-19",
+      "result": "pass",
+      "issueCount": 1,
+      "scope": "bootstrap cache, aggregated MCP tools, init/build/import/migrate linkage, real-project validation",
+      "reviewedAt": "2026-04-27T07:17:18.143Z",
+      "issues": [
+        "Validated with targeted MCP/init/build/migrate tests and full npm test suite; no failing regressions found."
+      ]
+    },
+    {
+      "reviewId": "REV-18",
+      "taskId": "TASK-20",
+      "result": "pass",
+      "issueCount": 1,
+      "scope": "run-data currentTaskId fallback, CLI log task-done, MCP aida_task_done, regression tests",
+      "reviewedAt": "2026-04-27T07:24:26.516Z",
+      "issues": [
+        "Added shared current-task resolver and verified via targeted cli-log/mcp-server tests plus full npm test suite (141/141 pass)."
+      ]
+    },
+    {
+      "reviewId": "REV-19",
+      "taskId": "TASK-21",
+      "result": "pass",
+      "issueCount": 11,
+      "scope": "built dist CLI command validation in current project; memory slash-path fix; rules conflict sample merge; MCP bootstrap/task/record/memory flow; packaging dry-run",
+      "reviewedAt": "2026-04-27T08:09:59.449Z",
+      "issues": [
+        "Verified real commands in this repository: build",
+        "init repair",
+        "import codex",
+        "migrate-legacy codex",
+        "rules list/build/dedupe/merge",
+        "merge",
+        "status",
+        "log task/task-start/task-done",
+        "MCP bootstrap/task/record/memory",
+        "npm pack --dry-run",
+        "and full npm test 142/142 pass after fixing migrate-legacy slash-module memory path bug."
+      ]
+    },
+    {
+      "reviewId": "REV-20",
+      "taskId": "TASK-27",
+      "result": "pass",
+      "issueCount": 8,
+      "scope": "README.md, COMMANDS.md, docs/INDEX.md scenario documentation for init/migrate/import/build/rules/skills conflicts",
+      "reviewedAt": "2026-04-27T08:16:34.855Z",
+      "issues": [
+        "Added scenario-driven guidance for new project init",
+        "legacy migration",
+        "repair flows",
+        "import vs build",
+        "rules conflict",
+        "skills conflict",
+        "git pull recovery",
+        "and release preflight."
+      ]
+    },
+    {
+      "reviewId": "REV-21",
+      "taskId": "TASK-28",
+      "result": "pass",
+      "issueCount": 7,
+      "scope": "README.md deep links to COMMANDS scenario sections",
+      "reviewedAt": "2026-04-27T08:18:46.915Z",
+      "issues": [
+        "Added per-scenario README links pointing directly to matching COMMANDS.md sections for init",
+        "migrate",
+        "repair",
+        "import/build",
+        "rules conflict",
+        "skills conflict",
+        "and release preflight."
+      ]
     }
   ],
   "files": [
     {
       "path": ".gitignore",
       "changeType": "created",
-      "linesAdded": 3,
+      "linesAdded": 127,
       "linesRemoved": 0,
-      "changeCount": 1,
-      "lastModified": "2026-04-24T02:00:36.265Z"
+      "changeCount": 11,
+      "lastModified": "2026-04-27T08:18:46.771Z"
     },
     {
       "path": ".mcp.json",
@@ -115,20 +828,341 @@
       "linesRemoved": 68,
       "changeCount": 1,
       "lastModified": "2026-04-24T02:00:36.265Z"
+    },
+    {
+      "path": ".aida/memories/index.json",
+      "changeType": "modified",
+      "linesAdded": 1410,
+      "linesRemoved": 600,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": ".aida/memories/modules/git.json",
+      "changeType": "modified",
+      "linesAdded": 226,
+      "linesRemoved": 226,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": ".aida/runs/main/context.json",
+      "changeType": "modified",
+      "linesAdded": 344,
+      "linesRemoved": 340,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": ".aida/runs/main/requirement.json",
+      "changeType": "modified",
+      "linesAdded": 350,
+      "linesRemoved": 346,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": ".aida/runs/main/vito-long/run.json",
+      "changeType": "modified",
+      "linesAdded": 22956,
+      "linesRemoved": 1395,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/cli/commands/init.ts",
+      "changeType": "modified",
+      "linesAdded": 503,
+      "linesRemoved": 490,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/ai-build.ts",
+      "changeType": "modified",
+      "linesAdded": 653,
+      "linesRemoved": 495,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/guide.ts",
+      "changeType": "modified",
+      "linesAdded": 628,
+      "linesRemoved": 620,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/prompt.ts",
+      "changeType": "modified",
+      "linesAdded": 224,
+      "linesRemoved": 224,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/build-cli.test.ts",
+      "changeType": "created",
+      "linesAdded": 630,
+      "linesRemoved": 0,
+      "changeCount": 18,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/build.test.ts",
+      "changeType": "created",
+      "linesAdded": 1390,
+      "linesRemoved": 332,
+      "changeCount": 17,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/migrate-legacy-cli.test.ts",
+      "changeType": "created",
+      "linesAdded": 858,
+      "linesRemoved": 297,
+      "changeCount": 17,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/cli/commands/merge.ts",
+      "changeType": "modified",
+      "linesAdded": 8,
+      "linesRemoved": 8,
+      "changeCount": 1,
+      "lastModified": "2026-04-24T09:26:50.347Z"
+    },
+    {
+      "path": "src/cli/commands/rules.ts",
+      "changeType": "modified",
+      "linesAdded": 386,
+      "linesRemoved": 341,
+      "changeCount": 16,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/fs.ts",
+      "changeType": "modified",
+      "linesAdded": 200,
+      "linesRemoved": 200,
+      "changeCount": 16,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/merge.test.ts",
+      "changeType": "modified",
+      "linesAdded": 271,
+      "linesRemoved": 225,
+      "changeCount": 16,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/rules.ts",
+      "changeType": "modified",
+      "linesAdded": 511,
+      "linesRemoved": 445,
+      "changeCount": 14,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/rules-cli.test.ts",
+      "changeType": "modified",
+      "linesAdded": 266,
+      "linesRemoved": 266,
+      "changeCount": 14,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/rules.test.ts",
+      "changeType": "created",
+      "linesAdded": 714,
+      "linesRemoved": 0,
+      "changeCount": 14,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "COMMANDS.md",
+      "changeType": "modified",
+      "linesAdded": 3629,
+      "linesRemoved": 2214,
+      "changeCount": 13,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "README.md",
+      "changeType": "modified",
+      "linesAdded": 2600,
+      "linesRemoved": 4085,
+      "changeCount": 13,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "changeType": "modified",
+      "linesAdded": 584,
+      "linesRemoved": 6033,
+      "changeCount": 13,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "docs/INDEX.md",
+      "changeType": "modified",
+      "linesAdded": 177,
+      "linesRemoved": 177,
+      "changeCount": 13,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/import.ts",
+      "changeType": "modified",
+      "linesAdded": 1268,
+      "linesRemoved": 478,
+      "changeCount": 11,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/skills.ts",
+      "changeType": "modified",
+      "linesAdded": 734,
+      "linesRemoved": 465,
+      "changeCount": 11,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/import-cli.test.ts",
+      "changeType": "created",
+      "linesAdded": 749,
+      "linesRemoved": 330,
+      "changeCount": 11,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": ".aida/rules.json",
+      "changeType": "created",
+      "linesAdded": 286,
+      "linesRemoved": 0,
+      "changeCount": 10,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/cli/commands/import.ts",
+      "changeType": "modified",
+      "linesAdded": 36,
+      "linesRemoved": 36,
+      "changeCount": 9,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/cli/commands/migrate-legacy.ts",
+      "changeType": "modified",
+      "linesAdded": 45,
+      "linesRemoved": 45,
+      "changeCount": 9,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/mcp/server.ts",
+      "changeType": "modified",
+      "linesAdded": 1253,
+      "linesRemoved": 342,
+      "changeCount": 6,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/paths.ts",
+      "changeType": "created",
+      "linesAdded": 30,
+      "linesRemoved": 0,
+      "changeCount": 6,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/cli-start.test.ts",
+      "changeType": "created",
+      "linesAdded": 6,
+      "linesRemoved": 0,
+      "changeCount": 6,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/mcp-server.test.ts",
+      "changeType": "modified",
+      "linesAdded": 256,
+      "linesRemoved": 256,
+      "changeCount": 6,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/cli/commands/log.ts",
+      "changeType": "created",
+      "linesAdded": 8,
+      "linesRemoved": 0,
+      "changeCount": 4,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/run-data.ts",
+      "changeType": "created",
+      "linesAdded": 56,
+      "linesRemoved": 0,
+      "changeCount": 4,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/cli-log.test.ts",
+      "changeType": "created",
+      "linesAdded": 48,
+      "linesRemoved": 0,
+      "changeCount": 4,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": ".aida/config.json",
+      "changeType": "modified",
+      "linesAdded": 6,
+      "linesRemoved": 6,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": ".aida/skills.json",
+      "changeType": "modified",
+      "linesAdded": 257,
+      "linesRemoved": 205,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "src/utils/memory.ts",
+      "changeType": "modified",
+      "linesAdded": 18,
+      "linesRemoved": 18,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T08:18:46.771Z"
+    },
+    {
+      "path": "tests/memory-cli.test.ts",
+      "changeType": "created",
+      "linesAdded": 228,
+      "linesRemoved": 0,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T08:18:46.771Z"
     }
   ],
   "metrics": {
     "aiDeviationRate": 0,
-    "bugRate": 0,
+    "bugRate": 24.14,
     "reviewPassRate": 100,
-    "rulesSedimentedCount": 0,
-    "averageLinesPerTask": 52,
-    "totalDevelopmentTimeSeconds": 5034,
-    "developmentVelocity": 1.43,
+    "rulesSedimentedCount": 1,
+    "averageLinesPerTask": 2297,
+    "totalDevelopmentTimeSeconds": 282103,
+    "developmentVelocity": 0.33,
     "nodeTimeBreakdown": {
-      "Code Generation": 4958.025
+      "Code Generation": 281915.559,
+      "Bug Fix": 274654.417
     },
-    "actualWorkSeconds": 4958
+    "actualWorkSeconds": 556570
   },
   "timeline": [
     {
@@ -165,6 +1199,436 @@
       "type": "task",
       "title": "TASK-03: 提交并推送剩余可提交改动",
       "timestamp": "2026-04-24T03:24:05.075Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-03: pass",
+      "timestamp": "2026-04-24T03:24:50.695Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-03: 提交并推送剩余可提交改动",
+      "timestamp": "2026-04-24T03:24:54.511Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-04: 修复 init/build 交互与规则生成链路",
+      "timestamp": "2026-04-24T03:44:43.943Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
+      "timestamp": "2026-04-24T03:52:34.932Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: Build flow skipped top-level guide/rule artifacts for migration compatibility",
+      "timestamp": "2026-04-24T03:52:35.039Z"
+    },
+    {
+      "type": "bug-fix",
+      "title": "BUG-01: CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
+      "timestamp": "2026-04-24T03:53:17.581Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-04: pass",
+      "timestamp": "2026-04-24T03:53:17.738Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-04: 修复 init/build 交互与规则生成链路",
+      "timestamp": "2026-04-24T03:53:20.904Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-05: 验证并优化迁移、init 交互与规则链路",
+      "timestamp": "2026-04-24T05:56:21.284Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: Non-interactive init fallback dropped subsequent answers across multi-step prompts",
+      "timestamp": "2026-04-24T06:02:57.244Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: Legacy AGENTS.md marker was not upgraded to full AIDA guidance during migration/build",
+      "timestamp": "2026-04-24T06:02:57.360Z"
+    },
+    {
+      "type": "bug-fix",
+      "title": "BUG-01: CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
+      "timestamp": "2026-04-24T06:03:04.529Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-05: pass",
+      "timestamp": "2026-04-24T06:03:04.739Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-05: 验证并优化迁移、init 交互与规则链路",
+      "timestamp": "2026-04-24T06:03:09.770Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-06: 修复自定义 *.rules.json 冲突合并被清空的问题",
+      "timestamp": "2026-04-24T09:11:01.124Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: Indented conflict markers in custom *.rules.json caused merge parsing failure or empty-array fallback",
+      "timestamp": "2026-04-24T09:26:21.817Z"
+    },
+    {
+      "type": "bug-fix",
+      "title": "BUG-01: CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
+      "timestamp": "2026-04-24T09:26:46.219Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-06: pass",
+      "timestamp": "2026-04-24T09:26:58.108Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-06: 修复自定义 *.rules.json 冲突合并被清空的问题",
+      "timestamp": "2026-04-24T09:27:17.090Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-07: 移除误加的自定义 rules 文件扫描合并逻辑",
+      "timestamp": "2026-04-24T09:33:21.373Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-07: pass",
+      "timestamp": "2026-04-24T09:37:46.969Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-07: 移除误加的自定义 rules 文件扫描合并逻辑",
+      "timestamp": "2026-04-24T09:38:02.278Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-08: 检查 CLI 交互、迁移幂等性与规则去重机制",
+      "timestamp": "2026-04-27T01:59:25.725Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-09: 补充 init / migrate-legacy 可反复执行补全的回归验证",
+      "timestamp": "2026-04-27T02:01:22.580Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-08: pass",
+      "timestamp": "2026-04-27T02:05:54.730Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-09: 补充 init / migrate-legacy 可反复执行补全的回归验证",
+      "timestamp": "2026-04-27T02:05:57.806Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-10: 调整中文主 README 并补充规则去重与重复执行覆盖说明",
+      "timestamp": "2026-04-27T02:23:37.443Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-09: pass",
+      "timestamp": "2026-04-27T02:27:35.978Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-10: 调整中文主 README 并补充规则去重与重复执行覆盖说明",
+      "timestamp": "2026-04-27T02:27:39.922Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-11: 修复 Codex config.toml 重复追加 AIDA MCP 配置",
+      "timestamp": "2026-04-27T02:31:28.040Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-10: pass",
+      "timestamp": "2026-04-27T02:33:06.420Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-11: 修复 Codex config.toml 重复追加 AIDA MCP 配置",
+      "timestamp": "2026-04-27T02:33:09.561Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-12: 补齐 skill 伴生文件的收录与分发能力",
+      "timestamp": "2026-04-27T03:05:16.286Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-11: pass",
+      "timestamp": "2026-04-27T03:07:29.511Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-12: 补齐 skill 伴生文件的收录与分发能力",
+      "timestamp": "2026-04-27T03:07:32.779Z"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-001: 功能必须闭环；若某条功能链路尚未闭环，必须在命令行为或输出中明确告知用户当前边界，不能默认让用户以为",
+      "timestamp": "2026-04-27T03:14:10.302Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-13: 补齐 Claude/Codex skill 伴生文件的闭环支持并明确未闭环边界",
+      "timestamp": "2026-04-27T03:14:14.437Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-12: pass",
+      "timestamp": "2026-04-27T03:16:23.264Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-13: 补齐 Claude/Codex skill 伴生文件的闭环支持并明确未闭环边界",
+      "timestamp": "2026-04-27T03:16:26.471Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-14: 收紧 import 仅暴露已闭环的工具选项",
+      "timestamp": "2026-04-27T03:21:24.924Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-13: pass",
+      "timestamp": "2026-04-27T03:23:13.061Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-14: 收紧 import 仅暴露已闭环的工具选项",
+      "timestamp": "2026-04-27T03:23:16.029Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-15: 自检迁移到构建全链路闭环与幂等行为",
+      "timestamp": "2026-04-27T03:27:37.410Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-16: Self-review and close idempotence gaps in import/build chain",
+      "timestamp": "2026-04-27T03:30:07.598Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-14: pass",
+      "timestamp": "2026-04-27T03:33:24.709Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-16: Self-review and close idempotence gaps in import/build chain",
+      "timestamp": "2026-04-27T03:33:26.948Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-17: Pin MCP install source to public npm registry and assess pre-authorization limits",
+      "timestamp": "2026-04-27T03:37:52.472Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-15: pass",
+      "timestamp": "2026-04-27T03:39:22.465Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-17: Pin MCP install source to public npm registry and assess pre-authorization limits",
+      "timestamp": "2026-04-27T03:39:25.097Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-18: Add MCP bootstrap checks, local auth cache, and plan tool consolidation",
+      "timestamp": "2026-04-27T05:56:25.076Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-16: pass",
+      "timestamp": "2026-04-27T06:05:29.215Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-18: Add MCP bootstrap checks, local auth cache, and plan tool consolidation",
+      "timestamp": "2026-04-27T06:05:32.404Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-19: Real-project linked validation for bootstrap and AIDA workflow changes",
+      "timestamp": "2026-04-27T06:46:39.409Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-17: pass",
+      "timestamp": "2026-04-27T07:17:18.143Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-19: Real-project linked validation for bootstrap and AIDA workflow changes",
+      "timestamp": "2026-04-27T07:17:49.376Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-20: Fix currentTaskId fallback when completing tasks",
+      "timestamp": "2026-04-27T07:21:09.778Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
+      "timestamp": "2026-04-27T07:21:15.477Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-18: pass",
+      "timestamp": "2026-04-27T07:24:26.516Z"
+    },
+    {
+      "type": "bug-fix",
+      "title": "BUG-01: CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
+      "timestamp": "2026-04-27T07:24:36.116Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-20: Fix currentTaskId fallback when completing tasks",
+      "timestamp": "2026-04-27T07:24:39.596Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-21: Real-command validation in current AIDA project",
+      "timestamp": "2026-04-27T07:36:35.705Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP",
+      "timestamp": "2026-04-27T07:56:11.255Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-22: Validation task A for currentTaskId",
+      "timestamp": "2026-04-27T08:06:57.312Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-23: Validation task B for currentTaskId",
+      "timestamp": "2026-04-27T08:06:57.412Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-23: Validation task B for currentTaskId",
+      "timestamp": "2026-04-27T08:07:06.530Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-23: Validation task B for currentTaskId",
+      "timestamp": "2026-04-27T08:07:14.360Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-24: Validation task C for currentTaskId",
+      "timestamp": "2026-04-27T08:07:40.231Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-24: Validation task C for currentTaskId",
+      "timestamp": "2026-04-27T08:07:45.094Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-25: Validation task D for currentTaskId",
+      "timestamp": "2026-04-27T08:07:49.888Z"
+    },
+    {
+      "type": "task-start",
+      "title": "TASK-25: Validation task D for currentTaskId",
+      "timestamp": "2026-04-27T08:07:54.201Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-25: Validation task D for currentTaskId",
+      "timestamp": "2026-04-27T08:07:59.265Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-26: MCP validation task",
+      "timestamp": "2026-04-27T08:08:29.010Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-26: MCP validation task",
+      "timestamp": "2026-04-27T08:08:29.134Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-22: Validation task A for currentTaskId",
+      "timestamp": "2026-04-27T08:09:40.542Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-24: Validation task C for currentTaskId",
+      "timestamp": "2026-04-27T08:09:40.658Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-19: pass",
+      "timestamp": "2026-04-27T08:09:59.449Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-21: Real-command validation in current AIDA project",
+      "timestamp": "2026-04-27T08:10:09.168Z"
+    },
+    {
+      "type": "bug-fix",
+      "title": "BUG-01: CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
+      "timestamp": "2026-04-27T08:10:09.348Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-21: Real-command validation in current AIDA project",
+      "timestamp": "2026-04-27T08:10:36.652Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-27: Update docs for init/migrate/build/import and conflict workflows",
+      "timestamp": "2026-04-27T08:14:51.605Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-20: pass",
+      "timestamp": "2026-04-27T08:16:34.855Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-27: Update docs for init/migrate/build/import and conflict workflows",
+      "timestamp": "2026-04-27T08:16:34.936Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-28: Add per-scenario deep links from README to COMMANDS",
+      "timestamp": "2026-04-27T08:18:11.933Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-28: Add per-scenario deep links from README to COMMANDS",
+      "timestamp": "2026-04-27T08:18:46.848Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-21: pass",
+      "timestamp": "2026-04-27T08:18:46.915Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-29: Commit, push, and publish validated release",
+      "timestamp": "2026-04-27T08:21:54.273Z"
     }
   ],
   "events": [
@@ -248,12 +1712,976 @@
       "data": {
         "taskId": "TASK-03"
       }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-24T03:24:50.695Z",
+      "data": {
+        "reviewId": "REV-03",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-24T03:24:54.511Z",
+      "data": {
+        "taskId": "TASK-03",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-24T03:44:43.942Z",
+      "data": {
+        "taskId": "TASK-04"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-24T03:44:43.942Z",
+      "data": {
+        "taskId": "TASK-04"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-04-24T03:52:34.932Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-04-24T03:52:35.039Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "highlight_added",
+      "time": "2026-04-24T03:52:36.685Z",
+      "data": {
+        "content": "`aida build` now generates repo-level `.aida/rules/_all.md` alongside tool-specific artifacts and auto-creates missing AGENTS.md / CLAUDE.md guide references."
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-04-24T03:53:17.581Z",
+      "data": {
+        "bugId": "BUG-01",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-24T03:53:17.686Z",
+      "data": {
+        "count": 10
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-24T03:53:17.738Z",
+      "data": {
+        "reviewId": "REV-04",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-24T03:53:20.904Z",
+      "data": {
+        "taskId": "TASK-04",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-24T05:56:21.284Z",
+      "data": {
+        "taskId": "TASK-05"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-24T05:56:21.284Z",
+      "data": {
+        "taskId": "TASK-05"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-04-24T06:02:57.244Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-04-24T06:02:57.360Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "highlight_added",
+      "time": "2026-04-24T06:02:57.419Z",
+      "data": {
+        "content": "Verified the migration chain end-to-end and aligned rule references so `.aida/rules/_all.md` now exists as the repo-level fallback while tool-specific `_all.md` files remain the primary entrypoint."
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-04-24T06:03:04.529Z",
+      "data": {
+        "bugId": "BUG-01",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-24T06:03:04.654Z",
+      "data": {
+        "count": 12
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-24T06:03:04.739Z",
+      "data": {
+        "reviewId": "REV-05",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-24T06:03:09.770Z",
+      "data": {
+        "taskId": "TASK-05",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-24T09:11:01.124Z",
+      "data": {
+        "taskId": "TASK-06"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-24T09:11:01.124Z",
+      "data": {
+        "taskId": "TASK-06"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-04-24T09:26:21.817Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-04-24T09:26:46.219Z",
+      "data": {
+        "bugId": "BUG-01",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-24T09:26:50.347Z",
+      "data": {
+        "count": 16
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-24T09:26:58.108Z",
+      "data": {
+        "reviewId": "REV-06",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-24T09:27:17.090Z",
+      "data": {
+        "taskId": "TASK-06",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-24T09:33:21.373Z",
+      "data": {
+        "taskId": "TASK-07"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-24T09:33:21.373Z",
+      "data": {
+        "taskId": "TASK-07"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-24T09:37:41.065Z",
+      "data": {
+        "count": 15
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-24T09:37:46.969Z",
+      "data": {
+        "reviewId": "REV-07",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-24T09:38:02.278Z",
+      "data": {
+        "taskId": "TASK-07",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T01:59:25.725Z",
+      "data": {
+        "taskId": "TASK-08"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T01:59:25.725Z",
+      "data": {
+        "taskId": "TASK-08"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T02:01:22.580Z",
+      "data": {
+        "taskId": "TASK-09"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T02:01:22.580Z",
+      "data": {
+        "taskId": "TASK-09"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T02:05:48.996Z",
+      "data": {
+        "count": 18
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T02:05:54.730Z",
+      "data": {
+        "reviewId": "REV-08",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T02:05:57.806Z",
+      "data": {
+        "taskId": "TASK-09",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T02:23:37.442Z",
+      "data": {
+        "taskId": "TASK-10"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T02:23:37.442Z",
+      "data": {
+        "taskId": "TASK-10"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T02:27:31.105Z",
+      "data": {
+        "count": 22
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T02:27:35.978Z",
+      "data": {
+        "reviewId": "REV-09",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T02:27:39.922Z",
+      "data": {
+        "taskId": "TASK-10",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T02:31:28.040Z",
+      "data": {
+        "taskId": "TASK-11"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T02:31:28.040Z",
+      "data": {
+        "taskId": "TASK-11"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T02:33:03.161Z",
+      "data": {
+        "count": 22
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T02:33:06.420Z",
+      "data": {
+        "reviewId": "REV-10",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T02:33:09.561Z",
+      "data": {
+        "taskId": "TASK-11",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T03:05:16.286Z",
+      "data": {
+        "taskId": "TASK-12"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T03:05:16.286Z",
+      "data": {
+        "taskId": "TASK-12"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T03:07:23.750Z",
+      "data": {
+        "count": 25
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T03:07:29.511Z",
+      "data": {
+        "reviewId": "REV-11",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T03:07:32.779Z",
+      "data": {
+        "taskId": "TASK-12",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "rule_sedimented",
+      "time": "2026-04-27T03:14:10.302Z",
+      "data": {
+        "ruleId": "RULE-001",
+        "registryId": "RULE-038"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T03:14:14.437Z",
+      "data": {
+        "taskId": "TASK-13"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T03:14:14.437Z",
+      "data": {
+        "taskId": "TASK-13"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T03:16:18.467Z",
+      "data": {
+        "count": 27
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T03:16:23.264Z",
+      "data": {
+        "reviewId": "REV-12",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T03:16:26.471Z",
+      "data": {
+        "taskId": "TASK-13",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T03:21:24.924Z",
+      "data": {
+        "taskId": "TASK-14"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T03:21:24.924Z",
+      "data": {
+        "taskId": "TASK-14"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T03:23:08.322Z",
+      "data": {
+        "count": 29
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T03:23:13.061Z",
+      "data": {
+        "reviewId": "REV-13",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T03:23:16.029Z",
+      "data": {
+        "taskId": "TASK-14",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T03:27:37.410Z",
+      "data": {
+        "taskId": "TASK-15"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T03:27:37.410Z",
+      "data": {
+        "taskId": "TASK-15"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T03:30:07.598Z",
+      "data": {
+        "taskId": "TASK-16"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T03:30:07.598Z",
+      "data": {
+        "taskId": "TASK-16"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T03:33:24.632Z",
+      "data": {
+        "count": 29
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T03:33:24.709Z",
+      "data": {
+        "reviewId": "REV-14",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T03:33:26.948Z",
+      "data": {
+        "taskId": "TASK-16",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T03:37:52.472Z",
+      "data": {
+        "taskId": "TASK-17"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T03:37:52.472Z",
+      "data": {
+        "taskId": "TASK-17"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T03:39:22.238Z",
+      "data": {
+        "count": 29
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T03:39:22.465Z",
+      "data": {
+        "reviewId": "REV-15",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T03:39:25.097Z",
+      "data": {
+        "taskId": "TASK-17",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T05:56:25.076Z",
+      "data": {
+        "taskId": "TASK-18"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T05:56:25.076Z",
+      "data": {
+        "taskId": "TASK-18"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T06:05:29.110Z",
+      "data": {
+        "count": 33
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T06:05:29.215Z",
+      "data": {
+        "reviewId": "REV-16",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T06:05:32.404Z",
+      "data": {
+        "taskId": "TASK-18",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T06:46:39.409Z",
+      "data": {
+        "taskId": "TASK-19"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T06:46:39.409Z",
+      "data": {
+        "taskId": "TASK-19"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T07:17:09.458Z",
+      "data": {
+        "count": 33
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T07:17:18.143Z",
+      "data": {
+        "reviewId": "REV-17",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "highlight_added",
+      "time": "2026-04-27T07:17:32.241Z",
+      "data": {
+        "content": "Validated bootstrap status/manifest/complete flow plus aggregated aida_task/aida_record/aida_memory behavior against real-project wiring; targeted MCP/init/build/migrate tests and full npm test suite now pass end-to-end."
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T07:17:49.376Z",
+      "data": {
+        "taskId": "TASK-19",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T07:21:09.778Z",
+      "data": {
+        "taskId": "TASK-20"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T07:21:09.778Z",
+      "data": {
+        "taskId": "TASK-20"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-04-27T07:21:15.477Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T07:24:22.411Z",
+      "data": {
+        "count": 36
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T07:24:26.516Z",
+      "data": {
+        "reviewId": "REV-18",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-04-27T07:24:36.116Z",
+      "data": {
+        "bugId": "BUG-01",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T07:24:39.596Z",
+      "data": {
+        "taskId": "TASK-20",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T07:36:35.705Z",
+      "data": {
+        "taskId": "TASK-21"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T07:36:35.705Z",
+      "data": {
+        "taskId": "TASK-21"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-04-27T07:56:11.255Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T08:06:57.312Z",
+      "data": {
+        "taskId": "TASK-22"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T08:06:57.412Z",
+      "data": {
+        "taskId": "TASK-23"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T08:07:06.530Z",
+      "data": {
+        "taskId": "TASK-23"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:07:14.360Z",
+      "data": {
+        "taskId": "TASK-23"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T08:07:40.231Z",
+      "data": {
+        "taskId": "TASK-24"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T08:07:45.094Z",
+      "data": {
+        "taskId": "TASK-24"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T08:07:49.888Z",
+      "data": {
+        "taskId": "TASK-25"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T08:07:54.201Z",
+      "data": {
+        "taskId": "TASK-25"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:07:59.265Z",
+      "data": {
+        "taskId": "TASK-25"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T08:08:29.010Z",
+      "data": {
+        "taskId": "TASK-26"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T08:08:29.010Z",
+      "data": {
+        "taskId": "TASK-26"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:08:29.134Z",
+      "data": {
+        "taskId": "TASK-26",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:09:40.542Z",
+      "data": {
+        "taskId": "TASK-22"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:09:40.658Z",
+      "data": {
+        "taskId": "TASK-24"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T08:09:59.358Z",
+      "data": {
+        "count": 40
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T08:09:59.449Z",
+      "data": {
+        "reviewId": "REV-19",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "highlight_added",
+      "time": "2026-04-27T08:09:59.537Z",
+      "data": {
+        "content": "Release-path validation now includes real built-command execution inside the AIDA repo itself, root-level rules conflict sample verification, MCP bootstrap/task/record/memory handshake, package dry-run, and a slash-module memory-path regression fix proven by real migrate-legacy rerun."
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:10:09.168Z",
+      "data": {
+        "taskId": "TASK-21",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-04-27T08:10:09.348Z",
+      "data": {
+        "bugId": "BUG-01",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:10:36.652Z",
+      "data": {
+        "taskId": "TASK-21"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T08:14:51.605Z",
+      "data": {
+        "taskId": "TASK-27"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T08:14:51.605Z",
+      "data": {
+        "taskId": "TASK-27"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T08:16:34.761Z",
+      "data": {
+        "count": 40
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T08:16:34.855Z",
+      "data": {
+        "reviewId": "REV-20",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:16:34.936Z",
+      "data": {
+        "taskId": "TASK-27",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T08:18:11.933Z",
+      "data": {
+        "taskId": "TASK-28"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T08:18:11.933Z",
+      "data": {
+        "taskId": "TASK-28"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T08:18:46.771Z",
+      "data": {
+        "count": 40
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T08:18:46.848Z",
+      "data": {
+        "taskId": "TASK-28",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T08:18:46.915Z",
+      "data": {
+        "reviewId": "REV-21",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T08:21:54.273Z",
+      "data": {
+        "taskId": "TASK-29"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T08:21:54.273Z",
+      "data": {
+        "taskId": "TASK-29"
+      }
     }
   ],
-  "rules": [],
+  "rules": [
+    {
+      "ruleId": "RULE-001",
+      "file": "rules.json#RULE-038",
+      "content": "功能必须闭环；若某条功能链路尚未闭环，必须在命令行为或输出中明确告知用户当前边界，不能默认让用户以为已完整支持。",
+      "category": "process",
+      "sourceDeviation": null,
+      "sedimentedAt": "2026-04-27T03:14:10.302Z"
+    }
+  ],
   "context": {
-    "currentTaskId": "TASK-03",
-    "lastUpdated": "2026-04-24T03:24:05.075Z"
+    "currentTaskId": "TASK-29",
+    "lastUpdated": "2026-04-27T08:21:54.273Z"
   },
   "cost": {
     "totalTokens": 0,
@@ -261,5 +2689,26 @@
     "actualHours": 0,
     "tokenBreakdown": []
   },
-  "highlights": []
+  "highlights": [
+    {
+      "content": "`aida build` now generates repo-level `.aida/rules/_all.md` alongside tool-specific artifacts and auto-creates missing AGENTS.md / CLAUDE.md guide references.",
+      "source": "auto",
+      "createdAt": "2026-04-24T03:52:36.685Z"
+    },
+    {
+      "content": "Verified the migration chain end-to-end and aligned rule references so `.aida/rules/_all.md` now exists as the repo-level fallback while tool-specific `_all.md` files remain the primary entrypoint.",
+      "source": "auto",
+      "createdAt": "2026-04-24T06:02:57.419Z"
+    },
+    {
+      "content": "Validated bootstrap status/manifest/complete flow plus aggregated aida_task/aida_record/aida_memory behavior against real-project wiring; targeted MCP/init/build/migrate tests and full npm test suite now pass end-to-end.",
+      "source": "auto",
+      "createdAt": "2026-04-27T07:17:32.241Z"
+    },
+    {
+      "content": "Release-path validation now includes real built-command execution inside the AIDA repo itself, root-level rules conflict sample verification, MCP bootstrap/task/record/memory handshake, package dry-run, and a slash-module memory-path regression fix proven by real migrate-legacy rerun.",
+      "source": "auto",
+      "createdAt": "2026-04-27T08:09:59.537Z"
+    }
+  ]
 }

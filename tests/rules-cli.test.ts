@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
-import { readJson, readText } from '../src/utils/fs.js';
+import { readJson, readText, writeJson } from '../src/utils/fs.js';
 import { createTestProject, runCliOutput } from './helpers.js';
 
 describe('aida rules add/delete', () => {
@@ -58,6 +58,42 @@ describe('aida rules add/delete', () => {
 
       assert.equal(parsed.length, 1);
       assert.equal(parsed[0].content, '禁止直接修改生成产物文件');
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should remove exact fingerprint duplicates from rules.json during dedupe', () => {
+    const project = createTestProject();
+    try {
+      writeJson(resolve(project.root, '.aida', 'rules.json'), [
+        {
+          id: 'RULE-001',
+          category: 'process',
+          content: '禁止任何形式的臆想，不清楚必须询问',
+          fingerprint: 'fp-same',
+          source: { branch: 'a', deviation: null, author: 'x' },
+          createdAt: '2026-04-01T00:00:00.000Z',
+          status: 'active',
+        },
+        {
+          id: 'RULE-002',
+          category: 'process',
+          content: '禁止任何形式的臆想，不清楚必须询问',
+          fingerprint: 'fp-same',
+          source: { branch: 'b', deviation: null, author: 'y' },
+          createdAt: '2026-04-02T00:00:00.000Z',
+          status: 'active',
+        },
+      ]);
+
+      const stdout = runCliOutput(project, 'rules dedupe');
+      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const allRules = readText(resolve(project.root, '.claude', 'rules', 'aida', '_all.md'));
+
+      assert.ok(stdout.includes('Removed 1 exact duplicate'));
+      assert.equal(rules.length, 1);
+      assert.equal((allRules.match(/禁止任何形式的臆想，不清楚必须询问/g) || []).length, 1);
     } finally {
       project.cleanup();
     }

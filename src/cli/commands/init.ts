@@ -1,5 +1,3 @@
-import * as readline from 'node:readline/promises';
-import { stdin, stdout } from 'node:process';
 import { resolve } from 'node:path';
 import { SKILLS_DIR } from '../../utils/paths.js';
 import {
@@ -15,8 +13,8 @@ import { addRule } from '../../utils/rules.js';
 import { ensureGuide, syncGuideReference, updateGuide, updateGuideReferences } from '../../utils/guide.js';
 import { ensureBundledSkills, seedBundledSkillRegistry, getSkillContent } from '../../utils/skills.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
-import { detectImportableTools, importExistingToolConfigs, importFromTool, mergeConfiguredTools } from '../../utils/import.js';
-import { promptMultiSelect, promptSingleSelect } from '../../utils/prompt.js';
+import { detectClosedLoopImportableTools, importExistingToolConfigs, importFromTool, mergeConfiguredTools } from '../../utils/import.js';
+import { promptMultiSelect, promptSingleSelect, promptText } from '../../utils/prompt.js';
 import type { AiToolChoice } from '../../schemas/aida-project.js';
 
 const QUICK_COMMANDS: { name: string; skill: string }[] = [
@@ -120,16 +118,17 @@ export async function init(): Promise<void> {
   // Check if already initialized
   if (fileExists(resolve(aidevos, 'config.json'))) {
     console.log(yellow('  AIDA is already initialized in this project.\n'));
-    console.log('  ? What would you like to do?\n');
-    console.log('    1) Add a new AI tool');
-    console.log('    2) Repair: fill missing files (guide, MCP config, .gitignore)');
-    console.log('    3) Exit\n');
+    const choice = await promptSingleSelect(
+      'What would you like to do?',
+      [
+        { value: 'add', label: 'Add a new AI tool' },
+        { value: 'repair', label: 'Repair missing generated files', hint: 'guide, MCP config, .gitignore' },
+        { value: 'exit', label: 'Exit' },
+      ],
+      { allowSkip: true },
+    );
 
-    const rl2 = readline.createInterface({ input: stdin, output: stdout });
-    const choice = (await rl2.question('  > ')).trim();
-    rl2.close();
-
-    if (choice === '3' || choice === '') {
+    if (choice === 'exit' || choice === null) {
       console.log(dim('\n  No changes made.\n'));
       return;
     }
@@ -139,7 +138,7 @@ export async function init(): Promise<void> {
     const existingTools: AiToolChoice[] = existingConfig.aiTools || [];
 
     // ── Option 2: Repair missing files ──────────────────
-    if (choice === '2') {
+    if (choice === 'repair') {
       console.log('\n  Repairing...\n');
       ensureDir(resolve(aidevos, 'runs'));
       const repaired = buildProjectArtifacts(projectRoot, existingTools);
@@ -176,19 +175,17 @@ export async function init(): Promise<void> {
     return;
   }
 
-  const rl = readline.createInterface({ input: stdin, output: stdout });
-
   // Step 1: Select mode
-  console.log('  ? Select mode:\n');
-  console.log('    1) Data collection only (MCP, recommended for existing workflows)');
-  console.log('    2) Full workflow (MCP + Skills + slash commands)\n');
-
-  let mode: 'collect' | 'full';
-  while (true) {
-    const answer = (await rl.question('  > ')).trim();
-    if (answer === '1') { mode = 'collect'; break; }
-    if (answer === '2') { mode = 'full'; break; }
-    console.log(yellow('  Please enter 1 or 2'));
+  const mode = await promptSingleSelect(
+    'Select mode:',
+    [
+      { value: 'collect', label: 'Data collection only', hint: 'MCP, recommended for existing workflows' },
+      { value: 'full', label: 'Full workflow', hint: 'MCP + Skills + slash commands' },
+    ],
+  );
+  if (!mode) {
+    console.log(dim('\n  No changes made.\n'));
+    return;
   }
 
   // Step 2: Select AI tools (multi-select)
@@ -198,11 +195,11 @@ export async function init(): Promise<void> {
     { required: true },
   );
 
-  const importableTools = detectImportableTools(projectRoot, selectedTools);
+  const importableTools = detectClosedLoopImportableTools(projectRoot, selectedTools);
   let baselineTool: AiToolChoice | null = null;
   if (importableTools.length > 0) {
     baselineTool = await promptSingleSelect(
-      'Found existing tool rules/skills/config. Choose one baseline tool to import into AIDA JSON:',
+      'Found existing closed-loop tool rules/skills/config. Choose one baseline tool to import into AIDA JSON:',
       toolOptions(importableTools),
       { allowSkip: true },
     );
@@ -213,7 +210,7 @@ export async function init(): Promise<void> {
   if (mode === 'full') {
     console.log('\n  ? Which AI model are you using? (e.g. claude-sonnet-4, gpt-4o)\n');
     console.log(dim('    Press Enter to skip, you can set it later.\n'));
-    aiModel = (await rl.question('  > ')).trim();
+    aiModel = await promptText('  > ');
   }
 
   // Step 4: Optional tools (only for full mode)
@@ -228,9 +225,6 @@ export async function init(): Promise<void> {
       if (optionalValues.includes(cmd.name)) selectedOptional.push(cmd);
     }
   }
-
-  rl.close();
-
   console.log(`\n  Initializing AIDevOS...\n`);
 
   // 1. Create directory structure
