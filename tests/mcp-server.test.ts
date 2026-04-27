@@ -154,10 +154,11 @@ describe('MCP Server - tools/list', () => {
     const resp = await client.rpc('tools/list');
     assert.ok(resp.result);
     const tools = resp.result.tools;
-    assert.equal(tools.length, 17);
+    assert.equal(tools.length, 21);
 
     const names = tools.map((t: any) => t.name).sort();
     const expected = [
+      'aida_bootstrap',
       'aida_bug_fix',
       'aida_context_get',
       'aida_context_rebuild',
@@ -168,15 +169,50 @@ describe('MCP Server - tools/list', () => {
       'aida_log_files',
       'aida_log_review',
       'aida_log_rule',
+      'aida_memory',
       'aida_memory_get',
       'aida_memory_pack',
       'aida_memory_search',
       'aida_memory_upsert',
+      'aida_record',
       'aida_status',
+      'aida_task',
       'aida_task_done',
       'aida_task_start',
     ];
     assert.deepEqual(names, expected);
+  });
+});
+
+describe('MCP Server - aida_bootstrap', () => {
+  it('should return bootstrap manifest and persist local bootstrap state', async () => {
+    await client.initialize();
+
+    const status = await client.callTool('aida_bootstrap', { action: 'status', host: 'claude-code' });
+    assert.equal(status.success, true);
+    assert.equal(status.host, 'claude-code');
+    assert.equal(typeof status.available, 'boolean');
+    assert.equal(status.cached, null);
+
+    const manifest = await client.callTool('aida_bootstrap', { action: 'manifest', host: 'claude-code' });
+    assert.equal(manifest.success, true);
+    assert.equal(manifest.required, true);
+    assert.ok(Array.isArray(manifest.groupedTools));
+    assert.ok(manifest.groupedTools.some((item: any) => item.name === 'aida_task'));
+
+    const completed = await client.callTool('aida_bootstrap', {
+      action: 'complete',
+      host: 'claude-code',
+      decision: 'approved',
+      approvedToolNames: ['aida_bootstrap', 'aida_task', 'aida_record', 'aida_memory'],
+      acknowledgedReason: true,
+    });
+    assert.equal(completed.success, true);
+    assert.equal(completed.decision, 'approved');
+
+    const bootstrapState = readJson<any>(resolve(project.root, '.aida', 'bootstrap-state.local.json'));
+    assert.ok(Array.isArray(bootstrapState.records));
+    assert.equal(bootstrapState.records[0].host, 'claude-code');
   });
 });
 
@@ -238,6 +274,40 @@ describe('MCP Server - aida_task_start', () => {
   });
 });
 
+describe('MCP Server - aggregated tools', () => {
+  it('should support task, record, and memory operations through grouped tools', async () => {
+    await client.initialize();
+
+    const started = await client.callTool('aida_task', {
+      action: 'start',
+      title: 'Implement auth module',
+      stage: 'Authentication',
+    });
+    assert.equal(started.success, true);
+    assert.equal(started.taskId, 'TASK-01');
+
+    const review = await client.callTool('aida_record', {
+      action: 'review',
+      result: 'pass',
+      scope: 'src/auth',
+    });
+    assert.equal(review.success, true);
+    assert.equal(review.reviewId, 'REV-01');
+
+    const search = await client.callTool('aida_memory', {
+      action: 'search',
+      query: 'auth',
+    });
+    assert.equal(search.success, true);
+
+    const done = await client.callTool('aida_task', {
+      action: 'done',
+      taskId: 'TASK-01',
+    });
+    assert.equal(done.success, true);
+  });
+});
+
 // ─── aida_task_done ────────────────────────────────────
 
 describe('MCP Server - aida_task_done', () => {
@@ -253,6 +323,21 @@ describe('MCP Server - aida_task_done', () => {
     assert.equal(data.tasks[0].status, 'done');
     assert.ok(data.tasks[0].completedAt);
     assert.equal(data.summary.completedTasks, 1);
+  });
+
+  it('should fall back currentTaskId to another in-progress task after completion', async () => {
+    await client.initialize();
+
+    await client.callTool('aida_task_start', { title: 'Task A', stage: 'Backend' });
+    await client.callTool('aida_task_start', { title: 'Task B', stage: 'Frontend' });
+
+    const result = await client.callTool('aida_task_done', { taskId: 'TASK-02' });
+    assert.equal(result.success, true);
+
+    const data = readJson<any>(project.runJsonPath);
+    assert.equal(data.context.currentTaskId, 'TASK-01');
+    assert.equal(data.tasks[0].status, 'in-progress');
+    assert.equal(data.tasks[1].status, 'done');
   });
 
   it('should return error for unknown task ID', async () => {
@@ -358,6 +443,7 @@ describe('MCP Server - prompts/list', () => {
     assert.ok(Array.isArray(resp.result.messages));
     assert.equal(resp.result.messages.length, 1);
     assert.equal(resp.result.messages[0].role, 'user');
-    assert.ok(resp.result.messages[0].content.text.includes('aida_task_start'));
+    assert.ok(resp.result.messages[0].content.text.includes('aida_bootstrap'));
+    assert.ok(resp.result.messages[0].content.text.includes('aida_task'));
   });
 });

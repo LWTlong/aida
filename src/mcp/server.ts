@@ -8,7 +8,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { writeJson } from '../utils/fs.js';
+import { fileExists, readJson, writeJson } from '../utils/fs.js';
 import type {
   RunData,
   TaskItem,
@@ -32,6 +32,7 @@ import {
   nextId,
   addEvent,
   addTimeline,
+  resolveCurrentTaskId,
   saveRunData,
   ensureRunJson as ensureRunJsonShared,
 } from '../utils/run-data.js';
@@ -40,6 +41,8 @@ import { getBranchName, getDevName } from '../utils/git.js';
 import { addRule } from '../utils/rules.js';
 import { buildProjectArtifacts } from '../utils/ai-build.js';
 import { buildMemoryViews, loadModuleMemory, loadRunContext, loadRunMemoryPack, rebuildCurrentBranchMemory, searchModuleMemories, updateRunContext, upsertModuleMemory } from '../utils/memory.js';
+import { BOOTSTRAP_MANIFEST, type BootstrapDecision, type BootstrapHost, getBootstrapStatus, saveBootstrapDecision } from '../utils/bootstrap.js';
+import { configPath } from '../utils/paths.js';
 
 // ─── JSON-RPC / MCP Protocol ─────────────────────────────
 
@@ -137,6 +140,92 @@ function getTaskTokens(startTime: string, endTime: string): number {
 // ─── MCP Tool Definitions ────────────────────────────────
 
 const TOOLS = [
+  {
+    name: 'aida_bootstrap',
+    description: '启动必检工具。开始任何真实开发任务前优先调用：检查 AIDA MCP 是否可用、返回集中授权清单、记录本地 bootstrap 授权状态，避免后续开发过程中因 AIDA 权限中断。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['status', 'manifest', 'complete'], description: 'status=查询当前宿主的 AIDA MCP 可用性与缓存状态；manifest=返回需要集中授权的工具清单与说明；complete=将本地 bootstrap 状态写入缓存' },
+        host: { type: 'string', enum: ['codex', 'cursor', 'claude-code'], description: '当前宿主 AI 工具' },
+        decision: { type: 'string', enum: ['approved', 'declined', 'deferred'], description: '仅在 complete 时传入，表示用户对集中授权的决定' },
+        approvedToolNames: { type: 'array', items: { type: 'string' }, description: '仅在 complete 时传入，本次已集中授权的工具名列表' },
+        acknowledgedReason: { type: 'boolean', description: '仅在 complete 时传入，表示用户已知晓“授权前置是为了避免后续开发中断”的原因' },
+      },
+    },
+  },
+  {
+    name: 'aida_task',
+    description: '聚合任务工具。优先使用该工具代替 aida_task_start / aida_task_done，以减少授权次数。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['start', 'done'], description: 'start=开始任务；done=完成任务' },
+        title: { type: 'string', description: '任务标题；action=start 时必填' },
+        stage: { type: 'string', description: '所属模块或阶段；action=start 时可选' },
+        taskId: { type: 'string', description: '任务 ID；action=done 时必填' },
+      },
+      required: ['action'],
+    },
+  },
+  {
+    name: 'aida_record',
+    description: '聚合记录工具。优先使用该工具代替 aida_log_files / aida_log_review / aida_log_bug / aida_bug_fix / aida_log_deviation / aida_highlight / aida_log_rule / aida_status，以减少授权次数。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['files', 'review', 'bug', 'bug-fix', 'deviation', 'highlight', 'rule', 'status'], description: '记录文件、自检、Bug、偏差、亮点、规则或查询状态' },
+        taskId: { type: 'string' },
+        result: { type: 'string', enum: ['pass', 'fail'] },
+        issues: { type: 'string' },
+        scope: { type: 'string' },
+        title: { type: 'string' },
+        severity: { type: 'string', enum: [...SEVERITY_VALUES] },
+        source: { type: 'string', enum: [...BUG_SOURCE_VALUES] },
+        bugId: { type: 'string' },
+        fix: { type: 'string' },
+        rootCause: { type: 'string', enum: [...ROOT_CAUSE_VALUES] },
+        category: { type: 'string', enum: [...DEVIATION_CAT_VALUES, ...RULE_CATEGORIES] },
+        content: { type: 'string' },
+        sourceDeviation: { type: 'string' },
+      },
+      required: ['action'],
+    },
+  },
+  {
+    name: 'aida_memory',
+    description: '聚合记忆工具。优先使用该工具代替 aida_memory_search / aida_memory_get / aida_memory_upsert / aida_context_get / aida_context_update / aida_context_rebuild / aida_memory_pack，以减少授权次数。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: ['search', 'get', 'upsert', 'context-get', 'context-update', 'context-rebuild', 'pack'], description: '统一的模块记忆与分支上下文入口' },
+        query: { type: 'string' },
+        pathHints: { type: 'array', items: { type: 'string' } },
+        moduleKey: { type: 'string' },
+        title: { type: 'string' },
+        summary: { type: 'string' },
+        keywords: { type: 'array', items: { type: 'string' } },
+        entryFiles: { type: 'array', items: { type: 'string' } },
+        relatedPaths: { type: 'array', items: { type: 'string' } },
+        dataFlow: { type: 'array', items: { type: 'string' } },
+        decisions: { type: 'array', items: { type: 'string' } },
+        constraints: { type: 'array', items: { type: 'string' } },
+        pitfalls: { type: 'array', items: { type: 'string' } },
+        relatedRules: { type: 'array', items: { type: 'string' } },
+        ticket: { type: 'string' },
+        branch: { type: 'string' },
+        referenceSummary: { type: 'string' },
+        currentPhase: { type: 'string' },
+        modules: { type: 'array', items: { type: 'string' } },
+        completed: { type: 'array', items: { type: 'string' } },
+        inProgress: { type: 'array', items: { type: 'string' } },
+        next: { type: 'array', items: { type: 'string' } },
+        keyFiles: { type: 'array', items: { type: 'string' } },
+        risks: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['action'],
+    },
+  },
   {
     name: 'aida_task_start',
     description: '当你开始一个新任务或功能开发时调用。在接到用户需求、开始编码前调用。每个任务的完整数据采集流程：1) aida_task_start 2) 编码 3) aida_log_files 4) aida_log_review 5) aida_task_done。多个子任务必须每个都单独 start/done。',
@@ -368,22 +457,53 @@ const PROMPTS = [
 
 const PROMPT_CONTENT = `你拥有 AIDA 数据采集工具，必须在开发过程中的关键节点调用，确保数据完整性。
 
+开始任何真实开发任务前，严禁跳过以下前置动作：
+1. 先调用 aida_bootstrap，action="status"，检查当前宿主中的 AIDA MCP 是否可用
+2. 如果不可用，先提示用户检查并启用当前宿主中的 AIDA MCP（例如 Cursor 里可能需要手动打开/批准）
+3. 如果可用，再调用 aida_bootstrap，action="manifest"，读取集中授权清单，向用户说明“提前授权是为了避免后续开发过程中被 AIDA 中断”
+4. 用户做出授权决定后，调用 aida_bootstrap，action="complete"，把本地 bootstrap 状态缓存下来
+5. 后续优先使用聚合工具 aida_task / aida_record / aida_memory，减少授权弹窗次数
+
 每个任务的完整流程：
-1. 开始前 → aida_task_start（传入标题和所属模块）
-2. 编码完成 → aida_log_files（自动扫描 git diff，无需传参）
-3. 自检代码 → aida_log_review（pass/fail + 问题列表）
-4. 任务完成 → aida_task_done（传入任务 ID）
+1. 开始前 → aida_task（action="start"，传入标题和所属模块）
+2. 编码完成 → aida_record（action="files"，自动扫描 git diff，无需传参）
+3. 自检代码 → aida_record（action="review"，pass/fail + 问题列表）
+4. 任务完成 → aida_task（action="done"，传入任务 ID）
 
 过程中遇到以下情况必须立即记录：
-- 发现 Bug → aida_log_bug，修复后 → aida_bug_fix
-- 用户指出 AI 产出偏差 → aida_log_deviation（传入描述、rootCause、category）
-- 值得记录的亮点 → aida_highlight
+- 发现 Bug → aida_record（action="bug"），修复后 → aida_record（action="bug-fix"）
+- 用户指出 AI 产出偏差 → aida_record（action="deviation"，传入描述、rootCause、category）
+- 值得记录的亮点 → aida_record（action="highlight"）
 
 偏差规则沉淀：
-- 当 aida_log_deviation 的 rootCause 为 rule-missing 时，修复后判断是否属于项目级技术规范（非业务逻辑）
-- 如果是，询问用户是否沉淀为规则，用户同意后调用 aida_log_rule 工具（传入 content、category、sourceDeviation）
+- 当 aida_record(action="deviation") 的 rootCause 为 rule-missing 时，修复后判断是否属于项目级技术规范（非业务逻辑）
+- 如果是，询问用户是否沉淀为规则，用户同意后调用 aida_record（action="rule"，传入 content、category、sourceDeviation）
 
-多任务场景下，每个子任务都必须单独 aida_task_start 和 aida_task_done。`;
+多任务场景下，每个子任务都必须单独 aida_task(action="start") 和 aida_task(action="done")。`;
+
+function preferredBootstrapHost(): BootstrapHost {
+  if (!fileExists(configPath(projectRoot))) return 'codex';
+  try {
+    const config = readJson<{ aiTools?: string[]; aiTool?: string }>(configPath(projectRoot));
+    const tools = Array.isArray(config.aiTools)
+      ? config.aiTools
+      : config.aiTool
+        ? [config.aiTool]
+        : [];
+    if (tools.includes('codex')) return 'codex';
+    if (tools.includes('cursor')) return 'cursor';
+    if (tools.includes('claude-code')) return 'claude-code';
+  } catch {
+    // Fall through to default.
+  }
+  return 'codex';
+}
+
+function normalizeBootstrapHost(value: unknown): BootstrapHost {
+  return value === 'cursor' || value === 'claude-code' || value === 'codex'
+    ? value
+    : preferredBootstrapHost();
+}
 
 // ─── Tool Handlers ───────────────────────────────────────
 
@@ -431,6 +551,7 @@ function handleTaskDone(args: any): any {
   task.completedAt = now();
   if (!task.startedAt) task.startedAt = task.createdAt || task.completedAt;
   data.summary.completedTasks = data.tasks.filter(t => t.status === 'done').length;
+  data.context.currentTaskId = resolveCurrentTaskId(data.tasks);
 
   // Auto-collect tokens for this task
   let taskTokens = 0;
@@ -769,6 +890,117 @@ function handleStatus(): any {
   }
 }
 
+function handleBootstrap(args: any): any {
+  const action = `${args.action || 'status'}`.trim();
+  const host = normalizeBootstrapHost(args.host);
+
+  switch (action) {
+    case 'status': {
+      const status = getBootstrapStatus(projectRoot, host);
+      return {
+        success: true,
+        host,
+        available: status.available,
+        needsBootstrap: status.needsBootstrap,
+        cached: status.record,
+        nextSteps: status.nextSteps,
+        manifestVersion: status.manifest.version,
+      };
+    }
+    case 'manifest': {
+      const status = getBootstrapStatus(projectRoot, host);
+      return {
+        success: true,
+        host,
+        available: status.available,
+        required: true,
+        reason: BOOTSTRAP_MANIFEST.reason,
+        groupedTools: BOOTSTRAP_MANIFEST.groupedTools,
+        nextSteps: status.nextSteps,
+        manifestVersion: BOOTSTRAP_MANIFEST.version,
+      };
+    }
+    case 'complete': {
+      const decision = `${args.decision || 'approved'}`.trim() as BootstrapDecision;
+      const record = saveBootstrapDecision(
+        projectRoot,
+        host,
+        decision,
+        Array.isArray(args.approvedToolNames) ? args.approvedToolNames : [],
+        args.acknowledgedReason !== false,
+      );
+      return {
+        success: true,
+        host,
+        decision: record.decision,
+        completedAt: record.completedAt,
+        approvedToolNames: record.approvedToolNames,
+        manifestVersion: record.manifestVersion,
+      };
+    }
+    default:
+      return { success: false, message: `unknown bootstrap action: ${action}` };
+  }
+}
+
+function handleTaskTool(args: any): any {
+  const action = `${args.action || ''}`.trim();
+  switch (action) {
+    case 'start':
+      return handleTaskStart(args);
+    case 'done':
+      return handleTaskDone(args);
+    default:
+      return { success: false, message: `unknown task action: ${action}` };
+  }
+}
+
+function handleRecordTool(args: any): any {
+  const action = `${args.action || ''}`.trim();
+  switch (action) {
+    case 'files':
+      return handleLogFiles();
+    case 'review':
+      return handleLogReview(args);
+    case 'bug':
+      return handleLogBug(args);
+    case 'bug-fix':
+      return handleBugFix(args);
+    case 'deviation':
+      return handleLogDeviation(args);
+    case 'highlight':
+      return handleHighlight(args);
+    case 'rule':
+      return handleLogRule(args);
+    case 'status':
+      return handleStatus();
+    default:
+      return { success: false, message: `unknown record action: ${action}` };
+  }
+}
+
+function handleMemoryTool(args: any): any {
+  const action = `${args.action || ''}`.trim();
+  switch (action) {
+    case 'search':
+      return handleMemorySearch(args);
+    case 'get':
+      return handleMemoryGet(args);
+    case 'upsert':
+      return handleMemoryUpsert(args);
+    case 'context-get':
+      return handleContextGet(args);
+    case 'context-update':
+      return handleContextUpdate(args);
+    case 'context-rebuild':
+      return handleContextRebuild(args);
+    case 'pack':
+      return handleMemoryPack(args);
+    default:
+      return { success: false, message: `unknown memory action: ${action}` };
+  }
+}
+
 function handleLogRule(args: any): any {
   const { path, data } = ensureRunJson();
   const branch = getBranchName();
@@ -973,6 +1205,18 @@ function handleRequest(req: JsonRpcRequest): void {
 
       try {
         switch (toolName) {
+          case 'aida_bootstrap':
+            result = handleBootstrap(args);
+            break;
+          case 'aida_task':
+            result = handleTaskTool(args);
+            break;
+          case 'aida_record':
+            result = handleRecordTool(args);
+            break;
+          case 'aida_memory':
+            result = handleMemoryTool(args);
+            break;
           case 'aida_task_start':
             result = handleTaskStart(args);
             break;

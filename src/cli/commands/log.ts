@@ -26,6 +26,7 @@ import {
   nextId,
   addEvent,
   addTimeline,
+  resolveCurrentTaskId,
   saveRunData,
   loadRunJson,
 } from '../../utils/run-data.js';
@@ -149,6 +150,7 @@ function logTaskDone(flags: Record<string, string>): void {
     task.startedAt = task.createdAt || task.completedAt;
   }
   data.summary.completedTasks = data.tasks.filter((t: any) => t.status === 'done').length;
+  data.context.currentTaskId = resolveCurrentTaskId(data.tasks as TaskItem[]);
   addEvent(data, 'task_completed', { taskId: id });
   addTimeline(data, 'task-done', `${id}: ${task.title}`);
   save(path, data);

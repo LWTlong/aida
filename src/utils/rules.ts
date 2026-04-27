@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
-import { fileExists, readJson, writeJson, writeText, ensureDir, readText } from './fs.js';
+import { fileExists, readJson, writeJson, writeText, ensureDir, readText, resetDir } from './fs.js';
 import { aidaDir } from './paths.js';
 import type { RuleRegistryEntry } from '../schemas/run-json.js';
 import { RULE_CATEGORIES } from '../schemas/run-json.js';
@@ -46,9 +46,73 @@ export function activeRules(entries: RuleRegistryEntry[]): RuleRegistryEntry[] {
   return entries.filter((entry) => entry.status !== 'deprecated');
 }
 
+function ruleStatusRank(status: RuleRegistryEntry['status']): number {
+  switch (status) {
+    case 'active':
+      return 0;
+    case 'pending':
+      return 1;
+    case 'conflict':
+      return 2;
+    case 'deprecated':
+      return 3;
+    default:
+      return 4;
+  }
+}
+
+function ruleIdNumber(entry: RuleRegistryEntry): number {
+  const match = entry.id.match(/^RULE-(\d+)$/);
+  return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
+}
+
+function preferRuleCandidate(current: RuleRegistryEntry, next: RuleRegistryEntry): RuleRegistryEntry {
+  const currentRank = ruleStatusRank(current.status);
+  const nextRank = ruleStatusRank(next.status);
+  if (nextRank < currentRank) return next;
+  if (nextRank > currentRank) return current;
+
+  const currentId = ruleIdNumber(current);
+  const nextId = ruleIdNumber(next);
+  if (nextId < currentId) return next;
+  if (nextId > currentId) return current;
+
+  return current;
+}
+
+export function dedupeExactRules(
+  entries: RuleRegistryEntry[],
+): { entries: RuleRegistryEntry[]; removed: RuleRegistryEntry[] } {
+  const preferredByFingerprint = new Map<string, RuleRegistryEntry>();
+
+  for (const entry of entries) {
+    const existing = preferredByFingerprint.get(entry.fingerprint);
+    if (!existing) {
+      preferredByFingerprint.set(entry.fingerprint, entry);
+      continue;
+    }
+    preferredByFingerprint.set(entry.fingerprint, preferRuleCandidate(existing, entry));
+  }
+
+  const removed: RuleRegistryEntry[] = [];
+  const deduped: RuleRegistryEntry[] = [];
+
+  for (const entry of entries) {
+    const preferred = preferredByFingerprint.get(entry.fingerprint);
+    if (preferred === entry) {
+      deduped.push(entry);
+      preferredByFingerprint.delete(entry.fingerprint);
+    } else {
+      removed.push(entry);
+    }
+  }
+
+  return { entries: deduped, removed };
+}
+
 export function groupActiveRulesByCategory(entries: RuleRegistryEntry[]): Record<string, RuleRegistryEntry[]> {
   const groups: Record<string, RuleRegistryEntry[]> = {};
-  for (const entry of activeRules(entries)) {
+  for (const entry of activeRules(dedupeExactRules(entries).entries)) {
     const category = entry.category || 'general';
     if (!groups[category]) groups[category] = [];
     groups[category].push(entry);
@@ -299,7 +363,7 @@ export function addRule(
 export function buildRuleViews(projectRoot: string): number {
   const entries = bootstrapRuleRegistry(projectRoot);
   const viewDir = rulesViewDir(projectRoot);
-  ensureDir(viewDir);
+  resetDir(viewDir);
   const files = renderRuleMarkdownFiles(entries);
   for (const [name, content] of files) {
     writeText(resolve(viewDir, name), content);

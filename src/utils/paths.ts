@@ -84,6 +84,11 @@ export function toolConfigStorePath(projectRoot: string = process.cwd()): string
   return resolve(projectRoot, '.aida', 'tool-configs.json');
 }
 
+/** Local-only MCP bootstrap cache */
+export function bootstrapStatePath(projectRoot: string = process.cwd()): string {
+  return resolve(projectRoot, '.aida', 'bootstrap-state.local.json');
+}
+
 /** Memory root */
 export function memoriesDir(projectRoot: string = process.cwd()): string {
   return resolve(projectRoot, '.aida', 'memories');

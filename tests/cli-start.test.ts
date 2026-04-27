@@ -203,6 +203,7 @@ describe('aidevos start - gitignore', () => {
     assert.ok(content.includes('.claude/'));
     assert.ok(content.includes('.aida/**'));
     assert.ok(content.includes('!.aida/**/*.json'));
+    assert.ok(content.includes('.aida/bootstrap-state.local.json'));
   });
 
   it('should not duplicate generated artifact entries on second start', () => {

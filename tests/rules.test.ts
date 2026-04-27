@@ -11,6 +11,7 @@ import {
   saveRegistry,
   nextRuleId,
   buildRuleViews,
+  dedupeExactRules,
   mergeRegistries,
   findSimilarRules,
   registryPath,
@@ -186,6 +187,56 @@ describe('addRule', () => {
 
     assert.equal(entry.status, 'pending');
     assert.equal(entry.source.deviation, 'DEV-01');
+  });
+});
+
+// ─── dedupeExactRules ────────────────────────────────────
+
+describe('dedupeExactRules', () => {
+  it('should remove exact duplicates by fingerprint', () => {
+    const fp = fingerprint('禁止任何形式的臆想，不清楚必须询问');
+    const entries = [
+      {
+        id: 'RULE-001', category: 'process', content: '禁止任何形式的臆想，不清楚必须询问',
+        fingerprint: fp,
+        source: { branch: 'a', deviation: null, author: 'x' },
+        createdAt: '2024-01-01', status: 'active',
+      },
+      {
+        id: 'RULE-002', category: 'process', content: '禁止任何形式的臆想，不清楚必须询问',
+        fingerprint: fp,
+        source: { branch: 'b', deviation: null, author: 'y' },
+        createdAt: '2024-01-02', status: 'active',
+      },
+    ] as RuleRegistryEntry[];
+
+    const result = dedupeExactRules(entries);
+    assert.equal(result.entries.length, 1);
+    assert.equal(result.removed.length, 1);
+    assert.equal(result.entries[0].id, 'RULE-001');
+  });
+
+  it('should prefer active rules over deprecated duplicates', () => {
+    const fp = fingerprint('禁止任何形式的臆想，不清楚必须询问');
+    const entries = [
+      {
+        id: 'RULE-001', category: 'process', content: '禁止任何形式的臆想，不清楚必须询问',
+        fingerprint: fp,
+        source: { branch: 'a', deviation: null, author: 'x' },
+        createdAt: '2024-01-01', status: 'deprecated',
+      },
+      {
+        id: 'RULE-002', category: 'process', content: '禁止任何形式的臆想，不清楚必须询问',
+        fingerprint: fp,
+        source: { branch: 'b', deviation: null, author: 'y' },
+        createdAt: '2024-01-02', status: 'active',
+      },
+    ] as RuleRegistryEntry[];
+
+    const result = dedupeExactRules(entries);
+    assert.equal(result.entries.length, 1);
+    assert.equal(result.entries[0].id, 'RULE-002');
+    assert.equal(result.entries[0].status, 'active');
   });
 });
 

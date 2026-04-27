@@ -1,16 +1,18 @@
 import { readdirSync, statSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, relative, resolve } from 'node:path';
 import { ensureDir, fileExists, readJson, readText, writeJson } from './fs.js';
 import { configPath, toolConfigStorePath } from './paths.js';
 import { QUICK_COMMANDS, ensureBuildGitignore } from './ai-build.js';
 import { importRulesFromViews, loadRegistry, saveRegistry, fingerprint, nextRuleId } from './rules.js';
-import { importSkillsFromViews, isBundledSkillName, loadSkillRegistry, saveSkillRegistry, skillFingerprint, nextSkillId, type SkillRegistryEntry } from './skills.js';
+import { importSkillsFromViews, isBundledSkillName, loadSkillRegistry, saveSkillRegistry, skillFingerprint, nextSkillId, type SkillCompanionFile, type SkillRegistryEntry } from './skills.js';
 import type { AidaConfig, AiToolChoice, ToolConfigSnapshot } from '../schemas/aida-project.js';
 
 interface ImportOptions {
   includeExternalSkills?: boolean
   includeExternalMcp?: boolean
 }
+
+export const CLOSED_LOOP_BASELINE_TOOLS: AiToolChoice[] = ['claude-code', 'cursor', 'codex'];
 
 const GENERATED_CURSOR_RULE_SEGMENTS = new Set(['aida', 'aidevos']);
 const GENERATED_RULE_FILENAMES = new Set(['aida-guide.md', 'iron-rules.md']);
@@ -56,6 +58,104 @@ function walkMarkdownFiles(rootDir: string): string[] {
   }
 
   return result.sort();
+}
+
+function walkFiles(rootDir: string): string[] {
+  if (!fileExists(rootDir)) return [];
+  const result: string[] = [];
+  const stack = [rootDir];
+
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    for (const name of readdirSync(current)) {
+      const full = resolve(current, name);
+      const stat = statSync(full);
+      if (stat.isDirectory()) {
+        stack.push(full);
+      } else {
+        result.push(full);
+      }
+    }
+  }
+
+  return result.sort();
+}
+
+function isSupportedSkillAsset(path: string): boolean {
+  const lowered = path.toLowerCase();
+  return lowered.endsWith('.md')
+    || lowered.endsWith('.txt')
+    || lowered.endsWith('.py')
+    || lowered.endsWith('.sh')
+    || lowered.endsWith('.js')
+    || lowered.endsWith('.ts')
+    || lowered.endsWith('.cjs')
+    || lowered.endsWith('.mjs')
+    || lowered.endsWith('.json')
+    || lowered.endsWith('.yaml')
+    || lowered.endsWith('.yml')
+    || lowered.endsWith('.toml');
+}
+
+function collectImportedSkillPackage(
+  skillDir: string,
+): { content: string; files: SkillCompanionFile[] } | null {
+  const mainFile = resolve(skillDir, 'SKILL.md');
+  if (!fileExists(mainFile)) return null;
+
+  const files: SkillCompanionFile[] = [];
+  for (const file of walkFiles(skillDir)) {
+    if (file === mainFile) continue;
+    const relPath = relative(skillDir, file).replace(/\\/g, '/');
+    if (!isSupportedSkillAsset(relPath)) continue;
+    files.push({ path: relPath, content: readText(file) });
+  }
+
+  return {
+    content: readText(mainFile),
+    files: files.sort((a, b) => a.path.localeCompare(b.path)),
+  };
+}
+
+function collectToolSkills(
+  projectRoot: string,
+  rootDir: string,
+): Array<{ name: string; content: string; files?: SkillCompanionFile[]; sourcePath: string }> {
+  if (!fileExists(rootDir)) return [];
+
+  const collected: Array<{ name: string; content: string; files?: SkillCompanionFile[]; sourcePath: string }> = [];
+  const namesWithPackages = new Set<string>();
+
+  for (const name of readdirSync(rootDir).sort()) {
+    const fullPath = resolve(rootDir, name);
+    const stat = statSync(fullPath);
+    if (!stat.isDirectory()) continue;
+    const pkg = collectImportedSkillPackage(fullPath);
+    if (!pkg) continue;
+    namesWithPackages.add(name);
+    collected.push({
+      name: normalizeImportedSkillName(name),
+      content: pkg.content,
+      files: pkg.files,
+      sourcePath: resolve(fullPath, 'SKILL.md').replace(`${projectRoot}/`, ''),
+    });
+  }
+
+  for (const file of readdirSync(rootDir).sort()) {
+    const fullPath = resolve(rootDir, file);
+    const stat = statSync(fullPath);
+    if (stat.isDirectory() || !file.endsWith('.md')) continue;
+    const name = file.replace(/\.md$/, '');
+    if (namesWithPackages.has(name)) continue;
+    collected.push({
+      name: normalizeImportedSkillName(name),
+      content: readText(fullPath),
+      files: [],
+      sourcePath: fullPath.replace(`${projectRoot}/`, ''),
+    });
+  }
+
+  return collected;
 }
 
 function parseMarkdownRuleCandidates(raw: string): string[] {
@@ -141,7 +241,7 @@ function mergeImportedRules(
 
 function mergeImportedSkills(
   projectRoot: string,
-  entries: Array<{ name: string; content: string; sourcePath: string }>,
+  entries: Array<{ name: string; content: string; files?: SkillCompanionFile[]; sourcePath: string }>,
   tool: AiToolChoice,
 ): { total: number; imported: number } {
   const existing = loadSkillRegistry(projectRoot);
@@ -151,19 +251,32 @@ function mergeImportedSkills(
   let imported = 0;
 
   for (const item of entries) {
-    const fp = skillFingerprint(item.content);
+    const files = item.files || [];
+    const fp = skillFingerprint(item.content, files);
     const existingByName = byName.get(item.name);
+    const nextSourcePath = item.sourcePath;
 
     if (existingByName) {
-      existingByName.content = item.content;
-      existingByName.fingerprint = fp;
-      existingByName.updatedAt = new Date().toISOString();
-      existingByName.status = 'active';
-      existingByName.source = {
-        kind: 'local',
-        path: item.sourcePath,
-      };
-      imported++;
+      const sameFiles = JSON.stringify(existingByName.files || []) === JSON.stringify(files);
+      const sameSource = existingByName.source.kind === 'local' && existingByName.source.path === nextSourcePath;
+      const unchanged = existingByName.content === item.content
+        && existingByName.fingerprint === fp
+        && sameFiles
+        && existingByName.status === 'active'
+        && sameSource;
+
+      if (!unchanged) {
+        existingByName.content = item.content;
+        existingByName.files = files;
+        existingByName.fingerprint = fp;
+        existingByName.updatedAt = new Date().toISOString();
+        existingByName.status = 'active';
+        existingByName.source = {
+          kind: 'local',
+          path: nextSourcePath,
+        };
+        imported++;
+      }
       byFingerprint.add(fp);
       continue;
     }
@@ -174,6 +287,7 @@ function mergeImportedSkills(
       id: nextSkillId(merged),
       name: item.name,
       content: item.content,
+      files,
       fingerprint: fp,
       source: {
         kind: 'local',
@@ -224,6 +338,10 @@ export function detectImportableTools(projectRoot: string, tools: AiToolChoice[]
   });
 }
 
+export function detectClosedLoopImportableTools(projectRoot: string, tools: AiToolChoice[]): AiToolChoice[] {
+  return detectImportableTools(projectRoot, tools).filter((tool) => CLOSED_LOOP_BASELINE_TOOLS.includes(tool));
+}
+
 export function importFromTool(projectRoot: string, tool: AiToolChoice): {
   rulesImported: number
   skillsImported: number
@@ -241,7 +359,7 @@ export function importFromToolWithOptions(
 } {
   const includeExternalSkills = options.includeExternalSkills !== false;
   const ruleContents: string[] = [];
-  const skills: Array<{ name: string; content: string; sourcePath: string }> = [];
+  const skills: Array<{ name: string; content: string; files?: SkillCompanionFile[]; sourcePath: string }> = [];
 
   switch (tool) {
     case 'claude-code': {
@@ -256,14 +374,7 @@ export function importFromToolWithOptions(
         ruleContents.push(...parseMarkdownRuleCandidates(raw));
       }
       const skillsDir = resolve(projectRoot, '.claude', 'skills');
-      for (const file of walkMarkdownFiles(skillsDir)) {
-        const name = normalizeImportedSkillName(file.split('/').pop()!.replace(/\.md$/, ''));
-        skills.push({
-          name,
-          content: readText(file),
-          sourcePath: file.replace(`${projectRoot}/`, ''),
-        });
-      }
+      skills.push(...collectToolSkills(projectRoot, skillsDir));
       const commandDir = resolve(projectRoot, '.claude', 'commands');
       for (const file of walkMarkdownFiles(commandDir)) {
         const name = normalizeImportedSkillName(file.split('/').pop()!.replace(/\.md$/, ''));
@@ -284,11 +395,14 @@ export function importFromToolWithOptions(
       }
       const skillsDir = resolve(projectRoot, '.cursor', 'skills');
       for (const file of walkMarkdownFiles(skillsDir).filter((path) => path.endsWith('SKILL.md'))) {
-        const parts = file.split('/');
-        const name = normalizeImportedSkillName(parts[parts.length - 2]);
+        const skillDir = dirname(file);
+        const parts = skillDir.split('/');
+        const name = normalizeImportedSkillName(parts[parts.length - 1]);
+        const collected = collectImportedSkillPackage(skillDir);
         skills.push({
           name,
-          content: readText(file),
+          content: collected?.content || readText(file),
+          files: collected?.files || [],
           sourcePath: file.replace(`${projectRoot}/`, ''),
         });
       }
@@ -315,14 +429,7 @@ export function importFromToolWithOptions(
         ruleContents.push(...parseMarkdownRuleCandidates(raw));
       }
       const skillsDir = resolve(projectRoot, '.codex', 'skills');
-      for (const file of walkMarkdownFiles(skillsDir)) {
-        const name = normalizeImportedSkillName(file.split('/').pop()!.replace(/\.md$/, ''));
-        skills.push({
-          name,
-          content: readText(file),
-          sourcePath: file.replace(`${projectRoot}/`, ''),
-        });
-      }
+      skills.push(...collectToolSkills(projectRoot, skillsDir));
       break;
     }
     case 'vscode-copilot':

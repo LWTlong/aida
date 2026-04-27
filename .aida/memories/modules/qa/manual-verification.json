@@ -1,41 +1,35 @@
 {
-  "moduleKey": "git",
-  "title": "Git",
+  "moduleKey": "qa/manual-verification",
+  "title": "QA/Manual Verification",
   "summary": "main",
   "keywords": [
-    "Git",
-    "main",
-    "git"
+    "QA/Manual Verification",
+    "qa/manual-verification",
+    "main"
   ],
   "entryFiles": [
-    "AGENTS.md",
-    "CLAUDE.md",
-    ".gitignore",
-    ".mcp.json",
     ".aida/runs/main/vito-long/run.json",
-    "src/cli/commands/init.ts",
-    "tests/build-cli.test.ts",
-    "src/utils/guide.ts"
+    "README.zh-CN.md",
+    "README.md",
+    "COMMANDS.md",
+    "tests/build.test.ts",
+    ".aida/memories/index.json"
   ],
   "relatedPaths": [
-    "AGENTS.md",
-    "CLAUDE.md",
-    ".gitignore",
-    ".mcp.json",
     ".aida/runs/main/vito-long/run.json",
-    "src/cli/commands/init.ts",
-    "tests/build-cli.test.ts",
-    ".aida/runs/main/requirement.json",
+    "README.zh-CN.md",
+    "README.md",
+    "COMMANDS.md",
+    "tests/build.test.ts",
+    "src/utils/import.ts",
     ".aida/memories/index.json",
-    ".aida/runs/main/context.json",
     "src/utils/guide.ts",
-    "tests/merge.test.ts"
+    "src/mcp/server.ts"
   ],
   "dataFlow": [],
   "decisions": [],
   "constraints": [],
   "pitfalls": [
-    "CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
     "Build flow skipped top-level guide/rule artifacts for migration compatibility",
     "Non-interactive init fallback dropped subsequent answers across multi-step prompts",
     "Legacy AGENTS.md marker was not upgraded to full AIDA guidance during migration/build",
@@ -48,8 +42,8 @@
     {
       "branch": "main",
       "summary": "main",
-      "updatedAt": "2026-04-24T02:00:11.291Z"
+      "updatedAt": "2026-04-27T07:58:21.754Z"
     }
   ],
-  "updatedAt": "2026-04-27T08:21:54.279Z"
+  "updatedAt": "2026-04-27T08:21:54.297Z"
 }

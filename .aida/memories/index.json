@@ -1,6 +1,78 @@
 {
-  "updatedAt": "2026-04-24T03:24:05.082Z",
+  "updatedAt": "2026-04-27T08:21:54.304Z",
   "modules": [
+    {
+      "key": "cli",
+      "title": "CLI",
+      "summary": "main",
+      "keywords": [
+        "cli",
+        "CLI",
+        "main"
+      ],
+      "paths": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".mcp.json",
+        ".gitignore",
+        ".aida/runs/main/vito-long/run.json",
+        "src/cli/commands/init.ts",
+        "tests/build-cli.test.ts",
+        "src/utils/guide.ts",
+        ".aida/runs/main/requirement.json",
+        ".aida/memories/index.json",
+        ".aida/runs/main/context.json",
+        "tests/merge.test.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.284Z"
+    },
+    {
+      "key": "cli/mcp",
+      "title": "CLI/MCP",
+      "summary": "main",
+      "keywords": [
+        "cli/mcp",
+        "CLI/MCP",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        "tests/build.test.ts",
+        ".aida/memories/index.json",
+        "src/utils/import.ts",
+        "src/utils/guide.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.295Z"
+    },
+    {
+      "key": "docs",
+      "title": "Docs",
+      "summary": "main",
+      "keywords": [
+        "docs",
+        "Docs",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "src/cli/commands/init.ts",
+        "src/utils/guide.ts",
+        "tests/build-cli.test.ts",
+        ".aida/runs/main/requirement.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        ".aida/memories/index.json",
+        ".aida/runs/main/context.json",
+        "tests/merge.test.ts",
+        "tests/build.test.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.285Z"
+    },
     {
       "key": "git",
       "title": "Git",
@@ -14,9 +86,218 @@
         "AGENTS.md",
         "CLAUDE.md",
         ".gitignore",
-        ".mcp.json"
+        ".mcp.json",
+        ".aida/runs/main/vito-long/run.json",
+        "src/cli/commands/init.ts",
+        "tests/build-cli.test.ts",
+        "src/utils/guide.ts",
+        ".aida/runs/main/requirement.json",
+        ".aida/memories/index.json",
+        ".aida/runs/main/context.json",
+        "tests/merge.test.ts"
       ],
-      "updatedAt": "2026-04-24T03:24:05.081Z"
+      "updatedAt": "2026-04-27T08:21:54.279Z"
+    },
+    {
+      "key": "import",
+      "title": "Import",
+      "summary": "main",
+      "keywords": [
+        "import",
+        "Import",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        "src/cli/commands/init.ts",
+        ".aida/memories/index.json",
+        "tests/build.test.ts",
+        "src/utils/guide.ts",
+        "src/utils/import.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.287Z"
+    },
+    {
+      "key": "mcp/rules",
+      "title": "MCP/Rules",
+      "summary": "main",
+      "keywords": [
+        "mcp/rules",
+        "MCP/Rules",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        "tests/build.test.ts",
+        ".aida/memories/index.json",
+        "src/utils/import.ts",
+        "src/utils/guide.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.296Z"
+    },
+    {
+      "key": "qa",
+      "title": "QA",
+      "summary": "main",
+      "keywords": [
+        "qa",
+        "QA",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        ".aida/memories/index.json",
+        "tests/build.test.ts",
+        "src/cli/commands/init.ts",
+        "src/utils/guide.ts",
+        "src/utils/import.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.289Z"
+    },
+    {
+      "key": "qa-/-manual-verification",
+      "title": "QA / Manual Verification",
+      "summary": "main",
+      "keywords": [
+        "qa-/-manual-verification",
+        "QA / Manual Verification",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        "tests/build.test.ts",
+        ".aida/memories/index.json",
+        "src/utils/import.ts",
+        "src/utils/guide.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.299Z"
+    },
+    {
+      "key": "qa/manual-verification",
+      "title": "QA/Manual Verification",
+      "summary": "main",
+      "keywords": [
+        "qa/manual-verification",
+        "QA/Manual Verification",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        "tests/build.test.ts",
+        ".aida/memories/index.json",
+        "src/utils/import.ts",
+        "src/utils/guide.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.297Z"
+    },
+    {
+      "key": "qa/mcp",
+      "title": "QA/MCP",
+      "summary": "main",
+      "keywords": [
+        "qa/mcp",
+        "QA/MCP",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        "tests/build.test.ts",
+        ".aida/memories/index.json",
+        "src/utils/import.ts",
+        "src/utils/guide.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.303Z"
+    },
+    {
+      "key": "release",
+      "title": "Release",
+      "summary": "main",
+      "keywords": [
+        "release",
+        "Release",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.md",
+        "README.zh-CN.md",
+        "COMMANDS.md",
+        ".aida/memories/index.json",
+        "src/utils/import.ts",
+        "tests/build.test.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.303Z"
+    },
+    {
+      "key": "run-data-/-mcp",
+      "title": "Run Data / MCP",
+      "summary": "main",
+      "keywords": [
+        "run-data-/-mcp",
+        "Run Data / MCP",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        "tests/build.test.ts",
+        ".aida/memories/index.json",
+        "src/utils/import.ts",
+        "src/utils/guide.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.298Z"
+    },
+    {
+      "key": "skills",
+      "title": "Skills",
+      "summary": "main",
+      "keywords": [
+        "skills",
+        "Skills",
+        "main"
+      ],
+      "paths": [
+        ".aida/runs/main/vito-long/run.json",
+        "README.zh-CN.md",
+        "README.md",
+        "COMMANDS.md",
+        "src/cli/commands/init.ts",
+        ".aida/memories/index.json",
+        "tests/build.test.ts",
+        "src/utils/guide.ts",
+        ".aida/runs/main/requirement.json",
+        "src/utils/import.ts",
+        "src/mcp/server.ts"
+      ],
+      "updatedAt": "2026-04-27T08:21:54.286Z"
     }
   ]
 }

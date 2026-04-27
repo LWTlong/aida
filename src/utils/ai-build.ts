@@ -1,10 +1,11 @@
 import { resolve } from 'node:path';
 import { bootstrapRuleRegistry, renderRuleMarkdownFiles } from './rules.js';
-import { activeSkills, bootstrapSkillRegistry, getSkillContent } from './skills.js';
-import { ensureGuide, updateGuide, updateGuideReferences } from './guide.js';
+import { activeSkills, bootstrapSkillRegistry, buildSkillViews, getSkillContent } from './skills.js';
+import { buildRuleViews } from './rules.js';
+import { ensureGuide, syncGuideReference, updateGuide, updateGuideReferences } from './guide.js';
 import { buildMemoryViews } from './memory.js';
 import { configPath, toolConfigStorePath } from './paths.js';
-import { ensureDir, fileExists, readJson, readText, writeJson, writeText } from './fs.js';
+import { ensureDir, fileExists, readJson, readText, resetDir, writeJson, writeText } from './fs.js';
 import type { AiToolChoice, AidaConfig, ToolConfigSnapshot, ToolConfigStore } from '../schemas/aida-project.js';
 
 export const QUICK_COMMANDS: { name: string; skill: string }[] = [
@@ -18,7 +19,7 @@ export const QUICK_COMMANDS: { name: string; skill: string }[] = [
 
 const MCP_SERVER_ENTRY = {
   command: 'npx',
-  args: ['-y', 'ai-dev-analytics', 'mcp'],
+  args: ['--registry=https://registry.npmjs.org/', '-y', 'ai-dev-analytics', 'mcp'],
 };
 
 const MCP_CONFIG_JSON = JSON.stringify({
@@ -29,11 +30,11 @@ const MCP_CONFIG_JSON = JSON.stringify({
 
 const CODEX_CONFIG_TOML = `[mcp_servers.aida]
 command = "npx"
-args = ["-y", "ai-dev-analytics", "mcp"]
+args = ["--registry=https://registry.npmjs.org/", "-y", "ai-dev-analytics", "mcp"]
 `;
 
 function writeRuleBundle(dir: string, files: Map<string, string>): number {
-  ensureDir(dir);
+  resetDir(dir);
   for (const [name, content] of files) {
     writeText(resolve(dir, name), content);
   }
@@ -58,21 +59,41 @@ function buildCodexRules(projectRoot: string, files: Map<string, string>): numbe
 
 function buildClaudeSkills(projectRoot: string): number {
   const dir = resolve(projectRoot, '.claude', 'skills');
-  ensureDir(dir);
+  resetDir(dir);
   let written = 0;
   for (const entry of activeSkills(bootstrapSkillRegistry(projectRoot))) {
     writeText(resolve(dir, `${entry.name}.md`), entry.content);
+    if ((entry.files || []).length > 0) {
+      const packageDir = resolve(dir, entry.name);
+      ensureDir(packageDir);
+      writeText(resolve(packageDir, 'SKILL.md'), entry.content);
+      for (const file of entry.files || []) {
+        const fullPath = resolve(packageDir, file.path);
+        ensureDir(resolve(fullPath, '..'));
+        writeText(fullPath, file.content);
+        written++;
+      }
+      written++;
+    }
     written++;
   }
   return written;
 }
 
 function buildCursorSkills(projectRoot: string): number {
+  const rootDir = resolve(projectRoot, '.cursor', 'skills');
+  resetDir(rootDir);
   let written = 0;
   for (const entry of activeSkills(bootstrapSkillRegistry(projectRoot))) {
-    const dir = resolve(projectRoot, '.cursor', 'skills', entry.name);
+    const dir = resolve(rootDir, entry.name);
     ensureDir(dir);
     writeText(resolve(dir, 'SKILL.md'), entry.content);
+    for (const file of entry.files || []) {
+      const fullPath = resolve(dir, file.path);
+      ensureDir(resolve(fullPath, '..'));
+      writeText(fullPath, file.content);
+      written++;
+    }
     written++;
   }
   return written;
@@ -80,10 +101,22 @@ function buildCursorSkills(projectRoot: string): number {
 
 function buildCodexSkills(projectRoot: string): number {
   const dir = resolve(projectRoot, '.codex', 'skills');
-  ensureDir(dir);
+  resetDir(dir);
   let written = 0;
   for (const entry of activeSkills(bootstrapSkillRegistry(projectRoot))) {
     writeText(resolve(dir, `${entry.name}.md`), entry.content);
+    if ((entry.files || []).length > 0) {
+      const packageDir = resolve(dir, entry.name);
+      ensureDir(packageDir);
+      writeText(resolve(packageDir, 'SKILL.md'), entry.content);
+      for (const file of entry.files || []) {
+        const fullPath = resolve(packageDir, file.path);
+        ensureDir(resolve(fullPath, '..'));
+        writeText(fullPath, file.content);
+        written++;
+      }
+      written++;
+    }
     written++;
   }
   return written;
@@ -168,13 +201,28 @@ function renderJsonConfig(content: unknown): string {
 function mergeCodexToml(raw: string): string {
   const trimmed = raw.trim();
   const block = CODEX_CONFIG_TOML.trim();
-  const pattern = /\[mcp_servers\.aida\][\s\S]*?(?=\n\[|$)/m;
 
   if (!trimmed) return `${block}\n`;
-  if (pattern.test(trimmed)) {
-    return `${trimmed.replace(pattern, block).trim()}\n`;
+
+  const lines = trimmed.split('\n');
+  const kept: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trim() === '[mcp_servers.aida]') {
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith('[')) {
+        i++;
+      }
+      i--;
+      continue;
+    }
+    kept.push(line);
   }
-  return `${trimmed}\n\n${block}\n`;
+
+  const base = kept.join('\n').trim();
+  if (!base) return `${block}\n`;
+  return `${base}\n\n${block}\n`;
 }
 
 function toolConfigSnapshotPath(projectRoot: string): string {
@@ -188,6 +236,18 @@ function readJsonIfExists(filePath: string): unknown {
   } catch {
     return readText(filePath);
   }
+}
+
+function readCurrentOrSnapshot(
+  projectRoot: string,
+  tool: AiToolChoice,
+  path: string,
+): unknown {
+  const fullPath = resolve(projectRoot, path);
+  if (fileExists(fullPath)) {
+    return readJsonIfExists(fullPath);
+  }
+  return findStoredSnapshot(projectRoot, tool, path)?.content ?? null;
 }
 
 function writeToolConfigSnapshot(projectRoot: string, tools: AiToolChoice[]): string {
@@ -252,7 +312,7 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
       case 'claude-code':
         writeText(
           resolve(projectRoot, '.mcp.json'),
-          renderJsonConfig(findStoredSnapshot(projectRoot, tool, '.mcp.json')?.content),
+          renderJsonConfig(readCurrentOrSnapshot(projectRoot, tool, '.mcp.json')),
         );
         written.push('.mcp.json');
         break;
@@ -261,7 +321,7 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
         ensureDir(dir);
         writeText(
           resolve(dir, 'mcp.json'),
-          renderJsonConfig(findStoredSnapshot(projectRoot, tool, '.cursor/mcp.json')?.content),
+          renderJsonConfig(readCurrentOrSnapshot(projectRoot, tool, '.cursor/mcp.json')),
         );
         written.push('.cursor/mcp.json');
         break;
@@ -271,7 +331,7 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
         ensureDir(dir);
         writeText(
           resolve(dir, 'mcp.json'),
-          renderJsonConfig(findStoredSnapshot(projectRoot, tool, '.vscode/mcp.json')?.content),
+          renderJsonConfig(readCurrentOrSnapshot(projectRoot, tool, '.vscode/mcp.json')),
         );
         written.push('.vscode/mcp.json');
         break;
@@ -281,7 +341,7 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
         ensureDir(dir);
         writeText(
           resolve(dir, 'mcp.json'),
-          renderJsonConfig(findStoredSnapshot(projectRoot, tool, '.lingma/mcp.json')?.content),
+          renderJsonConfig(readCurrentOrSnapshot(projectRoot, tool, '.lingma/mcp.json')),
         );
         written.push('.lingma/mcp.json');
         break;
@@ -289,7 +349,7 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
       case 'codex': {
         const dir = resolve(projectRoot, '.codex');
         ensureDir(dir);
-        const base = findStoredSnapshot(projectRoot, tool, '.codex/config.toml')?.content;
+        const base = readCurrentOrSnapshot(projectRoot, tool, '.codex/config.toml');
         const content = mergeCodexToml(typeof base === 'string' ? base : '');
         writeText(resolve(dir, 'config.toml'), content);
         written.push('.codex/config.toml');
@@ -306,7 +366,7 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
 
 function buildClaudeCommands(projectRoot: string): number {
   const dir = resolve(projectRoot, '.claude', 'commands');
-  ensureDir(dir);
+  resetDir(dir);
   let written = 0;
 
   for (const cmd of QUICK_COMMANDS) {
@@ -360,6 +420,7 @@ export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[])
     '.aida/**',
     '!.aida/**/',
     '!.aida/**/*.json',
+    '.aida/bootstrap-state.local.json',
     '.aida/index.json',
     '.aida/tool-configs.json',
   ];
@@ -398,6 +459,7 @@ export function buildProjectArtifacts(
   commandFiles: number
   gitignoreAdded: string[]
   toolConfigSnapshot: string
+  ruleViewFiles: number
   memoryViews: {
     moduleViews: number
     contextViews: number
@@ -406,6 +468,7 @@ export function buildProjectArtifacts(
   const tools = normalizeRequestedTools(projectRoot, requestedTools);
   const rules = renderRuleMarkdownFiles(bootstrapRuleRegistry(projectRoot));
   bootstrapSkillRegistry(projectRoot);
+  buildSkillViews(projectRoot);
   const mcpFiles = writeMcpConfig(projectRoot, tools);
 
   let ruleFiles = 0;
@@ -430,8 +493,10 @@ export function buildProjectArtifacts(
   }
 
   ensureGuide(projectRoot);
+  syncGuideReference(projectRoot, tools);
   updateGuide(projectRoot);
   updateGuideReferences(projectRoot, tools);
+  const ruleViewFiles = buildRuleViews(projectRoot);
   const memoryViews = buildMemoryViews(projectRoot);
 
   const toolConfigSnapshot = writeToolConfigSnapshot(projectRoot, tools);
@@ -445,6 +510,7 @@ export function buildProjectArtifacts(
     commandFiles,
     gitignoreAdded,
     toolConfigSnapshot,
+    ruleViewFiles,
     memoryViews,
   };
 }

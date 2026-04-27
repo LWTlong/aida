@@ -479,5 +479,44 @@
     },
     "createdAt": "2026-04-24T01:53:14.355Z",
     "status": "active"
+  },
+  {
+    "id": "RULE-038",
+    "category": "process",
+    "content": "功能必须闭环；若某条功能链路尚未闭环，必须在命令行为或输出中明确告知用户当前边界，不能默认让用户以为已完整支持。",
+    "fingerprint": "fe4549194870",
+    "source": {
+      "branch": "main",
+      "deviation": null,
+      "author": "vito-long"
+    },
+    "createdAt": "2026-04-27T03:14:10.300Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-039",
+    "category": "process",
+    "content": "开始任何真实开发任务前，严禁跳过 AIDA MCP bootstrap 检查；如果 AIDA MCP 不可用，必须先提示用户检查并启用当前宿主中的 AIDA MCP。",
+    "fingerprint": "94050d537c65",
+    "source": {
+      "branch": "main",
+      "deviation": null,
+      "author": "vito-long"
+    },
+    "createdAt": "2026-04-27T03:14:10.301Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-040",
+    "category": "process",
+    "content": "如果 AIDA MCP 可用，开始真实开发任务前必须先读取集中授权清单、向用户说明“提前授权是为了避免后续开发过程中被 AIDA 中断”，并优先使用 aida_bootstrap、aida_task、aida_record、aida_memory 这些聚合工具以减少授权弹窗。",
+    "fingerprint": "b7cdf9e378b0",
+    "source": {
+      "branch": "main",
+      "deviation": null,
+      "author": "vito-long"
+    },
+    "createdAt": "2026-04-27T03:14:10.302Z",
+    "status": "active"
   }
 ]

@@ -2,7 +2,7 @@ import { cyan, green, red, yellow } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
 import { fileExists, readJson } from '../../utils/fs.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
-import { detectImportableTools, importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
+import { CLOSED_LOOP_BASELINE_TOOLS, detectClosedLoopImportableTools, importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
 import { migrateLegacyMemories } from '../../utils/memory.js';
 import { migrate } from './migrate.js';
 import { migrateLegacyDirectory } from './migrate-dir.js';
@@ -12,7 +12,7 @@ import type { AiToolChoice } from '../../schemas/aida-project.js';
 function requestedBaseline(): AiToolChoice | null | 'invalid' {
   const value = process.argv[3]?.trim();
   if (!value) return null;
-  const valid = new Set<AiToolChoice>(['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex']);
+  const valid = new Set<AiToolChoice>(CLOSED_LOOP_BASELINE_TOOLS);
   return valid.has(value as AiToolChoice) ? value as AiToolChoice : 'invalid';
 }
 
@@ -51,7 +51,7 @@ function chooseBaselineTool(projectRoot: string, importable: AiToolChoice[]): Ai
     if (importable.includes(tool)) return tool;
   }
 
-  const priority: AiToolChoice[] = ['claude-code', 'cursor', 'codex', 'lingma', 'vscode-copilot', 'windsurf'];
+  const priority: AiToolChoice[] = ['claude-code', 'cursor', 'codex'];
   for (const tool of priority) {
     if (importable.includes(tool)) return tool;
   }
@@ -61,7 +61,7 @@ function chooseBaselineTool(projectRoot: string, importable: AiToolChoice[]): Ai
 
 async function resolveBaselineTool(projectRoot: string): Promise<{ tool: AiToolChoice | null; autoSelected: boolean }> {
   const requested = requestedBaseline();
-  const importable = detectImportableTools(projectRoot, ['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex']);
+  const importable = detectClosedLoopImportableTools(projectRoot, ['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex']);
 
   if (requested === 'invalid') {
     throw new Error(`Unknown baseline tool: ${process.argv[3]?.trim()}`);
@@ -107,6 +107,7 @@ export async function migrateLegacy(): Promise<void> {
     autoSelectedBaseline = resolved.autoSelected;
   } catch (error) {
     console.log(red(`\n  ${error instanceof Error ? error.message : String(error)}\n`));
+    console.log(`  Supported baseline tools: ${CLOSED_LOOP_BASELINE_TOOLS.join(', ')}\n`);
     return;
   }
   if (baselineTool) {

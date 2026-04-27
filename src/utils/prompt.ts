@@ -1,5 +1,6 @@
 import * as readline from 'node:readline';
 import * as readlinePromises from 'node:readline/promises';
+import { readFileSync } from 'node:fs';
 import { stdin, stdout } from 'node:process';
 import { cyan, dim, green, yellow } from './display.js';
 
@@ -17,13 +18,16 @@ interface SingleSelectOptions {
   allowSkip?: boolean
 }
 
+let nonInteractiveAnswers: string[] | null = null;
+let nonInteractiveCursor = 0;
+
 function isInteractiveTty(): boolean {
   return Boolean(stdin.isTTY && stdout.isTTY);
 }
 
 function restoreInputState(previousRawMode: boolean | undefined, wasPaused: boolean): void {
   stdin.setRawMode?.(previousRawMode ?? false);
-  if (wasPaused) stdin.pause();
+  if (wasPaused || stdin.isTTY) stdin.pause();
 }
 
 function clearRenderedLines(lines: number): void {
@@ -43,7 +47,8 @@ function renderOptions<T extends string>(
   allowSkip = false,
 ): number {
   const lines: string[] = [];
-  lines.push(`\n  ${title}`);
+  lines.push('');
+  lines.push(`  ${title}`);
   lines.push(dim(`  ${multi ? 'Use Up/Down to move, Space to toggle, Enter to confirm.' : 'Use Up/Down to move, Enter to confirm.'}${allowSkip ? ' Enter on empty selection to skip.' : ''}`));
   lines.push('');
 
@@ -60,10 +65,26 @@ function renderOptions<T extends string>(
 }
 
 async function promptLine(question: string): Promise<string> {
+  if (!isInteractiveTty()) {
+    if (nonInteractiveAnswers === null) {
+      const raw = readFileSync(0, 'utf8');
+      nonInteractiveAnswers = raw.split(/\r?\n/);
+      nonInteractiveCursor = 0;
+    }
+    stdout.write(question);
+    const answer = nonInteractiveAnswers[nonInteractiveCursor++] ?? '';
+    stdout.write(`${answer}\n`);
+    return answer.trim();
+  }
+
   const rl = readlinePromises.createInterface({ input: stdin, output: stdout });
   const answer = (await rl.question(question)).trim();
   rl.close();
   return answer;
+}
+
+export async function promptText(question: string): Promise<string> {
+  return promptLine(question);
 }
 
 async function promptMultiFallback<T extends string>(

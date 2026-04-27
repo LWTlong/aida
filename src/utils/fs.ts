@@ -4,6 +4,7 @@ import {
   readFileSync,
   writeFileSync,
   readdirSync,
+  rmSync,
   statSync,
 } from 'node:fs';
 import { resolve, basename } from 'node:path';
@@ -12,6 +13,11 @@ export function ensureDir(dir: string): void {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
+}
+
+export function resetDir(dir: string): void {
+  rmSync(dir, { recursive: true, force: true });
+  mkdirSync(dir, { recursive: true });
 }
 
 export function readJson<T = unknown>(filePath: string): T {
@@ -71,18 +77,27 @@ export function extractConflictSections(
   const theirsLines: string[] = [];
 
   for (const line of lines) {
-    if (line.startsWith('<<<<<<<')) {
+    const marker = line.trimStart();
+    if (marker.startsWith('<<<<<<<')) {
       hasConflict = true;
       state = 'ours';
-    } else if (line.startsWith('|||||||')) {
+    } else if (marker.startsWith('|||||||')) {
       state = 'base'; // diff3 base section — skip
-    } else if (line.startsWith('=======')) {
+    } else if (marker.startsWith('=======')) {
       state = 'theirs';
-    } else if (line.startsWith('>>>>>>>')) {
+    } else if (marker.startsWith('>>>>>>>')) {
       state = 'before'; // reset after conflict block
     } else {
-      if (state === 'ours') oursLines.push(line);
-      else if (state === 'theirs') theirsLines.push(line);
+      if (state === 'ours') {
+        oursLines.push(line);
+      } else if (state === 'theirs') {
+        theirsLines.push(line);
+      } else if (state === 'before') {
+        // Preserve shared lines on both sides so interleaved conflict blocks
+        // can still be reconstructed into complete JSON payloads.
+        oursLines.push(line);
+        theirsLines.push(line);
+      }
     }
   }
 

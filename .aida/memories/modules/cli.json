@@ -1,17 +1,17 @@
 {
-  "moduleKey": "git",
-  "title": "Git",
+  "moduleKey": "cli",
+  "title": "CLI",
   "summary": "main",
   "keywords": [
-    "Git",
+    "CLI",
     "main",
-    "git"
+    "cli"
   ],
   "entryFiles": [
     "AGENTS.md",
     "CLAUDE.md",
-    ".gitignore",
     ".mcp.json",
+    ".gitignore",
     ".aida/runs/main/vito-long/run.json",
     "src/cli/commands/init.ts",
     "tests/build-cli.test.ts",
@@ -20,8 +20,8 @@
   "relatedPaths": [
     "AGENTS.md",
     "CLAUDE.md",
-    ".gitignore",
     ".mcp.json",
+    ".gitignore",
     ".aida/runs/main/vito-long/run.json",
     "src/cli/commands/init.ts",
     "tests/build-cli.test.ts",
@@ -48,8 +48,8 @@
     {
       "branch": "main",
       "summary": "main",
-      "updatedAt": "2026-04-24T02:00:11.291Z"
+      "updatedAt": "2026-04-24T03:44:43.948Z"
     }
   ],
-  "updatedAt": "2026-04-27T08:21:54.279Z"
+  "updatedAt": "2026-04-27T08:21:54.284Z"
 }

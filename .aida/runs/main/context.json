@@ -4,24 +4,55 @@
   "summary": "main",
   "currentPhase": "In Progress",
   "modules": [
-    "Git"
+    "Git",
+    "CLI",
+    "Docs",
+    "Skills",
+    "Import",
+    "QA",
+    "CLI/MCP",
+    "MCP/Rules",
+    "QA/Manual Verification",
+    "Run Data / MCP",
+    "QA / Manual Verification",
+    "QA/MCP",
+    "Release"
   ],
   "completed": [
     "取消跟踪已被 .gitignore 忽略的文件",
-    "提交并推送忽略文件取消跟踪改动"
+    "提交并推送忽略文件取消跟踪改动",
+    "提交并推送剩余可提交改动",
+    "修复 init/build 交互与规则生成链路",
+    "验证并优化迁移、init 交互与规则链路",
+    "修复自定义 *.rules.json 冲突合并被清空的问题",
+    "移除误加的自定义 rules 文件扫描合并逻辑",
+    "补充 init / migrate-legacy 可反复执行补全的回归验证"
   ],
   "inProgress": [
-    "提交并推送剩余可提交改动"
+    "检查 CLI 交互、迁移幂等性与规则去重机制",
+    "自检迁移到构建全链路闭环与幂等行为",
+    "Commit, push, and publish validated release"
   ],
   "next": [],
   "decisions": [],
   "constraints": [],
   "keyFiles": [
-    "AGENTS.md",
-    "CLAUDE.md",
-    ".mcp.json",
-    ".gitignore"
+    ".aida/runs/main/vito-long/run.json",
+    "README.md",
+    "README.zh-CN.md",
+    "COMMANDS.md",
+    ".aida/memories/index.json",
+    "tests/build.test.ts",
+    "src/utils/import.ts",
+    "src/mcp/server.ts"
   ],
-  "risks": [],
-  "updatedAt": "2026-04-24T03:24:05.079Z"
+  "risks": [
+    "Build flow skipped top-level guide/rule artifacts for migration compatibility",
+    "Non-interactive init fallback dropped subsequent answers across multi-step prompts",
+    "Legacy AGENTS.md marker was not upgraded to full AIDA guidance during migration/build",
+    "Indented conflict markers in custom *.rules.json caused merge parsing failure or empty-array fallback",
+    "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
+    "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP"
+  ],
+  "updatedAt": "2026-04-27T08:21:54.278Z"
 }

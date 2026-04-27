@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
-import { parseConflictJsonArray, readJson, writeText } from '../src/utils/fs.js';
+import { extractConflictSections, parseConflictJsonArray, readJson, writeText } from '../src/utils/fs.js';
 import { createTestProject, runCliOutput } from './helpers.js';
 
 describe('parseConflictJsonArray', () => {
@@ -19,6 +19,32 @@ describe('parseConflictJsonArray', () => {
     const parsed = parseConflictJsonArray<{ id: string }>('{ "id": "RULE-001" }, { "id": "RULE-002" }');
     assert.equal(parsed.length, 2);
     assert.equal(parsed[1].id, 'RULE-002');
+  });
+
+  it('should preserve shared lines when extracting interleaved conflict sections', () => {
+    const sections = extractConflictSections(`[
+  {
+    "id": "RULE-001",
+<<<<<<< HEAD
+    "content": "Rule A"
+=======
+    "content": "Rule B"
+>>>>>>> branch-b
+  },
+  {
+    "id": "RULE-002",
+    "content": "Rule C"
+  }
+]`);
+
+    assert.ok(sections);
+    const ours = parseConflictJsonArray<{ id: string; content: string }>(sections!.ours);
+    const theirs = parseConflictJsonArray<{ id: string; content: string }>(sections!.theirs);
+    assert.equal(ours.length, 2);
+    assert.equal(theirs.length, 2);
+    assert.equal(ours[0].content, 'Rule A');
+    assert.equal(theirs[0].content, 'Rule B');
+    assert.equal(ours[1].content, 'Rule C');
   });
 });
 
