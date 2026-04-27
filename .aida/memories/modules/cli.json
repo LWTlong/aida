@@ -12,24 +12,24 @@
     "CLAUDE.md",
     ".mcp.json",
     ".gitignore",
-    ".aida/runs/main/vito-long/run.json",
     "src/cli/commands/init.ts",
     "tests/build-cli.test.ts",
-    "src/utils/guide.ts"
+    "src/utils/guide.ts",
+    "README.md"
   ],
   "relatedPaths": [
     "AGENTS.md",
     "CLAUDE.md",
     ".mcp.json",
     ".gitignore",
-    ".aida/runs/main/vito-long/run.json",
     "src/cli/commands/init.ts",
     "tests/build-cli.test.ts",
-    ".aida/runs/main/requirement.json",
-    ".aida/memories/index.json",
-    ".aida/runs/main/context.json",
     "src/utils/guide.ts",
-    "tests/merge.test.ts"
+    "tests/merge.test.ts",
+    "README.md",
+    "README.zh-CN.md",
+    "COMMANDS.md",
+    "src/utils/import.ts"
   ],
   "dataFlow": [],
   "decisions": [],
@@ -51,5 +51,5 @@
       "updatedAt": "2026-04-24T03:44:43.948Z"
     }
   ],
-  "updatedAt": "2026-04-27T08:21:54.284Z"
+  "updatedAt": "2026-04-27T12:53:46.465Z"
 }

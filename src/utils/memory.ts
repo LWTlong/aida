@@ -62,6 +62,23 @@ function uniqueStrings(values: Array<string | null | undefined>): string[] {
   return result;
 }
 
+function normalizeRepoPath(value: string): string {
+  return value.trim().replace(/\\/g, '/');
+}
+
+function isAidaRuntimePath(value: string): boolean {
+  const path = normalizeRepoPath(value);
+  return path.startsWith('.aida/runs/')
+    || path.startsWith('.aida/memories/')
+    || path === '.aida/bootstrap-state.local.json';
+}
+
+function filterMeaningfulPaths(values: Array<string | null | undefined>, limit?: number): string[] {
+  const filtered = uniqueStrings(values.map((value) => normalizeRepoPath(value || '')))
+    .filter((value) => value && !isAidaRuntimePath(value));
+  return typeof limit === 'number' ? filtered.slice(0, limit) : filtered;
+}
+
 function topItems(values: string[], limit: number = 8): string[] {
   return uniqueStrings(values).slice(0, limit);
 }
@@ -209,8 +226,10 @@ function pickKeyFiles(runs: RunData[]): string[] {
   const score = new Map<string, number>();
   for (const run of runs) {
     for (const file of run.files || []) {
+      if (isAidaRuntimePath(file.path)) continue;
+      const path = normalizeRepoPath(file.path);
       const weight = (file.linesAdded || 0) + (file.linesRemoved || 0) + ((file.changeCount || 1) * 5);
-      score.set(file.path, (score.get(file.path) || 0) + weight);
+      score.set(path, (score.get(path) || 0) + weight);
     }
   }
   return [...score.entries()]
@@ -325,7 +344,7 @@ function upsertMemoryIndexEntry(projectRoot: string, record: ModuleMemoryRecord)
     title: record.title,
     summary: record.summary,
     keywords: topItems([record.moduleKey, record.title, ...record.keywords], 12),
-    paths: topItems([...record.entryFiles, ...record.relatedPaths], 12),
+    paths: filterMeaningfulPaths([...record.entryFiles, ...record.relatedPaths], 12),
     updatedAt: record.updatedAt,
   };
 
@@ -539,14 +558,16 @@ function collectRelatedPaths(moduleName: string, branchContext: RunContextRecord
     for (const task of run.tasks || []) {
       if (task.stageName !== moduleName) continue;
       for (const file of run.files || []) {
+        if (isAidaRuntimePath(file.path)) continue;
+        const path = normalizeRepoPath(file.path);
         const bonus = (file.linesAdded || 0) + (file.linesRemoved || 0) + 10;
-        scored.set(file.path, (scored.get(file.path) || 0) + bonus);
+        scored.set(path, (scored.get(path) || 0) + bonus);
       }
     }
   }
 
   const ranked = [...scored.entries()].sort((a, b) => b[1] - a[1]).map(([path]) => path);
-  return ranked.length > 0 ? ranked.slice(0, 8) : branchContext.keyFiles.slice(0, 5);
+  return ranked.length > 0 ? ranked.slice(0, 8) : filterMeaningfulPaths(branchContext.keyFiles, 5);
 }
 
 export function upsertModuleMemory(projectRoot: string, input: ModuleMemoryUpsertInput): ModuleMemoryRecord {
@@ -557,8 +578,8 @@ export function upsertModuleMemory(projectRoot: string, input: ModuleMemoryUpser
     title: input.title || existing?.title || moduleKey,
     summary: input.summary || existing?.summary || '',
     keywords: topItems([...(existing?.keywords || []), ...(input.keywords || []), moduleKey, input.title || ''], 16),
-    entryFiles: topItems([...(existing?.entryFiles || []), ...(input.entryFiles || [])]),
-    relatedPaths: topItems([...(existing?.relatedPaths || []), ...(input.relatedPaths || [])], 12),
+    entryFiles: filterMeaningfulPaths([...(existing?.entryFiles || []), ...(input.entryFiles || [])], 8),
+    relatedPaths: filterMeaningfulPaths([...(existing?.relatedPaths || []), ...(input.relatedPaths || [])], 12),
     dataFlow: topItems([...(existing?.dataFlow || []), ...(input.dataFlow || [])]),
     decisions: topItems([...(existing?.decisions || []), ...(input.decisions || [])]),
     constraints: topItems([...(existing?.constraints || []), ...(input.constraints || [])]),
@@ -593,7 +614,7 @@ export function updateRunContext(projectRoot: string, input: RunContextUpdateInp
     next: topItems([...(existing?.next || []), ...(input.next || [])], 12),
     decisions: topItems([...(existing?.decisions || []), ...(input.decisions || [])], 12),
     constraints: topItems([...(existing?.constraints || []), ...(input.constraints || [])], 12),
-    keyFiles: topItems([...(existing?.keyFiles || []), ...(input.keyFiles || [])], 12),
+    keyFiles: filterMeaningfulPaths([...(existing?.keyFiles || []), ...(input.keyFiles || [])], 12),
     risks: topItems([...(existing?.risks || []), ...(input.risks || [])], 12),
     updatedAt: new Date().toISOString(),
   };

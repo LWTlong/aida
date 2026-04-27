@@ -8,21 +8,25 @@
     "release"
   ],
   "entryFiles": [
-    ".aida/runs/main/vito-long/run.json",
     "README.md",
     "README.zh-CN.md",
     "COMMANDS.md",
+    "src/utils/import.ts",
+    "tests/build.test.ts",
+    ".aida/runs/main/vito-long/run.json",
     ".aida/memories/index.json"
   ],
   "relatedPaths": [
-    ".aida/runs/main/vito-long/run.json",
     "README.md",
     "README.zh-CN.md",
     "COMMANDS.md",
-    ".aida/memories/index.json",
     "src/utils/import.ts",
     "tests/build.test.ts",
-    "src/mcp/server.ts"
+    "src/mcp/server.ts",
+    "src/utils/guide.ts",
+    "src/utils/skills.ts",
+    ".aida/runs/main/vito-long/run.json",
+    ".aida/memories/index.json"
   ],
   "dataFlow": [],
   "decisions": [],
@@ -43,5 +47,5 @@
       "updatedAt": "2026-04-27T08:21:54.278Z"
     }
   ],
-  "updatedAt": "2026-04-27T08:21:54.303Z"
+  "updatedAt": "2026-04-27T12:53:46.479Z"
 }

@@ -12,18 +12,18 @@
     "prdPhases": []
   },
   "summary": {
-    "totalTasks": 29,
-    "completedTasks": 26,
+    "totalTasks": 33,
+    "completedTasks": 30,
     "bugCount": 7,
     "deviationCount": 0,
-    "reviewCount": 21,
-    "reviewPassCount": 21,
+    "reviewCount": 25,
+    "reviewPassCount": 25,
     "reviewFailCount": 0,
-    "rulesSedimented": 1,
+    "rulesSedimented": 2,
     "prdPhaseCount": 0,
-    "filesChanged": 44,
-    "linesAdded": 44929,
-    "linesRemoved": 21692
+    "filesChanged": 56,
+    "linesAdded": 46028,
+    "linesRemoved": 22090
   },
   "workflow": [],
   "tasks": [
@@ -338,12 +338,56 @@
     {
       "taskId": "TASK-29",
       "title": "Commit, push, and publish validated release",
-      "status": "in-progress",
+      "status": "done",
       "stageName": "Release",
       "prdPhase": "",
       "acceptance": "",
       "createdAt": "2026-04-27T08:21:54.272Z",
       "startedAt": "2026-04-27T08:21:54.273Z",
+      "completedAt": "2026-04-27T09:06:47.369Z"
+    },
+    {
+      "taskId": "TASK-30",
+      "title": "Unlink global ai-dev-analytics and reinstall published 1.1.6",
+      "status": "done",
+      "stageName": "Release",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T09:10:47.041Z",
+      "startedAt": "2026-04-27T09:10:47.041Z",
+      "completedAt": "2026-04-27T10:17:03.164Z"
+    },
+    {
+      "taskId": "TASK-31",
+      "title": "Restrict AIDA recording to actual repository changes only",
+      "status": "done",
+      "stageName": "Process",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T11:23:01.173Z",
+      "startedAt": "2026-04-27T11:23:01.175Z",
+      "completedAt": "2026-04-27T11:24:20.190Z"
+    },
+    {
+      "taskId": "TASK-32",
+      "title": "Reduce AIDA memory/context noise and clarify upgrade path for existing projects",
+      "status": "done",
+      "stageName": "AIDA",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T12:42:48.560Z",
+      "startedAt": "2026-04-27T12:42:48.561Z",
+      "completedAt": "2026-04-27T12:48:26.672Z"
+    },
+    {
+      "taskId": "TASK-33",
+      "title": "Commit, push, and publish memory noise filtering release",
+      "status": "in-progress",
+      "stageName": "Release",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-27T12:53:46.409Z",
+      "startedAt": "2026-04-27T12:53:46.409Z",
       "completedAt": null
     }
   ],
@@ -794,6 +838,42 @@
         "skills conflict",
         "and release preflight."
       ]
+    },
+    {
+      "reviewId": "REV-22",
+      "taskId": "TASK-29",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "release publish verification",
+      "reviewedAt": "2026-04-27T09:06:37.997Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-23",
+      "taskId": "TASK-30",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "global npm unlink and Volta refresh for ai-dev-analytics 1.1.6",
+      "reviewedAt": "2026-04-27T10:16:57.454Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-24",
+      "taskId": "TASK-31",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "AIDA task/memory recording boundary rules in AGENTS.md and .aida/aida-guide.md",
+      "reviewedAt": "2026-04-27T11:24:12.521Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-25",
+      "taskId": "TASK-32",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "memory noise filtering, current repo memory rebuild, upgrade-path clarification",
+      "reviewedAt": "2026-04-27T12:48:20.617Z",
+      "issues": []
     }
   ],
   "files": [
@@ -832,42 +912,42 @@
     {
       "path": ".aida/memories/index.json",
       "changeType": "modified",
-      "linesAdded": 1410,
-      "linesRemoved": 600,
-      "changeCount": 18,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 1534,
+      "linesRemoved": 711,
+      "changeCount": 21,
+      "lastModified": "2026-04-27T12:48:20.535Z"
     },
     {
       "path": ".aida/memories/modules/git.json",
       "changeType": "modified",
-      "linesAdded": 226,
-      "linesRemoved": 226,
-      "changeCount": 18,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 236,
+      "linesRemoved": 236,
+      "changeCount": 21,
+      "lastModified": "2026-04-27T12:48:20.535Z"
     },
     {
       "path": ".aida/runs/main/context.json",
       "changeType": "modified",
-      "linesAdded": 344,
-      "linesRemoved": 340,
-      "changeCount": 18,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 357,
+      "linesRemoved": 353,
+      "changeCount": 21,
+      "lastModified": "2026-04-27T12:48:20.535Z"
     },
     {
       "path": ".aida/runs/main/requirement.json",
       "changeType": "modified",
-      "linesAdded": 350,
-      "linesRemoved": 346,
-      "changeCount": 18,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 374,
+      "linesRemoved": 374,
+      "changeCount": 21,
+      "lastModified": "2026-04-27T12:48:20.535Z"
     },
     {
       "path": ".aida/runs/main/vito-long/run.json",
       "changeType": "modified",
-      "linesAdded": 22956,
-      "linesRemoved": 1395,
-      "changeCount": 18,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 23663,
+      "linesRemoved": 1517,
+      "changeCount": 21,
+      "lastModified": "2026-04-27T12:48:20.535Z"
     },
     {
       "path": "src/cli/commands/init.ts",
@@ -1040,10 +1120,10 @@
     {
       "path": ".aida/rules.json",
       "changeType": "created",
-      "linesAdded": 286,
+      "linesAdded": 312,
       "linesRemoved": 0,
-      "changeCount": 10,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "changeCount": 12,
+      "lastModified": "2026-04-27T12:48:20.535Z"
     },
     {
       "path": "src/cli/commands/import.ts",
@@ -1136,33 +1216,129 @@
     {
       "path": "src/utils/memory.ts",
       "changeType": "modified",
-      "linesAdded": 18,
-      "linesRemoved": 18,
-      "changeCount": 3,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 36,
+      "linesRemoved": 36,
+      "changeCount": 4,
+      "lastModified": "2026-04-27T12:48:20.535Z"
     },
     {
       "path": "tests/memory-cli.test.ts",
       "changeType": "created",
-      "linesAdded": 228,
+      "linesAdded": 309,
       "linesRemoved": 0,
+      "changeCount": 4,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/cli.json",
+      "changeType": "modified",
+      "linesAdded": 10,
+      "linesRemoved": 10,
       "changeCount": 3,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/cli/mcp.json",
+      "changeType": "modified",
+      "linesAdded": 7,
+      "linesRemoved": 7,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/docs.json",
+      "changeType": "modified",
+      "linesAdded": 11,
+      "linesRemoved": 11,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/import.json",
+      "changeType": "modified",
+      "linesAdded": 8,
+      "linesRemoved": 8,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/mcp/rules.json",
+      "changeType": "modified",
+      "linesAdded": 7,
+      "linesRemoved": 7,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".../memories/modules/qa-/-manual-verification.json",
+      "changeType": "modified",
+      "linesAdded": 7,
+      "linesRemoved": 7,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/qa.json",
+      "changeType": "modified",
+      "linesAdded": 8,
+      "linesRemoved": 8,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/qa/manual-verification.json",
+      "changeType": "modified",
+      "linesAdded": 7,
+      "linesRemoved": 7,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/qa/mcp.json",
+      "changeType": "modified",
+      "linesAdded": 7,
+      "linesRemoved": 7,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/release.json",
+      "changeType": "modified",
+      "linesAdded": 8,
+      "linesRemoved": 8,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/run-data-/-mcp.json",
+      "changeType": "modified",
+      "linesAdded": 7,
+      "linesRemoved": 7,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
+    },
+    {
+      "path": ".aida/memories/modules/skills.json",
+      "changeType": "modified",
+      "linesAdded": 9,
+      "linesRemoved": 9,
+      "changeCount": 3,
+      "lastModified": "2026-04-27T12:48:20.535Z"
     }
   ],
   "metrics": {
     "aiDeviationRate": 0,
-    "bugRate": 24.14,
+    "bugRate": 21.21,
     "reviewPassRate": 100,
-    "rulesSedimentedCount": 1,
-    "averageLinesPerTask": 2297,
-    "totalDevelopmentTimeSeconds": 282103,
-    "developmentVelocity": 0.33,
+    "rulesSedimentedCount": 2,
+    "averageLinesPerTask": 2064,
+    "totalDevelopmentTimeSeconds": 298415,
+    "developmentVelocity": 0.36,
     "nodeTimeBreakdown": {
-      "Code Generation": 281915.559,
+      "Code Generation": 298095.384,
       "Bug Fix": 274654.417
     },
-    "actualWorkSeconds": 556570
+    "actualWorkSeconds": 572750
   },
   "timeline": [
     {
@@ -1629,6 +1805,71 @@
       "type": "task",
       "title": "TASK-29: Commit, push, and publish validated release",
       "timestamp": "2026-04-27T08:21:54.273Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-22: pass",
+      "timestamp": "2026-04-27T09:06:37.999Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-29: Commit, push, and publish validated release",
+      "timestamp": "2026-04-27T09:06:47.369Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-30: Unlink global ai-dev-analytics and reinstall published 1.1.6",
+      "timestamp": "2026-04-27T09:10:47.041Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-23: pass",
+      "timestamp": "2026-04-27T10:16:57.454Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-30: Unlink global ai-dev-analytics and reinstall published 1.1.6",
+      "timestamp": "2026-04-27T10:17:03.164Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-31: Restrict AIDA recording to actual repository changes only",
+      "timestamp": "2026-04-27T11:23:01.175Z"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-002: Only enter the AIDA task flow and persist branch/m",
+      "timestamp": "2026-04-27T11:23:52.445Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-24: pass",
+      "timestamp": "2026-04-27T11:24:12.521Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-31: Restrict AIDA recording to actual repository changes only",
+      "timestamp": "2026-04-27T11:24:20.190Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-32: Reduce AIDA memory/context noise and clarify upgrade path for existing projects",
+      "timestamp": "2026-04-27T12:42:48.561Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-25: pass",
+      "timestamp": "2026-04-27T12:48:20.617Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-32: Reduce AIDA memory/context noise and clarify upgrade path for existing projects",
+      "timestamp": "2026-04-27T12:48:26.672Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-33: Commit, push, and publish memory noise filtering release",
+      "timestamp": "2026-04-27T12:53:46.409Z"
     }
   ],
   "events": [
@@ -2667,6 +2908,155 @@
       "data": {
         "taskId": "TASK-29"
       }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T09:06:37.999Z",
+      "data": {
+        "reviewId": "REV-22",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T09:06:47.369Z",
+      "data": {
+        "taskId": "TASK-29",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T09:10:47.041Z",
+      "data": {
+        "taskId": "TASK-30"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T09:10:47.041Z",
+      "data": {
+        "taskId": "TASK-30"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T10:16:57.358Z",
+      "data": {
+        "count": 17
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T10:16:57.454Z",
+      "data": {
+        "reviewId": "REV-23",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T10:17:03.164Z",
+      "data": {
+        "taskId": "TASK-30",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T11:23:01.175Z",
+      "data": {
+        "taskId": "TASK-31"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T11:23:01.175Z",
+      "data": {
+        "taskId": "TASK-31"
+      }
+    },
+    {
+      "type": "rule_sedimented",
+      "time": "2026-04-27T11:23:52.445Z",
+      "data": {
+        "ruleId": "RULE-002",
+        "registryId": "RULE-041"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T11:24:12.444Z",
+      "data": {
+        "count": 18
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T11:24:12.521Z",
+      "data": {
+        "reviewId": "REV-24",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T11:24:20.190Z",
+      "data": {
+        "taskId": "TASK-31",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T12:42:48.561Z",
+      "data": {
+        "taskId": "TASK-32"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T12:42:48.561Z",
+      "data": {
+        "taskId": "TASK-32"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-27T12:48:20.535Z",
+      "data": {
+        "count": 20
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-27T12:48:20.617Z",
+      "data": {
+        "reviewId": "REV-25",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-27T12:48:26.672Z",
+      "data": {
+        "taskId": "TASK-32",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-27T12:53:46.409Z",
+      "data": {
+        "taskId": "TASK-33"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-27T12:53:46.409Z",
+      "data": {
+        "taskId": "TASK-33"
+      }
     }
   ],
   "rules": [
@@ -2677,11 +3067,19 @@
       "category": "process",
       "sourceDeviation": null,
       "sedimentedAt": "2026-04-27T03:14:10.302Z"
+    },
+    {
+      "ruleId": "RULE-002",
+      "file": "rules.json#RULE-041",
+      "content": "Only enter the AIDA task flow and persist branch/module memory after actual repository changes begin. Do not record pure investigation, solution discussion, ordinary chat, local environment operations, or experiments that do not land in the repository as tasks, context, or memory. Rule-only sedimentation can proceed normally without creating a task.",
+      "category": "process",
+      "sourceDeviation": null,
+      "sedimentedAt": "2026-04-27T11:23:52.445Z"
     }
   ],
   "context": {
-    "currentTaskId": "TASK-29",
-    "lastUpdated": "2026-04-27T08:21:54.273Z"
+    "currentTaskId": "TASK-33",
+    "lastUpdated": "2026-04-27T12:53:46.409Z"
   },
   "cost": {
     "totalTokens": 0,

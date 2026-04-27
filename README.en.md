@@ -14,7 +14,7 @@ One line to integrate. Zero workflow changes.
 { "mcpServers": { "aida": { "command": "npx", "args": ["-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-[![npm version](https://img.shields.io/badge/npm-v1.1.6-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
+[![npm version](https://img.shields.io/badge/npm-v1.1.7-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
