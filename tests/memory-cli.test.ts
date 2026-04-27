@@ -255,4 +255,85 @@ describe('aida memory', () => {
       project.cleanup();
     }
   });
+
+  it('should filter AIDA runtime files out of rebuilt context and module memory paths', () => {
+    const project = createTestProject({
+      branch: 'main',
+      runData: {
+        meta: {
+          schemaVersion: '2.0',
+          runId: 'main',
+          project: 'test-project',
+          developer: 'test-dev',
+          branch: 'main',
+          aiModel: 'claude',
+          aiTool: 'claude-code',
+          startTime: '2026-04-15T10:00:00.000Z',
+          status: 'running',
+          prdPhases: [],
+        },
+        summary: {
+          totalTasks: 1,
+          completedTasks: 0,
+          bugCount: 0,
+          deviationCount: 0,
+          reviewCount: 0,
+          reviewPassCount: 0,
+          reviewFailCount: 0,
+          rulesSedimented: 0,
+          prdPhaseCount: 0,
+          filesChanged: 3,
+          linesAdded: 120,
+          linesRemoved: 20,
+        },
+        workflow: [],
+        tasks: [
+          { taskId: 'TASK-01', title: 'Refine memory rebuild', stageName: 'AIDA', prdPhase: '', status: 'in-progress' },
+        ],
+        bugs: [],
+        deviations: [],
+        reviews: [],
+        files: [
+          { path: '.aida/memories/index.json', changeType: 'modified', linesAdded: 90, linesRemoved: 10, changeCount: 1 },
+          { path: '.aida/runs/main/vito-long/run.json', changeType: 'modified', linesAdded: 20, linesRemoved: 10, changeCount: 1 },
+          { path: 'src/utils/memory.ts', changeType: 'modified', linesAdded: 10, linesRemoved: 0, changeCount: 1 },
+        ],
+        metrics: {},
+        timeline: [],
+        events: [],
+        rules: [],
+        context: { currentStage: 'AIDA', currentTaskId: 'TASK-01', lastUpdated: '2026-04-15T11:30:00.000Z' },
+        cost: { totalTokens: 0, estimatedManualHours: 0, actualHours: 0, tokenBreakdown: [] },
+        highlights: [],
+      },
+    });
+
+    try {
+      writeJson(resolve(project.root, '.aida', 'runs', 'main', 'requirement.json'), {
+        branch: 'main',
+        title: 'MTR-003 AIDA memory cleanup',
+        summary: 'Reduce runtime noise in rebuilt AIDA context and module memory.',
+        prdPhases: [],
+        modules: [
+          { id: 'MOD-01', name: 'AIDA', description: 'AIDA runtime data pipeline', assignee: 'test-dev' },
+        ],
+        highlights: [],
+        developers: [],
+        totals: { tasks: 0, completedTasks: 0, bugs: 0, deviations: 0, linesAdded: 0, linesRemoved: 0, totalTokens: 0 },
+        createdAt: '2026-04-15T10:00:00.000Z',
+        updatedAt: '2026-04-15T10:00:00.000Z',
+      });
+
+      runCliOutput(project, 'memory rebuild main');
+
+      const context = readJson<any>(resolve(project.root, '.aida', 'runs', 'main', 'context.json'));
+      const moduleMemory = readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', 'aida.json'));
+
+      assert.deepEqual(context.keyFiles, ['src/utils/memory.ts']);
+      assert.deepEqual(moduleMemory.entryFiles, ['src/utils/memory.ts']);
+      assert.deepEqual(moduleMemory.relatedPaths, ['src/utils/memory.ts']);
+    } finally {
+      project.cleanup();
+    }
+  });
 });

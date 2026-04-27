@@ -16,7 +16,9 @@
     "Run Data / MCP",
     "QA / Manual Verification",
     "QA/MCP",
-    "Release"
+    "Release",
+    "Process",
+    "AIDA"
   ],
   "completed": [
     "取消跟踪已被 .gitignore 忽略的文件",
@@ -31,7 +33,7 @@
   "inProgress": [
     "检查 CLI 交互、迁移幂等性与规则去重机制",
     "自检迁移到构建全链路闭环与幂等行为",
-    "Commit, push, and publish validated release"
+    "Commit, push, and publish memory noise filtering release"
   ],
   "next": [],
   "decisions": [],
@@ -54,5 +56,5 @@
     "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
     "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP"
   ],
-  "updatedAt": "2026-04-27T08:21:54.278Z"
+  "updatedAt": "2026-04-27T12:53:46.453Z"
 }

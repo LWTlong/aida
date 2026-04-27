@@ -518,5 +518,18 @@
     },
     "createdAt": "2026-04-27T03:14:10.302Z",
     "status": "active"
+  },
+  {
+    "id": "RULE-041",
+    "category": "process",
+    "content": "Only enter the AIDA task flow and persist branch/module memory after actual repository changes begin. Do not record pure investigation, solution discussion, ordinary chat, local environment operations, or experiments that do not land in the repository as tasks, context, or memory. Rule-only sedimentation can proceed normally without creating a task.",
+    "fingerprint": "b22374ea9937",
+    "source": {
+      "branch": "main",
+      "deviation": null,
+      "author": "vito-long"
+    },
+    "createdAt": "2026-04-27T11:23:52.443Z",
+    "status": "active"
   }
 ]
