@@ -29,7 +29,7 @@ describe('aida migrate-legacy', () => {
       writeText(resolve(root, '.cursor', 'skills', 'custom-flow', 'SKILL.md'), '# Custom Flow\n\nImported from cursor\n');
       writeText(
         resolve(root, '.cursor', 'mcp.json'),
-        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['--registry=https://registry.npmjs.org/', '-y', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
+        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
       );
 
       writeJson(resolve(root, '.aidevos', 'runs', 'feature-big', 'tester', 'run.json'), {
@@ -176,7 +176,7 @@ describe('aida migrate-legacy', () => {
       writeText(resolve(root, '.codex', 'rules', 'team.md'), '# Codex Rules\n\n- Imported codex rule\n');
       writeText(
         resolve(root, '.cursor', 'mcp.json'),
-        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['--registry=https://registry.npmjs.org/', '-y', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
+        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
       );
 
       const output = execSync(`node ${cliPath} migrate-legacy`, {
@@ -227,7 +227,7 @@ describe('aida migrate-legacy', () => {
       writeText(resolve(root, '.codex', 'rules', 'team.md'), '# Codex Rules\n\n- Imported codex rule\n');
       writeText(
         resolve(root, '.cursor', 'mcp.json'),
-        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['--registry=https://registry.npmjs.org/', '-y', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
+        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
       );
 
       rmSync(resolve(root, 'AGENTS.md'), { force: true });

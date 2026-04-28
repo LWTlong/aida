@@ -46,6 +46,36 @@ describe('parseConflictJsonArray', () => {
     assert.equal(theirs[0].content, 'Rule B');
     assert.equal(ours[1].content, 'Rule C');
   });
+
+  it('should preserve shared object lines across multiple conflict blocks', () => {
+    const sections = extractConflictSections(`{
+  "branch": "main",
+<<<<<<< HEAD
+  "summary": "Branch A summary",
+=======
+  "summary": "Branch B summary",
+>>>>>>> branch-b
+  "modules": [
+    "CLI"
+  ],
+<<<<<<< HEAD
+  "risks": ["Risk A"],
+=======
+  "risks": ["Risk B"],
+>>>>>>> branch-b
+  "updatedAt": "2026-04-28T00:00:00.000Z"
+}`);
+
+    assert.ok(sections);
+    const ours = JSON.parse(sections!.ours);
+    const theirs = JSON.parse(sections!.theirs);
+    assert.equal(ours.summary, 'Branch A summary');
+    assert.equal(theirs.summary, 'Branch B summary');
+    assert.deepEqual(ours.modules, ['CLI']);
+    assert.deepEqual(theirs.modules, ['CLI']);
+    assert.deepEqual(ours.risks, ['Risk A']);
+    assert.deepEqual(theirs.risks, ['Risk B']);
+  });
 });
 
 describe('aida merge', () => {
@@ -75,7 +105,7 @@ describe('aida merge', () => {
       const stdout = runCliOutput(project, 'merge');
       const merged = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
 
-      assert.ok(stdout.includes('Registry merge completed'));
+      assert.ok(stdout.includes('AIDA merge completed'));
       assert.equal(merged.length, 1);
       assert.equal(merged[0].content, 'Rule A');
     } finally {
@@ -144,6 +174,59 @@ describe('aida merge', () => {
       assert.equal(mergedRules.length, 2);
       assert.equal(mergedSkills.length, 1);
       assert.equal(mergedSkills[0].name, 'workflow-orchestrator');
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should merge AIDA JSON data conflicts through the main merge command', () => {
+    const project = createTestProject();
+    try {
+      writeText(
+        resolve(project.root, '.aida', 'runs', 'test-branch', 'context.json'),
+        `<<<<<<< HEAD
+{
+  "branch": "test-branch",
+  "title": "Profile",
+  "summary": "Older summary",
+  "currentPhase": "In Progress",
+  "modules": ["Profile"],
+  "completed": ["Task A"],
+  "inProgress": ["Task B"],
+  "next": [],
+  "decisions": [],
+  "constraints": [],
+  "keyFiles": ["src/profile/index.tsx"],
+  "risks": ["Risk A"],
+  "updatedAt": "2026-04-28T00:00:00.000Z"
+}
+=======
+{
+  "branch": "test-branch",
+  "title": "Profile",
+  "summary": "Newer summary",
+  "currentPhase": "Completed",
+  "modules": ["Profile", "Settings"],
+  "completed": ["Task C"],
+  "inProgress": [],
+  "next": ["Task D"],
+  "decisions": [],
+  "constraints": [],
+  "keyFiles": ["src/profile/store.ts"],
+  "risks": ["Risk B"],
+  "updatedAt": "2026-04-28T01:00:00.000Z"
+}
+>>>>>>> uat
+`,
+      );
+
+      const stdout = runCliOutput(project, 'merge');
+      const context = readJson<any>(resolve(project.root, '.aida', 'runs', 'test-branch', 'context.json'));
+
+      assert.ok(stdout.includes('AIDA merge completed'));
+      assert.ok(stdout.includes('branch contexts: merged'));
+      assert.equal(context.summary, 'Newer summary');
+      assert.deepEqual(context.modules, ['Profile', 'Settings']);
     } finally {
       project.cleanup();
     }
