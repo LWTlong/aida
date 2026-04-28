@@ -300,6 +300,58 @@ args = ["staler"]
     assert.ok(agents.includes('## AIDA'));
     assert.ok(agents.includes('.aida/rules/_all.md'));
   });
+
+  it('should add .claude/ when .gitignore only contains .claude/settings.local.json', () => {
+    writeJson(resolve(tmpRoot, '.aida', 'config.json'), {
+      schemaVersion: '1.0',
+      project: 'build-test',
+      aiTools: ['claude-code'],
+    });
+    addRule(tmpRoot, {
+      content: 'Keep rules in the registry',
+      category: 'process',
+      branch: 'main',
+      deviation: null,
+      author: 'test',
+      status: 'active',
+    });
+    writeText(resolve(tmpRoot, '.gitignore'), 'node_modules\n.claude/settings.local.json\n');
+
+    buildProjectArtifacts(tmpRoot);
+
+    const gitignore = readText(resolve(tmpRoot, '.gitignore'));
+    assert.ok(gitignore.includes('.claude/settings.local.json'));
+    assert.ok(gitignore.includes('.claude/'));
+  });
+
+  it('should still add managed tool directories when .gitignore already contains specific generated files', () => {
+    writeJson(resolve(tmpRoot, '.aida', 'config.json'), {
+      schemaVersion: '1.0',
+      project: 'build-test',
+      aiTools: ['cursor', 'lingma', 'codex'],
+    });
+    writeJson(resolve(tmpRoot, '.aida', 'rules.json'), []);
+    writeJson(resolve(tmpRoot, '.aida', 'skills.json'), []);
+    writeText(
+      resolve(tmpRoot, '.gitignore'),
+      [
+        'node_modules',
+        '.cursor/mcp.json',
+        '.lingma/mcp.json',
+        '.codex/config.toml',
+      ].join('\n') + '\n',
+    );
+
+    buildProjectArtifacts(tmpRoot);
+
+    const gitignore = readText(resolve(tmpRoot, '.gitignore'));
+    assert.ok(gitignore.includes('.cursor/mcp.json'));
+    assert.ok(gitignore.includes('.cursor/'));
+    assert.ok(gitignore.includes('.lingma/mcp.json'));
+    assert.ok(gitignore.includes('.lingma/'));
+    assert.ok(gitignore.includes('.codex/config.toml'));
+    assert.ok(gitignore.includes('.codex/'));
+  });
 });
 
 describe('mergeSkillRegistries', () => {

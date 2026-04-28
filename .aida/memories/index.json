@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-27T12:53:46.483Z",
+  "updatedAt": "2026-04-28T01:54:33.856Z",
   "modules": [
     {
       "key": "aida",
@@ -22,7 +22,7 @@
         "src/utils/guide.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.482Z"
+      "updatedAt": "2026-04-28T01:54:33.856Z"
     },
     {
       "key": "cli",
@@ -47,7 +47,7 @@
         "COMMANDS.md",
         "src/utils/import.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.465Z"
+      "updatedAt": "2026-04-28T01:54:33.835Z"
     },
     {
       "key": "cli/mcp",
@@ -70,7 +70,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.471Z"
+      "updatedAt": "2026-04-28T01:54:33.841Z"
     },
     {
       "key": "docs",
@@ -95,7 +95,7 @@
         "src/utils/skills.ts",
         ".aida/runs/main/vito-long/run.json"
       ],
-      "updatedAt": "2026-04-27T12:53:46.466Z"
+      "updatedAt": "2026-04-28T01:54:33.836Z"
     },
     {
       "key": "git",
@@ -120,7 +120,7 @@
         "COMMANDS.md",
         "src/utils/import.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.462Z"
+      "updatedAt": "2026-04-28T01:54:33.835Z"
     },
     {
       "key": "import",
@@ -144,7 +144,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.469Z"
+      "updatedAt": "2026-04-28T01:54:33.840Z"
     },
     {
       "key": "mcp/rules",
@@ -167,7 +167,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.472Z"
+      "updatedAt": "2026-04-28T01:54:33.842Z"
     },
     {
       "key": "process",
@@ -190,7 +190,7 @@
         "src/utils/guide.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.481Z"
+      "updatedAt": "2026-04-28T01:54:33.849Z"
     },
     {
       "key": "qa",
@@ -214,7 +214,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.470Z"
+      "updatedAt": "2026-04-28T01:54:33.841Z"
     },
     {
       "key": "qa-/-manual-verification",
@@ -237,7 +237,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.476Z"
+      "updatedAt": "2026-04-28T01:54:33.844Z"
     },
     {
       "key": "qa/manual-verification",
@@ -260,7 +260,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.474Z"
+      "updatedAt": "2026-04-28T01:54:33.843Z"
     },
     {
       "key": "qa/mcp",
@@ -283,7 +283,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.477Z"
+      "updatedAt": "2026-04-28T01:54:33.848Z"
     },
     {
       "key": "release",
@@ -306,7 +306,7 @@
         "src/utils/guide.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.479Z"
+      "updatedAt": "2026-04-28T01:54:33.848Z"
     },
     {
       "key": "run-data-/-mcp",
@@ -329,7 +329,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.475Z"
+      "updatedAt": "2026-04-28T01:54:33.844Z"
     },
     {
       "key": "skills",
@@ -353,7 +353,7 @@
         "src/mcp/server.ts",
         "src/utils/skills.ts"
       ],
-      "updatedAt": "2026-04-27T12:53:46.468Z"
+      "updatedAt": "2026-04-28T01:54:33.839Z"
     }
   ]
 }

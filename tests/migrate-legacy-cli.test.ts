@@ -158,7 +158,7 @@ describe('aida migrate-legacy', () => {
     }
   });
 
-  it('should auto-select a baseline tool without waiting for interactive input', () => {
+  it('should prompt for baseline selection when multiple closed-loop tools are detected', () => {
     const root = mkdtempSync(join(tmpdir(), 'aida-migrate-legacy-'));
     const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');
 
@@ -184,11 +184,13 @@ describe('aida migrate-legacy', () => {
         encoding: 'utf-8',
         stdio: 'pipe',
         timeout: 10000,
+        input: '1\n',
         env: { ...process.env, HOME: root },
       });
 
       assert.ok(output.includes('Legacy migration completed'));
-      assert.ok(output.includes('Auto-selected baseline: Cursor'));
+      assert.ok(output.includes('Select baseline tool to import into AIDA JSON'));
+      assert.ok(output.includes('Selected baseline: Cursor'));
       assert.ok(output.includes('git rm --cached .mcp.json AGENTS.md CLAUDE.md'));
     } finally {
       rmSync(root, { recursive: true, force: true });
@@ -239,6 +241,7 @@ describe('aida migrate-legacy', () => {
         encoding: 'utf-8',
         stdio: 'pipe',
         timeout: 10000,
+        input: '1\n',
         env: { ...process.env, HOME: root },
       });
 
@@ -251,6 +254,38 @@ describe('aida migrate-legacy', () => {
       assert.ok(readText(resolve(root, 'AGENTS.md')).includes('.codex/rules/aida/_all.md'));
       assert.ok(readText(resolve(root, '.gitignore')).includes('.codex/config.toml'));
       assert.ok(readText(resolve(root, '.gitignore')).includes('.cursor/'));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('should fail fast in non-interactive mode when multiple baselines exist and no selection is provided', () => {
+    const root = mkdtempSync(join(tmpdir(), 'aida-migrate-legacy-noinput-'));
+    const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');
+
+    try {
+      ensureDir(resolve(root, '.aidevos', 'rules'));
+      ensureDir(resolve(root, '.cursor', 'rules'));
+      ensureDir(resolve(root, '.codex', 'rules'));
+      writeJson(resolve(root, '.aidevos', 'config.json'), {
+        schemaVersion: '1.0',
+        project: 'legacy-project',
+        aiTools: ['cursor', 'codex'],
+      });
+      writeText(resolve(root, 'AGENTS.md'), 'Read .aidevos/aida-guide.md first\n');
+      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Imported cursor rule\n');
+      writeText(resolve(root, '.codex', 'rules', 'team.md'), '# Codex Rules\n\n- Imported codex rule\n');
+
+      const output = execSync(`node ${cliPath} migrate-legacy`, {
+        cwd: root,
+        encoding: 'utf-8',
+        stdio: 'pipe',
+        timeout: 10000,
+        env: { ...process.env, HOME: root },
+      });
+
+      assert.ok(output.includes('Interactive selection required in a non-interactive terminal'));
+      assert.ok(output.includes('claude-code, cursor, codex'));
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
