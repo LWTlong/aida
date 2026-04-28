@@ -397,6 +397,12 @@ function buildCursorCommands(projectRoot: string): number {
 export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[]): string[] {
   const gitignorePath = resolve(projectRoot, '.gitignore');
   const existing = fileExists(gitignorePath) ? readText(gitignorePath) : '';
+  const existingLines = new Set(
+    existing
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean),
+  );
   const entries = [
     '.agent/',
     '.agents/',
@@ -438,7 +444,7 @@ export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[])
     entries.push('.codex/config.toml');
   }
 
-  const toAdd = entries.filter((entry) => !existing.includes(entry));
+  const toAdd = entries.filter((entry) => !existingLines.has(entry));
   if (toAdd.length > 0) {
     writeText(
       gitignorePath,

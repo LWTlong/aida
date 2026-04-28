@@ -4,6 +4,7 @@ import { fileExists, readJson } from '../../utils/fs.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { CLOSED_LOOP_BASELINE_TOOLS, detectClosedLoopImportableTools, importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
 import { migrateLegacyMemories } from '../../utils/memory.js';
+import { promptSingleSelect } from '../../utils/prompt.js';
 import { migrate } from './migrate.js';
 import { migrateLegacyDirectory } from './migrate-dir.js';
 import type { AidaConfig } from '../../schemas/aida-project.js';
@@ -44,32 +45,28 @@ function configuredToolOrder(projectRoot: string): AiToolChoice[] {
   }
 }
 
-function chooseBaselineTool(projectRoot: string, importable: AiToolChoice[]): AiToolChoice | null {
-  if (importable.length === 0) return null;
-  const configured = configuredToolOrder(projectRoot);
-  for (const tool of configured) {
-    if (importable.includes(tool)) return tool;
-  }
-
-  const priority: AiToolChoice[] = ['claude-code', 'cursor', 'codex'];
-  for (const tool of priority) {
-    if (importable.includes(tool)) return tool;
-  }
-
-  return importable[0] || null;
-}
-
-async function resolveBaselineTool(projectRoot: string): Promise<{ tool: AiToolChoice | null; autoSelected: boolean }> {
+async function resolveBaselineTool(projectRoot: string): Promise<{ tool: AiToolChoice | null; prompted: boolean }> {
   const requested = requestedBaseline();
   const importable = detectClosedLoopImportableTools(projectRoot, ['claude-code', 'cursor', 'vscode-copilot', 'windsurf', 'lingma', 'codex']);
 
   if (requested === 'invalid') {
     throw new Error(`Unknown baseline tool: ${process.argv[3]?.trim()}`);
   }
-  if (requested) return { tool: requested, autoSelected: false };
-  if (importable.length === 0) return { tool: null, autoSelected: false };
-  if (importable.length === 1) return { tool: importable[0], autoSelected: false };
-  return { tool: chooseBaselineTool(projectRoot, importable), autoSelected: true };
+  if (requested) return { tool: requested, prompted: false };
+  if (importable.length === 0) return { tool: null, prompted: false };
+  if (importable.length === 1) return { tool: importable[0], prompted: false };
+
+  const configured = configuredToolOrder(projectRoot);
+  const options = importable.map((tool) => ({
+    value: tool,
+    label: toolLabel(tool),
+    hint: configured.includes(tool) ? 'configured' : 'detected',
+  }));
+  const selected = await promptSingleSelect('Select baseline tool to import into AIDA JSON:', options);
+  return {
+    tool: selected || importable[0],
+    prompted: true,
+  };
 }
 
 export async function migrateLegacy(): Promise<void> {
@@ -100,11 +97,11 @@ export async function migrateLegacy(): Promise<void> {
   }
 
   let baselineTool: AiToolChoice | null;
-  let autoSelectedBaseline = false;
+  let promptedBaseline = false;
   try {
     const resolved = await resolveBaselineTool(projectRoot);
     baselineTool = resolved.tool;
-    autoSelectedBaseline = resolved.autoSelected;
+    promptedBaseline = resolved.prompted;
   } catch (error) {
     console.log(red(`\n  ${error instanceof Error ? error.message : String(error)}\n`));
     console.log(`  Supported baseline tools: ${CLOSED_LOOP_BASELINE_TOOLS.join(', ')}\n`);
@@ -117,8 +114,8 @@ export async function migrateLegacy(): Promise<void> {
     const built = buildProjectArtifacts(projectRoot, imported.tools);
 
     console.log(green('\n  ✓ Imported baseline') + ` ${toolLabel(baselineTool)}`);
-    if (autoSelectedBaseline) {
-      console.log(`    Auto-selected baseline: ${toolLabel(baselineTool)}`);
+    if (promptedBaseline) {
+      console.log(`    Selected baseline: ${toolLabel(baselineTool)}`);
     }
     console.log(`    Rules: ${imported.baseline.rulesImported}`);
     console.log(`    Skills: ${imported.baseline.skillsImported}`);

@@ -103,6 +103,9 @@ async function promptMultiFallback<T extends string>(
     const answer = await promptLine('  > ');
     if (!answer) {
       if (!opts.required) return [];
+      if (!isInteractiveTty()) {
+        throw new Error('Interactive selection required in a non-interactive terminal. Re-run the command with explicit choices.');
+      }
       console.log(yellow('  Please select at least one option.'));
       continue;
     }
@@ -135,6 +138,9 @@ async function promptSingleFallback<T extends string>(
   while (true) {
     const answer = await promptLine('  > ');
     if (!answer && opts.allowSkip) return null;
+    if (!answer && !isInteractiveTty()) {
+      throw new Error('Interactive selection required in a non-interactive terminal. Re-run the command with an explicit argument.');
+    }
     const index = parseInt(answer, 10);
     if (index >= 1 && index <= options.length) return options[index - 1].value;
     console.log(yellow(`  Please enter a number between 1 and ${options.length}${opts.allowSkip ? ', or press Enter to skip' : ''}.`));
