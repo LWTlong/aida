@@ -12,7 +12,7 @@
     "prdPhases": []
   },
   "summary": {
-    "totalTasks": 34,
+    "totalTasks": 35,
     "completedTasks": 32,
     "bugCount": 7,
     "deviationCount": 0,
@@ -400,6 +400,17 @@
       "createdAt": "2026-04-27T13:24:03.533Z",
       "startedAt": "2026-04-27T13:24:03.534Z",
       "completedAt": "2026-04-28T01:54:33.826Z"
+    },
+    {
+      "taskId": "TASK-35",
+      "title": "Release migrate-legacy and gitignore fixes",
+      "status": "in-progress",
+      "stageName": "Release",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-28T02:08:37.298Z",
+      "startedAt": "2026-04-28T02:08:37.299Z",
+      "completedAt": null
     }
   ],
   "bugs": [
@@ -1373,11 +1384,11 @@
   ],
   "metrics": {
     "aiDeviationRate": 0,
-    "bugRate": 20.59,
+    "bugRate": 20,
     "reviewPassRate": 100,
     "rulesSedimentedCount": 2,
-    "averageLinesPerTask": 2013,
-    "totalDevelopmentTimeSeconds": 345263,
+    "averageLinesPerTask": 1955,
+    "totalDevelopmentTimeSeconds": 346106,
     "developmentVelocity": 0.33,
     "nodeTimeBreakdown": {
       "Code Generation": 345262.538,
@@ -1940,6 +1951,11 @@
       "type": "task-done",
       "title": "TASK-34: Fix .claude ignore/build/import gaps exposed by real-project migration",
       "timestamp": "2026-04-28T01:54:33.828Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-35: Release migrate-legacy and gitignore fixes",
+      "timestamp": "2026-04-28T02:08:37.299Z"
     }
   ],
   "events": [
@@ -3180,6 +3196,20 @@
         "taskId": "TASK-34",
         "tokensConsumed": 0
       }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-28T02:08:37.299Z",
+      "data": {
+        "taskId": "TASK-35"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-28T02:08:37.299Z",
+      "data": {
+        "taskId": "TASK-35"
+      }
     }
   ],
   "rules": [
@@ -3201,8 +3231,8 @@
     }
   ],
   "context": {
-    "currentTaskId": "TASK-34",
-    "lastUpdated": "2026-04-28T01:54:33.828Z"
+    "currentTaskId": "TASK-35",
+    "lastUpdated": "2026-04-28T02:08:37.299Z"
   },
   "cost": {
     "totalTokens": 0,

@@ -32,7 +32,8 @@
   ],
   "inProgress": [
     "检查 CLI 交互、迁移幂等性与规则去重机制",
-    "自检迁移到构建全链路闭环与幂等行为"
+    "自检迁移到构建全链路闭环与幂等行为",
+    "Release migrate-legacy and gitignore fixes"
   ],
   "next": [],
   "decisions": [],
@@ -55,5 +56,5 @@
     "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
     "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP"
   ],
-  "updatedAt": "2026-04-28T01:54:33.833Z"
+  "updatedAt": "2026-04-28T02:08:37.305Z"
 }
