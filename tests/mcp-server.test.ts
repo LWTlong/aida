@@ -2,7 +2,7 @@ import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { resolve } from 'node:path';
-import { readJson } from '../src/utils/fs.js';
+import { readJson, writeJson } from '../src/utils/fs.js';
 import { createTestProject, type TestProject } from './helpers.js';
 
 const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');
@@ -213,6 +213,30 @@ describe('MCP Server - aida_bootstrap', () => {
     const bootstrapState = readJson<any>(resolve(project.root, '.aida', 'bootstrap-state.local.json'));
     assert.ok(Array.isArray(bootstrapState.records));
     assert.equal(bootstrapState.records[0].host, 'claude-code');
+  });
+
+  it('should treat the current MCP session as available even when project config lacks the host', async () => {
+    writeJson(project.configPath, {
+      schemaVersion: '1.0',
+      aiTool: 'cursor',
+      aiTools: ['cursor'],
+      project: 'test-project',
+    });
+
+    await client.initialize();
+
+    const status = await client.callTool('aida_bootstrap', { action: 'status', host: 'codex' });
+    assert.equal(status.success, true);
+    assert.equal(status.host, 'codex');
+    assert.equal(status.available, true);
+    assert.equal(status.configured, false);
+    assert.equal(status.sessionAvailable, true);
+    assert.equal(status.needsBootstrap, true);
+
+    const manifest = await client.callTool('aida_bootstrap', { action: 'manifest', host: 'codex' });
+    assert.equal(manifest.available, true);
+    assert.equal(manifest.configured, false);
+    assert.equal(manifest.sessionAvailable, true);
   });
 });
 

@@ -19,7 +19,8 @@
     "Release",
     "Process",
     "AIDA",
-    "Merge"
+    "Merge",
+    "MCP"
   ],
   "completed": [
     "取消跟踪已被 .gitignore 忽略的文件",
@@ -34,20 +35,20 @@
   "inProgress": [
     "检查 CLI 交互、迁移幂等性与规则去重机制",
     "自检迁移到构建全链路闭环与幂等行为",
-    "Release merge-data and MCP args order fixes"
+    "发布 aida_bootstrap 可用性修复到 npm"
   ],
   "next": [],
   "decisions": [],
   "constraints": [],
   "keyFiles": [
-    ".aida/runs/main/vito-long/run.json",
     "README.md",
     "README.zh-CN.md",
     "COMMANDS.md",
-    ".aida/memories/index.json",
     "tests/build.test.ts",
     "src/utils/import.ts",
-    "src/mcp/server.ts"
+    "src/mcp/server.ts",
+    "src/utils/guide.ts",
+    "tests/migrate-legacy-cli.test.ts"
   ],
   "risks": [
     "Build flow skipped top-level guide/rule artifacts for migration compatibility",
@@ -55,7 +56,8 @@
     "Legacy AGENTS.md marker was not upgraded to full AIDA guidance during migration/build",
     "Indented conflict markers in custom *.rules.json caused merge parsing failure or empty-array fallback",
     "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
-    "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP"
+    "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP",
+    "aida_bootstrap status 在当前会话已可调用 AIDA MCP 时仍可能返回 available=false"
   ],
-  "updatedAt": "2026-04-28T05:47:46.279Z"
+  "updatedAt": "2026-04-28T07:19:45.858Z"
 }

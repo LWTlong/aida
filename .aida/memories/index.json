@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-28T05:47:46.312Z",
+  "updatedAt": "2026-04-28T07:19:45.879Z",
   "modules": [
     {
       "key": "aida",
@@ -16,13 +16,12 @@
         "COMMANDS.md",
         "src/utils/import.ts",
         "tests/build.test.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/mcp/server.ts",
         "src/utils/guide.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.310Z"
+      "updatedAt": "2026-04-28T07:19:45.876Z"
     },
     {
       "key": "cli",
@@ -47,7 +46,7 @@
         "COMMANDS.md",
         "src/utils/import.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.295Z"
+      "updatedAt": "2026-04-28T07:19:45.861Z"
     },
     {
       "key": "cli/mcp",
@@ -64,13 +63,12 @@
         "COMMANDS.md",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.299Z"
+      "updatedAt": "2026-04-28T07:19:45.864Z"
     },
     {
       "key": "docs",
@@ -93,9 +91,9 @@
         "tests/merge.test.ts",
         "src/mcp/server.ts",
         "src/utils/skills.ts",
-        ".aida/runs/main/vito-long/run.json"
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.296Z"
+      "updatedAt": "2026-04-28T07:19:45.862Z"
     },
     {
       "key": "git",
@@ -120,7 +118,7 @@
         "COMMANDS.md",
         "src/utils/import.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.282Z"
+      "updatedAt": "2026-04-28T07:19:45.860Z"
     },
     {
       "key": "import",
@@ -138,13 +136,33 @@
         "src/cli/commands/init.ts",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.298Z"
+      "updatedAt": "2026-04-28T07:19:45.863Z"
+    },
+    {
+      "key": "mcp",
+      "title": "MCP",
+      "summary": "main",
+      "keywords": [
+        "mcp",
+        "MCP",
+        "main"
+      ],
+      "paths": [
+        "README.md",
+        "README.zh-CN.md",
+        "COMMANDS.md",
+        "tests/build.test.ts",
+        "src/utils/import.ts",
+        "src/mcp/server.ts",
+        "src/utils/guide.ts",
+        "tests/migrate-legacy-cli.test.ts"
+      ],
+      "updatedAt": "2026-04-28T07:19:45.878Z"
     },
     {
       "key": "mcp/rules",
@@ -161,13 +179,12 @@
         "COMMANDS.md",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.300Z"
+      "updatedAt": "2026-04-28T07:19:45.865Z"
     },
     {
       "key": "merge",
@@ -179,16 +196,16 @@
         "main"
       ],
       "paths": [
-        ".aida/runs/main/vito-long/run.json",
         "README.md",
         "README.zh-CN.md",
         "COMMANDS.md",
-        ".aida/memories/index.json",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        "src/mcp/server.ts"
+        "src/mcp/server.ts",
+        "src/utils/guide.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.312Z"
+      "updatedAt": "2026-04-28T07:19:45.877Z"
     },
     {
       "key": "process",
@@ -205,13 +222,12 @@
         "COMMANDS.md",
         "src/utils/import.ts",
         "tests/build.test.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/mcp/server.ts",
         "src/utils/guide.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.309Z"
+      "updatedAt": "2026-04-28T07:19:45.876Z"
     },
     {
       "key": "qa",
@@ -228,14 +244,13 @@
         "COMMANDS.md",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/cli/commands/init.ts",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.298Z"
+      "updatedAt": "2026-04-28T07:19:45.864Z"
     },
     {
       "key": "qa-/-manual-verification",
@@ -252,13 +267,12 @@
         "COMMANDS.md",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.306Z"
+      "updatedAt": "2026-04-28T07:19:45.867Z"
     },
     {
       "key": "qa/manual-verification",
@@ -275,13 +289,12 @@
         "COMMANDS.md",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.301Z"
+      "updatedAt": "2026-04-28T07:19:45.866Z"
     },
     {
       "key": "qa/mcp",
@@ -298,13 +311,12 @@
         "COMMANDS.md",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.307Z"
+      "updatedAt": "2026-04-28T07:19:45.868Z"
     },
     {
       "key": "release",
@@ -321,13 +333,12 @@
         "COMMANDS.md",
         "src/utils/import.ts",
         "tests/build.test.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/mcp/server.ts",
         "src/utils/guide.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.307Z"
+      "updatedAt": "2026-04-28T07:19:45.873Z"
     },
     {
       "key": "run-data-/-mcp",
@@ -344,13 +355,12 @@
         "COMMANDS.md",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.306Z"
+      "updatedAt": "2026-04-28T07:19:45.867Z"
     },
     {
       "key": "skills",
@@ -368,13 +378,12 @@
         "src/cli/commands/init.ts",
         "tests/build.test.ts",
         "src/utils/import.ts",
-        ".aida/runs/main/vito-long/run.json",
-        ".aida/memories/index.json",
         "src/utils/guide.ts",
         "src/mcp/server.ts",
-        "src/utils/skills.ts"
+        "src/utils/skills.ts",
+        "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-28T05:47:46.297Z"
+      "updatedAt": "2026-04-28T07:19:45.863Z"
     }
   ]
 }

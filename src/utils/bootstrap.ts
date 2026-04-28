@@ -93,8 +93,16 @@ function writeState(projectRoot: string, state: BootstrapStateFile): void {
   writeJson(bootstrapStatePath(projectRoot), state);
 }
 
-export function getBootstrapStatus(projectRoot: string, host: BootstrapHost): {
+export function getBootstrapStatus(
+  projectRoot: string,
+  host: BootstrapHost,
+  options: {
+    sessionAvailable?: boolean
+  } = {},
+): {
   available: boolean
+  configured: boolean
+  sessionAvailable: boolean
   host: BootstrapHost
   manifest: BootstrapManifest
   record: BootstrapStateRecord | null
@@ -103,7 +111,9 @@ export function getBootstrapStatus(projectRoot: string, host: BootstrapHost): {
 } {
   const state = readState(projectRoot);
   const record = state.records.find((item) => item.host === host) || null;
-  const available = detectBootstrapHostAvailability(projectRoot, host);
+  const configured = detectBootstrapHostAvailability(projectRoot, host);
+  const sessionAvailable = options.sessionAvailable === true;
+  const available = configured || sessionAvailable;
   const stale = !record || record.manifestVersion !== BOOTSTRAP_MANIFEST.version;
   const needsBootstrap = !available || stale || record?.decision !== 'approved';
 
@@ -113,6 +123,8 @@ export function getBootstrapStatus(projectRoot: string, host: BootstrapHost): {
 
   return {
     available,
+    configured,
+    sessionAvailable,
     host,
     manifest: BOOTSTRAP_MANIFEST,
     record,

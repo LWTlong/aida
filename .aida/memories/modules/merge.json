@@ -8,21 +8,21 @@
     "merge"
   ],
   "entryFiles": [
-    ".aida/runs/main/vito-long/run.json",
     "README.md",
     "README.zh-CN.md",
     "COMMANDS.md",
-    ".aida/memories/index.json"
+    "tests/build.test.ts",
+    "src/utils/import.ts"
   ],
   "relatedPaths": [
-    ".aida/runs/main/vito-long/run.json",
     "README.md",
     "README.zh-CN.md",
     "COMMANDS.md",
-    ".aida/memories/index.json",
     "tests/build.test.ts",
     "src/utils/import.ts",
-    "src/mcp/server.ts"
+    "src/mcp/server.ts",
+    "src/utils/guide.ts",
+    "tests/migrate-legacy-cli.test.ts"
   ],
   "dataFlow": [],
   "decisions": [],
@@ -33,7 +33,8 @@
     "Legacy AGENTS.md marker was not upgraded to full AIDA guidance during migration/build",
     "Indented conflict markers in custom *.rules.json caused merge parsing failure or empty-array fallback",
     "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
-    "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP"
+    "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP",
+    "aida_bootstrap status 在当前会话已可调用 AIDA MCP 时仍可能返回 available=false"
   ],
   "relatedRules": [],
   "tickets": [
@@ -43,5 +44,5 @@
       "updatedAt": "2026-04-28T02:53:46.875Z"
     }
   ],
-  "updatedAt": "2026-04-28T05:47:46.312Z"
+  "updatedAt": "2026-04-28T07:19:45.877Z"
 }
