@@ -1,28 +1,27 @@
 {
-  "moduleKey": "mcp/rules",
-  "title": "MCP/Rules",
+  "moduleKey": "mcp",
+  "title": "MCP",
   "summary": "main",
   "keywords": [
-    "MCP/Rules",
-    "mcp/rules",
-    "main"
+    "MCP",
+    "main",
+    "mcp"
   ],
   "entryFiles": [
-    "README.zh-CN.md",
     "README.md",
+    "README.zh-CN.md",
     "COMMANDS.md",
     "tests/build.test.ts",
     "src/utils/import.ts"
   ],
   "relatedPaths": [
-    "README.zh-CN.md",
     "README.md",
+    "README.zh-CN.md",
     "COMMANDS.md",
     "tests/build.test.ts",
     "src/utils/import.ts",
-    "src/utils/guide.ts",
     "src/mcp/server.ts",
-    "src/utils/skills.ts",
+    "src/utils/guide.ts",
     "tests/migrate-legacy-cli.test.ts"
   ],
   "dataFlow": [],
@@ -42,8 +41,8 @@
     {
       "branch": "main",
       "summary": "main",
-      "updatedAt": "2026-04-27T07:58:21.754Z"
+      "updatedAt": "2026-04-28T06:50:55.057Z"
     }
   ],
-  "updatedAt": "2026-04-28T07:19:45.865Z"
+  "updatedAt": "2026-04-28T07:19:45.878Z"
 }

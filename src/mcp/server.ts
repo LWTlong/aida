@@ -893,14 +893,17 @@ function handleStatus(): any {
 function handleBootstrap(args: any): any {
   const action = `${args.action || 'status'}`.trim();
   const host = normalizeBootstrapHost(args.host);
+  const sessionAvailable = true;
 
   switch (action) {
     case 'status': {
-      const status = getBootstrapStatus(projectRoot, host);
+      const status = getBootstrapStatus(projectRoot, host, { sessionAvailable });
       return {
         success: true,
         host,
         available: status.available,
+        configured: status.configured,
+        sessionAvailable: status.sessionAvailable,
         needsBootstrap: status.needsBootstrap,
         cached: status.record,
         nextSteps: status.nextSteps,
@@ -908,11 +911,13 @@ function handleBootstrap(args: any): any {
       };
     }
     case 'manifest': {
-      const status = getBootstrapStatus(projectRoot, host);
+      const status = getBootstrapStatus(projectRoot, host, { sessionAvailable });
       return {
         success: true,
         host,
         available: status.available,
+        configured: status.configured,
+        sessionAvailable: status.sessionAvailable,
         required: true,
         reason: BOOTSTRAP_MANIFEST.reason,
         groupedTools: BOOTSTRAP_MANIFEST.groupedTools,
