@@ -19,7 +19,7 @@ export const QUICK_COMMANDS: { name: string; skill: string }[] = [
 
 const MCP_SERVER_ENTRY = {
   command: 'npx',
-  args: ['--registry=https://registry.npmjs.org/', '-y', 'ai-dev-analytics', 'mcp'],
+  args: ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp'],
 };
 
 const MCP_CONFIG_JSON = JSON.stringify({
@@ -30,7 +30,7 @@ const MCP_CONFIG_JSON = JSON.stringify({
 
 const CODEX_CONFIG_TOML = `[mcp_servers.aida]
 command = "npx"
-args = ["--registry=https://registry.npmjs.org/", "-y", "ai-dev-analytics", "mcp"]
+args = ["-y", "--registry=https://registry.npmjs.org/", "ai-dev-analytics", "mcp"]
 `;
 
 function writeRuleBundle(dir: string, files: Map<string, string>): number {

@@ -4,6 +4,17 @@ import { fileExists } from '../../utils/fs.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { mergeRulesRegistry } from './rules.js';
 import { mergeSkillsRegistry } from './skills.js';
+import { mergeAidaJsonData } from './merge-data.js';
+
+function printDataLine(lines: string[], label: string, result: { status: string; merged: number }): void {
+  if (result.status === 'merged') {
+    lines.push(`  ${label}: merged, ${result.merged} file(s)`);
+  } else if (result.status === 'no-conflict') {
+    lines.push(`  ${label}: no conflict`);
+  } else if (result.status === 'missing') {
+    lines.push(`  ${label}: missing`);
+  }
+}
 
 export async function merge(): Promise<void> {
   const projectRoot = process.cwd();
@@ -15,8 +26,17 @@ export async function merge(): Promise<void> {
 
   const rules = await mergeRulesRegistry(projectRoot);
   const skills = await mergeSkillsRegistry(projectRoot);
+  const data = mergeAidaJsonData(projectRoot);
 
-  if (rules.status === 'error' || skills.status === 'error') {
+  const dataHasError = [
+    data.memoryIndex,
+    data.moduleMemories,
+    data.contexts,
+    data.requirements,
+    data.runs,
+  ].some((item) => item.status === 'error');
+
+  if (rules.status === 'error' || skills.status === 'error' || dataHasError) {
     console.log(red('\n  Merge finished with parse errors. Resolve the remaining conflicted file manually.\n'));
     return;
   }
@@ -39,15 +59,29 @@ export async function merge(): Promise<void> {
     lines.push('  skills.json: missing');
   }
 
-  const changed = rules.status === 'merged' || skills.status === 'merged';
+  printDataLine(lines, 'memory index', data.memoryIndex);
+  printDataLine(lines, 'module memories', data.moduleMemories);
+  printDataLine(lines, 'branch contexts', data.contexts);
+  printDataLine(lines, 'requirements', data.requirements);
+  printDataLine(lines, 'run.json', data.runs);
+
+  const changed = rules.status === 'merged'
+    || skills.status === 'merged'
+    || data.memoryIndex.status === 'merged'
+    || data.moduleMemories.status === 'merged'
+    || data.contexts.status === 'merged'
+    || data.requirements.status === 'merged'
+    || data.runs.status === 'merged';
   if (!changed) {
-    console.log(yellow('\n  No registry conflicts detected.\n'));
+    console.log(yellow('\n  No AIDA conflicts detected.\n'));
     return;
   }
 
-  buildProjectArtifacts(projectRoot);
+  if (rules.status === 'merged' || skills.status === 'merged') {
+    buildProjectArtifacts(projectRoot);
+  }
 
-  console.log(green('\n  ✓ Registry merge completed\n'));
+  console.log(green('\n  ✓ AIDA merge completed\n'));
   for (const line of lines) console.log(line);
   console.log('');
 }

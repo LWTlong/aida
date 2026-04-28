@@ -531,5 +531,18 @@
     },
     "createdAt": "2026-04-27T11:23:52.443Z",
     "status": "active"
+  },
+  {
+    "id": "RULE-042",
+    "category": "process",
+    "content": "任何会生成可执行命令、处理冲突、或影响真实工具启动链路的改动，必须补充可运行样本或真实命令验证；禁止只依赖脑内推断、宽松包含断言或“看起来应该可用”的结论。对于 merge、migrate、build、import、MCP 启动命令等链路，至少覆盖一条真实样本回放或实际命令执行验证。",
+    "fingerprint": "60fe5557eb45",
+    "source": {
+      "branch": "main",
+      "deviation": null,
+      "author": "vito-long"
+    },
+    "createdAt": "2026-04-28T03:43:21.787Z",
+    "status": "active"
   }
 ]

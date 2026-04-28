@@ -32,7 +32,7 @@ describe('aida import', () => {
       ensureDir(resolve(project.root, '.cursor'));
       writeText(
         resolve(project.root, '.cursor', 'mcp.json'),
-        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['--registry=https://registry.npmjs.org/', '-y', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
+        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
       );
 
       const output = runCliOutput(project, 'import');
@@ -76,7 +76,7 @@ describe('aida import', () => {
       );
       writeText(
         resolve(project.root, '.cursor', 'mcp.json'),
-        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['--registry=https://registry.npmjs.org/', '-y', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
+        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
       );
 
       const importable = detectImportableTools(project.root, ['cursor', 'claude-code']);
@@ -237,7 +237,7 @@ description: AIDA 数据采集与规则沉淀规范
       );
       writeText(
         resolve(project.root, '.cursor', 'mcp.json'),
-        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['--registry=https://registry.npmjs.org/', '-y', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
+        JSON.stringify({ mcpServers: { aida: { command: 'npx', args: ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp'] } } }, null, 2),
       );
 
       const output = runCliOutput(project, 'import cursor');

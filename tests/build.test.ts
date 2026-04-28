@@ -120,7 +120,7 @@ describe('buildProjectArtifacts', () => {
 
     assert.deepEqual(result.tools, ['claude-code', 'cursor']);
     assert.equal(mcp.mcpServers.aida.command, 'npx');
-    assert.ok(mcp.mcpServers.aida.args.includes('--registry=https://registry.npmjs.org/'));
+    assert.deepEqual(mcp.mcpServers.aida.args, ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp']);
   });
 
   it('should generate Codex config snippet when codex is configured', () => {
@@ -169,7 +169,7 @@ model = "gpt-5"
 
 [mcp_servers.aida]
 command = "npx"
-args = ["-y", "ai-dev-analytics", "mcp"]
+args = ["-y", "--registry=https://registry.npmjs.org/", "ai-dev-analytics", "mcp"]
 `);
 
     buildProjectArtifacts(tmpRoot);
@@ -209,7 +209,7 @@ args = ["staler"]
     assert.ok(codexConfig.includes('[profiles.default]'));
     assert.ok(codexConfig.includes('[sandbox]'));
     assert.ok(codexConfig.includes('command = "npx"'));
-    assert.ok(codexConfig.includes('args = ["--registry=https://registry.npmjs.org/", "-y", "ai-dev-analytics", "mcp"]'));
+    assert.ok(codexConfig.includes('args = ["-y", "--registry=https://registry.npmjs.org/", "ai-dev-analytics", "mcp"]'));
   });
 
   it('should fully rebuild managed rules and skill package outputs without leaving stale files', () => {

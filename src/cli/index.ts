@@ -91,6 +91,11 @@ async function main() {
       await merge();
       break;
     }
+    case 'merge-data': {
+      const { mergeData } = await import('./commands/merge-data.js');
+      await mergeData();
+      break;
+    }
     case 'memory': {
       const { memory } = await import('./commands/memory.js');
       await memory();
@@ -132,6 +137,7 @@ async function main() {
     aida report      Generate performance report data
     aida memory      Manage branch context and module memory
     aida merge       Merge rules.json and skills.json conflicts together
+    aida merge-data  Merge AIDA JSON data conflicts (memories/context/requirement/run)
     aida rules       Manage project rules registry (build/dedupe/merge)
     aida skills      Manage project skills registry (build/merge/list)
     aida -v          Show version

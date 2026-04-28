@@ -12,18 +12,18 @@
     "prdPhases": []
   },
   "summary": {
-    "totalTasks": 35,
-    "completedTasks": 32,
+    "totalTasks": 38,
+    "completedTasks": 35,
     "bugCount": 7,
     "deviationCount": 0,
-    "reviewCount": 27,
-    "reviewPassCount": 27,
+    "reviewCount": 30,
+    "reviewPassCount": 30,
     "reviewFailCount": 0,
-    "rulesSedimented": 2,
+    "rulesSedimented": 3,
     "prdPhaseCount": 0,
-    "filesChanged": 58,
-    "linesAdded": 46256,
-    "linesRemoved": 22181
+    "filesChanged": 59,
+    "linesAdded": 46941,
+    "linesRemoved": 22436
   },
   "workflow": [],
   "tasks": [
@@ -404,12 +404,45 @@
     {
       "taskId": "TASK-35",
       "title": "Release migrate-legacy and gitignore fixes",
-      "status": "in-progress",
+      "status": "done",
       "stageName": "Release",
       "prdPhase": "",
       "acceptance": "",
       "createdAt": "2026-04-28T02:08:37.298Z",
       "startedAt": "2026-04-28T02:08:37.299Z",
+      "completedAt": "2026-04-28T02:21:57.793Z"
+    },
+    {
+      "taskId": "TASK-36",
+      "title": "Add structured merge/repair flow for AIDA JSON conflicts",
+      "status": "done",
+      "stageName": "Merge",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-28T02:53:46.867Z",
+      "startedAt": "2026-04-28T02:53:46.868Z",
+      "completedAt": "2026-04-28T03:10:12.923Z"
+    },
+    {
+      "taskId": "TASK-37",
+      "title": "Fix MCP public npm args order for npx invocation",
+      "status": "done",
+      "stageName": "CLI/MCP",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-28T03:19:09.619Z",
+      "startedAt": "2026-04-28T03:19:09.619Z",
+      "completedAt": "2026-04-28T03:22:54.924Z"
+    },
+    {
+      "taskId": "TASK-38",
+      "title": "Release merge-data and MCP args order fixes",
+      "status": "in-progress",
+      "stageName": "Release",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-28T05:47:46.269Z",
+      "startedAt": "2026-04-28T05:47:46.271Z",
       "completedAt": null
     }
   ],
@@ -914,6 +947,33 @@
       "scope": "src/cli/commands/migrate-legacy.ts, src/utils/ai-build.ts, src/utils/prompt.ts, tests/build.test.ts, tests/migrate-legacy-cli.test.ts",
       "reviewedAt": "2026-04-28T01:54:24.989Z",
       "issues": []
+    },
+    {
+      "reviewId": "REV-28",
+      "taskId": "TASK-35",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "package.json, package-lock.json, release publish flow, local package refresh",
+      "reviewedAt": "2026-04-28T02:21:49.551Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-29",
+      "taskId": "TASK-36",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "merge-data command, merge command integration, realistic conflict fixtures, conflict-section parsing",
+      "reviewedAt": "2026-04-28T03:10:05.384Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-30",
+      "taskId": "TASK-37",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "MCP npx registry args order in build/import/migrate fixtures and generated configs",
+      "reviewedAt": "2026-04-28T03:22:38.885Z",
+      "issues": []
     }
   ],
   "files": [
@@ -952,42 +1012,42 @@
     {
       "path": ".aida/memories/index.json",
       "changeType": "modified",
-      "linesAdded": 1550,
-      "linesRemoved": 727,
-      "changeCount": 22,
-      "lastModified": "2026-04-28T01:54:24.806Z"
+      "linesAdded": 1627,
+      "linesRemoved": 756,
+      "changeCount": 24,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/git.json",
       "changeType": "modified",
-      "linesAdded": 237,
-      "linesRemoved": 237,
-      "changeCount": 22,
-      "lastModified": "2026-04-28T01:54:24.809Z"
+      "linesAdded": 239,
+      "linesRemoved": 239,
+      "changeCount": 24,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/runs/main/context.json",
       "changeType": "modified",
-      "linesAdded": 359,
-      "linesRemoved": 355,
-      "changeCount": 22,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 367,
+      "linesRemoved": 363,
+      "changeCount": 24,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/runs/main/requirement.json",
       "changeType": "modified",
-      "linesAdded": 378,
-      "linesRemoved": 382,
-      "changeCount": 22,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 392,
+      "linesRemoved": 400,
+      "changeCount": 24,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/runs/main/vito-long/run.json",
       "changeType": "modified",
-      "linesAdded": 23737,
-      "linesRemoved": 1534,
-      "changeCount": 22,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 24056,
+      "linesRemoved": 1649,
+      "changeCount": 24,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": "src/cli/commands/init.ts",
@@ -1000,10 +1060,10 @@
     {
       "path": "src/utils/ai-build.ts",
       "changeType": "modified",
-      "linesAdded": 657,
-      "linesRemoved": 499,
-      "changeCount": 19,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 659,
+      "linesRemoved": 501,
+      "changeCount": 20,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": "src/utils/guide.ts",
@@ -1032,26 +1092,26 @@
     {
       "path": "tests/build.test.ts",
       "changeType": "created",
-      "linesAdded": 1442,
-      "linesRemoved": 332,
-      "changeCount": 18,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 1445,
+      "linesRemoved": 335,
+      "changeCount": 19,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": "tests/migrate-legacy-cli.test.ts",
       "changeType": "created",
-      "linesAdded": 893,
-      "linesRemoved": 301,
-      "changeCount": 18,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 896,
+      "linesRemoved": 304,
+      "changeCount": 19,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": "src/cli/commands/merge.ts",
       "changeType": "modified",
-      "linesAdded": 8,
-      "linesRemoved": 8,
-      "changeCount": 1,
-      "lastModified": "2026-04-24T09:26:50.347Z"
+      "linesAdded": 73,
+      "linesRemoved": 31,
+      "changeCount": 3,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": "src/cli/commands/rules.ts",
@@ -1072,10 +1132,10 @@
     {
       "path": "tests/merge.test.ts",
       "changeType": "modified",
-      "linesAdded": 271,
-      "linesRemoved": 225,
-      "changeCount": 16,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 420,
+      "linesRemoved": 246,
+      "changeCount": 18,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": "src/utils/rules.ts",
@@ -1152,10 +1212,10 @@
     {
       "path": "tests/import-cli.test.ts",
       "changeType": "created",
-      "linesAdded": 749,
-      "linesRemoved": 330,
-      "changeCount": 11,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 752,
+      "linesRemoved": 333,
+      "changeCount": 12,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/rules.json",
@@ -1272,129 +1332,137 @@
     {
       "path": ".aida/memories/modules/cli.json",
       "changeType": "modified",
-      "linesAdded": 11,
-      "linesRemoved": 11,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.809Z"
+      "linesAdded": 13,
+      "linesRemoved": 13,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/cli/mcp.json",
       "changeType": "modified",
-      "linesAdded": 8,
-      "linesRemoved": 8,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.809Z"
+      "linesAdded": 10,
+      "linesRemoved": 10,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/docs.json",
       "changeType": "modified",
-      "linesAdded": 12,
-      "linesRemoved": 12,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.809Z"
+      "linesAdded": 14,
+      "linesRemoved": 14,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/import.json",
       "changeType": "modified",
-      "linesAdded": 9,
-      "linesRemoved": 9,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.809Z"
+      "linesAdded": 11,
+      "linesRemoved": 11,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/mcp/rules.json",
       "changeType": "modified",
-      "linesAdded": 8,
-      "linesRemoved": 8,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.809Z"
+      "linesAdded": 10,
+      "linesRemoved": 10,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".../memories/modules/qa-/-manual-verification.json",
       "changeType": "modified",
-      "linesAdded": 8,
-      "linesRemoved": 8,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.810Z"
+      "linesAdded": 10,
+      "linesRemoved": 10,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/qa.json",
       "changeType": "modified",
-      "linesAdded": 9,
-      "linesRemoved": 9,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 11,
+      "linesRemoved": 11,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/qa/manual-verification.json",
       "changeType": "modified",
-      "linesAdded": 8,
-      "linesRemoved": 8,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 10,
+      "linesRemoved": 10,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/qa/mcp.json",
       "changeType": "modified",
-      "linesAdded": 8,
-      "linesRemoved": 8,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 10,
+      "linesRemoved": 10,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/release.json",
       "changeType": "modified",
-      "linesAdded": 9,
-      "linesRemoved": 9,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 11,
+      "linesRemoved": 11,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/run-data-/-mcp.json",
       "changeType": "modified",
-      "linesAdded": 8,
-      "linesRemoved": 8,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 10,
+      "linesRemoved": 10,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/skills.json",
       "changeType": "modified",
-      "linesAdded": 10,
-      "linesRemoved": 10,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T01:54:24.816Z"
+      "linesAdded": 12,
+      "linesRemoved": 12,
+      "changeCount": 6,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/aida.json",
       "changeType": "modified",
-      "linesAdded": 1,
-      "linesRemoved": 1,
-      "changeCount": 1,
-      "lastModified": "2026-04-28T01:54:24.809Z"
+      "linesAdded": 3,
+      "linesRemoved": 3,
+      "changeCount": 3,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     },
     {
       "path": ".aida/memories/modules/process.json",
       "changeType": "modified",
-      "linesAdded": 1,
-      "linesRemoved": 1,
-      "changeCount": 1,
-      "lastModified": "2026-04-28T01:54:24.810Z"
+      "linesAdded": 3,
+      "linesRemoved": 3,
+      "changeCount": 3,
+      "lastModified": "2026-04-28T03:22:32.022Z"
+    },
+    {
+      "path": "src/cli/index.ts",
+      "changeType": "created",
+      "linesAdded": 12,
+      "linesRemoved": 0,
+      "changeCount": 2,
+      "lastModified": "2026-04-28T03:22:32.022Z"
     }
   ],
   "metrics": {
     "aiDeviationRate": 0,
-    "bugRate": 20,
+    "bugRate": 18.42,
     "reviewPassRate": 100,
-    "rulesSedimentedCount": 2,
-    "averageLinesPerTask": 1955,
-    "totalDevelopmentTimeSeconds": 346106,
-    "developmentVelocity": 0.33,
+    "rulesSedimentedCount": 3,
+    "averageLinesPerTask": 1826,
+    "totalDevelopmentTimeSeconds": 359255,
+    "developmentVelocity": 0.35,
     "nodeTimeBreakdown": {
-      "Code Generation": 345262.538,
+      "Code Generation": 350563.636,
       "Bug Fix": 274654.417
     },
-    "actualWorkSeconds": 619917
+    "actualWorkSeconds": 625218
   },
   "timeline": [
     {
@@ -1956,6 +2024,56 @@
       "type": "task",
       "title": "TASK-35: Release migrate-legacy and gitignore fixes",
       "timestamp": "2026-04-28T02:08:37.299Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-28: pass",
+      "timestamp": "2026-04-28T02:21:49.551Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-35: Release migrate-legacy and gitignore fixes",
+      "timestamp": "2026-04-28T02:21:57.793Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-36: Add structured merge/repair flow for AIDA JSON conflicts",
+      "timestamp": "2026-04-28T02:53:46.868Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-29: pass",
+      "timestamp": "2026-04-28T03:10:05.384Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-36: Add structured merge/repair flow for AIDA JSON conflicts",
+      "timestamp": "2026-04-28T03:10:12.923Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-37: Fix MCP public npm args order for npx invocation",
+      "timestamp": "2026-04-28T03:19:09.619Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-30: pass",
+      "timestamp": "2026-04-28T03:22:38.885Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-37: Fix MCP public npm args order for npx invocation",
+      "timestamp": "2026-04-28T03:22:54.924Z"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-003: 任何会生成可执行命令、处理冲突、或影响真实工具启动链路的改动，必须补充可运行样本或真实命令验证；禁止",
+      "timestamp": "2026-04-28T03:43:21.789Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-38: Release merge-data and MCP args order fixes",
+      "timestamp": "2026-04-28T05:47:46.271Z"
     }
   ],
   "events": [
@@ -3210,6 +3328,118 @@
       "data": {
         "taskId": "TASK-35"
       }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-28T02:21:49.551Z",
+      "data": {
+        "reviewId": "REV-28",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-28T02:21:57.793Z",
+      "data": {
+        "taskId": "TASK-35",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-28T02:53:46.868Z",
+      "data": {
+        "taskId": "TASK-36"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-28T02:53:46.868Z",
+      "data": {
+        "taskId": "TASK-36"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-28T03:09:51.806Z",
+      "data": {
+        "count": 22
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-28T03:10:05.384Z",
+      "data": {
+        "reviewId": "REV-29",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-28T03:10:12.923Z",
+      "data": {
+        "taskId": "TASK-36",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-28T03:19:09.619Z",
+      "data": {
+        "taskId": "TASK-37"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-28T03:19:09.619Z",
+      "data": {
+        "taskId": "TASK-37"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-28T03:22:32.022Z",
+      "data": {
+        "count": 26
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-28T03:22:38.885Z",
+      "data": {
+        "reviewId": "REV-30",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-28T03:22:54.924Z",
+      "data": {
+        "taskId": "TASK-37",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "rule_sedimented",
+      "time": "2026-04-28T03:43:21.789Z",
+      "data": {
+        "ruleId": "RULE-003",
+        "registryId": "RULE-042"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-28T05:47:46.271Z",
+      "data": {
+        "taskId": "TASK-38"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-28T05:47:46.271Z",
+      "data": {
+        "taskId": "TASK-38"
+      }
     }
   ],
   "rules": [
@@ -3228,11 +3458,19 @@
       "category": "process",
       "sourceDeviation": null,
       "sedimentedAt": "2026-04-27T11:23:52.445Z"
+    },
+    {
+      "ruleId": "RULE-003",
+      "file": "rules.json#RULE-042",
+      "content": "任何会生成可执行命令、处理冲突、或影响真实工具启动链路的改动，必须补充可运行样本或真实命令验证；禁止只依赖脑内推断、宽松包含断言或“看起来应该可用”的结论。对于 merge、migrate、build、import、MCP 启动命令等链路，至少覆盖一条真实样本回放或实际命令执行验证。",
+      "category": "process",
+      "sourceDeviation": null,
+      "sedimentedAt": "2026-04-28T03:43:21.789Z"
     }
   ],
   "context": {
-    "currentTaskId": "TASK-35",
-    "lastUpdated": "2026-04-28T02:08:37.299Z"
+    "currentTaskId": "TASK-38",
+    "lastUpdated": "2026-04-28T05:47:46.271Z"
   },
   "cost": {
     "totalTokens": 0,
