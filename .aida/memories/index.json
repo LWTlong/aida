@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-29T02:12:31.577Z",
+  "updatedAt": "2026-04-29T02:19:54.768Z",
   "modules": [
     {
       "key": "aida",
@@ -22,7 +22,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.576Z"
+      "updatedAt": "2026-04-29T02:19:54.766Z"
     },
     {
       "key": "cli",
@@ -47,7 +47,7 @@
         "COMMANDS.md",
         "src/utils/import.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.567Z"
+      "updatedAt": "2026-04-29T02:19:54.757Z"
     },
     {
       "key": "cli/mcp",
@@ -70,7 +70,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.571Z"
+      "updatedAt": "2026-04-29T02:19:54.760Z"
     },
     {
       "key": "docs",
@@ -95,7 +95,7 @@
         "src/utils/skills.ts",
         "tests/migrate-legacy-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.568Z"
+      "updatedAt": "2026-04-29T02:19:54.757Z"
     },
     {
       "key": "git",
@@ -120,7 +120,7 @@
         "COMMANDS.md",
         "src/utils/import.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.567Z"
+      "updatedAt": "2026-04-29T02:19:54.756Z"
     },
     {
       "key": "import",
@@ -144,7 +144,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.570Z"
+      "updatedAt": "2026-04-29T02:19:54.759Z"
     },
     {
       "key": "mcp",
@@ -166,7 +166,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.576Z"
+      "updatedAt": "2026-04-29T02:19:54.767Z"
     },
     {
       "key": "mcp/rules",
@@ -189,7 +189,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.571Z"
+      "updatedAt": "2026-04-29T02:19:54.761Z"
     },
     {
       "key": "merge",
@@ -211,7 +211,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.576Z"
+      "updatedAt": "2026-04-29T02:19:54.766Z"
     },
     {
       "key": "migration",
@@ -233,7 +233,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.577Z"
+      "updatedAt": "2026-04-29T02:19:54.768Z"
     },
     {
       "key": "process",
@@ -256,7 +256,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.575Z"
+      "updatedAt": "2026-04-29T02:19:54.765Z"
     },
     {
       "key": "qa",
@@ -280,7 +280,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.570Z"
+      "updatedAt": "2026-04-29T02:19:54.759Z"
     },
     {
       "key": "qa-/-manual-verification",
@@ -303,7 +303,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.573Z"
+      "updatedAt": "2026-04-29T02:19:54.763Z"
     },
     {
       "key": "qa/manual-verification",
@@ -326,7 +326,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.572Z"
+      "updatedAt": "2026-04-29T02:19:54.761Z"
     },
     {
       "key": "qa/mcp",
@@ -349,7 +349,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.574Z"
+      "updatedAt": "2026-04-29T02:19:54.764Z"
     },
     {
       "key": "release",
@@ -372,7 +372,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.575Z"
+      "updatedAt": "2026-04-29T02:19:54.765Z"
     },
     {
       "key": "run-data-/-mcp",
@@ -395,7 +395,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.573Z"
+      "updatedAt": "2026-04-29T02:19:54.762Z"
     },
     {
       "key": "skills",
@@ -419,7 +419,7 @@
         "tests/migrate-legacy-cli.test.ts",
         "tests/import-cli.test.ts"
       ],
-      "updatedAt": "2026-04-29T02:12:31.569Z"
+      "updatedAt": "2026-04-29T02:19:54.758Z"
     }
   ]
 }

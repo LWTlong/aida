@@ -60,5 +60,5 @@
     "aida_bootstrap status 在当前会话已可调用 AIDA MCP 时仍可能返回 available=false",
     "真实项目迁移产物缺失 .aida_corrupted_bak 中存在的 MTR-2376 历史运行数据"
   ],
-  "updatedAt": "2026-04-29T02:12:31.566Z"
+  "updatedAt": "2026-04-29T02:19:54.755Z"
 }
