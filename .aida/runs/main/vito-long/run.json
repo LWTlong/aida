@@ -12,18 +12,18 @@
     "prdPhases": []
   },
   "summary": {
-    "totalTasks": 43,
-    "completedTasks": 41,
+    "totalTasks": 44,
+    "completedTasks": 42,
     "bugCount": 9,
     "deviationCount": 3,
-    "reviewCount": 36,
-    "reviewPassCount": 36,
+    "reviewCount": 37,
+    "reviewPassCount": 37,
     "reviewFailCount": 0,
     "rulesSedimented": 5,
     "prdPhaseCount": 0,
-    "filesChanged": 63,
-    "linesAdded": 49805,
-    "linesRemoved": 23424
+    "filesChanged": 65,
+    "linesAdded": 49885,
+    "linesRemoved": 23479
   },
   "workflow": [],
   "tasks": [
@@ -499,6 +499,17 @@
       "createdAt": "2026-04-29T01:57:35.281Z",
       "startedAt": "2026-04-29T01:57:35.281Z",
       "completedAt": "2026-04-29T02:12:31.563Z"
+    },
+    {
+      "taskId": "TASK-44",
+      "title": "发布迁移修复版本 1.1.11",
+      "status": "done",
+      "stageName": "Release",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-29T02:19:11.549Z",
+      "startedAt": "2026-04-29T02:19:11.551Z",
+      "completedAt": "2026-04-29T02:19:54.752Z"
     }
   ],
   "bugs": [
@@ -1275,6 +1286,15 @@
       "scope": "src/utils/import.ts, src/utils/memory.ts, tests/import-cli.test.ts, tests/memory-cli.test.ts, tests/migrate-legacy-cli.test.ts, real project migration artifacts",
       "reviewedAt": "2026-04-29T02:12:24.420Z",
       "issues": []
+    },
+    {
+      "reviewId": "REV-37",
+      "taskId": "TASK-44",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "package.json, package-lock.json",
+      "reviewedAt": "2026-04-29T02:19:45.344Z",
+      "issues": []
     }
   ],
   "files": [
@@ -1313,42 +1333,42 @@
     {
       "path": ".aida/memories/index.json",
       "changeType": "modified",
-      "linesAdded": 1835,
-      "linesRemoved": 886,
-      "changeCount": 28,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 1853,
+      "linesRemoved": 906,
+      "changeCount": 29,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/git.json",
       "changeType": "modified",
-      "linesAdded": 245,
-      "linesRemoved": 245,
-      "changeCount": 28,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 246,
+      "linesRemoved": 246,
+      "changeCount": 29,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/runs/main/context.json",
       "changeType": "modified",
-      "linesAdded": 389,
-      "linesRemoved": 391,
-      "changeCount": 28,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 392,
+      "linesRemoved": 393,
+      "changeCount": 29,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/runs/main/requirement.json",
       "changeType": "modified",
-      "linesAdded": 443,
-      "linesRemoved": 450,
-      "changeCount": 28,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 445,
+      "linesRemoved": 454,
+      "changeCount": 29,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/runs/main/vito-long/run.json",
       "changeType": "modified",
-      "linesAdded": 25282,
-      "linesRemoved": 1962,
-      "changeCount": 28,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 25318,
+      "linesRemoved": 1970,
+      "changeCount": 29,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": "src/cli/commands/init.ts",
@@ -1633,114 +1653,114 @@
     {
       "path": ".aida/memories/modules/cli.json",
       "changeType": "modified",
-      "linesAdded": 19,
-      "linesRemoved": 19,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 20,
+      "linesRemoved": 20,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/cli/mcp.json",
       "changeType": "modified",
-      "linesAdded": 26,
-      "linesRemoved": 26,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/docs.json",
       "changeType": "modified",
-      "linesAdded": 27,
-      "linesRemoved": 27,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 28,
+      "linesRemoved": 28,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/import.json",
       "changeType": "modified",
-      "linesAdded": 27,
-      "linesRemoved": 27,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 28,
+      "linesRemoved": 28,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/mcp/rules.json",
       "changeType": "modified",
-      "linesAdded": 26,
-      "linesRemoved": 26,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".../memories/modules/qa-/-manual-verification.json",
       "changeType": "modified",
-      "linesAdded": 26,
-      "linesRemoved": 26,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/qa.json",
       "changeType": "modified",
-      "linesAdded": 27,
-      "linesRemoved": 27,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 28,
+      "linesRemoved": 28,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/qa/manual-verification.json",
       "changeType": "modified",
-      "linesAdded": 26,
-      "linesRemoved": 26,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/qa/mcp.json",
       "changeType": "modified",
-      "linesAdded": 26,
-      "linesRemoved": 26,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/release.json",
       "changeType": "modified",
-      "linesAdded": 27,
-      "linesRemoved": 27,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 28,
+      "linesRemoved": 28,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/run-data-/-mcp.json",
       "changeType": "modified",
-      "linesAdded": 26,
-      "linesRemoved": 26,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/skills.json",
       "changeType": "modified",
-      "linesAdded": 28,
-      "linesRemoved": 28,
-      "changeCount": 10,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 29,
+      "linesRemoved": 29,
+      "changeCount": 11,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/aida.json",
       "changeType": "modified",
-      "linesAdded": 19,
-      "linesRemoved": 19,
-      "changeCount": 7,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 20,
+      "linesRemoved": 20,
+      "changeCount": 8,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": ".aida/memories/modules/process.json",
       "changeType": "modified",
-      "linesAdded": 19,
-      "linesRemoved": 19,
-      "changeCount": 7,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 20,
+      "linesRemoved": 20,
+      "changeCount": 8,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": "src/cli/index.ts",
@@ -1753,10 +1773,10 @@
     {
       "path": ".aida/memories/modules/merge.json",
       "changeType": "modified",
-      "linesAdded": 15,
-      "linesRemoved": 20,
-      "changeCount": 4,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 16,
+      "linesRemoved": 21,
+      "changeCount": 5,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": "src/utils/bootstrap.ts",
@@ -1769,33 +1789,49 @@
     {
       "path": ".aida/memories/modules/mcp.json",
       "changeType": "modified",
-      "linesAdded": 10,
-      "linesRemoved": 10,
-      "changeCount": 3,
-      "lastModified": "2026-04-29T02:12:19.819Z"
+      "linesAdded": 11,
+      "linesRemoved": 11,
+      "changeCount": 4,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     },
     {
       "path": "package-lock.json",
       "changeType": "modified",
-      "linesAdded": 6,
-      "linesRemoved": 6,
-      "changeCount": 3,
-      "lastModified": "2026-04-29T02:12:19.820Z"
+      "linesAdded": 8,
+      "linesRemoved": 8,
+      "changeCount": 4,
+      "lastModified": "2026-04-29T02:19:36.729Z"
+    },
+    {
+      "path": ".aida/memories/modules/migration.json",
+      "changeType": "modified",
+      "linesAdded": 1,
+      "linesRemoved": 1,
+      "changeCount": 1,
+      "lastModified": "2026-04-29T02:19:36.729Z"
+    },
+    {
+      "path": "package.json",
+      "changeType": "modified",
+      "linesAdded": 1,
+      "linesRemoved": 1,
+      "changeCount": 1,
+      "lastModified": "2026-04-29T02:19:36.729Z"
     }
   ],
   "metrics": {
-    "aiDeviationRate": 6.98,
-    "bugRate": 20.93,
+    "aiDeviationRate": 6.82,
+    "bugRate": 20.45,
     "reviewPassRate": 100,
     "rulesSedimentedCount": 5,
-    "averageLinesPerTask": 1703,
-    "totalDevelopmentTimeSeconds": 432740,
-    "developmentVelocity": 0.34,
+    "averageLinesPerTask": 1667,
+    "totalDevelopmentTimeSeconds": 433183,
+    "developmentVelocity": 0.35,
     "nodeTimeBreakdown": {
-      "Code Generation": 432740.275,
+      "Code Generation": 433183.464,
       "Bug Fix": 425968.169
     },
-    "actualWorkSeconds": 858708
+    "actualWorkSeconds": 859152
   },
   "timeline": [
     {
@@ -2537,6 +2573,21 @@
       "type": "task-done",
       "title": "TASK-43: 修复迁移遗漏备份运行分支数据问题",
       "timestamp": "2026-04-29T02:12:31.563Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-44: 发布迁移修复版本 1.1.11",
+      "timestamp": "2026-04-29T02:19:11.551Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-37: pass",
+      "timestamp": "2026-04-29T02:19:45.344Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-44: 发布迁移修复版本 1.1.11",
+      "timestamp": "2026-04-29T02:19:54.753Z"
     }
   ],
   "events": [
@@ -4171,6 +4222,43 @@
         "taskId": "TASK-43",
         "tokensConsumed": 0
       }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-29T02:19:11.551Z",
+      "data": {
+        "taskId": "TASK-44"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-29T02:19:11.551Z",
+      "data": {
+        "taskId": "TASK-44"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-29T02:19:36.730Z",
+      "data": {
+        "count": 24
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-29T02:19:45.344Z",
+      "data": {
+        "reviewId": "REV-37",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-29T02:19:54.753Z",
+      "data": {
+        "taskId": "TASK-44",
+        "tokensConsumed": 0
+      }
     }
   ],
   "rules": [
@@ -4217,7 +4305,7 @@
   ],
   "context": {
     "currentTaskId": "TASK-15",
-    "lastUpdated": "2026-04-29T02:12:31.563Z"
+    "lastUpdated": "2026-04-29T02:19:54.753Z"
   },
   "cost": {
     "totalTokens": 0,
