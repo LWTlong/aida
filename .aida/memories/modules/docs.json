@@ -41,7 +41,8 @@
     "Indented conflict markers in custom *.rules.json caused merge parsing failure or empty-array fallback",
     "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
     "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP",
-    "aida_bootstrap status 在当前会话已可调用 AIDA MCP 时仍可能返回 available=false"
+    "aida_bootstrap status 在当前会话已可调用 AIDA MCP 时仍可能返回 available=false",
+    "发布 npm 包时未先在隔离环境执行发布验证，直接在当前工作树发包"
   ],
   "relatedRules": [],
   "tickets": [
@@ -51,5 +52,5 @@
       "updatedAt": "2026-04-27T02:23:37.450Z"
     }
   ],
-  "updatedAt": "2026-04-28T07:19:45.862Z"
+  "updatedAt": "2026-04-29T02:12:31.568Z"
 }

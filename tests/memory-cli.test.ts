@@ -136,6 +136,72 @@ describe('aida memory', () => {
     }
   });
 
+  it('should rebuild the memory index from existing module files', () => {
+    const project = createTestProject();
+    try {
+      ensureDir(resolve(project.root, '.aida', 'memories', 'modules'));
+      writeJson(resolve(project.root, '.aida', 'memories', 'modules', 'profile.json'), {
+        moduleKey: 'profile',
+        title: '个人中心',
+        summary: '用户资料展示、编辑和头像上传',
+        keywords: ['profile', 'account'],
+        entryFiles: ['src/pages/profile/index.tsx'],
+        relatedPaths: [],
+        dataFlow: [],
+        decisions: [],
+        constraints: [],
+        pitfalls: [],
+        relatedRules: [],
+        tickets: [],
+        updatedAt: '2026-04-15T12:00:00.000Z',
+      });
+      writeText(resolve(project.root, '.aida', 'memories', 'index.json'), JSON.stringify({ updatedAt: 'old', modules: [] }, null, 2));
+
+      runCliOutput(project, 'memory build');
+      const memoryIndex = readJson<any>(resolve(project.root, '.aida', 'memories', 'index.json'));
+
+      assert.ok(memoryIndex.modules.some((entry: any) => entry.key === 'profile'));
+      assert.ok(memoryIndex.modules.find((entry: any) => entry.key === 'profile')?.paths.includes('src/pages/profile/index.tsx'));
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should recover searchable index entries from orphan module markdown views', () => {
+    const project = createTestProject();
+    try {
+      ensureDir(resolve(project.root, '.aida', 'memories', 'modules'));
+      writeText(resolve(project.root, '.aida', 'memories', 'modules', 'billing.md'), [
+        '# Module Memory',
+        '',
+        '- Module Key: billing',
+        '- Title: Billing',
+        '- Updated At: 2026-04-15T12:00:00.000Z',
+        '',
+        '## Summary',
+        '',
+        'Billing module memory.',
+        '',
+        '## Keywords',
+        '',
+        '- billing',
+        '',
+        '## Entry Files',
+        '',
+        '- src/pages/billing/index.tsx',
+      ].join('\n'));
+      writeJson(resolve(project.root, '.aida', 'memories', 'index.json'), { updatedAt: 'old', modules: [] });
+
+      const stdout = runCliOutput(project, 'memory search billing');
+      const memoryIndex = readJson<any>(resolve(project.root, '.aida', 'memories', 'index.json'));
+
+      assert.ok(stdout.includes('billing'));
+      assert.ok(memoryIndex.modules.some((entry: any) => entry.key === 'billing'));
+    } finally {
+      project.cleanup();
+    }
+  });
+
   it('should print the aggregated memory pack for a branch', () => {
     const project = createTestProject();
     try {

@@ -12,18 +12,18 @@
     "prdPhases": []
   },
   "summary": {
-    "totalTasks": 40,
-    "completedTasks": 37,
-    "bugCount": 8,
-    "deviationCount": 0,
-    "reviewCount": 32,
-    "reviewPassCount": 32,
+    "totalTasks": 43,
+    "completedTasks": 41,
+    "bugCount": 9,
+    "deviationCount": 3,
+    "reviewCount": 36,
+    "reviewPassCount": 36,
     "reviewFailCount": 0,
-    "rulesSedimented": 3,
+    "rulesSedimented": 5,
     "prdPhaseCount": 0,
-    "filesChanged": 61,
-    "linesAdded": 47254,
-    "linesRemoved": 22649
+    "filesChanged": 63,
+    "linesAdded": 49805,
+    "linesRemoved": 23424
   },
   "workflow": [],
   "tasks": [
@@ -459,13 +459,46 @@
     {
       "taskId": "TASK-40",
       "title": "发布 aida_bootstrap 可用性修复到 npm",
-      "status": "in-progress",
+      "status": "done",
       "stageName": "Release",
       "prdPhase": "",
       "acceptance": "",
       "createdAt": "2026-04-28T07:19:45.851Z",
       "startedAt": "2026-04-28T07:19:45.852Z",
-      "completedAt": null
+      "completedAt": "2026-04-28T07:42:47.552Z"
+    },
+    {
+      "taskId": "TASK-41",
+      "title": "修复旧项目迁移规则污染与记忆索引自愈缺陷",
+      "status": "done",
+      "stageName": "Migration",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-28T11:21:14.697Z",
+      "startedAt": "2026-04-28T11:21:14.701Z",
+      "completedAt": "2026-04-28T11:25:55.615Z"
+    },
+    {
+      "taskId": "TASK-42",
+      "title": "补强真实项目迁移污染清理验证",
+      "status": "done",
+      "stageName": "Migration",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-28T12:07:21.507Z",
+      "startedAt": "2026-04-28T12:07:21.507Z",
+      "completedAt": "2026-04-28T12:07:32.353Z"
+    },
+    {
+      "taskId": "TASK-43",
+      "title": "修复迁移遗漏备份运行分支数据问题",
+      "status": "done",
+      "stageName": "Migration",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-04-29T01:57:35.281Z",
+      "startedAt": "2026-04-29T01:57:35.281Z",
+      "completedAt": "2026-04-29T02:12:31.563Z"
     }
   ],
   "bugs": [
@@ -487,10 +520,10 @@
         "src/utils/prompt.ts",
         "tests/build-cli.test.ts"
       ],
-      "fix": "将 aida_bootstrap 的 available 判定扩展为“项目配置命中或当前 MCP 会话已成功调用”，并返回 configured/sessionAvailable 以消除歧义",
+      "fix": "确认 MTR-2376 缺失属于真实项目多次迁移后的现场数据缺口，不作为通用包兼容逻辑处理；从真实项目备份明确复制 MTR-2376 到 .aida/runs 后，使用修复后的 CLI 重建产物并验证 4 个 run、4 个 context/memory、15 个模块记忆索引一致。",
       "taskId": "TASK-04",
       "reportedAt": "2026-04-24T03:52:34.931Z",
-      "fixedAt": "2026-04-28T06:53:07.365Z"
+      "fixedAt": "2026-04-29T02:12:03.100Z"
     },
     {
       "bugId": "BUG-01",
@@ -723,9 +756,168 @@
       "taskId": "TASK-39",
       "reportedAt": "2026-04-28T06:50:56.824Z",
       "fixedAt": null
+    },
+    {
+      "bugId": "BUG-01",
+      "title": "真实项目迁移产物缺失 .aida_corrupted_bak 中存在的 MTR-2376 历史运行数据",
+      "severity": "high",
+      "source": "user-feedback",
+      "status": "open",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/aida.json",
+        ".aida/memories/modules/cli.json",
+        ".aida/memories/modules/cli/mcp.json",
+        ".aida/memories/modules/docs.json",
+        ".aida/memories/modules/git.json",
+        ".aida/memories/modules/import.json",
+        ".aida/memories/modules/mcp.json",
+        ".aida/memories/modules/mcp/rules.json",
+        ".aida/memories/modules/merge.json",
+        ".aida/memories/modules/process.json",
+        ".aida/memories/modules/qa-/-manual-verification.json",
+        ".aida/memories/modules/qa.json",
+        ".aida/memories/modules/qa/manual-verification.json",
+        ".aida/memories/modules/qa/mcp.json",
+        ".aida/memories/modules/release.json",
+        ".aida/memories/modules/run-data-/-mcp.json",
+        ".aida/memories/modules/skills.json",
+        ".aida/rules.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        "package-lock.json",
+        "src/utils/import.ts",
+        "src/utils/memory.ts",
+        "tests/import-cli.test.ts",
+        "tests/memory-cli.test.ts",
+        "tests/migrate-legacy-cli.test.ts"
+      ],
+      "fix": null,
+      "taskId": "TASK-15",
+      "reportedAt": "2026-04-29T01:57:03.785Z",
+      "fixedAt": null
     }
   ],
-  "deviations": [],
+  "deviations": [
+    {
+      "deviationId": "DEV-01",
+      "title": "发布 npm 包时未先在隔离环境执行发布验证，直接在当前工作树发包",
+      "rootCauseCategory": "process-omission",
+      "deviationCategory": "process",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/aida.json",
+        ".aida/memories/modules/cli.json",
+        ".aida/memories/modules/cli/mcp.json",
+        ".aida/memories/modules/docs.json",
+        ".aida/memories/modules/git.json",
+        ".aida/memories/modules/import.json",
+        ".aida/memories/modules/mcp.json",
+        ".aida/memories/modules/mcp/rules.json",
+        ".aida/memories/modules/merge.json",
+        ".aida/memories/modules/process.json",
+        ".aida/memories/modules/qa-/-manual-verification.json",
+        ".aida/memories/modules/qa.json",
+        ".aida/memories/modules/qa/manual-verification.json",
+        ".aida/memories/modules/qa/mcp.json",
+        ".aida/memories/modules/release.json",
+        ".aida/memories/modules/run-data-/-mcp.json",
+        ".aida/memories/modules/skills.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json"
+      ],
+      "ruleSedimented": null,
+      "detectedAt": "2026-04-28T07:28:30.186Z",
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-02",
+      "title": "真实项目迁移验证误跑 npm run build，验证目标偏离迁移产物正确性",
+      "rootCauseCategory": "misunderstanding",
+      "deviationCategory": "process",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/aida.json",
+        ".aida/memories/modules/cli.json",
+        ".aida/memories/modules/cli/mcp.json",
+        ".aida/memories/modules/docs.json",
+        ".aida/memories/modules/git.json",
+        ".aida/memories/modules/import.json",
+        ".aida/memories/modules/mcp.json",
+        ".aida/memories/modules/mcp/rules.json",
+        ".aida/memories/modules/merge.json",
+        ".aida/memories/modules/process.json",
+        ".aida/memories/modules/qa-/-manual-verification.json",
+        ".aida/memories/modules/qa.json",
+        ".aida/memories/modules/qa/manual-verification.json",
+        ".aida/memories/modules/qa/mcp.json",
+        ".aida/memories/modules/release.json",
+        ".aida/memories/modules/run-data-/-mcp.json",
+        ".aida/memories/modules/skills.json",
+        ".aida/rules.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        "package-lock.json",
+        "src/utils/import.ts",
+        "src/utils/memory.ts",
+        "tests/import-cli.test.ts",
+        "tests/memory-cli.test.ts",
+        "tests/migrate-legacy-cli.test.ts"
+      ],
+      "ruleSedimented": null,
+      "detectedAt": "2026-04-29T01:48:24.167Z",
+      "fixedAt": null
+    },
+    {
+      "deviationId": "DEV-03",
+      "title": "将真实项目现场的 .aida_corrupted_bak 恢复逻辑硬编码进通用 migrate-legacy 命令",
+      "rootCauseCategory": "misunderstanding",
+      "deviationCategory": "architecture",
+      "aiOutput": "",
+      "expectedOutput": "",
+      "files": [
+        ".aida/memories/index.json",
+        ".aida/memories/modules/aida.json",
+        ".aida/memories/modules/cli.json",
+        ".aida/memories/modules/cli/mcp.json",
+        ".aida/memories/modules/docs.json",
+        ".aida/memories/modules/git.json",
+        ".aida/memories/modules/import.json",
+        ".aida/memories/modules/mcp.json",
+        ".aida/memories/modules/mcp/rules.json",
+        ".aida/memories/modules/merge.json",
+        ".aida/memories/modules/process.json",
+        ".aida/memories/modules/qa-/-manual-verification.json",
+        ".aida/memories/modules/qa.json",
+        ".aida/memories/modules/qa/manual-verification.json",
+        ".aida/memories/modules/qa/mcp.json",
+        ".aida/memories/modules/release.json",
+        ".aida/memories/modules/run-data-/-mcp.json",
+        ".aida/memories/modules/skills.json",
+        ".aida/rules.json",
+        ".aida/runs/main/context.json",
+        ".aida/runs/main/requirement.json",
+        ".aida/runs/main/vito-long/run.json",
+        "package-lock.json",
+        "src/cli/commands/migrate-legacy.ts",
+        "src/utils/import.ts",
+        "src/utils/memory.ts",
+        "tests/import-cli.test.ts",
+        "tests/memory-cli.test.ts",
+        "tests/migrate-legacy-cli.test.ts"
+      ],
+      "ruleSedimented": null,
+      "detectedAt": "2026-04-29T02:00:20.681Z",
+      "fixedAt": null
+    }
+  ],
   "reviews": [
     {
       "reviewId": "REV-01",
@@ -1047,6 +1239,42 @@
       "scope": "src/utils/bootstrap.ts, src/mcp/server.ts, tests/mcp-server.test.ts",
       "reviewedAt": "2026-04-28T06:53:07.229Z",
       "issues": []
+    },
+    {
+      "reviewId": "REV-33",
+      "taskId": "TASK-40",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/utils/bootstrap.ts, src/mcp/server.ts, tests/mcp-server.test.ts, package.json",
+      "reviewedAt": "2026-04-28T07:22:22.059Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-34",
+      "taskId": "TASK-41",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/utils/import.ts, src/utils/memory.ts, tests/import-cli.test.ts, tests/memory-cli.test.ts",
+      "reviewedAt": "2026-04-28T11:25:51.657Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-35",
+      "taskId": "TASK-42",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "import/migration parser hardening, memory index rebuild, real project migration verification",
+      "reviewedAt": "2026-04-28T12:07:29.244Z",
+      "issues": []
+    },
+    {
+      "reviewId": "REV-36",
+      "taskId": "TASK-43",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "src/utils/import.ts, src/utils/memory.ts, tests/import-cli.test.ts, tests/memory-cli.test.ts, tests/migrate-legacy-cli.test.ts, real project migration artifacts",
+      "reviewedAt": "2026-04-29T02:12:24.420Z",
+      "issues": []
     }
   ],
   "files": [
@@ -1085,42 +1313,42 @@
     {
       "path": ".aida/memories/index.json",
       "changeType": "modified",
-      "linesAdded": 1689,
-      "linesRemoved": 818,
-      "changeCount": 25,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 1835,
+      "linesRemoved": 886,
+      "changeCount": 28,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/git.json",
       "changeType": "modified",
-      "linesAdded": 242,
-      "linesRemoved": 242,
-      "changeCount": 25,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 245,
+      "linesRemoved": 245,
+      "changeCount": 28,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/runs/main/context.json",
       "changeType": "modified",
-      "linesAdded": 372,
-      "linesRemoved": 374,
-      "changeCount": 25,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 389,
+      "linesRemoved": 391,
+      "changeCount": 28,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/runs/main/requirement.json",
       "changeType": "modified",
-      "linesAdded": 397,
-      "linesRemoved": 411,
-      "changeCount": 25,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 443,
+      "linesRemoved": 450,
+      "changeCount": 28,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/runs/main/vito-long/run.json",
       "changeType": "modified",
-      "linesAdded": 24174,
-      "linesRemoved": 1669,
-      "changeCount": 25,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 25282,
+      "linesRemoved": 1962,
+      "changeCount": 28,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": "src/cli/commands/init.ts",
@@ -1173,10 +1401,10 @@
     {
       "path": "tests/migrate-legacy-cli.test.ts",
       "changeType": "created",
-      "linesAdded": 896,
-      "linesRemoved": 304,
-      "changeCount": 19,
-      "lastModified": "2026-04-28T03:22:32.022Z"
+      "linesAdded": 906,
+      "linesRemoved": 314,
+      "changeCount": 21,
+      "lastModified": "2026-04-29T02:12:19.820Z"
     },
     {
       "path": "src/cli/commands/merge.ts",
@@ -1269,10 +1497,10 @@
     {
       "path": "src/utils/import.ts",
       "changeType": "modified",
-      "linesAdded": 1268,
-      "linesRemoved": 478,
-      "changeCount": 11,
-      "lastModified": "2026-04-27T08:18:46.771Z"
+      "linesAdded": 1511,
+      "linesRemoved": 537,
+      "changeCount": 14,
+      "lastModified": "2026-04-29T02:12:19.820Z"
     },
     {
       "path": "src/utils/skills.ts",
@@ -1285,18 +1513,18 @@
     {
       "path": "tests/import-cli.test.ts",
       "changeType": "created",
-      "linesAdded": 752,
-      "linesRemoved": 333,
-      "changeCount": 12,
-      "lastModified": "2026-04-28T03:22:32.022Z"
+      "linesAdded": 1005,
+      "linesRemoved": 390,
+      "changeCount": 15,
+      "lastModified": "2026-04-29T02:12:19.820Z"
     },
     {
       "path": ".aida/rules.json",
       "changeType": "created",
-      "linesAdded": 312,
+      "linesAdded": 364,
       "linesRemoved": 0,
-      "changeCount": 12,
-      "lastModified": "2026-04-27T12:48:20.535Z"
+      "changeCount": 15,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": "src/cli/commands/import.ts",
@@ -1389,130 +1617,130 @@
     {
       "path": "src/utils/memory.ts",
       "changeType": "modified",
-      "linesAdded": 36,
-      "linesRemoved": 36,
-      "changeCount": 4,
-      "lastModified": "2026-04-27T12:48:20.535Z"
+      "linesAdded": 353,
+      "linesRemoved": 107,
+      "changeCount": 7,
+      "lastModified": "2026-04-29T02:12:19.820Z"
     },
     {
       "path": "tests/memory-cli.test.ts",
       "changeType": "created",
-      "linesAdded": 309,
+      "linesAdded": 507,
       "linesRemoved": 0,
-      "changeCount": 4,
-      "lastModified": "2026-04-27T12:48:20.535Z"
+      "changeCount": 7,
+      "lastModified": "2026-04-29T02:12:19.820Z"
     },
     {
       "path": ".aida/memories/modules/cli.json",
       "changeType": "modified",
-      "linesAdded": 16,
-      "linesRemoved": 16,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 19,
+      "linesRemoved": 19,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/cli/mcp.json",
       "changeType": "modified",
-      "linesAdded": 16,
-      "linesRemoved": 16,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 26,
+      "linesRemoved": 26,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/docs.json",
       "changeType": "modified",
-      "linesAdded": 18,
-      "linesRemoved": 18,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/import.json",
       "changeType": "modified",
-      "linesAdded": 17,
-      "linesRemoved": 17,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/mcp/rules.json",
       "changeType": "modified",
-      "linesAdded": 16,
-      "linesRemoved": 16,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 26,
+      "linesRemoved": 26,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".../memories/modules/qa-/-manual-verification.json",
       "changeType": "modified",
-      "linesAdded": 16,
-      "linesRemoved": 16,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 26,
+      "linesRemoved": 26,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/qa.json",
       "changeType": "modified",
-      "linesAdded": 17,
-      "linesRemoved": 17,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/qa/manual-verification.json",
       "changeType": "modified",
-      "linesAdded": 16,
-      "linesRemoved": 16,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 26,
+      "linesRemoved": 26,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/qa/mcp.json",
       "changeType": "modified",
-      "linesAdded": 16,
-      "linesRemoved": 16,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 26,
+      "linesRemoved": 26,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/release.json",
       "changeType": "modified",
-      "linesAdded": 17,
-      "linesRemoved": 17,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 27,
+      "linesRemoved": 27,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/run-data-/-mcp.json",
       "changeType": "modified",
-      "linesAdded": 16,
-      "linesRemoved": 16,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 26,
+      "linesRemoved": 26,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/skills.json",
       "changeType": "modified",
-      "linesAdded": 18,
-      "linesRemoved": 18,
-      "changeCount": 7,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 28,
+      "linesRemoved": 28,
+      "changeCount": 10,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/aida.json",
       "changeType": "modified",
-      "linesAdded": 9,
-      "linesRemoved": 9,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 19,
+      "linesRemoved": 19,
+      "changeCount": 7,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": ".aida/memories/modules/process.json",
       "changeType": "modified",
-      "linesAdded": 9,
-      "linesRemoved": 9,
-      "changeCount": 4,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 19,
+      "linesRemoved": 19,
+      "changeCount": 7,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": "src/cli/index.ts",
@@ -1525,10 +1753,10 @@
     {
       "path": ".aida/memories/modules/merge.json",
       "changeType": "modified",
-      "linesAdded": 5,
-      "linesRemoved": 10,
-      "changeCount": 1,
-      "lastModified": "2026-04-28T06:53:07.156Z"
+      "linesAdded": 15,
+      "linesRemoved": 20,
+      "changeCount": 4,
+      "lastModified": "2026-04-29T02:12:19.819Z"
     },
     {
       "path": "src/utils/bootstrap.ts",
@@ -1537,21 +1765,37 @@
       "linesRemoved": 5,
       "changeCount": 1,
       "lastModified": "2026-04-28T06:53:07.156Z"
+    },
+    {
+      "path": ".aida/memories/modules/mcp.json",
+      "changeType": "modified",
+      "linesAdded": 10,
+      "linesRemoved": 10,
+      "changeCount": 3,
+      "lastModified": "2026-04-29T02:12:19.819Z"
+    },
+    {
+      "path": "package-lock.json",
+      "changeType": "modified",
+      "linesAdded": 6,
+      "linesRemoved": 6,
+      "changeCount": 3,
+      "lastModified": "2026-04-29T02:12:19.820Z"
     }
   ],
   "metrics": {
-    "aiDeviationRate": 0,
-    "bugRate": 20,
+    "aiDeviationRate": 6.98,
+    "bugRate": 20.93,
     "reviewPassRate": 100,
-    "rulesSedimentedCount": 3,
-    "averageLinesPerTask": 1748,
-    "totalDevelopmentTimeSeconds": 364775,
-    "developmentVelocity": 0.37,
+    "rulesSedimentedCount": 5,
+    "averageLinesPerTask": 1703,
+    "totalDevelopmentTimeSeconds": 432740,
+    "developmentVelocity": 0.34,
     "nodeTimeBreakdown": {
-      "Code Generation": 363176.009,
-      "Bug Fix": 356432.434
+      "Code Generation": 432740.275,
+      "Bug Fix": 425968.169
     },
-    "actualWorkSeconds": 719608
+    "actualWorkSeconds": 858708
   },
   "timeline": [
     {
@@ -2203,6 +2447,96 @@
       "type": "task",
       "title": "TASK-40: 发布 aida_bootstrap 可用性修复到 npm",
       "timestamp": "2026-04-28T07:19:45.852Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-33: pass",
+      "timestamp": "2026-04-28T07:22:22.060Z"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-01: 发布 npm 包时未先在隔离环境执行发布验证，直接在当前工作树发包",
+      "timestamp": "2026-04-28T07:28:30.187Z"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-004: 发布或隔离验证应优先隔离命令环境，不得为规避环境污染随意创建 git worktree；执行 git",
+      "timestamp": "2026-04-28T07:33:41.382Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-40: 发布 aida_bootstrap 可用性修复到 npm",
+      "timestamp": "2026-04-28T07:42:47.556Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-41: 修复旧项目迁移规则污染与记忆索引自愈缺陷",
+      "timestamp": "2026-04-28T11:21:14.701Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-34: pass",
+      "timestamp": "2026-04-28T11:25:51.657Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-41: 修复旧项目迁移规则污染与记忆索引自愈缺陷",
+      "timestamp": "2026-04-28T11:25:55.615Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-42: 补强真实项目迁移污染清理验证",
+      "timestamp": "2026-04-28T12:07:21.507Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-35: pass",
+      "timestamp": "2026-04-28T12:07:29.244Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-42: 补强真实项目迁移污染清理验证",
+      "timestamp": "2026-04-28T12:07:32.353Z"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-02: 真实项目迁移验证误跑 npm run build，验证目标偏离迁移产物正确性",
+      "timestamp": "2026-04-29T01:48:24.169Z"
+    },
+    {
+      "type": "bug",
+      "title": "BUG-01: 真实项目迁移产物缺失 .aida_corrupted_bak 中存在的 MTR-2376 历史运行数据",
+      "timestamp": "2026-04-29T01:57:03.786Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-43: 修复迁移遗漏备份运行分支数据问题",
+      "timestamp": "2026-04-29T01:57:35.281Z"
+    },
+    {
+      "type": "deviation",
+      "title": "DEV-03: 将真实项目现场的 .aida_corrupted_bak 恢复逻辑硬编码进通用 migrate-legacy 命令",
+      "timestamp": "2026-04-29T02:00:20.681Z"
+    },
+    {
+      "type": "rule",
+      "title": "RULE-005: 处理用户反馈或真实项目异常前，必须先梳理完整流程和业务边界；如果用户提出的修复方向可能不属于通用产品",
+      "timestamp": "2026-04-29T02:08:45.269Z"
+    },
+    {
+      "type": "bug-fix",
+      "title": "BUG-01: CLI interactive prompts left TTY open and mis-rendered multi-select cursor updates",
+      "timestamp": "2026-04-29T02:12:03.101Z"
+    },
+    {
+      "type": "review",
+      "title": "REV-36: pass",
+      "timestamp": "2026-04-29T02:12:24.420Z"
+    },
+    {
+      "type": "task-done",
+      "title": "TASK-43: 修复迁移遗漏备份运行分支数据问题",
+      "timestamp": "2026-04-29T02:12:31.563Z"
     }
   ],
   "events": [
@@ -3651,6 +3985,192 @@
       "data": {
         "taskId": "TASK-40"
       }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-28T07:22:22.060Z",
+      "data": {
+        "reviewId": "REV-33",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "deviation_created",
+      "time": "2026-04-28T07:28:30.187Z",
+      "data": {
+        "deviationId": "DEV-01"
+      }
+    },
+    {
+      "type": "rule_sedimented",
+      "time": "2026-04-28T07:33:41.382Z",
+      "data": {
+        "ruleId": "RULE-004",
+        "registryId": "RULE-043"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-28T07:42:47.555Z",
+      "data": {
+        "taskId": "TASK-40",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "highlight_added",
+      "time": "2026-04-28T07:42:47.733Z",
+      "data": {
+        "content": "ai-dev-analytics@1.1.10 已通过公共 npm 源在隔离命令环境发布，修复 aida_bootstrap 可用性误判并补充集中授权真实链路验证。"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-28T11:21:14.701Z",
+      "data": {
+        "taskId": "TASK-41"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-28T11:21:14.701Z",
+      "data": {
+        "taskId": "TASK-41"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-28T11:25:47.177Z",
+      "data": {
+        "count": 27
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-28T11:25:51.657Z",
+      "data": {
+        "reviewId": "REV-34",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-28T11:25:55.615Z",
+      "data": {
+        "taskId": "TASK-41",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-28T12:07:21.507Z",
+      "data": {
+        "taskId": "TASK-42"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-28T12:07:21.507Z",
+      "data": {
+        "taskId": "TASK-42"
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-28T12:07:24.735Z",
+      "data": {
+        "count": 28
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-28T12:07:29.244Z",
+      "data": {
+        "reviewId": "REV-35",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-28T12:07:32.353Z",
+      "data": {
+        "taskId": "TASK-42",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "deviation_created",
+      "time": "2026-04-29T01:48:24.169Z",
+      "data": {
+        "deviationId": "DEV-02"
+      }
+    },
+    {
+      "type": "bug_created",
+      "time": "2026-04-29T01:57:03.786Z",
+      "data": {
+        "bugId": "BUG-01"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-04-29T01:57:35.281Z",
+      "data": {
+        "taskId": "TASK-43"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-04-29T01:57:35.281Z",
+      "data": {
+        "taskId": "TASK-43"
+      }
+    },
+    {
+      "type": "deviation_created",
+      "time": "2026-04-29T02:00:20.681Z",
+      "data": {
+        "deviationId": "DEV-03"
+      }
+    },
+    {
+      "type": "rule_sedimented",
+      "time": "2026-04-29T02:08:45.269Z",
+      "data": {
+        "ruleId": "RULE-005",
+        "registryId": "RULE-044"
+      }
+    },
+    {
+      "type": "bug_fixed",
+      "time": "2026-04-29T02:12:03.101Z",
+      "data": {
+        "bugId": "BUG-01",
+        "tokensConsumed": 0
+      }
+    },
+    {
+      "type": "files_scanned",
+      "time": "2026-04-29T02:12:19.820Z",
+      "data": {
+        "count": 28
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-04-29T02:12:24.420Z",
+      "data": {
+        "reviewId": "REV-36",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_completed",
+      "time": "2026-04-29T02:12:31.563Z",
+      "data": {
+        "taskId": "TASK-43",
+        "tokensConsumed": 0
+      }
     }
   ],
   "rules": [
@@ -3677,11 +4197,27 @@
       "category": "process",
       "sourceDeviation": null,
       "sedimentedAt": "2026-04-28T03:43:21.789Z"
+    },
+    {
+      "ruleId": "RULE-004",
+      "file": "rules.json#RULE-043",
+      "content": "发布或隔离验证应优先隔离命令环境，不得为规避环境污染随意创建 git worktree；执行 git 命令前必须先确认写入范围与副作用，涉及 worktree、branch、index 的操作必须采用最小副作用方案。",
+      "category": "process",
+      "sourceDeviation": "DEV-01",
+      "sedimentedAt": "2026-04-28T07:33:41.382Z"
+    },
+    {
+      "ruleId": "RULE-005",
+      "file": "rules.json#RULE-044",
+      "content": "处理用户反馈或真实项目异常前，必须先梳理完整流程和业务边界；如果用户提出的修复方向可能不属于通用产品缺陷，必须先说明判断、风险和建议方案并与用户确认，不能直接把一次性现场修复写进通用代码。",
+      "category": "process",
+      "sourceDeviation": "DEV-03",
+      "sedimentedAt": "2026-04-29T02:08:45.269Z"
     }
   ],
   "context": {
-    "currentTaskId": "TASK-40",
-    "lastUpdated": "2026-04-28T07:19:45.852Z"
+    "currentTaskId": "TASK-15",
+    "lastUpdated": "2026-04-29T02:12:31.563Z"
   },
   "cost": {
     "totalTokens": 0,
@@ -3709,6 +4245,11 @@
       "content": "Release-path validation now includes real built-command execution inside the AIDA repo itself, root-level rules conflict sample verification, MCP bootstrap/task/record/memory handshake, package dry-run, and a slash-module memory-path regression fix proven by real migrate-legacy rerun.",
       "source": "auto",
       "createdAt": "2026-04-27T08:09:59.537Z"
+    },
+    {
+      "content": "ai-dev-analytics@1.1.10 已通过公共 npm 源在隔离命令环境发布，修复 aida_bootstrap 可用性误判并补充集中授权真实链路验证。",
+      "source": "auto",
+      "createdAt": "2026-04-28T07:42:47.733Z"
     }
   ]
 }

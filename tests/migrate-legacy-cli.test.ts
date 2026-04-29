@@ -25,7 +25,7 @@ describe('aida migrate-legacy', () => {
       writeText(resolve(root, '.aidevos', 'rules', '_all.md'), '# Rules\n\n- use .aidevos paths\n');
       writeText(resolve(root, 'AGENTS.md'), 'Read .aidevos/aida-guide.md first\n');
       writeText(resolve(root, '.gitignore'), '.aidevos/rules/*.md\n');
-      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Imported cursor rule\n');
+      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Must follow imported cursor rule\n');
       writeText(resolve(root, '.cursor', 'skills', 'custom-flow', 'SKILL.md'), '# Custom Flow\n\nImported from cursor\n');
       writeText(
         resolve(root, '.cursor', 'mcp.json'),
@@ -93,7 +93,7 @@ describe('aida migrate-legacy', () => {
       const skills = readJson<any[]>(resolve(root, '.aida', 'skills.json'));
       const migratedRun = readJson<any>(resolve(root, '.aida', 'runs', 'feature-big', 'tester', 'run.json'));
 
-      assert.ok(rules.some((entry) => entry.content === 'Imported cursor rule'));
+      assert.ok(rules.some((entry) => entry.content === 'Must follow imported cursor rule'));
       assert.ok(skills.some((entry) => entry.name === 'custom-flow'));
       assert.equal(migratedRun.meta.schemaVersion, '2.0');
       assert.ok(Array.isArray(migratedRun.highlights));
@@ -172,7 +172,7 @@ describe('aida migrate-legacy', () => {
         aiTools: ['cursor', 'codex'],
       });
       writeText(resolve(root, 'AGENTS.md'), 'Read .aidevos/aida-guide.md first\n');
-      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Imported cursor rule\n');
+      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Must follow imported cursor rule\n');
       writeText(resolve(root, '.codex', 'rules', 'team.md'), '# Codex Rules\n\n- Imported codex rule\n');
       writeText(
         resolve(root, '.cursor', 'mcp.json'),
@@ -223,7 +223,7 @@ describe('aida migrate-legacy', () => {
       ]);
       writeJson(resolve(root, '.aida', 'skills.json'), []);
       writeText(resolve(root, 'AGENTS.md'), 'Read .aida/aida-guide.md first\n');
-      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Imported cursor rule\n');
+      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Must follow imported cursor rule\n');
       writeText(resolve(root, '.codex', 'rules', 'team.md'), '# Codex Rules\n\n- Imported codex rule\n');
       writeText(
         resolve(root, '.cursor', 'mcp.json'),
@@ -273,7 +273,7 @@ describe('aida migrate-legacy', () => {
         aiTools: ['cursor', 'codex'],
       });
       writeText(resolve(root, 'AGENTS.md'), 'Read .aidevos/aida-guide.md first\n');
-      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Imported cursor rule\n');
+      writeText(resolve(root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Must follow imported cursor rule\n');
       writeText(resolve(root, '.codex', 'rules', 'team.md'), '# Codex Rules\n\n- Imported codex rule\n');
 
       const output = execSync(`node ${cliPath} migrate-legacy`, {

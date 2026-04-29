@@ -1,9 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
-import { ensureDir, fileExists, readJson, writeText } from '../src/utils/fs.js';
+import { ensureDir, fileExists, readJson, writeJson, writeText } from '../src/utils/fs.js';
 import { createTestProject, runCliOutput } from './helpers.js';
-import { detectImportableTools, importFromTool } from '../src/utils/import.js';
+import { detectImportableTools, importFromTool, importProjectSourcesWithBaseline } from '../src/utils/import.js';
 
 describe('aida import', () => {
   it('should reverse-read existing rules, skills, and tool configs into JSON sources', () => {
@@ -64,7 +64,7 @@ describe('aida import', () => {
       ensureDir(resolve(project.root, '.cursor', 'skills', 'custom-flow'));
       writeText(
         resolve(project.root, '.cursor', 'rules', 'team.md'),
-        '# Team Rules\n\n- Imported cursor rule\n- API requests must go through shared client\n',
+        '# Team Rules\n\n- Must follow imported cursor rule\n- API requests must go through shared client\n',
       );
       writeText(
         resolve(project.root, '.cursor', 'skills', 'custom-flow', 'SKILL.md'),
@@ -87,9 +87,128 @@ describe('aida import', () => {
       assert.deepEqual(importable, ['cursor']);
       assert.equal(result.rulesImported, 2);
       assert.equal(result.skillsImported, 1);
-      assert.ok(rules.some((entry) => entry.content === 'Imported cursor rule'));
+      assert.ok(rules.some((entry) => entry.content === 'Must follow imported cursor rule'));
       assert.ok(skills.some((entry) => entry.name === 'custom-flow'));
       assert.equal(skills.find((entry) => entry.name === 'custom-flow')?.files?.[0]?.path, 'run.py');
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should avoid importing example and reference bullets as rules', () => {
+    const project = createTestProject();
+
+    try {
+      ensureDir(resolve(project.root, '.cursor', 'rules'));
+      writeText(
+        resolve(project.root, '.cursor', 'rules', 'team.md'),
+        [
+          '# Team Rules',
+          '',
+          '- API requests must go through shared client',
+          '- `routesList.ts` - dynamic route store',
+          '- @param row table row',
+          '- ✅ 必须 Keep generated code consistent',
+          '',
+          '## 示例',
+          '',
+          '- This example bullet should not become a rule',
+          '',
+          '```ts',
+          '- code fence bullet should not become a rule',
+          '```',
+        ].join('\n'),
+      );
+
+      const result = importFromTool(project.root, 'cursor');
+      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+
+      assert.equal(result.rulesImported, 2);
+      assert.ok(rules.some((entry) => entry.content === 'API requests must go through shared client'));
+      assert.ok(rules.some((entry) => String(entry.content).includes('generated code consistent')));
+      assert.ok(!rules.some((entry) => String(entry.content).includes('routesList.ts')));
+      assert.ok(!rules.some((entry) => String(entry.content).includes('@param')));
+      assert.ok(!rules.some((entry) => String(entry.content).includes('example bullet')));
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should replace previously imported baseline rules without reimporting stale generated views', () => {
+    const project = createTestProject();
+
+    try {
+      ensureDir(resolve(project.root, '.aida', 'rules'));
+      ensureDir(resolve(project.root, '.cursor', 'rules'));
+      writeJson(resolve(project.root, '.aida', 'rules.json'), [
+        {
+          id: 'RULE-001',
+          category: 'general',
+          content: '`routesList.ts` - stale generated-view pollution',
+          fingerprint: 'stale-fp',
+          source: { branch: 'import:cursor', deviation: null, author: 'import' },
+          createdAt: '2026-04-28T00:00:00.000Z',
+          status: 'active',
+        },
+        {
+          id: 'RULE-002',
+          category: 'process',
+          content: 'Manual project rule should stay',
+          fingerprint: 'manual-fp',
+          source: { branch: 'main', deviation: null, author: 'test' },
+          createdAt: '2026-04-28T00:00:00.000Z',
+          status: 'active',
+        },
+      ]);
+      writeText(resolve(project.root, '.aida', 'rules', '_all.md'), [
+        '<!-- AUTO-GENERATED from rules.json - DO NOT EDIT -->',
+        '# All Project Rules',
+        '',
+        '## General',
+        '',
+        '- [RULE-001] `routesList.ts` - stale generated-view pollution',
+      ].join('\n'));
+      writeText(resolve(project.root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Must use shared request client\n');
+
+      const result = importProjectSourcesWithBaseline(project.root, 'cursor');
+      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+
+      assert.equal(result.baseline.rulesImported, 1);
+      assert.ok(rules.some((entry) => entry.content === 'Manual project rule should stay'));
+      assert.ok(rules.some((entry) => entry.content === 'Must use shared request client'));
+      assert.ok(!rules.some((entry) => String(entry.content).includes('routesList.ts')));
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should skip generated rule files that declare a different project name', () => {
+    const project = createTestProject();
+
+    try {
+      writeJson(resolve(project.root, 'package.json'), { name: 'current-project' });
+      ensureDir(resolve(project.root, '.cursor', 'rules'));
+      writeText(resolve(project.root, '.cursor', 'rules', 'foreign.md'), [
+        '# Project Rules',
+        '',
+        '本文档定义了 other-project 项目的代码生成规范。',
+        '',
+        '- Must not be imported from another project',
+      ].join('\n'));
+      writeText(resolve(project.root, '.cursor', 'rules', 'local.md'), [
+        '# Project Rules',
+        '',
+        '本文档定义了 current-project 项目的代码生成规范。',
+        '',
+        '- Must import local project rules',
+      ].join('\n'));
+
+      const result = importFromTool(project.root, 'cursor');
+      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+
+      assert.equal(result.rulesImported, 1);
+      assert.ok(rules.some((entry) => entry.content === 'Must import local project rules'));
+      assert.ok(!rules.some((entry) => entry.content === 'Must not be imported from another project'));
     } finally {
       project.cleanup();
     }
@@ -199,7 +318,7 @@ description: AIDA 数据采集与规则沉淀规范
       );
       writeText(
         resolve(project.root, '.cursor', 'rules', 'team.md'),
-        '# Team Rules\n\n- Imported cursor rule\n',
+        '# Team Rules\n\n- Must follow imported cursor rule\n',
       );
       writeText(
         resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md'),
@@ -211,7 +330,7 @@ description: AIDA 数据采集与规则沉淀规范
       const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
 
       assert.equal(result.rulesImported, 1);
-      assert.ok(rules.some((entry) => entry.content === 'Imported cursor rule'));
+      assert.ok(rules.some((entry) => entry.content === 'Must follow imported cursor rule'));
       assert.ok(!rules.some((entry) => String(entry.content).includes('AIDA 数据采集与规则沉淀指南')));
       assert.ok(skills.some((entry) => entry.name === 'workflow-orchestrator'));
       assert.ok(!skills.some((entry) => entry.name === 'workflow'));
@@ -229,7 +348,7 @@ description: AIDA 数据采集与规则沉淀规范
       ensureDir(resolve(project.root, '.cursor'));
       writeText(
         resolve(project.root, '.cursor', 'rules', 'team.md'),
-        '# Team Rules\n\n- Imported cursor rule\n',
+        '# Team Rules\n\n- Must follow imported cursor rule\n',
       );
       writeText(
         resolve(project.root, '.cursor', 'skills', 'custom-flow', 'SKILL.md'),
@@ -245,7 +364,7 @@ description: AIDA 数据采集与规则沉淀规范
       const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
 
       assert.ok(output.includes('Baseline: cursor'));
-      assert.ok(rules.some((entry) => entry.content === 'Imported cursor rule'));
+      assert.ok(rules.some((entry) => entry.content === 'Must follow imported cursor rule'));
       assert.ok(skills.some((entry) => entry.name === 'custom-flow'));
     } finally {
       project.cleanup();
