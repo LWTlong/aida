@@ -1,8 +1,10 @@
-import { readdirSync, statSync } from 'node:fs';
+import { readdirSync, renameSync, rmSync, statSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
 import { ensureDir, fileExists, readJson, readText, writeJson, writeText } from './fs.js';
 import {
   branchDir,
+  legacyModuleMemoryPath,
+  legacyModuleMemoryViewPath,
   memoriesDir,
   memoryIndexPath,
   moduleMemoriesDir,
@@ -123,6 +125,49 @@ function walkMarkdownFiles(rootDir: string): string[] {
   }
 
   return result.sort();
+}
+
+function pruneEmptyModuleMemoryDirs(rootDir: string): void {
+  if (!fileExists(rootDir)) return;
+
+  for (const name of readdirSync(rootDir)) {
+    const full = resolve(rootDir, name);
+    if (!statSync(full).isDirectory()) continue;
+    pruneEmptyModuleMemoryDirs(full);
+    if (readdirSync(full).length === 0) {
+      rmSync(full, { recursive: true, force: true });
+    }
+  }
+}
+
+function migrateLegacyNestedModuleMemoryLayout(projectRoot: string): void {
+  const rootDir = moduleMemoriesDir(projectRoot);
+  if (!fileExists(rootDir)) return;
+
+  const files = [
+    ...walkJsonFiles(rootDir).filter((file) => basename(file) !== 'index.json'),
+    ...walkMarkdownFiles(rootDir),
+  ];
+
+  for (const file of files) {
+    const relative = file.slice(rootDir.length + 1).replace(/\\/g, '/');
+    if (!relative.includes('/')) continue;
+
+    const moduleKey = relative.replace(/\.(json|md)$/u, '');
+    const target = file.endsWith('.json')
+      ? moduleMemoryPath(projectRoot, moduleKey)
+      : moduleMemoryViewPath(projectRoot, moduleKey);
+    if (target === file) continue;
+
+    ensureDir(dirname(target));
+    if (fileExists(target)) {
+      rmSync(file, { force: true });
+      continue;
+    }
+    renameSync(file, target);
+  }
+
+  pruneEmptyModuleMemoryDirs(rootDir);
 }
 
 function walkRunJsonFiles(rootDir: string): string[] {
@@ -355,9 +400,13 @@ export function loadModuleMemory(projectRoot: string, moduleKey: string): Module
   const normalized = normalizeModuleKey(moduleKey);
   const path = moduleMemoryPath(projectRoot, normalized);
   if (fileExists(path)) return readJson<ModuleMemoryRecord>(path);
+  const legacyPath = legacyModuleMemoryPath(projectRoot, normalized);
+  if (fileExists(legacyPath)) return readJson<ModuleMemoryRecord>(legacyPath);
   const viewPath = moduleMemoryViewPath(projectRoot, normalized);
-  if (!fileExists(viewPath)) return null;
-  return moduleMemoryRecordFromMarkdown(readText(viewPath));
+  if (fileExists(viewPath)) return moduleMemoryRecordFromMarkdown(readText(viewPath));
+  const legacyViewPath = legacyModuleMemoryViewPath(projectRoot, normalized);
+  if (!fileExists(legacyViewPath)) return null;
+  return moduleMemoryRecordFromMarkdown(readText(legacyViewPath));
 }
 
 function upsertMemoryIndexEntry(projectRoot: string, record: ModuleMemoryRecord): void {
@@ -428,6 +477,7 @@ function moduleMemoryRecordFromMarkdown(raw: string): ModuleMemoryRecord | null 
 
 export function rebuildMemoryIndexFromDisk(projectRoot: string): ModuleMemoryIndex {
   ensureDir(moduleMemoriesDir(projectRoot));
+  migrateLegacyNestedModuleMemoryLayout(projectRoot);
   const byKey = new Map<string, ModuleMemoryIndexEntry>();
 
   for (const entry of loadMemoryIndex(projectRoot).modules || []) {
@@ -570,6 +620,7 @@ export function renderRunMemoryPackMarkdown(
 
 export function buildMemoryViews(projectRoot: string): BuildMemoryViewsResult {
   ensureDir(moduleMemoriesDir(projectRoot));
+  migrateLegacyNestedModuleMemoryLayout(projectRoot);
   let moduleViews = 0;
   for (const file of walkJsonFiles(moduleMemoriesDir(projectRoot))) {
     if (basename(file) === 'index.json') continue;

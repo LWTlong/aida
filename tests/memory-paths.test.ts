@@ -1,6 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  legacyModuleMemoryPath,
+  legacyModuleMemoryViewPath,
   memoryIndexPath,
   moduleMemoryPath,
   moduleMemoryViewPath,
@@ -22,6 +24,10 @@ describe('memory path helpers', () => {
     assert.equal(memoryIndexPath(root), '/tmp/example-project/.aida/memories/index.json');
     assert.equal(moduleMemoryPath(root, 'profile'), '/tmp/example-project/.aida/memories/modules/profile.json');
     assert.equal(moduleMemoryViewPath(root, 'profile'), '/tmp/example-project/.aida/memories/modules/profile.md');
+    assert.equal(moduleMemoryPath(root, 'order/detail'), '/tmp/example-project/.aida/memories/modules/order_s_detail.json');
+    assert.equal(moduleMemoryViewPath(root, 'order/detail'), '/tmp/example-project/.aida/memories/modules/order_s_detail.md');
+    assert.equal(legacyModuleMemoryPath(root, 'order/detail'), '/tmp/example-project/.aida/memories/modules/order/detail.json');
+    assert.equal(legacyModuleMemoryViewPath(root, 'order/detail'), '/tmp/example-project/.aida/memories/modules/order/detail.md');
     assert.equal(runContextPath(root, 'feature/profile'), '/tmp/example-project/.aida/runs/feature-profile/context.json');
     assert.equal(runContextViewPath(root, 'feature/profile'), '/tmp/example-project/.aida/runs/feature-profile/context.md');
     assert.equal(runMemoryPackViewPath(root, 'feature/profile'), '/tmp/example-project/.aida/runs/feature-profile/memory.md');

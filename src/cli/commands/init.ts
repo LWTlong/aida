@@ -55,7 +55,8 @@ const IRON_RULES_APPEND = `
 1. 禁止任何形式的臆想，不清楚必须询问
 2. 禁止随意生成文档，如需生成文档，必须询问用户是否需要
 3. 生成测试脚本，在测试验证通过后必须删除测试脚本，保持项目清爽
-4. 当用户直接要求沉淀项目级技术规范，或识别到 rule-missing 需要沉淀规则时，必须通过 AIDA MCP 的 aida_log_rule 写入 .aida/rules.json，不要只修改本地规则说明文件
+4. 只有当修改实际落到项目仓库代码或配置后，才进入 AIDA task flow；纯调查、只读分析、聊天、git 历史排查、本地环境操作、不会落库的实验都不记录 task/context/memory
+5. 当用户直接要求沉淀项目级技术规范，或识别到 rule-missing 需要沉淀规则时，必须通过 AIDA MCP 的 aida_log_rule 写入 .aida/rules.json，不要只修改本地规则说明文件
 `;
 
 function printManualUntrackNotice(): void {
@@ -236,6 +237,7 @@ export async function init(): Promise<void> {
     '禁止任何形式的臆想，不清楚必须询问',
     '禁止随意生成文档，如需生成文档，必须询问用户是否需要',
     '生成测试脚本，在测试验证通过后必须删除测试脚本，保持项目清爽',
+    '只有当修改实际落到项目仓库代码或配置后，才进入 AIDA task flow；纯调查、只读分析、聊天、git 历史排查、本地环境操作、不会落库的实验都不记录 task/context/memory',
   ];
   for (const content of ironRules) {
     addRule(projectRoot, {
@@ -248,7 +250,7 @@ export async function init(): Promise<void> {
     });
   }
   console.log(
-    green('  ✓ Created') + ' .aida/rules.json       (with 3 iron rules)',
+    green('  ✓ Created') + ' .aida/rules.json       (with 4 iron rules)',
   );
 
   // 6. Full mode: copy skills + slash commands

@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
-import { ensureDir, readJson, readText, writeJson, writeText } from '../src/utils/fs.js';
+import { ensureDir, fileExists, readJson, readText, writeJson, writeText } from '../src/utils/fs.js';
 import { createTestProject, runCliOutput } from './helpers.js';
 
 describe('aida memory', () => {
@@ -315,8 +315,54 @@ describe('aida memory', () => {
       const stdout = runCliOutput(project, 'memory rebuild main');
 
       assert.ok(stdout.includes('Rebuilt memory'));
-      assert.equal(readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.json')).moduleKey, 'cli/mcp');
-      assert.ok(readText(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.md')).includes('CLI/MCP'));
+      assert.equal(readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', 'cli_s_mcp.json')).moduleKey, 'cli/mcp');
+      assert.ok(readText(resolve(project.root, '.aida', 'memories', 'modules', 'cli_s_mcp.md')).includes('CLI/MCP'));
+      assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli')), false);
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should flatten legacy nested module memory files during memory build', () => {
+    const project = createTestProject();
+    try {
+      ensureDir(resolve(project.root, '.aida', 'memories', 'modules', 'cli'));
+      writeJson(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.json'), {
+        moduleKey: 'cli/mcp',
+        title: 'CLI/MCP',
+        summary: 'Legacy nested module memory.',
+        keywords: ['cli/mcp'],
+        entryFiles: ['src/mcp/server.ts'],
+        relatedPaths: [],
+        dataFlow: [],
+        decisions: [],
+        constraints: [],
+        pitfalls: [],
+        relatedRules: [],
+        tickets: [],
+        updatedAt: '2026-04-15T12:00:00.000Z',
+      });
+      writeText(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.md'), [
+        '# Module Memory',
+        '',
+        '- Module Key: cli/mcp',
+        '- Title: CLI/MCP',
+        '- Updated At: 2026-04-15T12:00:00.000Z',
+        '',
+        '## Summary',
+        '',
+        'Legacy nested module memory.',
+      ].join('\n'));
+      writeJson(resolve(project.root, '.aida', 'memories', 'index.json'), { updatedAt: 'old', modules: [] });
+
+      const stdout = runCliOutput(project, 'memory build');
+
+      assert.ok(stdout.includes('Built memory views'));
+      assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli_s_mcp.json')), true);
+      assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli_s_mcp.md')), true);
+      assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.json')), false);
+      assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.md')), false);
+      assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli')), false);
     } finally {
       project.cleanup();
     }
