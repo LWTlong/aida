@@ -197,6 +197,7 @@ describe('aida build', () => {
       assert.ok(readText(resolve(project.root, 'CLAUDE.md')).includes('.aida/aida-guide.md'));
       assert.ok(readText(resolve(project.root, 'AGENTS.md')).includes('.aida/aida-guide.md'));
       assert.ok(readText(resolve(project.root, 'AGENTS.md')).includes('.aida/rules/_all.md'));
+      assert.ok(readText(resolve(project.root, '.aida', 'aida-guide.md')).includes('不要调用 `aida_task(action="start")`'));
     } finally {
       project.cleanup();
     }

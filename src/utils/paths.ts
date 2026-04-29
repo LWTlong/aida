@@ -104,13 +104,30 @@ export function memoryIndexPath(projectRoot: string = process.cwd()): string {
   return resolve(memoriesDir(projectRoot), 'index.json');
 }
 
+/** Stable on-disk name for module memory files */
+export function moduleMemoryStorageName(moduleKey: string): string {
+  return moduleKey
+    .replace(/_/g, '__')
+    .replace(/\//g, '_s_');
+}
+
 /** Module memory source */
 export function moduleMemoryPath(projectRoot: string, moduleKey: string): string {
-  return resolve(moduleMemoriesDir(projectRoot), `${moduleKey}.json`);
+  return resolve(moduleMemoriesDir(projectRoot), `${moduleMemoryStorageName(moduleKey)}.json`);
 }
 
 /** Module memory markdown view */
 export function moduleMemoryViewPath(projectRoot: string, moduleKey: string): string {
+  return resolve(moduleMemoriesDir(projectRoot), `${moduleMemoryStorageName(moduleKey)}.md`);
+}
+
+/** Legacy nested module memory source path */
+export function legacyModuleMemoryPath(projectRoot: string, moduleKey: string): string {
+  return resolve(moduleMemoriesDir(projectRoot), `${moduleKey}.json`);
+}
+
+/** Legacy nested module memory markdown view path */
+export function legacyModuleMemoryViewPath(projectRoot: string, moduleKey: string): string {
   return resolve(moduleMemoriesDir(projectRoot), `${moduleKey}.md`);
 }
 

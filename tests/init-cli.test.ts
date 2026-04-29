@@ -23,7 +23,9 @@ describe('aida init', () => {
       assert.ok(readJson<any>(resolve(root, '.aida', 'config.json')).aiTools.includes('cursor'));
       assert.ok(readJson<any>(resolve(root, '.aida', 'config.json')).aiTools.includes('codex'));
       assert.ok(readText(resolve(root, '.aida', 'aida-guide.md')).includes('.aida/rules/_all.md'));
+      assert.ok(readText(resolve(root, '.aida', 'aida-guide.md')).includes('只有当修改实际落到项目仓库代码或配置后，才进入 AIDA task flow'));
       assert.ok(readText(resolve(root, '.aida', 'rules', '_all.md')).includes('All Project Rules'));
+      assert.ok(readText(resolve(root, '.aida', 'rules.json')).includes('纯调查、只读分析、聊天、git 历史排查、本地环境操作、不会落库的实验都不记录 task/context/memory'));
       assert.ok(readText(resolve(root, '.cursor', 'rules', 'aida', '_all.md')).includes('All Project Rules'));
       assert.ok(readText(resolve(root, 'AGENTS.md')).includes('## AIDA'));
       assert.ok(readText(resolve(root, 'AGENTS.md')).includes('.codex/rules/aida/_all.md'));
@@ -65,6 +67,7 @@ describe('aida init', () => {
       assert.equal(fileExists(resolve(root, '.aida', 'rules', '_all.md')), true);
       assert.equal(fileExists(resolve(root, '.cursor', 'rules', 'aida', '_all.md')), true);
       assert.ok(readText(resolve(root, 'AGENTS.md')).includes('.codex/rules/aida/_all.md'));
+      assert.ok(readText(resolve(root, '.aida', 'aida-guide.md')).includes('git blame'));
       assert.ok(readText(resolve(root, '.gitignore')).includes('.codex/config.toml'));
       assert.ok(readText(resolve(root, '.gitignore')).includes('.cursor/'));
     } finally {
