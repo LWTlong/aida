@@ -544,5 +544,31 @@
     },
     "createdAt": "2026-04-28T03:43:21.787Z",
     "status": "active"
+  },
+  {
+    "id": "RULE-043",
+    "category": "process",
+    "content": "发布或隔离验证应优先隔离命令环境，不得为规避环境污染随意创建 git worktree；执行 git 命令前必须先确认写入范围与副作用，涉及 worktree、branch、index 的操作必须采用最小副作用方案。",
+    "fingerprint": "8f3786f6d8c5",
+    "source": {
+      "branch": "main",
+      "deviation": "DEV-01",
+      "author": "vito-long"
+    },
+    "createdAt": "2026-04-28T07:33:41.381Z",
+    "status": "active"
+  },
+  {
+    "id": "RULE-044",
+    "category": "process",
+    "content": "处理用户反馈或真实项目异常前，必须先梳理完整流程和业务边界；如果用户提出的修复方向可能不属于通用产品缺陷，必须先说明判断、风险和建议方案并与用户确认，不能直接把一次性现场修复写进通用代码。",
+    "fingerprint": "61f0ef580183",
+    "source": {
+      "branch": "main",
+      "deviation": "DEV-03",
+      "author": "vito-long"
+    },
+    "createdAt": "2026-04-29T02:08:45.267Z",
+    "status": "active"
   }
 ]

@@ -20,7 +20,8 @@
     "Process",
     "AIDA",
     "Merge",
-    "MCP"
+    "MCP",
+    "Migration"
   ],
   "completed": [
     "取消跟踪已被 .gitignore 忽略的文件",
@@ -34,8 +35,7 @@
   ],
   "inProgress": [
     "检查 CLI 交互、迁移幂等性与规则去重机制",
-    "自检迁移到构建全链路闭环与幂等行为",
-    "发布 aida_bootstrap 可用性修复到 npm"
+    "自检迁移到构建全链路闭环与幂等行为"
   ],
   "next": [],
   "decisions": [],
@@ -44,11 +44,11 @@
     "README.md",
     "README.zh-CN.md",
     "COMMANDS.md",
-    "tests/build.test.ts",
     "src/utils/import.ts",
+    "tests/build.test.ts",
     "src/mcp/server.ts",
-    "src/utils/guide.ts",
-    "tests/migrate-legacy-cli.test.ts"
+    "tests/import-cli.test.ts",
+    "src/utils/guide.ts"
   ],
   "risks": [
     "Build flow skipped top-level guide/rule artifacts for migration compatibility",
@@ -57,7 +57,8 @@
     "Indented conflict markers in custom *.rules.json caused merge parsing failure or empty-array fallback",
     "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
     "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP",
-    "aida_bootstrap status 在当前会话已可调用 AIDA MCP 时仍可能返回 available=false"
+    "aida_bootstrap status 在当前会话已可调用 AIDA MCP 时仍可能返回 available=false",
+    "真实项目迁移产物缺失 .aida_corrupted_bak 中存在的 MTR-2376 历史运行数据"
   ],
-  "updatedAt": "2026-04-28T07:19:45.858Z"
+  "updatedAt": "2026-04-29T02:12:31.566Z"
 }

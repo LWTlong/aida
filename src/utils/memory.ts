@@ -104,6 +104,27 @@ function walkJsonFiles(rootDir: string): string[] {
   return result.sort();
 }
 
+function walkMarkdownFiles(rootDir: string): string[] {
+  if (!fileExists(rootDir)) return [];
+  const result: string[] = [];
+  const stack = [rootDir];
+
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    for (const name of readdirSync(current)) {
+      const full = resolve(current, name);
+      const stat = statSync(full);
+      if (stat.isDirectory()) {
+        stack.push(full);
+      } else if (name.endsWith('.md')) {
+        result.push(full);
+      }
+    }
+  }
+
+  return result.sort();
+}
+
 function walkRunJsonFiles(rootDir: string): string[] {
   if (!fileExists(rootDir)) return [];
   const result: string[] = [];
@@ -333,21 +354,15 @@ export function saveMemoryIndex(projectRoot: string, index: ModuleMemoryIndex): 
 export function loadModuleMemory(projectRoot: string, moduleKey: string): ModuleMemoryRecord | null {
   const normalized = normalizeModuleKey(moduleKey);
   const path = moduleMemoryPath(projectRoot, normalized);
-  if (!fileExists(path)) return null;
-  return readJson<ModuleMemoryRecord>(path);
+  if (fileExists(path)) return readJson<ModuleMemoryRecord>(path);
+  const viewPath = moduleMemoryViewPath(projectRoot, normalized);
+  if (!fileExists(viewPath)) return null;
+  return moduleMemoryRecordFromMarkdown(readText(viewPath));
 }
 
 function upsertMemoryIndexEntry(projectRoot: string, record: ModuleMemoryRecord): void {
   const index = loadMemoryIndex(projectRoot);
-  const entry: ModuleMemoryIndexEntry = {
-    key: record.moduleKey,
-    title: record.title,
-    summary: record.summary,
-    keywords: topItems([record.moduleKey, record.title, ...record.keywords], 12),
-    paths: filterMeaningfulPaths([...record.entryFiles, ...record.relatedPaths], 12),
-    updatedAt: record.updatedAt,
-  };
-
+  const entry = memoryIndexEntryFromRecord(record);
   const next = index.modules.filter((item) => item.key !== record.moduleKey);
   next.push(entry);
   next.sort((a, b) => a.key.localeCompare(b.key));
@@ -355,6 +370,90 @@ function upsertMemoryIndexEntry(projectRoot: string, record: ModuleMemoryRecord)
     updatedAt: new Date().toISOString(),
     modules: next,
   });
+}
+
+function memoryIndexEntryFromRecord(record: ModuleMemoryRecord): ModuleMemoryIndexEntry {
+  return {
+    key: record.moduleKey,
+    title: record.title,
+    summary: record.summary,
+    keywords: topItems([record.moduleKey, record.title, ...record.keywords], 12),
+    paths: filterMeaningfulPaths([...record.entryFiles, ...record.relatedPaths], 12),
+    updatedAt: record.updatedAt,
+  };
+}
+
+function mergeMemoryIndexEntry(
+  existing: ModuleMemoryIndexEntry | undefined,
+  next: ModuleMemoryIndexEntry,
+): ModuleMemoryIndexEntry {
+  if (!existing) return next;
+  return {
+    key: next.key,
+    title: next.title || existing.title,
+    summary: next.summary || existing.summary,
+    keywords: topItems([...(existing.keywords || []), ...(next.keywords || [])], 12),
+    paths: filterMeaningfulPaths([...(existing.paths || []), ...(next.paths || [])], 12),
+    updatedAt: next.updatedAt || existing.updatedAt,
+  };
+}
+
+function parseListSection(raw: string, title: string): string[] {
+  return findSectionItems(raw, [title.toLowerCase()]);
+}
+
+function moduleMemoryRecordFromMarkdown(raw: string): ModuleMemoryRecord | null {
+  const moduleKey = raw.match(/^- Module Key:\s+(.+)$/m)?.[1]?.trim();
+  if (!moduleKey) return null;
+
+  const sections = extractMarkdownSections(raw);
+  const summary = sections.get('summary') || '';
+
+  return {
+    moduleKey,
+    title: raw.match(/^- Title:\s+(.+)$/m)?.[1]?.trim() || moduleKey,
+    summary,
+    keywords: parseListSection(raw, 'keywords'),
+    entryFiles: parseListSection(raw, 'entry files'),
+    relatedPaths: parseListSection(raw, 'related paths'),
+    dataFlow: parseListSection(raw, 'data flow'),
+    decisions: parseListSection(raw, 'decisions'),
+    constraints: parseListSection(raw, 'constraints'),
+    pitfalls: parseListSection(raw, 'pitfalls'),
+    relatedRules: parseListSection(raw, 'related rules'),
+    tickets: [],
+    updatedAt: raw.match(/^- Updated At:\s+(.+)$/m)?.[1]?.trim() || new Date().toISOString(),
+  };
+}
+
+export function rebuildMemoryIndexFromDisk(projectRoot: string): ModuleMemoryIndex {
+  ensureDir(moduleMemoriesDir(projectRoot));
+  const byKey = new Map<string, ModuleMemoryIndexEntry>();
+
+  for (const entry of loadMemoryIndex(projectRoot).modules || []) {
+    byKey.set(entry.key, entry);
+  }
+
+  for (const file of walkJsonFiles(moduleMemoriesDir(projectRoot))) {
+    if (basename(file) === 'index.json') continue;
+    const record = readJson<ModuleMemoryRecord>(file);
+    const entry = memoryIndexEntryFromRecord(record);
+    byKey.set(record.moduleKey, mergeMemoryIndexEntry(byKey.get(record.moduleKey), entry));
+  }
+
+  for (const file of walkMarkdownFiles(moduleMemoriesDir(projectRoot))) {
+    const record = moduleMemoryRecordFromMarkdown(readText(file));
+    if (!record) continue;
+    const entry = memoryIndexEntryFromRecord(record);
+    byKey.set(record.moduleKey, mergeMemoryIndexEntry(byKey.get(record.moduleKey), entry));
+  }
+
+  const index = {
+    updatedAt: new Date().toISOString(),
+    modules: [...byKey.values()].sort((a, b) => a.key.localeCompare(b.key)),
+  };
+  saveMemoryIndex(projectRoot, index);
+  return index;
 }
 
 export function saveModuleMemory(projectRoot: string, record: ModuleMemoryRecord): void {
@@ -484,7 +583,10 @@ export function buildMemoryViews(projectRoot: string): BuildMemoryViewsResult {
   let contextViews = 0;
   let packViews = 0;
   const root = runsDir(projectRoot);
-  if (!fileExists(root)) return { moduleViews, contextViews, packViews };
+  if (!fileExists(root)) {
+    rebuildMemoryIndexFromDisk(projectRoot);
+    return { moduleViews, contextViews, packViews };
+  }
   for (const branchName of readdirSync(root)) {
     const safeBranchDir = resolve(root, branchName);
     if (!fileExists(safeBranchDir) || !statSync(safeBranchDir).isDirectory()) continue;
@@ -501,6 +603,7 @@ export function buildMemoryViews(projectRoot: string): BuildMemoryViewsResult {
     packViews++;
   }
 
+  rebuildMemoryIndexFromDisk(projectRoot);
   return { moduleViews, contextViews, packViews };
 }
 
@@ -631,7 +734,10 @@ export function searchModuleMemories(
   if (!normalizedQuery) return [];
   const tokens = splitQueryTokens(normalizedQuery);
   const hints = pathHints.map((hint) => hint.toLowerCase());
-  const index = loadMemoryIndex(projectRoot);
+  let index = loadMemoryIndex(projectRoot);
+  if (index.modules.length === 0 && fileExists(moduleMemoriesDir(projectRoot))) {
+    index = rebuildMemoryIndexFromDisk(projectRoot);
+  }
 
   return index.modules
     .map((entry) => {
@@ -715,6 +821,7 @@ export function migrateLegacyMemories(projectRoot: string): LegacyMemoryMigratio
   }
 
   buildMemoryViews(projectRoot);
+  rebuildMemoryIndexFromDisk(projectRoot);
 
   return {
     branches,

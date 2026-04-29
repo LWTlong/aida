@@ -10,6 +10,7 @@ import type { AidaConfig, AiToolChoice, ToolConfigSnapshot } from '../schemas/ai
 interface ImportOptions {
   includeExternalSkills?: boolean
   includeExternalMcp?: boolean
+  includeAidaRuleViews?: boolean
 }
 
 export const CLOSED_LOOP_BASELINE_TOOLS: AiToolChoice[] = ['claude-code', 'cursor', 'codex'];
@@ -79,6 +80,34 @@ function walkFiles(rootDir: string): string[] {
   }
 
   return result.sort();
+}
+
+function acceptedProjectNames(projectRoot: string): Set<string> {
+  const names = new Set<string>();
+  const pkgPath = resolve(projectRoot, 'package.json');
+  if (fileExists(pkgPath)) {
+    const pkg = readJson<{ name?: string }>(pkgPath);
+    if (pkg.name) names.add(pkg.name);
+  }
+  const config = configPath(projectRoot);
+  if (fileExists(config)) {
+    const aidaConfig = readJson<Partial<AidaConfig>>(config);
+    if (aidaConfig.project) names.add(aidaConfig.project);
+  }
+  return names;
+}
+
+function isForeignProjectRuleFile(projectRoot: string, raw: string): boolean {
+  const names = acceptedProjectNames(projectRoot);
+  if (names.size === 0) return false;
+
+  const declared = [
+    ...raw.matchAll(/本文档定义了\s+([A-Za-z0-9_-]+)\s+项目/g),
+    ...raw.matchAll(/([A-Za-z0-9_-]+)\s+项目的代码生成规范/g),
+  ].map((match) => match[1]);
+
+  if (declared.length === 0) return false;
+  return declared.every((name) => !names.has(name));
 }
 
 function isSupportedSkillAsset(path: string): boolean {
@@ -158,12 +187,72 @@ function collectToolSkills(
   return collected;
 }
 
+function isRuleHeading(value: string): boolean {
+  const normalized = value.toLowerCase();
+  return /规则|规范|约束|要求|禁止|必须|rules?|guidelines?|constraints?|requirements?/.test(normalized);
+}
+
+function isExampleHeading(value: string): boolean {
+  const normalized = value.toLowerCase();
+  return /示例|例子|example|examples|目录结构|引用|可用组件|available|参考/.test(normalized);
+}
+
+function stripRuleDecorations(value: string): string {
+  const trimmed = value.trim();
+  if (/^[❌✘]\s*/.test(trimmed)) {
+    return `禁止 ${trimmed.replace(/^[❌✘]\s*/, '').trim()}`;
+  }
+  if (/^[✅✔]\s*/.test(trimmed)) {
+    return `必须 ${trimmed.replace(/^[✅✔]\s*/, '').trim()}`;
+  }
+  return trimmed
+    .replace(/^\*\*(.+?)\*\*[:：]\s*/, '$1: ')
+    .trim();
+}
+
+function looksLikeReferenceItem(value: string): boolean {
+  const normalized = stripRuleDecorations(value);
+  if (!normalized) return true;
+  if (/^\[[ xX]\]\s+/.test(normalized)) return true;
+  if (/^\*\*?[^:：]{1,30}[:：]\*\*?$/.test(normalized) || /^[^:：]{1,30}[:：]$/.test(normalized)) return true;
+  if (/^[@\w./-]+\.(?:js|ts|tsx|jsx|vue|d\.ts|scss|less|css|json|md)\b/.test(normalized)) return true;
+  if (/^`[^`]+`(?:\s*[-:：]\s*.+)?$/.test(normalized) && !/必须|禁止|严禁|不得|不要|应|优先|统一|must|should|never|always|do not/i.test(normalized)) return true;
+  if (/^@(?:param|returns?|throws?)\b/i.test(normalized)) return true;
+  if (/^(示例|例如|引用|目录|文件|路径|可选注释|必须添加注释的函数)[:：]/.test(normalized)) return true;
+  return false;
+}
+
+function looksLikeRuleContent(value: string, inRuleSection: boolean): boolean {
+  const normalized = stripRuleDecorations(value);
+  if (!normalized || looksLikeReferenceItem(normalized)) return false;
+  if (/必须|禁止|严禁|不得|不要|应当|应\s|优先|统一|强制|避免|不能|需要|遵循|保持|绝对|一律|而非|must|should|never|always|do not|required|forbid/i.test(normalized)) {
+    return true;
+  }
+  return inRuleSection && /^(所有|全部|每个|复杂|超过|只需要|需要)\S+/.test(normalized);
+}
+
 function parseMarkdownRuleCandidates(raw: string): string[] {
   const results: string[] = [];
+  let inFence = false;
+  let inRuleSection = false;
+  let inExampleSection = false;
 
   for (const line of raw.split('\n')) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('```') || trimmed.startsWith('>')) continue;
+    if (trimmed.startsWith('```')) {
+      inFence = !inFence;
+      continue;
+    }
+    if (!trimmed || inFence || trimmed.startsWith('>')) continue;
+
+    const headingMatch = trimmed.match(/^#{1,6}\s+(.+)$/);
+    if (headingMatch) {
+      const title = headingMatch[1].trim();
+      inRuleSection = isRuleHeading(title);
+      inExampleSection = isExampleHeading(title);
+      continue;
+    }
+    if (inExampleSection) continue;
 
     const generatedMatch = trimmed.match(/^-\s+\[(?:RULE-\d+)\](?:\s+\[[A-Z]+\])?\s+(.+)$/);
     if (generatedMatch) {
@@ -173,13 +262,15 @@ function parseMarkdownRuleCandidates(raw: string): string[] {
 
     const bulletMatch = trimmed.match(/^[-*]\s+(.+)$/);
     if (bulletMatch) {
-      results.push(bulletMatch[1].trim());
+      const candidate = stripRuleDecorations(bulletMatch[1]);
+      if (looksLikeRuleContent(candidate, inRuleSection)) results.push(candidate);
       continue;
     }
 
     const orderedMatch = trimmed.match(/^\d+\.\s+(.+)$/);
     if (orderedMatch) {
-      results.push(orderedMatch[1].trim());
+      const candidate = stripRuleDecorations(orderedMatch[1]);
+      if (looksLikeRuleContent(candidate, inRuleSection)) results.push(candidate);
     }
   }
 
@@ -237,6 +328,16 @@ function mergeImportedRules(
   }
 
   return { total: merged.length, imported };
+}
+
+function removePreviouslyImportedRules(projectRoot: string, tools: AiToolChoice[]): number {
+  const importedBranches = new Set(tools.map((tool) => `import:${tool}`));
+  const existing = loadRegistry(projectRoot);
+  const next = existing.filter((entry) => !importedBranches.has(entry.source?.branch || ''));
+  if (next.length !== existing.length) {
+    saveRegistry(projectRoot, next);
+  }
+  return existing.length - next.length;
 }
 
 function mergeImportedSkills(
@@ -371,6 +472,7 @@ export function importFromToolWithOptions(
       for (const file of walkMarkdownFiles(rulesDir)) {
         const raw = readText(file);
         if (isGeneratedRuleFile(file, raw)) continue;
+        if (isForeignProjectRuleFile(projectRoot, raw)) continue;
         ruleContents.push(...parseMarkdownRuleCandidates(raw));
       }
       const skillsDir = resolve(projectRoot, '.claude', 'skills');
@@ -391,6 +493,7 @@ export function importFromToolWithOptions(
       for (const file of walkMarkdownFiles(rulesDir)) {
         const raw = readText(file);
         if (isGeneratedRuleFile(file, raw)) continue;
+        if (isForeignProjectRuleFile(projectRoot, raw)) continue;
         ruleContents.push(...parseMarkdownRuleCandidates(raw));
       }
       const skillsDir = resolve(projectRoot, '.cursor', 'skills');
@@ -413,6 +516,7 @@ export function importFromToolWithOptions(
       for (const file of walkMarkdownFiles(rulesDir)) {
         const raw = readText(file);
         if (isGeneratedRuleFile(file, raw)) continue;
+        if (isForeignProjectRuleFile(projectRoot, raw)) continue;
         ruleContents.push(...parseMarkdownRuleCandidates(raw));
       }
       break;
@@ -426,6 +530,7 @@ export function importFromToolWithOptions(
       for (const file of walkMarkdownFiles(rulesDir)) {
         const raw = readText(file);
         if (isGeneratedRuleFile(file, raw)) continue;
+        if (isForeignProjectRuleFile(projectRoot, raw)) continue;
         ruleContents.push(...parseMarkdownRuleCandidates(raw));
       }
       const skillsDir = resolve(projectRoot, '.codex', 'skills');
@@ -512,7 +617,9 @@ export function importProjectSources(projectRoot: string, options: ImportOptions
   snapshotPath: string
   gitignoreAdded: string[]
 } {
-  const rules = importRulesFromViews(projectRoot);
+  const rules = options.includeAidaRuleViews === false
+    ? { entries: loadRegistry(projectRoot), imported: 0 }
+    : importRulesFromViews(projectRoot);
   const skills = options.includeExternalSkills === false
     ? { entries: loadSkillRegistry(projectRoot), imported: 0 }
     : importSkillsFromViews(projectRoot);
@@ -541,8 +648,12 @@ export function importProjectSourcesWithBaseline(
   gitignoreAdded: string[]
   baseline: { rulesImported: number; skillsImported: number }
 } {
+  removePreviouslyImportedRules(projectRoot, CLOSED_LOOP_BASELINE_TOOLS);
   const baseline = importFromToolWithOptions(projectRoot, baselineTool, options);
-  const imported = importProjectSources(projectRoot, options);
+  const imported = importProjectSources(projectRoot, {
+    ...options,
+    includeAidaRuleViews: false,
+  });
 
   return {
     ...imported,
