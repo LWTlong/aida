@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { ensureDir, fileExists, readJson, writeJson, writeText } from '../src/utils/fs.js';
-import { createTestProject, runCliOutput } from './helpers.js';
+import { createTestProject, runCliOutput, readRuleRegistryItems, readSkillRegistryItems } from './helpers.js';
 import { detectImportableTools, importFromTool, importProjectSourcesWithBaseline } from '../src/utils/import.js';
 
 describe('aida import', () => {
@@ -36,8 +36,8 @@ describe('aida import', () => {
       );
 
       const output = runCliOutput(project, 'import');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
-      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const rules = readRuleRegistryItems(project.root);
+      const skills = readSkillRegistryItems(project.root);
       const toolConfigs = readJson<{ tools: string[] }>(resolve(project.root, '.aida', 'tool-configs.json'));
       const config = readJson<{ aiTools: string[] }>(resolve(project.root, '.aida', 'config.json'));
 
@@ -81,8 +81,8 @@ describe('aida import', () => {
 
       const importable = detectImportableTools(project.root, ['cursor', 'claude-code']);
       const result = importFromTool(project.root, 'cursor');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
-      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const rules = readRuleRegistryItems(project.root);
+      const skills = readSkillRegistryItems(project.root);
 
       assert.deepEqual(importable, ['cursor']);
       assert.equal(result.rulesImported, 2);
@@ -121,7 +121,7 @@ describe('aida import', () => {
       );
 
       const result = importFromTool(project.root, 'cursor');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const rules = readRuleRegistryItems(project.root);
 
       assert.equal(result.rulesImported, 2);
       assert.ok(rules.some((entry) => entry.content === 'API requests must go through shared client'));
@@ -171,7 +171,7 @@ describe('aida import', () => {
       writeText(resolve(project.root, '.cursor', 'rules', 'team.md'), '# Team Rules\n\n- Must use shared request client\n');
 
       const result = importProjectSourcesWithBaseline(project.root, 'cursor');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const rules = readRuleRegistryItems(project.root);
 
       assert.equal(result.baseline.rulesImported, 1);
       assert.ok(rules.some((entry) => entry.content === 'Manual project rule should stay'));
@@ -204,7 +204,7 @@ describe('aida import', () => {
       ].join('\n'));
 
       const result = importFromTool(project.root, 'cursor');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const rules = readRuleRegistryItems(project.root);
 
       assert.equal(result.rulesImported, 1);
       assert.ok(rules.some((entry) => entry.content === 'Must import local project rules'));
@@ -233,7 +233,7 @@ describe('aida import', () => {
       );
 
       const result = importFromTool(project.root, 'claude-code');
-      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const skills = readSkillRegistryItems(project.root);
       const customFlow = skills.find((entry) => entry.name === 'custom-flow');
 
       assert.equal(result.skillsImported, 1);
@@ -259,7 +259,7 @@ describe('aida import', () => {
       );
 
       const result = importFromTool(project.root, 'codex');
-      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const skills = readSkillRegistryItems(project.root);
       const customFlow = skills.find((entry) => entry.name === 'custom-flow');
 
       assert.equal(result.skillsImported, 1);
@@ -285,11 +285,11 @@ describe('aida import', () => {
       );
 
       const first = importFromTool(project.root, 'codex');
-      const firstRegistry = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const firstRegistry = readSkillRegistryItems(project.root);
       const firstSnapshot = JSON.stringify(firstRegistry);
 
       const second = importFromTool(project.root, 'codex');
-      const secondRegistry = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const secondRegistry = readSkillRegistryItems(project.root);
 
       assert.equal(first.skillsImported, 1);
       assert.equal(second.skillsImported, 0);
@@ -306,7 +306,7 @@ describe('aida import', () => {
 
     try {
       ensureDir(resolve(project.root, '.cursor', 'rules', 'aidevos'));
-      ensureDir(resolve(project.root, '.cursor', 'skills', 'workflow'));
+      ensureDir(resolve(project.root, '.cursor', 'skills', 'audit'));
       writeText(
         resolve(project.root, '.cursor', 'rules', 'aidevos', 'aida-guide.md'),
         `---
@@ -321,18 +321,18 @@ description: AIDA 数据采集与规则沉淀规范
         '# Team Rules\n\n- Must follow imported cursor rule\n',
       );
       writeText(
-        resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md'),
-        '# Workflow\n\nGenerated workflow command content\n',
+        resolve(project.root, '.cursor', 'skills', 'audit', 'SKILL.md'),
+        '# Audit\n\nGenerated audit command content\n',
       );
 
       const result = importFromTool(project.root, 'cursor');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
-      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const rules = readRuleRegistryItems(project.root);
+      const skills = readSkillRegistryItems(project.root);
 
       assert.equal(result.rulesImported, 1);
       assert.ok(rules.some((entry) => entry.content === 'Must follow imported cursor rule'));
       assert.ok(!rules.some((entry) => String(entry.content).includes('AIDA 数据采集与规则沉淀指南')));
-      assert.ok(skills.some((entry) => entry.name === 'workflow-orchestrator'));
+      assert.ok(skills.some((entry) => entry.name === 'audit'));
       assert.ok(!skills.some((entry) => entry.name === 'workflow'));
     } finally {
       project.cleanup();
@@ -360,8 +360,8 @@ description: AIDA 数据采集与规则沉淀规范
       );
 
       const output = runCliOutput(project, 'import cursor');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
-      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const rules = readRuleRegistryItems(project.root);
+      const skills = readSkillRegistryItems(project.root);
 
       assert.ok(output.includes('Baseline: cursor'));
       assert.ok(rules.some((entry) => entry.content === 'Must follow imported cursor rule'));

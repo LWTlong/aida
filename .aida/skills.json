@@ -1,184 +1,58 @@
-[
-  {
-    "id": "SKILL-001",
-    "name": "audit",
-    "content": "---\nname: audit\ndescription: 扫描项目代码，生成与项目完全匹配的 AI 开发规范，写入 .aida/rules.json 并通过 build 分发。\nglobs: ['.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# audit (项目审计)\n\n## 提示\n\n此 Skill 由用户人工触发，不纳入 workflow-orchestrator 自动化流程。\n\n## 角色\n\n你是一个顶级的架构师，擅长通过分析现有项目代码库（逻辑、公共组件、业务组件）来沉淀自动化指令。你的目标是编写能让 AI 生成代码\"如出一辙\"的规则。\n\n## 核心目标\n\n通过扫描真实项目代码 + 分析现有规则，构建一套与项目完全匹配的 AI 开发规范体系，使 AI 生成代码一次通过率达到 90% 以上。\n\n## 执行阶段\n\n### 阶段一：加载现有规则\n\n读取并理解项目现有的所有规则来源：\n1. **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件\n2. **全局规则文件**：\n   - Claude Code 用户：`CLAUDE.md`\n   - Cursor 用户：`.cursor/rules/*/*.md`\n\n### 阶段二：项目真实结构建模\n\n1. 扫描范围（排除 node_modules/dist/build/.git）\n2. 技术栈识别（框架、UI 库、状态管理、请求封装、路由模式）\n3. 深度分析：\n   - 公共组件：使用方式、Props 约定、插槽设计\n   - API 封装：请求函数命名、参数传递、错误处理\n   - 状态管理：Store 结构、Action/Mutation 模式\n   - 路由模式：路由配置、权限控制、懒加载\n   - 类型系统：接口定义、泛型使用、枚举约定\n   - 样式方案：CSS Modules / Tailwind / CSS-in-JS\n   - i18n 方案：文案管理、语言切换、命名约定\n\n### 阶段三：规则审计\n\n对现有 `.aida/rules.json` 与工具分发规则进行审计：\n- **重复检测**：语义重复、约束重复\n- **冲突检测**：A 强制 vs B 禁止\n- **失配检测**：引用不存在的组件/API\n- **缺失关键约束**：对照真实代码，发现未覆盖的模式\n\n### 阶段四：生成规则并直接写入\n\n基于真实代码生成或更新 `.aida/rules.json` 中的规则：\n\n| 文件 | 内容 |\n|------|------|\n| `code-style.md` | 编码风格：命名规范、文件组织、注释要求 |\n| `component-usage.md` | 组件使用：UI 库组件选择、自定义组件约定、Props 传递 |\n| `api-patterns.md` | API 封装：请求函数模式、错误处理、类型定义 |\n| `state-management.md` | 状态管理：Store 结构、Action 命名、数据流 |\n| `i18n-rules.md` | 国际化：文案位置、key 命名、禁止硬编码 |\n| `architecture.md` | 架构约束：目录结构、模块划分、依赖关系 |\n| `type-system.md` | 类型系统：接口定义、泛型使用、any 禁用 |\n\n**所有规则必须**：\n1. 基于真实项目代码（不臆造）\n2. 可执行、可验证（不能是模糊建议）\n3. 包含正确示例和错误示例\n4. 引用真实存在的组件/API 路径\n\n### 阶段五：输出确认\n\n生成完成后输出：\n```\n✓ 已生成/更新 .aida/rules.json 中的规则，并可通过 aida build 分发：\n  - code-style.md\n  - component-usage.md\n  - api-patterns.md\n  - state-management.md\n  - i18n-rules.md\n  - architecture.md\n  - type-system.md\n\n基于项目代码扫描，识别：\n  - 技术栈：[Vue 3 + TypeScript + Pinia + Element Plus]\n  - 请求封装：[src/api/request.ts]\n  - 公共组件：[src/components/common/]\n  - 状态管理：[src/store/]\n```\n\n## 质量控制原则\n\n1. 所有结论必须基于真实代码\n2. 不允许猜测组件、虚构 API 模式\n3. 优化目标为\"AI 生成代码一致性\"\n4. 所有规则必须可执行、可验证\n5. 规则文件使用 Markdown 格式，结构清晰\n",
-    "fingerprint": "188a10fdd6c4",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/audit.md"
+{
+  "schemaVersion": "2.0",
+  "updatedAt": "2026-05-09T06:11:09.815Z",
+  "items": [
+    {
+      "id": "SKILL-001",
+      "name": "audit",
+      "content": "---\nname: audit\ndescription: 扫描项目代码，生成与项目完全匹配的 AI 开发规范，写入 .aida/rules.json 并通过 build 分发。\nglobs: ['.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# audit (项目审计)\n\n## 提示\n\n此 Skill 由用户人工触发，不纳入 workflow-orchestrator 自动化流程。\n\n## 角色\n\n你是一个顶级的架构师，擅长通过分析现有项目代码库（逻辑、公共组件、业务组件）来沉淀自动化指令。你的目标是编写能让 AI 生成代码\"如出一辙\"的规则。\n\n## 核心目标\n\n通过扫描真实项目代码 + 分析现有规则，构建一套与项目完全匹配的 AI 开发规范体系，使 AI 生成代码一次通过率达到 90% 以上。\n\n## 执行阶段\n\n### 阶段一：加载现有规则\n\n读取并理解项目现有的所有规则来源：\n1. **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件\n2. **全局规则文件**：\n   - Claude Code 用户：`CLAUDE.md`\n   - Cursor 用户：`.cursor/rules/*/*.md`\n\n### 阶段二：项目真实结构建模\n\n1. 扫描范围（排除 node_modules/dist/build/.git）\n2. 技术栈识别（框架、UI 库、状态管理、请求封装、路由模式）\n3. 深度分析：\n   - 公共组件：使用方式、Props 约定、插槽设计\n   - API 封装：请求函数命名、参数传递、错误处理\n   - 状态管理：Store 结构、Action/Mutation 模式\n   - 路由模式：路由配置、权限控制、懒加载\n   - 类型系统：接口定义、泛型使用、枚举约定\n   - 样式方案：CSS Modules / Tailwind / CSS-in-JS\n   - i18n 方案：文案管理、语言切换、命名约定\n\n### 阶段三：规则审计\n\n对现有 `.aida/rules.json` 与工具分发规则进行审计：\n- **重复检测**：语义重复、约束重复\n- **冲突检测**：A 强制 vs B 禁止\n- **失配检测**：引用不存在的组件/API\n- **缺失关键约束**：对照真实代码，发现未覆盖的模式\n\n### 阶段四：生成规则并直接写入\n\n基于真实代码生成或更新 `.aida/rules.json` 中的规则：\n\n| 文件 | 内容 |\n|------|------|\n| `code-style.md` | 编码风格：命名规范、文件组织、注释要求 |\n| `component-usage.md` | 组件使用：UI 库组件选择、自定义组件约定、Props 传递 |\n| `api-patterns.md` | API 封装：请求函数模式、错误处理、类型定义 |\n| `state-management.md` | 状态管理：Store 结构、Action 命名、数据流 |\n| `i18n-rules.md` | 国际化：文案位置、key 命名、禁止硬编码 |\n| `architecture.md` | 架构约束：目录结构、模块划分、依赖关系 |\n| `type-system.md` | 类型系统：接口定义、泛型使用、any 禁用 |\n\n**所有规则必须**：\n1. 基于真实项目代码（不臆造）\n2. 可执行、可验证（不能是模糊建议）\n3. 包含正确示例和错误示例\n4. 引用真实存在的组件/API 路径\n\n### 阶段五：输出确认\n\n生成完成后输出：\n```\n✓ 已生成/更新 .aida/rules.json 中的规则，并可通过 aida build 分发：\n  - code-style.md\n  - component-usage.md\n  - api-patterns.md\n  - state-management.md\n  - i18n-rules.md\n  - architecture.md\n  - type-system.md\n\n基于项目代码扫描，识别：\n  - 技术栈：[Vue 3 + TypeScript + Pinia + Element Plus]\n  - 请求封装：[src/api/request.ts]\n  - 公共组件：[src/components/common/]\n  - 状态管理：[src/store/]\n```\n\n## 质量控制原则\n\n1. 所有结论必须基于真实代码\n2. 不允许猜测组件、虚构 API 模式\n3. 优化目标为\"AI 生成代码一致性\"\n4. 所有规则必须可执行、可验证\n5. 规则文件使用 Markdown 格式，结构清晰\n",
+      "fingerprint": "188a10fdd6c4",
+      "source": {
+        "kind": "local",
+        "path": ".codex/skills/audit.md"
+      },
+      "updatedAt": "2026-04-27T07:55:42.982Z",
+      "status": "active",
+      "files": []
     },
-    "updatedAt": "2026-04-27T07:55:42.982Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-002",
-    "name": "bug-fixer",
-    "content": "---\nname: bug-fixer\ndescription: 处理自检不通过或测试产生的 Bug 缺陷。基于 review 结果或用户反馈进行专项修复，并将 Bug 记录写入 run.json.bugs[]。\nglobs: ['.aida/runs/*/*/run.json', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# bug-fixer (缺陷修复器)\n\n> **铁律**：1) 修复后必须在 `run.json.bugs[]` 追加 Bug 记录并更新 `summary.bugCount` 2) 写入后输出 `✓ run.json updated: bugs[], summary` 3) 修复前必须回顾当前 AI 工具目录下的规则文件判断是否为规范偏离 4) 如属于 AI 偏差（非功能 Bug），建议用户使用 deviation-recorder 记录\n\n## 角色\n\n你是一个经验丰富的高级救火队长。你擅于快速定位由于规范不匹配、组件搭配错误或业务逻辑理解偏差导致的隐患代码，并给予重构性的精准修复。\n\n## 路径约定\n\n> **[run_id]**：当前需求/功能的唯一标识\n> **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。\n> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`\n> **数据文件**：`run.json`\n\n## 执行指令\n\n1. **获取修复任务：**\n   - 读取 `run.json.reviews[]` 中最近一条 `result: \"fail\"` 的 review 记录，或从用户反馈中获取 Bug 描述。\n\n2. **定位与分析：**\n   - 根据 Bug 的描述或错误堆栈，定位到具体的问题文件。\n   - 回顾项目所有规范，以识别是不是架构偏离问题导致的：\n     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件\n     - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）\n\n3. **修复策略执行：**\n   - 严谨地修改问题代码。\n   - 修复完成后请求再次自检触发，保证没有产生衍生问题。\n\n4. **记录反馈（强制，不可跳过）：**\n   - 如果此 Bug 源于 AI 生成代码与用户期望的偏差，应建议用户使用 deviation-recorder 记录到 `run.json.deviations[]`。\n   - 调用以下 MCP 工具记录 Bug 和修复：\n   - **记录 Bug** → 调用 `aida_log_bug`，传入 `title`、`severity`（critical/high/medium/low）、`source`（self-review/testing/user-report）、`taskId`、`files`\n   - **修复后标记** → 调用 `aida_bug_fix`，传入 `id`（BUG-XX）、`fix`（修复方案描述）\n   - **记录文件变更** → 调用 `aida_log_files`（自动扫描 git diff，无需传参）\n   - 工具会自动更新 summary 统计和 timeline。\n",
-    "fingerprint": "fc2120372817",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/bug-fixer.md"
+    {
+      "id": "SKILL-008",
+      "name": "docx-to-markdown",
+      "content": "---\nname: docx-to-markdown\ndescription: 将 .docx 文件转换为 Markdown 格式，支持文本、标题、列表、表格、图片等元素。\nglobs: ['**/*.docx']\n---\n\n# docx-to-markdown (文档转换器)\n\n## 角色\n\n你是一个文档格式转换工具，负责将 .docx 文件转换为开发流程可用的 Markdown 格式。\n\n## 执行步骤\n\n### 1. 检查可用转换工具\n\n优先级：pandoc > mammoth > python-docx\n\n```bash\nwhich pandoc        # 推荐\nwhich mammoth       # 备选\npython3 -c \"import docx\" 2>/dev/null  # 最后备选\n```\n\n### 2. 执行转换\n\n#### 使用 pandoc（推荐）\n\n```bash\npandoc \"[input.docx]\" -o \"[output.md]\" --extract-media=\"./media\" --wrap=none\n```\n\n#### 使用 mammoth\n\n```bash\nmammoth \"[input.docx]\" \"[output.md]\"\n```\n\n### 3. 后处理\n\n- 清理多余空行\n- 确保标题格式正确\n- 修复列表缩进\n- 确保表格格式正确\n- 处理图片路径\n\n### 4. 验证\n\n```bash\nif [ -f \"$MD_FILE\" ]; then\n    echo \"转换成功: $MD_FILE\"\nfi\n```\n\n## 支持的元素\n\n- 标题（H1-H6）、段落、列表（有序/无序）、表格\n- 粗体、斜体、图片（提取到 media 目录）\n- 复杂格式和嵌入对象可能部分丢失\n\n## 安装依赖\n\n```bash\n# macOS\nbrew install pandoc\n\n# 或使用 npm\nnpm install -g mammoth\n```\n",
+      "fingerprint": "e326dfcefe79",
+      "source": {
+        "kind": "local",
+        "path": ".codex/skills/docx-to-markdown.md"
+      },
+      "updatedAt": "2026-04-27T07:55:42.983Z",
+      "status": "active",
+      "files": []
     },
-    "updatedAt": "2026-04-27T07:55:42.983Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-003",
-    "name": "code-generator",
-    "content": "---\nname: code-generator\ndescription: 严格按照 run.json.tasks[] 和项目规范生成业务代码，并更新任务状态。\nglobs: ['.aida/runs/*/*/run.json', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# code-generator (代码生成器)\n\n> **铁律**：1) 必须先读取项目所有规范再写代码（当前 AI 工具目录下的规则文件、`CLAUDE.md` 或 `AGENTS.md`） 2) 完成后必须更新 `run.json.tasks[].status` 和 `summary.completedTasks` 3) 写入后输出 `✓ run.json updated: tasks[], summary, files[]` 4) 禁止臆想不存在的 API / 组件 5) 禁止魔法字符串，文案必须走 i18n\n\n## 角色\n\n你是一个极其严谨的、深刻理解项目架构的高级工程师。你严格执行任务清单，产出百分之百符合架构要求的代码。\n\n## 路径约定\n\n> **[run_id]**：当前需求/功能的唯一标识\n> **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。\n> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`\n> **数据文件**：`run.json`\n\n## 执行指令\n\n1. **确定当前任务并记录开始时间：**\n\n   - 读取 `run.json.tasks[]`。\n   - 寻找**第一个** `status: \"pending\"` 或 `status: \"in-progress\"` 的任务作为本次工作的核心目标。\n   - 如果所有任务 `status: \"done\"`，提示工作结束。\n   - **立即调用** `aida_task_start` MCP 工具，传入 `id`（如 TASK-01）和 `title`，记录任务开始时间用于耗时统计。\n\n2. **强制规则加载与参考文档读取：**\n\n   **a) 读取项目规范（必须）：**\n   - 仔细阅读项目所有规范：\n     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件\n     - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）\n   - 规范包括：编码风格、组件使用、API 封装、i18n、状态管理、架构约束等。\n\n   **b) 读取接口文档（如果存在）：**\n   - 检查数据根目录下是否存在接口文档：\n     - `api.md` / `interface.md` / `接口文档.md`\n   - 如果当前任务涉及 API 调用，优先参考接口文档中的定义：\n     - 接口路径、请求方式、参数结构、响应格式\n     - 按照接口文档的定义生成 API 调用代码\n   - 如果没有接口文档，根据 `analysis.md` 中的推断或任务描述编写。\n\n3. **编写代码：**\n\n   - 严格按照所选任务的需求生成/修改代码。\n   - **通用禁区：**\n     - 禁止不符合项目规范的代码模式（从 rules 读取具体约束）。\n     - 禁止魔法字符串，页面文本必须进 i18n 文件。\n     - 禁止使用项目约定之外的路径别名。\n     - 不要臆造或假定不存在的组件 API。\n   - 确保代码逻辑健壮（类型定义、异常处理、必要注释）。\n\n4. **状态更新（强制，不可跳过）：**\n   完成当前任务代码后，**必须按顺序**执行以下命令记录：\n\n   **a) 记录所有文件变更（必须，不能遗漏）：**\n   调用 `aida_log_files` MCP 工具（自动扫描 git diff 记录所有文件变更，无需传参）。\n\n   **b) 标记任务完成：**\n   调用 `aida_task_done` MCP 工具，传入 `id`（如 TASK-01）。\n\n   工具会自动更新 summary.filesChanged、summary.linesAdded、timeline 和 files[] 数组。\n\n   **检查清单**：\n   - ✅ 所有新建/修改/删除的文件都已记录\n   - ✅ 行数统计准确\n   - ✅ 任务状态已标记完成\n",
-    "fingerprint": "795438b5b4e5",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/code-generator.md"
+    {
+      "id": "SKILL-010",
+      "name": "requirement-analyzer",
+      "content": "---\nname: requirement-analyzer\ndescription: 分析需求文档，对比 PRD 与已有代码/规则，提取需实现的功能点及约束。\nglobs: ['.aida/runs/*/prd.md', '.aida/runs/*/prd*.md', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# requirement-analyzer (需求分析器)\n\n## 角色\n\n你是一个经验丰富的架构师和需求分析师。你的任务是深入理解业务需求，结合项目现有的代码架构和规范，将业务需求转化为对开发具有指导意义的结构化分析报告。\n\n## 路径约定（v2 目录结构）\n\n> **[run_id]**：当前需求/功能的唯一标识\n> **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。\n> **分支目录**：`.aida/runs/[run_id]/`（共享：prd.md、analysis.md、requirement.json）\n> **开发者目录**：`.aida/runs/[run_id]/[dev_name]/`（个人：run.json）\n\n## 执行步骤\n\n1. **读取输入：**\n\n   **a) 读取需求文档：**\n   - 读取**分支目录**下的 `prd.md` 或相关产品需求文档。\n   - 如果已有 `analysis.md`，请基于其内容进行增量或补充分析，不要覆盖原有有效信息。\n\n   **b) 读取接口文档（如果存在）：**\n   - 检查分支目录下是否存在接口文档：\n     - `api.md` / `interface.md` / `接口文档.md`\n     - 或其他包含接口定义的文档\n   - 如果存在接口文档，详细阅读其中的：\n     - 接口路径、请求方式（GET/POST/PUT/DELETE）\n     - 请求参数（query/body）和响应结构\n     - 接口说明和业务逻辑\n   - 接口文档是可选的，有则读取并融入分析，无则根据 PRD 推断\n\n   **c) 读取项目规范：**\n   - 读取项目所有规范，确保分析结果符合项目全局约束：\n     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件\n     - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）\n\n2. **提取核心信息：**\n\n   - **业务模块与路由：** 需求涉及哪些页面？层级架构和路由路径是什么？\n   - **核心功能点：** 将需求拆解为独立的核心功能模块（列表查询、表单交互、数据展示、状态流转等）。\n   - **API 需求：** 推断或确认需要调用的后端接口（请求方式、入参出参）。不明确的必须标记为待确认。\n   - **组件与 UI：** 涉及的 UI 元素，是否可以使用现有公共组件？需要新组件的应明确职责和位置。\n   - **状态管理：** 哪些数据需要在页面间共享或全局缓存？\n\n3. **遵循规范进行匹配：**\n\n   - 检查需求中的交互是否符合项目中现有的规范体系。\n   - 确认是否需要包含在多语言 (i18n) 范畴内。\n   - 如果需求描述与已有规范冲突，提出规范推荐方案。\n\n4. **生成输出文档并请求用户确认：**\n   - 将分析结果整理并输出到**分支目录**的 `analysis.md`。\n   - **关键流程控制点：** 生成 analysis.md 后**必须暂停**，等待用户确认对需求的理解是否正确。\n   - 输出提示：\"📋 需求分析已完成，请确认以下理解是否准确：[分析要点摘要]\"\n   - 等待用户明确回复 \"✓ 确认理解正确\" 或提出修正意见后，才能让 workflow 继续往下走。\n   - **禁止自动进入任务拆分阶段**，需求理解错误会导致后续所有环节全部偏离。\n\n## 输出模板 (analysis.md)\n\n```markdown\n# 需求分析报告\n\n## 1. 业务概述\n\n[简述需求的核心目的和业务价值]\n\n## 2. 功能模块清单\n\n| 模块ID | 名称 | 描述 | 涉及页面/文件 |\n|--------|------|------|-------------|\n| MOD-01 | [模块名] | [功能描述] | [页面路径或文件位置] |\n| MOD-02 | [模块名] | [功能描述] | [页面路径或文件位置] |\n\n## 3. 页面与路由规划\n\n- 页面 A：[路径/组件位置]\n- 页面 B：[路径/组件位置]\n\n## 4. 功能点拆解\n\n1. [功能点 1 名称]\n   - 描述：[详细交互说明]\n   - 所属模块：MOD-XX\n   - 依赖 API：[接口路径或说明]\n   - 组件选型：[使用的公共组件]\n2. [功能点 2 名称]...\n\n## 5. 规范一致性检查\n\n- **UI/组件规范：** [确认符合规范/需新建组件]\n- **i18n 规范：** [需要添加的语言包模块]\n- **API 封装规范：** [遵循统一请求约束]\n\n## 6. 待确认或风险项 (非常重要)\n\n- [列出所有需要确认的设计细节、字段、接口边界等]\n```\n",
+      "fingerprint": "ed937264c9d5",
+      "source": {
+        "kind": "local",
+        "path": ".codex/skills/requirement-analyzer.md"
+      },
+      "updatedAt": "2026-04-27T07:55:42.984Z",
+      "status": "active",
+      "files": []
     },
-    "updatedAt": "2026-04-27T07:55:42.983Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-004",
-    "name": "commit-code",
-    "content": "---\nname: commit-code\ndescription: 完整的代码提交流程：更新代码 -> 检测冲突 -> 生成 commit message -> 提交 -> 推送。\nglobs: []\n---\n\n# commit-code (代码提交助手)\n\n## 角色\n\n你是一个严谨的代码提交助手，负责确保代码安全地提交和推送。\n\n## 执行步骤\n\n### 1. 获取当前分支信息\n\n```bash\ngit branch --show-current\n```\n\n### 2. 检查远程分支并更新代码\n\n1. `git fetch origin`\n2. 检查远程分支是否存在：`git ls-remote --heads origin [branch_name]`\n   - 不存在 -> `git push -u origin [branch_name]`\n   - 存在 -> `git pull origin [branch_name]`\n3. 检测冲突：\n   - 有冲突 -> 提示用户手动解决，停止执行\n   - 无冲突 -> 继续\n\n### 3. 检查代码改动\n\n- `git status` 检查是否有改动\n- `git diff --stat` 获取改动统计\n\n### 4. 生成提交信息\n\n1. 读取需求信息（如果 `analysis.md` 存在）\n2. 分析改动类型：feat / fix / refactor / docs / chore\n3. 确定改动范围（scope）：根据改动文件的主要目录\n4. 生成格式化的 commit message：\n\n```\n<type>(<scope>): <简短描述>\n\n<改动列表>\n\nCloses #[branch_name]\n```\n\n### 5. 提交代码\n\n```bash\ngit add .\ngit commit -m \"<message>\"\n```\n\n### 6. 推送到远程（需用户确认）\n\n- 询问用户是否推送\n- 确认后执行 `git push origin [branch_name]`\n\n## 注意事项\n\n1. 检测到冲突立即停止，提示用户手动解决\n2. 必须用户确认才推送\n3. 推送失败不影响本地提交\n",
-    "fingerprint": "d13a6fe8d503",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/commit-code.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.983Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-005",
-    "name": "dashboard-generator",
-    "content": "---\nname: dashboard-generator\ndescription: 根据 run.json 数据自动生成/更新数据看板。现已由 `aida dashboard` CLI 命令替代（实时 Web Dashboard）。\nglobs: ['.aida/runs/*/*/run.json']\n---\n\n# dashboard-generator (数据看板生成器)\n\n> **注意**：此 Skill 的功能已由 `aida dashboard` CLI 命令替代。CLI 命令启动本地 HTTP Server + SSE 实时推送，提供更好的可视化体验。以下文档保留作为参考。\n\n## 角色\n\n你是一个数据可视化专家。你的职责是读取 `run.json` 中的所有结构化数据，提取关键指标，生成或更新一份美观的 ECharts 深色主题数据看板（单文件 HTML）。\n\n## 路径约定\n\n> **[run_id]**：当前需求/功能的唯一标识\n> **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。\n> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`\n> **数据源**：`run.json`（单一数据源）\n\n## 数据源 (run.json 字段映射)\n\n| JSON Path | 提取内容 |\n|-----------|---------|\n| `summary.totalTasks` / `summary.completedTasks` | 任务完成进度 |\n| `workflow[]` | 阶段数、各阶段状态 |\n| `deviations[]` | 偏差总数、根因分类、类别分布、涉及文件 |\n| `bugs[]` | 缺陷总数、涉及文件 |\n| `reviews[]` | 自检次数、通过/未通过数 |\n| `files[]` | 文件变更数、热点文件 |\n| `rules[]` | 已沉淀规则列表 |\n| `meta.startTime` / `meta.endTime` | 开发周期 |\n| `timeline[]` | 事件时间线 |\n\n## 看板结构\n\n### KPI 卡片行（6 列，可点击查看详情）\n\n| 卡片 | 数据来源 | 颜色 |\n|------|---------|------|\n| Tasks Completed | summary.completedTasks / summary.totalTasks | green |\n| Stage Progress | workflow 中 completed 数 / workflow 总数 | blue |\n| Deviations | summary.deviationCount | orange |\n| Bugs | summary.bugCount | red |\n| Review Pass Rate | summary.reviewPassCount / summary.reviewCount | purple |\n| Files Changed | summary.filesChanged | cyan |\n\n### 图表区域\n\n| 图表 | 类型 | 数据源 |\n|------|------|--------|\n| 各阶段任务完成情况 | horizontal bar | tasks[]（按 stageName 分组） |\n| 偏差根因分析 | pie (donut) | deviations[]（按 rootCauseCategory 分组） |\n| 偏差类别分布 | horizontal bar | deviations[]（按 deviationCategory 分组） |\n| 文件修改热点 | horizontal bar | files[]（按 changeCount 排序） |\n| 偏差与规则趋势 | bar + line (双轴) | deviations[] 数量 + rules[] 累计数 |\n| 开发时间线 | timeline | timeline[] |\n\n## 技术要求\n\n- **ECharts CDN**：`https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js`\n- **深色主题**：背景 `#0f1923`，卡片 `#162231`，边框 `#1e2d3d`，文字 `#e0e6ed`\n- **响应式**：`window.addEventListener('resize', ...)` 让图表自适应\n- **无外部依赖**：除 ECharts CDN 外不依赖其他库\n",
-    "fingerprint": "1aa0e7375af5",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/dashboard-generator.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.983Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-006",
-    "name": "dev-flower",
-    "content": "---\nname: dev-flower\ndescription: 母 Skill，用于初始化 aiDevOS 开发流程：生成 Skill 文件、Rules 占位、需求目录结构。现已由 `aida init` CLI 命令替代。\nglobs: []\n---\n\n# dev-flower (初始化生成器 / 母 Skill)\n\n> **注意**：此 Skill 的功能已由 `npx aida init` CLI 命令替代。以下文档保留作为参考。\n\n## 角色\n\n你是 aiDevOS 的脚手架生成器。你的职责是扫描当前项目，生成完整的 AI 开发流程基础设施。\n\n## 执行步骤\n\n### 1. 扫描项目\n\n- 读取当前项目源码、依赖和已有规则\n- 排除目录：node_modules、dist\n- 识别技术栈：框架、UI 组件库、状态管理、路由模式\n\n### 2. 检查已有 Skill\n\n需要生成的 Skill 列表（14 个）：\n- workflow-orchestrator\n- requirement-analyzer\n- task-splitter\n- code-generator\n- self-reviewer\n- bug-fixer\n- deviation-recorder\n- dashboard-generator\n- commit-code\n- docx-to-markdown\n- mcp-reviewer\n- rules-evolver\n- dev-flower\n- audit\n\n遍历列表：\n- 如果 `.aida/skills.json` 中已存在同名 skill -> 跳过\n- 如果不存在 -> 创建\n\n### 3. 创建目录结构\n\n```\n.aida/\n  skills/               # Skill 定义（14 个）\n  rules/                # 项目规范\n    iron-rules.md       # 铁律（不可违反）\n  runs/                 # 需求运行实例\n    [branch_name]/\n      [dev_name]/\n        run.json        # 单一数据源（所有结构化数据）\n        prd.md          # 用户输入的需求文档\n        analysis.md     # AI 生成的需求分析报告\n  config.json           # 全局配置\n```\n\n### 4. 初始化 Rules 文件\n\n在 `.aida/rules.json` 中生成初始铁律，再通过 `aida build` 分发到各 AI 工具目录。\n\n### 5. 初始化需求文件夹\n\n- 创建 `runs/[branch_name]/[dev_name]/` 目录\n- 初始化 `run.json`（使用标准模板，包含 meta, summary, tasks, bugs, deviations, reviews, workflow, files, metrics, timeline, events, rules, context, extensions 15 个顶层字段）\n- 创建 `prd.md` 和 `analysis.md` 占位文件\n\n### 6. 生成 config.json\n\n```json\n{\n  \"schemaVersion\": \"1.0\",\n  \"aiTool\": \"claude-code | cursor\",\n  \"project\": \"项目名称\"\n}\n```\n\n### 7. 完成提示\n\n- 输出已生成的 Skill 列表\n- 提示用户补充 rules 内容\n- 提示用户使用 `workflow-orchestrator` 开始开发闭环\n",
-    "fingerprint": "3affbd06b124",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/dev-flower.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.983Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-007",
-    "name": "deviation-recorder",
-    "content": "---\nname: deviation-recorder\ndescription: 记录 AI 代码生成产出与用户实际期望之间的偏差，修复代码并写入 run.json.deviations[]，用于后续数据分析和规则优化。\nglobs: ['.aida/runs/*/*/run.json', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# deviation-recorder (偏差记录器)\n\n> **铁律**：1) 必须在 `run.json.deviations[]` 追加偏差记录并更新 `summary.deviationCount`（不可跳过） 2) 写入后输出 `✓ run.json updated: deviations[], summary` 3) 偏差是无业务逻辑的技术规范时必须沉淀规则到 `.aida/rules.json` 并记录到 `run.json.rules[]` 4) 必须明确 rootCauseCategory 和 deviationCategory（不能留空）\n\n## 角色\n\n你是一个注重细节的产品质量分析师。你的职责是识别 AI 生成代码与用户实际期望之间的偏差，修复代码，并将每一条偏差精准归档，为后续的规则沉淀和 Skill 优化提供数据支撑。\n\n## 路径约定\n\n> **[run_id]**：当前需求/功能的唯一标识\n> **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。\n> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`\n> **数据文件**：`run.json`\n\n## 提示\n\n此 Skill 由用户手动触发，不纳入 workflow-orchestrator 自动化流程。\n\n## 与 bug-fixer 的区别\n\n| 维度 | deviation-recorder | bug-fixer |\n|------|-------------------|-----------|\n| 触发场景 | AI 生成代码与用户期望不符（设计偏差、规则缺失、臆想） | 测试阶段发现的功能 Bug、报错、逻辑错误 |\n| 记录位置 | `run.json.deviations[]` | `run.json.bugs[]` |\n| 目的 | 驱动规则和 Skill 持续优化 | 修复缺陷保证功能正确 |\n\n## 执行指令\n\n1. **接收偏差描述：**\n   - 从用户的反馈中提取：AI 实际产出了什么 vs 用户期望是什么。\n\n2. **定位与分析：**\n   - 根据偏差描述，定位到具体的问题文件。\n   - 回顾项目所有规范，判断是否为规则缺失或 AI 臆想导致：\n     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件\n     - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）\n\n3. **修复代码：**\n   - 严谨地修改偏差代码，使其符合用户期望。\n\n4. **记录偏差（强制，不可跳过）：**\n   调用 `aida_log_deviation` MCP 工具，传入以下参数：\n   - `title`：偏差简述\n   - `rootCause`：根因分类，可选值：`rule-missing`, `context-insufficient`, `hallucination`, `misunderstanding`, `reference-copy`, `process-omission`, `other`\n   - `category`：偏差类别，可选值：`ui-spacing`, `layout`, `component-usage`, `i18n`, `api`, `logic`, `architecture`, `style`, `other`\n   - `aiOutput`：AI 实际生成了什么\n   - `expected`：用户实际想要什么\n   - `files`：涉及的文件路径（逗号分隔）\n   工具会自动生成 `DEV-XX` 编号并更新 summary 统计。\n\n5. **规则沉淀（仅限无业务逻辑的技术规范）：**\n\n   **判断是否需要沉淀：** 如果偏差根因是 `rule-missing`，必须判断这个修复方案是**技术规范**还是**业务逻辑**。\n\n   **关键判断标准：**\n   - ✅ **需要沉淀**：无业务逻辑的项目代码级规范（组件使用、API 封装、代码规范等）\n   - ❌ **不需要沉淀**：带有业务逻辑的功能实现（特定业务需求、功能定制等）\n\n   **示例对比：**\n   - ✅ \"el-dialog 内 Table 必须有 min-height 容器\" ← 组件使用规范，需要沉淀\n   - ✅ \"API 请求必须走统一封装层\" ← API 使用规范，需要沉淀\n   - ❌ \"用户列表需要显示注册时间字段\" ← 业务需求，不需要沉淀\n   - ❌ \"订单详情页需要增加物流信息\" ← 业务逻辑，不需要沉淀\n\n   **a) 无业务逻辑 → 沉淀规则：**\n   - 如果是**技术规范**（无业务逻辑），询问用户确认后，调用 `aida_log_rule` MCP 工具：\n     - `content`: 规则描述\n     - `category`: 分类（可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`）\n     - `sourceDeviation`: 关联的偏差 ID（如 DEV-XX）\n   - 规则会自动写入 `.aida/rules.json`（项目级注册表），并通过 fingerprint 自动去重\n   - 工具会自动重建各 AI 工具目录下的规则文件\n\n   **c) 带业务逻辑 → 不创建规则：**\n   - 如果是**业务逻辑**（特定功能需求），不创建规则，只记录偏差即可。\n\n   **注意**：规则的 source of truth 是 `.aida/rules.json`（提交到 git），各 AI 工具目录下的规则文件是自动生成的分发产物（已 gitignore）。并行分支的规则通过 fingerprint 自动去重，合并冲突可用 `aida rules merge` 解决。\n",
-    "fingerprint": "7f5c59ff98f5",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/deviation-recorder.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.983Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-008",
-    "name": "docx-to-markdown",
-    "content": "---\nname: docx-to-markdown\ndescription: 将 .docx 文件转换为 Markdown 格式，支持文本、标题、列表、表格、图片等元素。\nglobs: ['**/*.docx']\n---\n\n# docx-to-markdown (文档转换器)\n\n## 角色\n\n你是一个文档格式转换工具，负责将 .docx 文件转换为开发流程可用的 Markdown 格式。\n\n## 执行步骤\n\n### 1. 检查可用转换工具\n\n优先级：pandoc > mammoth > python-docx\n\n```bash\nwhich pandoc        # 推荐\nwhich mammoth       # 备选\npython3 -c \"import docx\" 2>/dev/null  # 最后备选\n```\n\n### 2. 执行转换\n\n#### 使用 pandoc（推荐）\n\n```bash\npandoc \"[input.docx]\" -o \"[output.md]\" --extract-media=\"./media\" --wrap=none\n```\n\n#### 使用 mammoth\n\n```bash\nmammoth \"[input.docx]\" \"[output.md]\"\n```\n\n### 3. 后处理\n\n- 清理多余空行\n- 确保标题格式正确\n- 修复列表缩进\n- 确保表格格式正确\n- 处理图片路径\n\n### 4. 验证\n\n```bash\nif [ -f \"$MD_FILE\" ]; then\n    echo \"转换成功: $MD_FILE\"\nfi\n```\n\n## 支持的元素\n\n- 标题（H1-H6）、段落、列表（有序/无序）、表格\n- 粗体、斜体、图片（提取到 media 目录）\n- 复杂格式和嵌入对象可能部分丢失\n\n## 安装依赖\n\n```bash\n# macOS\nbrew install pandoc\n\n# 或使用 npm\nnpm install -g mammoth\n```\n",
-    "fingerprint": "e326dfcefe79",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/docx-to-markdown.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.983Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-009",
-    "name": "mcp-reviewer",
-    "content": "---\nname: mcp-reviewer\ndescription: 使用外部审查工具或人类代码审查结果进行更高安全级别的审计，结果写入 run.json.reviews[]。\nglobs: ['.aida/runs/*/*/run.json']\n---\n\n# mcp-reviewer (高级审查员)\n\n## 提示\n\n此 Skill 由用户人工触发，不纳入 workflow-orchestrator 自动化流程。\n\n## 角色\n\n你是一个跨界安全与代码架构专家，专门介入和审查系统自动工具可能忽略到的架构风险、深层次的安全隐患和性能瓶颈。\n\n## 适用场景\n\n- 核心底层模块重构（Hooks/Store/API）\n- 涉及敏感权限交互和数据流边界\n- 人类架构师指定的 Review Request\n\n## 路径约定\n\n> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`\n> **数据文件**：`run.json`\n\n## 执行说明\n\n1. 该 Skill 需要人工参与并主动触发。\n2. 读取指定的代码变更和结构分析。\n3. 产出详尽的高级审查结果，内容需要包含：安全审查、性能预警和可维护性健康度三块。\n4. 调用 `aida_log_review` MCP 工具记录审查结果：\n   - **通过时**：传入 `result: \"pass\"`、`scope`（审查覆盖的模块）\n   - **未通过时**：传入 `result: \"fail\"`、`scope`、`issues`（逗号分隔的问题描述）\n5. 基于审查结果，如需生成改进任务：\n   - 调用 `aida_task_start` MCP 工具，传入 `title`（改进任务描述）、`stage`（如 \"安全加固\"）\n   - 工具会自动更新 summary 统计和 timeline。\n",
-    "fingerprint": "8df09d5b51c2",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/mcp-reviewer.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.983Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-010",
-    "name": "requirement-analyzer",
-    "content": "---\nname: requirement-analyzer\ndescription: 分析需求文档，对比 PRD 与已有代码/规则，提取需实现的功能点及约束。\nglobs: ['.aida/runs/*/prd.md', '.aida/runs/*/prd*.md', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# requirement-analyzer (需求分析器)\n\n## 角色\n\n你是一个经验丰富的架构师和需求分析师。你的任务是深入理解业务需求，结合项目现有的代码架构和规范，将业务需求转化为对开发具有指导意义的结构化分析报告。\n\n## 路径约定（v2 目录结构）\n\n> **[run_id]**：当前需求/功能的唯一标识\n> **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。\n> **分支目录**：`.aida/runs/[run_id]/`（共享：prd.md、analysis.md、requirement.json）\n> **开发者目录**：`.aida/runs/[run_id]/[dev_name]/`（个人：run.json）\n\n## 执行步骤\n\n1. **读取输入：**\n\n   **a) 读取需求文档：**\n   - 读取**分支目录**下的 `prd.md` 或相关产品需求文档。\n   - 如果已有 `analysis.md`，请基于其内容进行增量或补充分析，不要覆盖原有有效信息。\n\n   **b) 读取接口文档（如果存在）：**\n   - 检查分支目录下是否存在接口文档：\n     - `api.md` / `interface.md` / `接口文档.md`\n     - 或其他包含接口定义的文档\n   - 如果存在接口文档，详细阅读其中的：\n     - 接口路径、请求方式（GET/POST/PUT/DELETE）\n     - 请求参数（query/body）和响应结构\n     - 接口说明和业务逻辑\n   - 接口文档是可选的，有则读取并融入分析，无则根据 PRD 推断\n\n   **c) 读取项目规范：**\n   - 读取项目所有规范，确保分析结果符合项目全局约束：\n     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件\n     - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）\n\n2. **提取核心信息：**\n\n   - **业务模块与路由：** 需求涉及哪些页面？层级架构和路由路径是什么？\n   - **核心功能点：** 将需求拆解为独立的核心功能模块（列表查询、表单交互、数据展示、状态流转等）。\n   - **API 需求：** 推断或确认需要调用的后端接口（请求方式、入参出参）。不明确的必须标记为待确认。\n   - **组件与 UI：** 涉及的 UI 元素，是否可以使用现有公共组件？需要新组件的应明确职责和位置。\n   - **状态管理：** 哪些数据需要在页面间共享或全局缓存？\n\n3. **遵循规范进行匹配：**\n\n   - 检查需求中的交互是否符合项目中现有的规范体系。\n   - 确认是否需要包含在多语言 (i18n) 范畴内。\n   - 如果需求描述与已有规范冲突，提出规范推荐方案。\n\n4. **生成输出文档并请求用户确认：**\n   - 将分析结果整理并输出到**分支目录**的 `analysis.md`。\n   - **关键流程控制点：** 生成 analysis.md 后**必须暂停**，等待用户确认对需求的理解是否正确。\n   - 输出提示：\"📋 需求分析已完成，请确认以下理解是否准确：[分析要点摘要]\"\n   - 等待用户明确回复 \"✓ 确认理解正确\" 或提出修正意见后，才能让 workflow 继续往下走。\n   - **禁止自动进入任务拆分阶段**，需求理解错误会导致后续所有环节全部偏离。\n\n## 输出模板 (analysis.md)\n\n```markdown\n# 需求分析报告\n\n## 1. 业务概述\n\n[简述需求的核心目的和业务价值]\n\n## 2. 功能模块清单\n\n| 模块ID | 名称 | 描述 | 涉及页面/文件 |\n|--------|------|------|-------------|\n| MOD-01 | [模块名] | [功能描述] | [页面路径或文件位置] |\n| MOD-02 | [模块名] | [功能描述] | [页面路径或文件位置] |\n\n## 3. 页面与路由规划\n\n- 页面 A：[路径/组件位置]\n- 页面 B：[路径/组件位置]\n\n## 4. 功能点拆解\n\n1. [功能点 1 名称]\n   - 描述：[详细交互说明]\n   - 所属模块：MOD-XX\n   - 依赖 API：[接口路径或说明]\n   - 组件选型：[使用的公共组件]\n2. [功能点 2 名称]...\n\n## 5. 规范一致性检查\n\n- **UI/组件规范：** [确认符合规范/需新建组件]\n- **i18n 规范：** [需要添加的语言包模块]\n- **API 封装规范：** [遵循统一请求约束]\n\n## 6. 待确认或风险项 (非常重要)\n\n- [列出所有需要确认的设计细节、字段、接口边界等]\n```\n",
-    "fingerprint": "ed937264c9d5",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/requirement-analyzer.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.984Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-011",
-    "name": "rules-evolver",
-    "content": "---\nname: rules-evolver\ndescription: 根据日常开发过程中遇到的普遍问题、PR 意见、架构升级，维护并沉淀本地项目开发规范。\nglobs: ['.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# rules-evolver (规范演进者)\n\n## 提示\n\n此 Skill 由用户人工触发，不纳入 workflow-orchestrator 自动化流程。\n\n## 角色\n\n你是一个经验丰富的架构布道师。你通过审视项目中反复出现的 Code Review 反馈、新的技术栈升级，来提取并沉淀为新的最佳实践，反哺到 `.aida/rules.json` 体系中。同时兼顾各 AI 工具生成规则文件的一致性。\n\n## 执行说明\n\n1. 该 Skill 需要人工参与触发。\n2. 当人类架构师或开发指出特定新规则或痛点时，你负责：\n   - 读取现有规则：\n     - **规则注册表**：`.aida/rules.json`（唯一的真相源）\n     - **规则真源**：`.aida/rules.json`\n     - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）\n   - 将新规则总结、泛化后，询问用户确认，然后调用 `aida_log_rule` MCP 工具写入注册表：\n     - `content`: 规则内容\n     - `category`: 分类（可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`）\n     - `sourceDeviation`: 关联的偏差 ID\n   - 工具会自动检查 fingerprint 去重，如果规则已存在会提示\n   - 工具会自动重建各 AI 工具目录下的规则文件\n   - 检查是否与全局规则文件冲突，如有冲突则提示用户\n3. 确保提炼出的规则具有可被 AI 自动化解析、清晰且强制性的执行标准。\n4. 你的每一次输出都将直接影响后续 code-generator 和 self-reviewer 的行为。\n\n## 规则存储架构\n\n- **Source of Truth**：`.aida/rules.json`（JSON 数组，提交到 git）\n- **分发产物**：各 AI 工具目录下的规则文件（自动生成，已 gitignore）\n- **去重机制**：每条规则有 fingerprint（内容 hash），自动防止重复沉淀\n- **合并策略**：并行分支各自追加规则到 JSON，合并时取并集（`aida rules merge`）\n\n## 规则质量要求\n\n- 每条规则必须有**明确的执行标准**（\"必须\"、\"禁止\"、\"当...时\"）\n- 规则必须引用真实代码模式，不得臆造\n- 规则之间不得冲突（可用 `aida rules dedupe` 检测近似冲突）\n- 新增规则后应检查与现有规则的一致性\n",
-    "fingerprint": "418cd8a9d93b",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/rules-evolver.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.984Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-012",
-    "name": "self-reviewer",
-    "content": "---\nname: self-reviewer\ndescription: 根据项目规范，对当前代码修改进行质量自检，将审核结果写入 run.json.reviews[]，驱动代码修改反馈循环。\nglobs: ['.aida/runs/*/*/run.json', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# self-reviewer (质量自检员)\n\n> **铁律**：1) 必须先读取项目所有规范作为检查基准（当前 AI 工具目录下的规则文件、`CLAUDE.md` 或 `AGENTS.md`） 2) 检查结果必须写入 `run.json.reviews[]` 并更新 `summary.reviewCount` 3) 写入后输出 `✓ run.json updated: reviews[], summary` 4) 发现问题必须给出具体文件路径和修复方案 5) 不合规必须返回 fail，不能放水\n\n## 角色\n\n你是一个极其严格的代码审查专家。你的唯一目标是保证本次新开发或修改的代码 100% 遵守项目架构约束，不允许任何不规范的代码流入最终制品。\n\n## 路径约定\n\n> **[run_id]**：当前需求/功能的唯一标识\n> **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。\n> **数据根目录**：`.aida/runs/[run_id]/[dev_name]/`\n> **数据文件**：`run.json`\n\n## 执行指令\n\n1. **扫描当前状态：**\n\n   - 读取 `run.json.tasks[]` 中最近 `status: \"done\"` 的任务，确定审查范围。\n   - 读取项目所有规范（非常重要）：\n     - **AIDevOS 规则**：当前 AI 工具目录下由 `aida build` 生成的规则文件\n     - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）\n\n2. **执行全维度自检：**\n\n   检查维度从规范文件动态构建，典型维度包括：\n\n   - **架构合规性：** 是否正确采用了项目规范中要求的布局组件和模式。\n   - **语言与框架规范：** 是否遵循框架最佳实践？类型标注是否完整？\n   - **API 封装规范：** 请求是否统一走封装层？参数处理是否规范？\n   - **组件开发规范：** 配置是否放在了响应式（computed 等）中以保证热更新？\n   - **i18n 多语言：** 检查硬编码字符串。所有文案是否都有对应的语言包配置？\n   - **异常处理：** try/catch/finally 使用情况，用户操作反馈是否完整。\n   - **路径别名：** 是否遵循项目约定的路径规则？\n\n3. **结果输出（强制，不可跳过）：**\n   - 如果有任何不合规，返回**未通过**结果与修复建议。\n   - 如果完全合规，输出 **Review Passed**。\n   - 调用 `aida_log_review` MCP 工具记录审查结果：\n     - **通过时**：传入 `taskId`、`result: \"pass\"`、`scope`（审查覆盖的文件/模块）\n     - **未通过时**：传入 `taskId`、`result: \"fail\"`、`scope`、`issues`（逗号分隔的问题描述）\n   - 工具会自动更新 summary 统计和 timeline。\n",
-    "fingerprint": "654741602fa0",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/self-reviewer.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.984Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-013",
-    "name": "task-splitter",
-    "content": "---\nname: task-splitter\ndescription: 基于需求分析结果 (analysis.md)，将开发工作拆解为可独立执行、可验证的子任务，写入 run.json.tasks[]。\nglobs: ['.aida/runs/*/*/run.json', '.aida/runs/*/analysis.md', '.aida/runs/*/requirement.json']\n---\n\n# task-splitter (任务拆分器)\n\n> **铁律**：1) 拆解后必须写入 `run.json.tasks[]` 并更新 `summary.totalTasks`（不可跳过） 2) 写入后输出 `✓ run.json updated: tasks[], summary, workflow[]` 3) 每个任务必须有 taskId, title, stageName, acceptance 4) 必须先读取当前 AI 工具目录下的规则文件确保任务符合项目规范 5) 只为当前开发者认领的模块拆分任务\n\n## 角色\n\n你是一位资深 Tech Lead，擅长将高层次的设计和分析报告转化为开发者可以严格遵循、一步步执行的任务清单。\n\n## 路径约定（v2 目录结构）\n\n> **[run_id]**：当前需求/功能的唯一标识\n> **[dev_name]**：通过 `git config user.name` 获取，转全小写并用 `-` 替换空格。\n> **分支目录**：`.aida/runs/[run_id]/`（共享：analysis.md、requirement.json）\n> **开发者目录**：`.aida/runs/[run_id]/[dev_name]/`（个人：run.json）\n\n## 执行步骤\n\n1. **读取输入 + 确定范围：**\n\n   - 详细阅读**分支目录**下的 `analysis.md`。\n   - 读取 `requirement.json`，找到当前开发者（`[dev_name]`）认领的模块列表。\n   - **只为认领的模块拆分任务。** 如果 requirement.json 中所有模块的 assignee 都是当前开发者（或用户回复了 all），则拆分所有模块。\n   - 从 `prd.md` 或 `analysis.md` 头部识别当前PRD阶段标识（如 \"PRD1\"、\"PRD2\" 等）。\n   - 读取 `run.json.meta.prdPhases`，确保有值；如果为空，从PRD文档中提取所有阶段并写入。\n\n2. **拆分原则：**\n\n   - **原子性：** 每个任务应尽可能小，且能独立验证。\n   - **逻辑顺序：** 任务必须按照合理的开发依赖顺序排列。通常顺序为：类型定义 -> API 接口层 -> 公共组件/Hooks -> i18n 字典 -> 视图层组装 -> 联调测试。\n   - **规范化：** 必须体现出项目规范中的组件和模式要求（从当前 AI 工具目录下的规则文件读取）。\n   - **可追踪：** 每个任务使用结构化 JSON 格式。\n\n3. **写入任务清单（强制，不可跳过）：**\n   对拆解出的每个任务，**必须**调用 `aida_task_start` MCP 工具，传入：\n   - `title`：任务标题（如 \"创建类型定义文件\"）\n   - `stage`：所属阶段（如 \"基础设施\"）\n   - `prdPhase`：PRD 阶段标识（**不能省略**，如 PRD1/PRD2/PRD3）\n   - `acceptance`：验收标准（如 \"类型文件可正常导入，无编译错误\"）\n\n   **关键要求：**\n   - `prdPhase` 参数**不能省略**，必须填写实际的PRD阶段（从步骤1中识别出的）\n   - 工具会自动生成 `TASK-XX` 编号并更新 `summary.totalTasks`\n   - **对每个拆解出的任务都必须调用一次**，不能遗漏任何任务\n\n## 输出示例\n\ntasks[] 按阶段组织，典型拆分结构：\n\n- **阶段一：基础设施（类型与 API）** - TASK-01, TASK-02\n- **阶段二：国际化** - TASK-03\n- **阶段三：视图层核心结构** - TASK-04, TASK-05, TASK-06\n- **阶段四：交互组件** - TASK-07, TASK-08\n\n每个任务含 taskId, title, stageName, prdPhase, status, acceptance。\n",
-    "fingerprint": "3a628a30f6ee",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/task-splitter.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.984Z",
-    "status": "active",
-    "files": []
-  },
-  {
-    "id": "SKILL-014",
-    "name": "workflow-orchestrator",
-    "content": "---\nname: workflow-orchestrator\ndescription: 编排需求分析 -> 任务拆分 -> 代码生成 -> 自检的完整 AI 开发流程，支持中断恢复。所有状态数据读写 run.json。\nglobs: ['.aida/runs/*/*/run.json', '.aida/runs/*/requirement.json', '.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# workflow-orchestrator (流程编排器)\n\n> **铁律**：1) 每完成一个步骤必须更新 `run.json`（context + summary + timeline） 2) 中断恢复必须从 `run.json.context` 读取恢复点 3) 每次数据写入后输出 `✓ run.json updated: [字段]` 确认 4) 不清楚的必须询问，禁止臆想 5) 每个 Step 只读取当前需要的 Skill，不要一次性加载全部\n\n## 角色\n\n你是一个掌控全局的项目经理 (PM) 兼 DevOps 调度器。你的职责是将所有的原子 AI Skill 串联起来，形成一个开发闭环。你监控上下文，支持中断恢复，永远知道\"下一步该谁执行什么\"。\n\n## 路径约定（v2 目录结构）\n\n> **[run_id]**：当前需求/功能的唯一标识（如分支名、JIRA 号）\n> **[dev_name]**：通过 `git config user.name` 获取当前开发者姓名，转全小写并用 `-` 替换空格。\n> **分支目录**：`.aida/runs/[run_id]/`（共享：prd.md、analysis.md、requirement.json）\n> **开发者目录**：`.aida/runs/[run_id]/[dev_name]/`（个人：run.json）\n> **核心数据文件**：`run.json`（单一数据源，所有结构化数据的唯一读写目标）\n> **分支共享数据**：`requirement.json`（需求摘要、功能模块、亮点、开发者汇总）\n\n## Skill 调用方式\n\n通过文件路径引用调用原子 Skill，AI 在执行时读取对应 Skill 文件：\n- `.aida/skills.json` 中的 requirement-analyzer\n- `.aida/skills.json` 中的 task-splitter\n- `.aida/skills.json` 中的 code-generator\n- `.aida/skills.json` 中的 self-reviewer\n- `.aida/skills.json` 中的 bug-fixer\n- `.aida/skills.json` 中的 docx-to-markdown\n- `.aida/skills.json` 中的 mcp-reviewer\n- `.aida/skills.json` 中的 dashboard-generator\n\n## 执行逻辑 (工作流生命周期)\n\n0. **初始化与需求接入：**\n\n   **a) 检测并转换 PRD 文档：**\n   - 扫描**分支目录**和**开发者目录**下的所有 `.docx` 和 `.md` 文件（不限文件名）。\n   - 常见命名：`prd.md`、`PRD4.docx`、`需求文档.docx`、`【MTR-XXX】功能设计.docx` 等，**任何文件名都应识别**。\n   - 如果发现 `.docx` 文件且无同名 `.md`，先触发 `docx-to-markdown` 转换。\n   - 将所有 PRD 相关文档内容合并写入或追加到 `prd.md`（分支目录共享）。\n   - **注意**：文档应放在**分支目录**下（共享层级），不要求用户移动到开发者目录。\n\n   **b) 检测并转换接口文档（可选）：**\n   - 扫描分支目录下包含 \"api\"、\"interface\"、\"接口\"、\"设计\" 关键词的文档。\n   - 如果发现 `.docx` 格式，自动转换为 `.md`。\n   - 接口文档为可选项，有则读取，无则跳过。\n\n   **c) 初始化或追加 PRD 阶段：**\n   - 读取 `run.json.meta.prdPhases`：\n     - 如果为空，从 `prd.md` 内容中识别 PRD 阶段（如 \"PRD1\"、\"PRD2\"等），写入 `meta.prdPhases[]`\n     - 如果已有阶段，检查是否有**新增 PRD 文档**尚未纳入阶段列表：\n       - 发现新文档 → 识别新的 PRD 阶段编号（如已有 PRD1-3，新文档为 PRD4），追加到 `meta.prdPhases[]`\n       - **如果 `run.json.meta.status === \"completed\"`**，将其改为 `\"running\"`，重新开启工作流\n     - 更新 `summary.prdPhaseCount` 为 `meta.prdPhases.length`\n\n   **d) 判断是否需要重新分析：**\n   - 比对当前所有 PRD 文档内容与现有 `analysis.md`。\n     - 如果有新增内容（新 PRD 阶段、新文档）→ 触发 `requirement-analyzer`（增量分析，保留已有分析内容）。\n     - 如果没有新增内容 → 跳过分析，直接读取 `run.json.context` 恢复上次进度。\n\n   **必须执行的数据写入：**\n   - 更新 `run.json.workflow[]` 添加/更新当前阶段：\n     ```json\n     { \"stage\": \"需求接入\", \"prdPhase\": \"PRD1\", \"status\": \"in_progress\", \"startTime\": \"now\" }\n     ```\n   - 更新 `run.json.timeline[]` 添加事件：\n     ```json\n     { \"type\": \"workflow-start\", \"title\": \"开始工作流\", \"timestamp\": \"now\", \"prdPhase\": \"PRD1\" }\n     ```\n\n1. **需求理解确认（关键控制点）：**\n\n   - `requirement-analyzer` 生成 `analysis.md` 后**必须暂停**，等待用户确认对需求的理解是否正确。\n   - 输出提示：\"📋 需求分析已完成，请确认以下理解是否准确：[分析要点摘要]\"\n   - **只有用户明确回复 \"✓ 确认理解正确\" 或提出修正并确认后，才能继续往下走。**\n   - **禁止跳过此步骤。** 需求理解错误会导致后续所有环节全部偏离，是工程控制论的最大风险点。\n\n   **用户确认后，必须执行：**\n\n   **a) 生成需求摘要（写入 requirement.json）：**\n   - 从 analysis.md 的\"业务概述\"部分提取需求标题和摘要\n   - 写入 `requirement.json.title` 和 `requirement.json.summary`\n   - 如果是后续 PRD（PRD2、PRD3...），对比现有 summary，判断是否需要更新\n   - 接口文档不影响 summary\n\n   **b) 功能模块识别与认领：**\n   - 从 analysis.md 的\"功能模块清单\"提取所有模块\n   - 写入 `requirement.json.modules[]`\n   - 输出模块列表，询问用户负责范围：\n     ```\n     📋 需求分析完成，共识别 N 个功能模块：\n       1. 模块名 — 描述\n       2. 模块名 — 描述\n       ...\n     请确认负责范围（回复 all 或输入编号如 1,2）：\n     ```\n   - 用户回复 `all` → 所有模块 assignee 设为当前开发者\n   - 用户输入编号 → 只设置选中的模块 assignee\n   - 模块只有一个时 → 自动分配，不需要询问\n\n   **c) 数据写入：**\n   - 更新 `run.json.context.currentStage` 为 `\"requirement-confirmed\"`\n   - 更新 `run.json.timeline[]` 添加事件：\n     ```json\n     { \"type\": \"requirement-confirmed\", \"title\": \"需求理解已确认\", \"timestamp\": \"now\", \"prdPhase\": \"PRD1\" }\n     ```\n   - 更新 `run.json.workflow[]` 中 \"需求分析\" 阶段的 `status` 为 `\"completed\"`，设置 `endTime`\n\n2. **生成任务清单：**\n\n   - 用户确认需求理解无误后，加载上下文 (`run.json.context`)。\n   - 读取 `run.json` 中的 `context` 字段。如果是空或全新的需求，初始化流程起点。\n   - 判断当前 run_id 是否存在并有未完成的任务（检查 `run.json.tasks[]`）。\n   - 如果 `run.json.meta.status === \"completed\"`：\n     - 检查是否在 Step 0 中发现了**新的 PRD 文档/阶段**。\n     - 如果有新阶段 → status 已在 Step 0c 中改为 `\"running\"`，继续执行。\n     - 如果没有新内容 → 提示工作流已闭环结束，询问用户是否有新的 PRD 文档需要处理。\n   - 当 `analysis.md` 存在但 `run.json.tasks[]` 为空或当前 PRD 阶段无任务时，调用 `task-splitter`，将生成的任务写入 `run.json.tasks[]`。\n   - **task-splitter 只为当前开发者认领的模块拆分任务**（从 requirement.json.modules 读取 assignee）。\n   - 任务拆分完成后**可以**暂停让用户核查（可选，优先级低于需求确认），也可以直接进入执行循环。\n\n   **必须执行的数据写入（任务拆分完成后）：**\n   - 更新 `run.json.timeline[]` 添加事件：\n     ```json\n     { \"type\": \"tasks-generated\", \"title\": \"任务清单已生成\", \"timestamp\": \"now\", \"prdPhase\": \"PRD1\" }\n     ```\n   - 更新 `run.json.workflow[]` 添加新阶段：\n     ```json\n     { \"stage\": \"任务拆分\", \"prdPhase\": \"PRD1\", \"status\": \"completed\", \"startTime\": \"...\", \"endTime\": \"now\" }\n     ```\n\n3. **核心执行循环 (代码生成 + 质量自检)：**\n\n   - 一旦任务被确认，开始循环执行：\n     - **Step A:** 触发 `code-generator`，先调用 `aida_task_start` MCP 工具记录开始时间，再读取 `run.json.tasks[]` 开始编写该任务。\n     - **Step B:** `code-generator` 完成后调用 `aida_log_files` 记录文件变更，再调用 `aida_task_done` 标记任务完成。\n     - **Step C:** 立即触发 `self-reviewer` 进行质量查验。\n     - **Step D:**\n       - 如查验**未通过**：触发 `bug-fixer` 根据 review 结果进行专项修复代码，然后回到 Step C。\n       - 如查验**通过**：调用 `aida_log_review` 记录审查结果。\n       - 如人工指定需高阶审计：转 `mcp-reviewer`（脱离主循环）。\n\n4. **保存进度与状态更新：**\n\n   每完成上述一个子任务循环，必须更新以下数据（由 `code-generator` 和 `self-reviewer` 通过 CLI 命令自动完成）：\n   - `run.json.context.currentTaskId` 记录当前任务ID\n   - `run.json.summary` 中的统计数据（由 CLI 自动更新）\n   - `run.json.timeline[]` 添加事件（由 CLI 自动更新）\n   - 循环往复直到 `run.json.tasks[]` 中的所有任务都被标记完成。\n\n5. **结束流程：**\n\n   当该需求的所有任务完成，**必须执行以下操作：**\n\n   **a) 数据写入：**\n   - 更新 `run.json.meta.status` 为 `\"completed\"`\n   - 更新 `run.json.meta.endTime` 为当前时间\n   - 更新 `run.json.workflow[]` 中所有阶段的 `status` 为 `\"completed\"`，设置各自的 `endTime`\n   - 更新 `run.json.context.currentStage` 为 `\"completed\"`\n   - 更新 `run.json.timeline[]` 添加最终事件：\n     ```json\n     { \"type\": \"workflow-completed\", \"title\": \"工作流完成\", \"timestamp\": \"now\", \"prdPhase\": \"PRD1\" }\n     ```\n   - 更新 `run.json.metrics` 计算最终统计指标（aiDeviationRate、bugRate、reviewPassRate 等）\n\n   **b) 自动生成 highlights 草稿：**\n   - 从任务列表和 PRD 摘要中推断业务价值亮点\n   - 输出草稿并提示用户：\n     ```\n     自动生成的亮点：\n       1. [从任务/PRD 推断的亮点]\n       2. [从任务/PRD 推断的亮点]\n     请补充业务价值数据（如性能指标、成本节省等），输入 ok 跳过：\n     ```\n   - 用户补充或确认后，调用 `aida_highlight` MCP 工具，传入 `content` 和 `source: \"auto\"` 写入\n   - 用户手动补充的调用 `aida_highlight`，传入 `content` 和 `source: \"manual\"` 写入\n\n## 关于中断恢复\n\n如果在循环中的任意一步被用户强行终止或因外界因素打断，下次呼叫 workflow-orchestrator 时，必须依据 `run.json.context`（currentTaskId, currentStage）与 `run.json.tasks[]` 中各任务的 status，从被打断的任务直接无缝续拍。\n\n## run.json 关键字段说明\n\n- **执行状态**：`run.json.context`（currentStage, currentTaskId, currentPrdPhase）\n- **开发工单**：`run.json.tasks[]`（每个任务含 taskId, title, status, stageName, startedAt, completedAt）\n- **Bug 记录**：`run.json.bugs[]`（通过 `aida_log_bug` / `aida_bug_fix` MCP 工具写入）\n- **质量自检**：`run.json.reviews[]`（通过 `aida_log_review` MCP 工具写入）\n- **偏差记录**：`run.json.deviations[]`（通过 `aida_log_deviation` MCP 工具写入，用户手动触发）\n- **规则沉淀**：`run.json.rules[]`（通过 `aida_log_rule` MCP 工具写入）\n- **工作流阶段**：`run.json.workflow[]`（记录各阶段执行状态和耗时）\n- **时间线**：`run.json.timeline[]`（记录关键事件时间点）\n- **文件变更**：`run.json.files[]`（记录修改过的文件路径和统计）\n- **汇总指标**：`run.json.summary` + `run.json.metrics`（含 nodeTimeBreakdown、actualWorkSeconds、efficiencyMultiplier）\n- **成本数据**：`run.json.cost`（token 消耗、预估工时、实际工时）\n- **业务亮点**：`run.json.highlights[]`（业务价值记录）\n\n## 偏差记录\n\n当一轮工作流闭环完成后，用户在测试验证阶段反馈的细节修正（与 AI 初始生成代码的偏差），通过 deviation-recorder 记录到 `run.json.deviations[]`。\n\n与 Bug 记录的区别：\n- `run.json.bugs[]`：测试阶段发现的功能 Bug，由 bug-fixer 记录\n- `run.json.deviations[]`：AI 产出与用户期望的设计偏差，由 deviation-recorder 记录\n\n两者均用于后续数据分析，驱动规则和 Skill 的持续优化。\n",
-    "fingerprint": "c4867ba9e244",
-    "source": {
-      "kind": "local",
-      "path": ".codex/skills/workflow-orchestrator.md"
-    },
-    "updatedAt": "2026-04-27T07:55:42.984Z",
-    "status": "active",
-    "files": []
-  }
-]
+    {
+      "id": "SKILL-011",
+      "name": "rules-evolver",
+      "content": "---\nname: rules-evolver\ndescription: 根据日常开发过程中遇到的普遍问题、PR 意见、架构升级，维护并沉淀本地项目开发规范。\nglobs: ['.claude/rules/**/*.md', '.cursor/rules/**/*.md', '.codex/rules/**/*.md', '.lingma/rules/**/*.md', 'CLAUDE.md', 'AGENTS.md']\n---\n\n# rules-evolver (规范演进者)\n\n## 提示\n\n此 Skill 由用户人工触发，不纳入 workflow-orchestrator 自动化流程。\n\n## 角色\n\n你是一个经验丰富的架构布道师。你通过审视项目中反复出现的 Code Review 反馈、新的技术栈升级，来提取并沉淀为新的最佳实践，反哺到 `.aida/rules.json` 体系中。同时兼顾各 AI 工具生成规则文件的一致性。\n\n## 执行说明\n\n1. 该 Skill 需要人工参与触发。\n2. 当人类架构师或开发指出特定新规则或痛点时，你负责：\n   - 读取现有规则：\n     - **规则注册表**：`.aida/rules.json`（唯一的真相源）\n     - **规则真源**：`.aida/rules.json`\n     - **全局规则文件**：`CLAUDE.md`（Claude Code 项目）或 `.cursor/rules/*/*.md`（Cursor 项目）\n   - 将新规则总结、泛化后，询问用户确认，然后调用 `aida_log_rule` MCP 工具写入注册表：\n     - `content`: 规则内容\n     - `category`: 分类（可选值：`component`, `api`, `style`, `i18n`, `architecture`, `state-management`, `routing`, `testing`, `process`, `general`）\n     - `sourceDeviation`: 关联的偏差 ID\n   - 工具会自动检查 fingerprint 去重，如果规则已存在会提示\n   - 工具会自动重建各 AI 工具目录下的规则文件\n   - 检查是否与全局规则文件冲突，如有冲突则提示用户\n3. 确保提炼出的规则具有可被 AI 自动化解析、清晰且强制性的执行标准。\n4. 你的每一次输出都将直接影响后续 code-generator 和 self-reviewer 的行为。\n\n## 规则存储架构\n\n- **Source of Truth**：`.aida/rules.json`（JSON 数组，提交到 git）\n- **分发产物**：各 AI 工具目录下的规则文件（自动生成，已 gitignore）\n- **去重机制**：每条规则有 fingerprint（内容 hash），自动防止重复沉淀\n- **合并策略**：并行分支各自追加规则到 JSON，合并时取并集（`aida rules merge`）\n\n## 规则质量要求\n\n- 每条规则必须有**明确的执行标准**（\"必须\"、\"禁止\"、\"当...时\"）\n- 规则必须引用真实代码模式，不得臆造\n- 规则之间不得冲突（可用 `aida rules dedupe` 检测近似冲突）\n- 新增规则后应检查与现有规则的一致性\n",
+      "fingerprint": "418cd8a9d93b",
+      "source": {
+        "kind": "local",
+        "path": ".codex/skills/rules-evolver.md"
+      },
+      "updatedAt": "2026-04-27T07:55:42.984Z",
+      "status": "active",
+      "files": []
+    }
+  ]
+}

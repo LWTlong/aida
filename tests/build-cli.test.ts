@@ -32,10 +32,10 @@ describe('aida build', () => {
         JSON.stringify([
           {
             id: 'SKILL-001',
-            name: 'workflow-orchestrator',
-            content: 'Workflow content',
+            name: 'custom-flow',
+            content: 'Custom flow content',
             fingerprint: 'fp-skill-a',
-            source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+            source: { kind: 'local', path: '.aida/skills/custom-flow/SKILL.md' },
             updatedAt: '2026-04-13T00:00:00.000Z',
             status: 'active',
           },
@@ -48,15 +48,11 @@ describe('aida build', () => {
 
       assert.ok(stdout.includes('AIDA build completed'));
       assert.ok(readText(resolve(project.root, '.codex', 'config.toml')).includes('[mcp_servers.aida]'));
-      assert.ok(readText(resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md')).includes('Workflow content'));
+      assert.ok(readText(resolve(project.root, '.cursor', 'skills', 'custom-flow', 'SKILL.md')).includes('Custom flow content'));
       assert.ok(readText(resolve(project.root, '.cursor', 'rules', 'aida', '_all.md')).includes('Rule A'));
       assert.ok(readText(resolve(project.root, '.codex', 'rules', 'aida', '_all.md')).includes('Rule A'));
       assert.ok(readText(resolve(project.root, '.aida', 'rules', '_all.md')).includes('Rule A'));
-      const snapshot = readJson<any>(resolve(project.root, '.aida', 'tool-configs.json'));
-      assert.ok(Array.isArray(snapshot.snapshots));
-      assert.ok(snapshot.snapshots.some((item: any) => item.tool === 'codex'));
       const gitignore = readText(resolve(project.root, '.gitignore'));
-      assert.ok(gitignore.includes('.aida/tool-configs.json'));
       assert.ok(gitignore.includes('.aida/**'));
       assert.ok(gitignore.includes('!.aida/**/*.json'));
       assert.ok(gitignore.includes('.cursor/'));
@@ -96,10 +92,10 @@ describe('aida build', () => {
         JSON.stringify([
           {
             id: 'SKILL-001',
-            name: 'workflow-orchestrator',
-            content: 'Workflow content',
+            name: 'custom-flow',
+            content: 'Custom flow content',
             fingerprint: 'fp-skill-a',
-            source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+            source: { kind: 'local', path: '.aida/skills/custom-flow/SKILL.md' },
             updatedAt: '2026-04-13T00:00:00.000Z',
             status: 'active',
           },
@@ -111,7 +107,7 @@ describe('aida build', () => {
       const stdout = runCliWithInput(project, 'build', '2\n');
 
       assert.ok(stdout.includes('Select AI tools to build'));
-      assert.ok(readText(resolve(project.root, '.cursor', 'skills', 'workflow', 'SKILL.md')).includes('Workflow content'));
+      assert.ok(readText(resolve(project.root, '.cursor', 'skills', 'custom-flow', 'SKILL.md')).includes('Custom flow content'));
       assert.ok(readText(resolve(project.root, '.cursor', 'rules', 'aida', '_all.md')).includes('Rule A'));
     } finally {
       project.cleanup();
@@ -145,10 +141,10 @@ describe('aida build', () => {
         JSON.stringify([
           {
             id: 'SKILL-001',
-            name: 'workflow-orchestrator',
-            content: 'Workflow content',
+            name: 'custom-flow',
+            content: 'Custom flow content',
             fingerprint: 'fp-skill-a',
-            source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+            source: { kind: 'local', path: '.aida/skills/custom-flow/SKILL.md' },
             updatedAt: '2026-04-13T00:00:00.000Z',
             status: 'active',
           },
@@ -197,7 +193,7 @@ describe('aida build', () => {
       assert.ok(readText(resolve(project.root, 'CLAUDE.md')).includes('.aida/aida-guide.md'));
       assert.ok(readText(resolve(project.root, 'AGENTS.md')).includes('.aida/aida-guide.md'));
       assert.ok(readText(resolve(project.root, 'AGENTS.md')).includes('.aida/rules/_all.md'));
-      assert.ok(readText(resolve(project.root, '.aida', 'aida-guide.md')).includes('不要调用 `aida_task(action="start")`'));
+      assert.ok(readText(resolve(project.root, '.aida', 'aida-guide.md')).includes('不要沉淀 task、runtime、timeline、event、workflow 之类的过程数据'));
     } finally {
       project.cleanup();
     }

@@ -1,19 +1,16 @@
+import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { bootstrapRuleRegistry, renderRuleMarkdownFiles } from './rules.js';
-import { activeSkills, bootstrapSkillRegistry, buildSkillViews, getSkillContent } from './skills.js';
+import { activeSkills, bootstrapSkillRegistry, getSkillContent } from './skills.js';
 import { buildRuleViews } from './rules.js';
 import { ensureGuide, syncGuideReference, updateGuide, updateGuideReferences } from './guide.js';
 import { buildMemoryViews } from './memory.js';
-import { configPath, toolConfigStorePath } from './paths.js';
+import { configPath } from './paths.js';
 import { ensureDir, fileExists, readJson, readText, resetDir, writeJson, writeText } from './fs.js';
-import type { AiToolChoice, AidaConfig, ToolConfigSnapshot, ToolConfigStore } from '../schemas/aida-project.js';
+import type { AiToolChoice, AidaConfig } from '../schemas/aida-project.js';
 
 export const QUICK_COMMANDS: { name: string; skill: string }[] = [
-  { name: 'workflow', skill: 'workflow-orchestrator' },
   { name: 'audit', skill: 'audit' },
-  { name: 'deviation', skill: 'deviation-recorder' },
-  { name: 'self-reviewer', skill: 'self-reviewer' },
-  { name: 'bug-fixer', skill: 'bug-fixer' },
   { name: 'rules-evolver', skill: 'rules-evolver' },
 ];
 
@@ -158,22 +155,6 @@ function writeJsonMerge(filePath: string): void {
   writeText(filePath, MCP_CONFIG_JSON + '\n');
 }
 
-function readToolConfigStore(projectRoot: string): ToolConfigStore {
-  const path = toolConfigStorePath(projectRoot);
-  if (!fileExists(path)) return { snapshots: [] };
-  try {
-    return readJson<ToolConfigStore>(path);
-  } catch {
-    return { snapshots: [] };
-  }
-}
-
-function findStoredSnapshot(projectRoot: string, tool: AiToolChoice, path: string): ToolConfigSnapshot | null {
-  const store = readToolConfigStore(projectRoot);
-  const snapshots = Array.isArray(store.snapshots) ? store.snapshots : [];
-  return snapshots.find((snapshot) => snapshot.tool === tool && snapshot.path === path) || null;
-}
-
 function renderJsonConfig(content: unknown): string {
   let config: Record<string, unknown> = {};
 
@@ -225,10 +206,6 @@ function mergeCodexToml(raw: string): string {
   return `${base}\n\n${block}\n`;
 }
 
-function toolConfigSnapshotPath(projectRoot: string): string {
-  return toolConfigStorePath(projectRoot);
-}
-
 function readJsonIfExists(filePath: string): unknown {
   if (!fileExists(filePath)) return null;
   try {
@@ -240,68 +217,14 @@ function readJsonIfExists(filePath: string): unknown {
 
 function readCurrentOrSnapshot(
   projectRoot: string,
-  tool: AiToolChoice,
+  _tool: AiToolChoice,
   path: string,
 ): unknown {
   const fullPath = resolve(projectRoot, path);
   if (fileExists(fullPath)) {
     return readJsonIfExists(fullPath);
   }
-  return findStoredSnapshot(projectRoot, tool, path)?.content ?? null;
-}
-
-function writeToolConfigSnapshot(projectRoot: string, tools: AiToolChoice[]): string {
-  const snapshots: ToolConfigSnapshot[] = [];
-
-  if (tools.includes('claude-code')) {
-    snapshots.push({
-      tool: 'claude-code',
-      path: '.mcp.json',
-      format: 'json',
-      content: readJsonIfExists(resolve(projectRoot, '.mcp.json')),
-    });
-  }
-  if (tools.includes('cursor')) {
-    snapshots.push({
-      tool: 'cursor',
-      path: '.cursor/mcp.json',
-      format: 'json',
-      content: readJsonIfExists(resolve(projectRoot, '.cursor', 'mcp.json')),
-    });
-  }
-  if (tools.includes('vscode-copilot')) {
-    snapshots.push({
-      tool: 'vscode-copilot',
-      path: '.vscode/mcp.json',
-      format: 'json',
-      content: readJsonIfExists(resolve(projectRoot, '.vscode', 'mcp.json')),
-    });
-  }
-  if (tools.includes('lingma')) {
-    snapshots.push({
-      tool: 'lingma',
-      path: '.lingma/mcp.json',
-      format: 'json',
-      content: readJsonIfExists(resolve(projectRoot, '.lingma', 'mcp.json')),
-    });
-  }
-  if (tools.includes('codex')) {
-    snapshots.push({
-      tool: 'codex',
-      path: '.codex/config.toml',
-      format: 'toml',
-      content: fileExists(resolve(projectRoot, '.codex', 'config.toml'))
-        ? readText(resolve(projectRoot, '.codex', 'config.toml'))
-        : '',
-    });
-  }
-
-  writeJson(toolConfigSnapshotPath(projectRoot), {
-    generatedAt: new Date().toISOString(),
-    tools,
-    snapshots,
-  });
-  return toolConfigSnapshotPath(projectRoot);
+  return null;
 }
 
 export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): string[] {
@@ -394,6 +317,35 @@ function buildCursorCommands(projectRoot: string): number {
   return written;
 }
 
+function pruneInactiveToolArtifacts(projectRoot: string, tools: AiToolChoice[]): void {
+  const active = new Set(tools);
+
+  if (!active.has('claude-code')) {
+    rmSync(resolve(projectRoot, 'CLAUDE.md'), { force: true });
+    rmSync(resolve(projectRoot, '.mcp.json'), { force: true });
+    rmSync(resolve(projectRoot, '.claude'), { recursive: true, force: true });
+  }
+
+  if (!active.has('codex')) {
+    rmSync(resolve(projectRoot, 'AGENTS.md'), { force: true });
+    rmSync(resolve(projectRoot, '.codex'), { recursive: true, force: true });
+  }
+
+  if (!active.has('cursor')) {
+    rmSync(resolve(projectRoot, '.cursor', 'mcp.json'), { force: true });
+    rmSync(resolve(projectRoot, '.cursor', 'rules'), { recursive: true, force: true });
+    rmSync(resolve(projectRoot, '.cursor', 'skills'), { recursive: true, force: true });
+  }
+
+  if (!active.has('lingma')) {
+    rmSync(resolve(projectRoot, '.lingma'), { recursive: true, force: true });
+  }
+
+  if (!active.has('vscode-copilot')) {
+    rmSync(resolve(projectRoot, '.vscode', 'mcp.json'), { force: true });
+  }
+}
+
 export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[]): string[] {
   const gitignorePath = resolve(projectRoot, '.gitignore');
   const existing = fileExists(gitignorePath) ? readText(gitignorePath) : '';
@@ -427,8 +379,6 @@ export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[])
     '!.aida/**/',
     '!.aida/**/*.json',
     '.aida/bootstrap-state.local.json',
-    '.aida/index.json',
-    '.aida/tool-configs.json',
   ];
 
   if (tools.includes('cursor')) {
@@ -457,6 +407,9 @@ export function ensureBuildGitignore(projectRoot: string, tools: AiToolChoice[])
 export function buildProjectArtifacts(
   projectRoot: string,
   requestedTools: string[] = [],
+  options: {
+    skipMcpConfig?: boolean
+  } = {},
 ): {
   tools: AiToolChoice[]
   ruleFiles: number
@@ -464,18 +417,17 @@ export function buildProjectArtifacts(
   mcpFiles: string[]
   commandFiles: number
   gitignoreAdded: string[]
-  toolConfigSnapshot: string
   ruleViewFiles: number
   memoryViews: {
     moduleViews: number
-    contextViews: number
   }
 } {
   const tools = normalizeRequestedTools(projectRoot, requestedTools);
   const rules = renderRuleMarkdownFiles(bootstrapRuleRegistry(projectRoot));
   bootstrapSkillRegistry(projectRoot);
-  buildSkillViews(projectRoot);
-  const mcpFiles = writeMcpConfig(projectRoot, tools);
+  pruneInactiveToolArtifacts(projectRoot, tools);
+  rmSync(resolve(projectRoot, '.aida', 'skills'), { recursive: true, force: true });
+  const mcpFiles = options.skipMcpConfig ? [] : writeMcpConfig(projectRoot, tools);
 
   let ruleFiles = 0;
   let skillFiles = 0;
@@ -504,8 +456,6 @@ export function buildProjectArtifacts(
   updateGuideReferences(projectRoot, tools);
   const ruleViewFiles = buildRuleViews(projectRoot);
   const memoryViews = buildMemoryViews(projectRoot);
-
-  const toolConfigSnapshot = writeToolConfigSnapshot(projectRoot, tools);
   const gitignoreAdded = ensureBuildGitignore(projectRoot, tools);
 
   return {
@@ -515,7 +465,6 @@ export function buildProjectArtifacts(
     mcpFiles,
     commandFiles,
     gitignoreAdded,
-    toolConfigSnapshot,
     ruleViewFiles,
     memoryViews,
   };

@@ -3,7 +3,7 @@ import { readFileSync, watch, existsSync } from 'node:fs';
 import { resolve, extname } from 'node:path';
 import { PACKAGE_ROOT } from '../utils/paths.js';
 import { getAllRuns, getRunData, getAggregatedData, getRequirementData, getIndexData, updateRunCost, updateProjectConfig } from './api.js';
-import { buildIndex } from '../cli/commands/reindex.js';
+import { rebuildSummaryIndex } from '../utils/summary.js';
 
 const DASHBOARD_DIR = resolve(PACKAGE_ROOT, 'src', 'dashboard');
 
@@ -208,7 +208,7 @@ export async function startServer(
       if (debounceTimer) clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         // Rebuild index so overview stays fresh
-        try { buildIndex(projectRoot); } catch { /* best-effort */ }
+        try { rebuildSummaryIndex(projectRoot); } catch { /* best-effort */ }
 
         const event = JSON.stringify({
           type: 'run_updated',

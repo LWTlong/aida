@@ -38,6 +38,9 @@ describe('bootstrapSkillRegistry', () => {
     assert.equal(entries[0].files?.length, 1);
     assert.equal(entries[0].files?.[0].path, 'run.py');
     assert.ok(fileExists(skillsRegistryPath(tmpRoot)));
+    const raw = readJson<any>(skillsRegistryPath(tmpRoot));
+    assert.equal(raw.schemaVersion, '2.0');
+    assert.equal(Array.isArray(raw.items), true);
   });
 });
 
@@ -61,10 +64,10 @@ describe('bootstrapRuleRegistry', () => {
 });
 
 describe('buildProjectArtifacts', () => {
-  it('should build rules, skills, tool configs and gitignore entries', () => {
-    const skillDir = resolve(tmpRoot, '.aida', 'skills', 'workflow-orchestrator');
+  it('should build rules, skills, tool outputs and gitignore entries', () => {
+    const skillDir = resolve(tmpRoot, '.aida', 'skills', 'custom-flow');
     ensureDir(skillDir);
-    writeText(resolve(skillDir, 'SKILL.md'), '# Workflow\n\nTest content\n');
+    writeText(resolve(skillDir, 'SKILL.md'), '# Custom Flow\n\nTest content\n');
     writeText(resolve(skillDir, 'run.py'), 'print("hello")\n');
 
     addRule(tmpRoot, {
@@ -81,14 +84,12 @@ describe('buildProjectArtifacts', () => {
     assert.deepEqual(result.tools, ['claude-code', 'cursor']);
     assert.ok(fileExists(resolve(tmpRoot, '.claude', 'rules', 'aida', '_all.md')));
     assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'rules', 'aida', '_all.md')));
-    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'skills', 'workflow-orchestrator.md')));
-    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'skills', 'workflow-orchestrator', 'SKILL.md')));
-    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'skills', 'workflow-orchestrator', 'run.py')));
+    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'skills', 'custom-flow.md')));
+    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'skills', 'custom-flow', 'SKILL.md')));
+    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'skills', 'custom-flow', 'run.py')));
     assert.ok(fileExists(resolve(tmpRoot, '.mcp.json')));
     assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'mcp.json')));
-    assert.ok(fileExists(resolve(tmpRoot, '.claude', 'commands', 'workflow.md')));
-    assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'workflow', 'SKILL.md')));
-    assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'workflow-orchestrator', 'run.py')));
+    assert.ok(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'custom-flow', 'run.py')));
 
     const gitignore = readText(resolve(tmpRoot, '.gitignore'));
     assert.ok(gitignore.includes('.claude/'));
@@ -102,9 +103,9 @@ describe('buildProjectArtifacts', () => {
   });
 
   it('should use configured tools when build is called with all', () => {
-    const skillDir = resolve(tmpRoot, '.aida', 'skills', 'workflow-orchestrator');
+    const skillDir = resolve(tmpRoot, '.aida', 'skills', 'custom-flow');
     ensureDir(skillDir);
-    writeText(resolve(skillDir, 'SKILL.md'), '# Workflow\n\nTest content\n');
+    writeText(resolve(skillDir, 'SKILL.md'), '# Custom Flow\n\nTest content\n');
 
     addRule(tmpRoot, {
       content: 'Forbid direct fetch calls in feature modules',
@@ -131,9 +132,9 @@ describe('buildProjectArtifacts', () => {
       project: 'build-test',
       aiTools: ['codex'],
     });
-    const skillDir = resolve(tmpRoot, '.aida', 'skills', 'workflow-orchestrator');
+    const skillDir = resolve(tmpRoot, '.aida', 'skills', 'custom-flow');
     ensureDir(skillDir);
-    writeText(resolve(skillDir, 'SKILL.md'), '# Workflow\n\nTest content\n');
+    writeText(resolve(skillDir, 'SKILL.md'), '# Custom Flow\n\nTest content\n');
     writeText(resolve(skillDir, 'run.py'), 'print("hello")\n');
     writeText(resolve(tmpRoot, 'AGENTS.md'), '# Project Agents\n');
     process.env.HOME = fakeHome;
@@ -147,9 +148,9 @@ describe('buildProjectArtifacts', () => {
       assert.ok(codexConfig.includes('[mcp_servers.aida]'));
       assert.ok(agents.includes('.aida/aida-guide.md'));
       assert.ok(readText(resolve(tmpRoot, '.codex', 'config.toml')).includes('[mcp_servers.aida]'));
-      assert.ok(fileExists(resolve(tmpRoot, '.codex', 'skills', 'workflow-orchestrator.md')));
-      assert.ok(fileExists(resolve(tmpRoot, '.codex', 'skills', 'workflow-orchestrator', 'SKILL.md')));
-      assert.ok(fileExists(resolve(tmpRoot, '.codex', 'skills', 'workflow-orchestrator', 'run.py')));
+      assert.ok(fileExists(resolve(tmpRoot, '.codex', 'skills', 'custom-flow.md')));
+      assert.ok(fileExists(resolve(tmpRoot, '.codex', 'skills', 'custom-flow', 'SKILL.md')));
+      assert.ok(fileExists(resolve(tmpRoot, '.codex', 'skills', 'custom-flow', 'run.py')));
       assert.equal(fileExists(resolve(fakeHome, '.codex', 'config.toml')), false);
     } finally {
       process.env.HOME = originalHome;
@@ -222,13 +223,13 @@ args = ["staler"]
     writeJson(resolve(tmpRoot, '.aida', 'skills.json'), [
       {
         id: 'SKILL-001',
-        name: 'workflow-orchestrator',
-        content: '# Workflow\n\nFresh content\n',
+        name: 'custom-flow',
+        content: '# Custom Flow\n\nFresh content\n',
         files: [
           { path: 'run.py', content: 'print("fresh")\n' },
         ],
         fingerprint: 'fp-fresh',
-        source: { kind: 'local', path: '.aida/skills/workflow-orchestrator/SKILL.md' },
+        source: { kind: 'local', path: '.aida/skills/custom-flow/SKILL.md' },
         updatedAt: '2026-04-27T00:00:00.000Z',
         status: 'active',
       },
@@ -245,36 +246,36 @@ args = ["staler"]
       },
     ]);
 
-    ensureDir(resolve(tmpRoot, '.aida', 'skills', 'workflow-orchestrator'));
-    writeText(resolve(tmpRoot, '.aida', 'skills', 'workflow-orchestrator', 'stale.sh'), 'echo stale\n');
+    ensureDir(resolve(tmpRoot, '.aida', 'skills', 'custom-flow'));
+    writeText(resolve(tmpRoot, '.aida', 'skills', 'custom-flow', 'stale.sh'), 'echo stale\n');
     ensureDir(resolve(tmpRoot, '.aida', 'rules'));
     writeText(resolve(tmpRoot, '.aida', 'rules', 'process.md'), '# stale\n');
-    ensureDir(resolve(tmpRoot, '.claude', 'skills', 'workflow-orchestrator'));
-    writeText(resolve(tmpRoot, '.claude', 'skills', 'workflow-orchestrator', 'stale.sh'), 'echo stale\n');
+    ensureDir(resolve(tmpRoot, '.claude', 'skills', 'custom-flow'));
+    writeText(resolve(tmpRoot, '.claude', 'skills', 'custom-flow', 'stale.sh'), 'echo stale\n');
     ensureDir(resolve(tmpRoot, '.claude', 'commands'));
     writeText(resolve(tmpRoot, '.claude', 'commands', 'stale.md'), '# stale\n');
-    ensureDir(resolve(tmpRoot, '.cursor', 'skills', 'workflow-orchestrator'));
-    writeText(resolve(tmpRoot, '.cursor', 'skills', 'workflow-orchestrator', 'stale.sh'), 'echo stale\n');
+    ensureDir(resolve(tmpRoot, '.cursor', 'skills', 'custom-flow'));
+    writeText(resolve(tmpRoot, '.cursor', 'skills', 'custom-flow', 'stale.sh'), 'echo stale\n');
     ensureDir(resolve(tmpRoot, '.cursor', 'rules', 'aida'));
     writeText(resolve(tmpRoot, '.cursor', 'rules', 'aida', 'stale.md'), '# stale\n');
-    ensureDir(resolve(tmpRoot, '.codex', 'skills', 'workflow-orchestrator'));
-    writeText(resolve(tmpRoot, '.codex', 'skills', 'workflow-orchestrator', 'stale.sh'), 'echo stale\n');
+    ensureDir(resolve(tmpRoot, '.codex', 'skills', 'custom-flow'));
+    writeText(resolve(tmpRoot, '.codex', 'skills', 'custom-flow', 'stale.sh'), 'echo stale\n');
     ensureDir(resolve(tmpRoot, '.codex', 'rules', 'aida'));
     writeText(resolve(tmpRoot, '.codex', 'rules', 'aida', 'stale.md'), '# stale\n');
 
     buildProjectArtifacts(tmpRoot);
 
-    assert.equal(fileExists(resolve(tmpRoot, '.aida', 'skills', 'workflow-orchestrator', 'stale.sh')), false);
+    assert.equal(fileExists(resolve(tmpRoot, '.aida', 'skills', 'custom-flow', 'stale.sh')), false);
     assert.equal(fileExists(resolve(tmpRoot, '.aida', 'rules', 'process.md')), false);
-    assert.equal(fileExists(resolve(tmpRoot, '.claude', 'skills', 'workflow-orchestrator', 'stale.sh')), false);
+    assert.equal(fileExists(resolve(tmpRoot, '.claude', 'skills', 'custom-flow', 'stale.sh')), false);
     assert.equal(fileExists(resolve(tmpRoot, '.claude', 'commands', 'stale.md')), false);
-    assert.equal(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'workflow-orchestrator', 'stale.sh')), false);
+    assert.equal(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'custom-flow', 'stale.sh')), false);
     assert.equal(fileExists(resolve(tmpRoot, '.cursor', 'rules', 'aida', 'stale.md')), false);
-    assert.equal(fileExists(resolve(tmpRoot, '.codex', 'skills', 'workflow-orchestrator', 'stale.sh')), false);
+    assert.equal(fileExists(resolve(tmpRoot, '.codex', 'skills', 'custom-flow', 'stale.sh')), false);
     assert.equal(fileExists(resolve(tmpRoot, '.codex', 'rules', 'aida', 'stale.md')), false);
-    assert.equal(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'workflow-orchestrator', 'run.py')), true);
-    assert.equal(fileExists(resolve(tmpRoot, '.claude', 'skills', 'workflow-orchestrator', 'run.py')), true);
-    assert.equal(fileExists(resolve(tmpRoot, '.codex', 'skills', 'workflow-orchestrator', 'run.py')), true);
+    assert.equal(fileExists(resolve(tmpRoot, '.cursor', 'skills', 'custom-flow', 'run.py')), true);
+    assert.equal(fileExists(resolve(tmpRoot, '.claude', 'skills', 'custom-flow', 'run.py')), true);
+    assert.equal(fileExists(resolve(tmpRoot, '.codex', 'skills', 'custom-flow', 'run.py')), true);
     assert.equal(fileExists(resolve(tmpRoot, '.aida', 'rules', 'api.md')), true);
   });
 
@@ -299,6 +300,97 @@ args = ["staler"]
     const agents = readText(resolve(tmpRoot, 'AGENTS.md'));
     assert.ok(agents.includes('## AIDA'));
     assert.ok(agents.includes('.aida/rules/_all.md'));
+  });
+
+  it('should collapse duplicated leading AIDA sections in AGENTS.md during build', () => {
+    writeJson(resolve(tmpRoot, '.aida', 'config.json'), {
+      schemaVersion: '1.0',
+      project: 'build-test',
+      aiTools: ['codex'],
+    });
+    addRule(tmpRoot, {
+      content: 'Keep rules in the registry',
+      category: 'process',
+      branch: 'main',
+      deviation: null,
+      author: 'test',
+      status: 'active',
+    });
+    writeText(resolve(tmpRoot, 'AGENTS.md'), [
+      '## AIDA',
+      '',
+      '## AIDA',
+      '',
+      'Read .aida/aida-guide.md first',
+      '',
+    ].join('\n'));
+
+    buildProjectArtifacts(tmpRoot);
+
+    const agents = readText(resolve(tmpRoot, 'AGENTS.md'));
+    assert.equal((agents.match(/^## AIDA$/gm) || []).length, 1);
+    assert.ok(agents.includes('.codex/rules/aida/_all.md'));
+  });
+
+  it('should prune stale codex root artifacts when codex is not configured', () => {
+    writeJson(resolve(tmpRoot, '.aida', 'config.json'), {
+      schemaVersion: '1.0',
+      project: 'build-test',
+      aiTools: ['cursor', 'claude-code'],
+    });
+    writeText(resolve(tmpRoot, 'AGENTS.md'), 'legacy codex instructions\n');
+    ensureDir(resolve(tmpRoot, '.codex'));
+    writeText(resolve(tmpRoot, '.codex', 'config.toml'), '[mcp_servers.aida]\ncommand = "old"\n');
+
+    buildProjectArtifacts(tmpRoot);
+
+    assert.equal(fileExists(resolve(tmpRoot, 'AGENTS.md')), false);
+    assert.equal(fileExists(resolve(tmpRoot, '.codex')), false);
+    assert.equal(fileExists(resolve(tmpRoot, 'CLAUDE.md')), true);
+  });
+
+  it('should replace stale legacy CLAUDE template content with the current AIDA top section', () => {
+    writeJson(resolve(tmpRoot, '.aida', 'config.json'), {
+      schemaVersion: '1.0',
+      project: 'build-test',
+      aiTools: ['claude-code'],
+    });
+    addRule(tmpRoot, {
+      content: 'Keep rules in the registry',
+      category: 'process',
+      branch: 'main',
+      deviation: null,
+      author: 'test',
+      status: 'active',
+    });
+    writeText(resolve(tmpRoot, 'CLAUDE.md'), [
+      '# CLAUDE.md',
+      '',
+      '## AIDA',
+      '',
+      'Read .aida/aida-guide.md first',
+      '',
+      '## Project Overview',
+      '',
+      '**AIDA** (AI Development Analytics) is an open-source AI Development Observability Platform.',
+      '',
+      '## CLI Commands',
+      '',
+      'aida update',
+      '',
+      '## AIDevOS Iron Rules',
+      '',
+      '1. legacy',
+      '',
+    ].join('\n'));
+
+    buildProjectArtifacts(tmpRoot);
+
+    const claude = readText(resolve(tmpRoot, 'CLAUDE.md'));
+    assert.ok(claude.includes('.claude/rules/aida/_all.md'));
+    assert.equal(claude.includes('## CLI Commands'), false);
+    assert.equal(claude.includes('open-source AI Development Observability Platform'), false);
+    assert.equal(claude.includes('## AIDevOS Iron Rules'), false);
   });
 
   it('should add .claude/ when .gitignore only contains .claude/settings.local.json', () => {

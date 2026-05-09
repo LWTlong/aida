@@ -78,7 +78,7 @@ export async function merge(): Promise<void> {
   }
 
   if (rules.status === 'merged' || skills.status === 'merged') {
-    buildProjectArtifacts(projectRoot);
+    buildProjectArtifacts(projectRoot, [], { skipMcpConfig: true });
   }
 
   console.log(green('\n  ✓ AIDA merge completed\n'));

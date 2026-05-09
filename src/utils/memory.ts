@@ -17,6 +17,7 @@ import {
   runsDir,
 } from './paths.js';
 import type {
+  ModuleChangeEntry,
   ModuleMemoryIndex,
   ModuleMemoryIndexEntry,
   ModuleMemoryRecord,
@@ -42,15 +43,24 @@ export interface LegacyMemoryMigrationResult {
   modulesTouched: string[]
 }
 
+interface ModuleDescriptor {
+  key: string
+  title: string
+  description?: string
+}
+
 type ModuleMemoryUpsertInput = Partial<Omit<ModuleMemoryRecord, 'moduleKey' | 'updatedAt' | 'tickets'>> & {
   moduleKey: string
   title?: string
   tickets?: ModuleMemoryReference[]
+  changeTitle?: string
 }
 
 type RunContextUpdateInput = Partial<Omit<RunContextRecord, 'branch' | 'updatedAt'>> & {
   branch: string
 }
+
+const MEMORY_SCHEMA_VERSION = '2.0';
 
 function uniqueStrings(values: Array<string | null | undefined>): string[] {
   const result: string[] = [];
@@ -64,20 +74,75 @@ function uniqueStrings(values: Array<string | null | undefined>): string[] {
   return result;
 }
 
+function latestIso(a?: string, b?: string): string {
+  if (!a) return b || '';
+  if (!b) return a;
+  return new Date(a).getTime() >= new Date(b).getTime() ? a : b;
+}
+
 function normalizeRepoPath(value: string): string {
   return value.trim().replace(/\\/g, '/');
 }
 
+function stripKnownSourcePrefix(path: string): string {
+  const normalized = normalizeRepoPath(path);
+  const prefixes = [
+    'src/modules/',
+    'src/module/',
+    'src/features/',
+    'src/feature/',
+    'src/pages/',
+    'src/views/',
+    'src/components/',
+    'src/',
+  ];
+  for (const prefix of prefixes) {
+    if (normalized.startsWith(prefix)) {
+      return normalized.slice(prefix.length);
+    }
+  }
+  return normalized;
+}
+
+function isNoisePath(value: string): boolean {
+  const path = normalizeRepoPath(value);
+  const fileName = basename(path);
+  return path.startsWith('.../')
+    || fileName.startsWith('.')
+    || fileName === 'yarn.lock'
+    || fileName === 'package-lock.json'
+    || fileName === 'pnpm-lock.yaml'
+    || fileName === 'bun.lockb';
+}
+
+function isGeneratedToolingPath(value: string): boolean {
+  const path = normalizeRepoPath(value);
+  return path === 'AGENTS.md'
+    || path === 'CLAUDE.md'
+    || path === '.mcp.json'
+    || path.startsWith('.claude/')
+    || path.startsWith('.cursor/')
+    || path.startsWith('.codex/')
+    || path.startsWith('.kiro/')
+    || path.startsWith('.agents/')
+    || path.startsWith('.agent/')
+    || path.startsWith('.roo/')
+    || path.startsWith('.roo-code/')
+    || path.startsWith('.augment/')
+    || path.startsWith('.gemini/')
+    || path.startsWith('.vscode/')
+    || path.startsWith('.lingma/')
+    || path.startsWith('.windsurf/');
+}
+
 function isAidaRuntimePath(value: string): boolean {
   const path = normalizeRepoPath(value);
-  return path.startsWith('.aida/runs/')
-    || path.startsWith('.aida/memories/')
-    || path === '.aida/bootstrap-state.local.json';
+  return path.startsWith('.aida/');
 }
 
 function filterMeaningfulPaths(values: Array<string | null | undefined>, limit?: number): string[] {
   const filtered = uniqueStrings(values.map((value) => normalizeRepoPath(value || '')))
-    .filter((value) => value && !isAidaRuntimePath(value));
+    .filter((value) => value && !isAidaRuntimePath(value) && !isNoisePath(value) && !isGeneratedToolingPath(value));
   return typeof limit === 'number' ? filtered.slice(0, limit) : filtered;
 }
 
@@ -292,7 +357,7 @@ function pickKeyFiles(runs: RunData[]): string[] {
   const score = new Map<string, number>();
   for (const run of runs) {
     for (const file of run.files || []) {
-      if (isAidaRuntimePath(file.path)) continue;
+      if (isAidaRuntimePath(file.path) || isNoisePath(file.path) || isGeneratedToolingPath(file.path)) continue;
       const path = normalizeRepoPath(file.path);
       const weight = (file.linesAdded || 0) + (file.linesRemoved || 0) + ((file.changeCount || 1) * 5);
       score.set(path, (score.get(path) || 0) + weight);
@@ -312,16 +377,57 @@ function deriveCurrentPhase(runs: RunData[]): string {
   return 'Not Started';
 }
 
-function inferModules(requirement: RequirementData | null, runs: RunData[]): string[] {
+function inferModuleDescriptors(requirement: RequirementData | null, runs: RunData[]): ModuleDescriptor[] {
+  const byKey = new Map<string, ModuleDescriptor>();
+  const meaningfulRunPaths = runs
+    .flatMap((run) => run.files || [])
+    .filter((file) => !isAidaRuntimePath(file.path) && !isNoisePath(file.path) && !isGeneratedToolingPath(file.path))
+    .map((file) => file.path);
+
+  const put = (descriptor: ModuleDescriptor) => {
+    const key = normalizeModuleKey(descriptor.key);
+    if (!key || key === 'default') return;
+    const existing = byKey.get(key);
+    if (!existing) {
+      byKey.set(key, {
+        key,
+        title: descriptor.title || key,
+        description: descriptor.description || undefined,
+      });
+      return;
+    }
+    byKey.set(key, {
+      key,
+      title: existing.title || descriptor.title || key,
+      description: existing.description || descriptor.description || undefined,
+    });
+  };
+
   if (requirement?.modules?.length) {
-    return uniqueStrings(requirement.modules.map((module) => module.name).filter(Boolean));
+    for (const module of requirement.modules) {
+      const candidatePaths = typeof (module as any).file === 'string' && (module as any).file.trim().length > 0
+        ? [(module as any).file]
+        : meaningfulRunPaths;
+      put(deriveModuleDescriptor(module.name, candidatePaths, module.description || ''));
+    }
+  } else {
+    const stageNames = uniqueStrings(
+      runs
+        .flatMap((run) => run.tasks || [])
+        .map((task) => task.stageName)
+        .filter((stage) => stage && stage !== 'default'),
+    );
+    for (const stageName of stageNames) {
+      put(deriveModuleDescriptor(stageName, meaningfulRunPaths));
+    }
+    if (byKey.size === 0) {
+      for (const descriptor of inferModuleDescriptorsFromPaths(meaningfulRunPaths)) {
+        put(descriptor);
+      }
+    }
   }
-  return uniqueStrings(
-    runs
-      .flatMap((run) => run.tasks || [])
-      .map((task) => task.stageName)
-      .filter((stage) => stage && stage !== 'default'),
-  );
+
+  return [...byKey.values()].sort((a, b) => a.key.localeCompare(b.key));
 }
 
 function renderListSection(title: string, values: string[]): string {
@@ -374,26 +480,169 @@ export function normalizeModuleKey(value: string): string {
   return value
     .trim()
     .toLowerCase()
+    .replace(/\s*\/\s*/g, '/')
+    .replace(/-\//g, '/')
+    .replace(/\/-/g, '/')
     .replace(/[^a-z0-9/_\u4e00-\u9fa5-]+/g, '-')
     .replace(/\/+/g, '/')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
 }
 
+function normalizeModuleSegment(value: string): string {
+  return normalizeModuleKey(value).replace(/\//g, '-');
+}
+
+function isGenericPathStem(value: string): boolean {
+  return new Set([
+    'index',
+    'page',
+    'view',
+    'component',
+    'service',
+    'services',
+    'store',
+    'model',
+    'models',
+    'type',
+    'types',
+    'utils',
+    'util',
+    'helper',
+    'helpers',
+    'api',
+    'hooks',
+    'hook',
+  ]).has(value);
+}
+
+function isGenericModuleName(value: string): boolean {
+  return new Set([
+    'module',
+    'modules',
+    'feature',
+    'features',
+    'page',
+    'pages',
+    'view',
+    'views',
+    'component',
+    'components',
+    'api',
+    'utils',
+    'util',
+    'helper',
+    'helpers',
+    '基础设施',
+    '视图层',
+    '集成',
+    '国际化',
+    '公共工具',
+    '工具',
+    '配置',
+  ]).has(value);
+}
+
+function areAllModulesGeneric(values: string[]): boolean {
+  return values.length > 0 && values.every((value) => isGenericModuleName(normalizeModuleKey(value)));
+}
+
+function isPlaceholderBranchText(value: string | undefined, branchName: string): boolean {
+  if (!value) return true;
+  const normalized = value.trim();
+  if (!normalized) return true;
+  return normalized === branchName || normalized === branchName.replace(/-/g, '/');
+}
+
+function inferModuleDescriptorsFromPaths(paths: Array<string | null | undefined>): ModuleDescriptor[] {
+  const byKey = new Map<string, ModuleDescriptor>();
+  for (const path of filterMeaningfulPaths(paths)) {
+    const key = deriveModuleKeyFromPaths([path]);
+    if (!key || byKey.has(key)) continue;
+    byKey.set(key, { key, title: key });
+  }
+  return [...byKey.values()];
+}
+
+export function deriveModuleKeyFromPaths(paths: Array<string | null | undefined>): string {
+  for (const value of paths) {
+    const normalized = stripKnownSourcePrefix(value || '');
+    if (!normalized) continue;
+    const segments = normalized
+      .split('/')
+      .map((segment, index, all) => {
+        if (index === all.length - 1) return segment.replace(/\.[^.]+$/u, '');
+        return segment;
+      })
+      .map((segment) => normalizeModuleSegment(segment))
+      .filter(Boolean);
+
+    while (segments.length > 1 && isGenericPathStem(segments[segments.length - 1])) {
+      segments.pop();
+    }
+
+    if (segments.length >= 2) return `${segments[0]}/${segments[1]}`;
+    if (segments.length === 1) return segments[0];
+  }
+  return '';
+}
+
+function deriveModuleDescriptor(
+  rawName: string,
+  candidatePaths: Array<string | null | undefined> = [],
+  description: string = '',
+): ModuleDescriptor {
+  const normalizedName = normalizeModuleKey(rawName);
+  const pathDerived = deriveModuleKeyFromPaths(candidatePaths);
+  const key = normalizedName.includes('/')
+    ? normalizedName
+    : (!normalizedName || isGenericModuleName(normalizedName))
+      ? (pathDerived || normalizedName)
+      : normalizedName;
+
+  return {
+    key: key || normalizedName || 'module',
+    title: rawName.trim() || key || 'module',
+    description: description.trim() || undefined,
+  };
+}
+
+function normalizeModuleMemoryRecord(record: ModuleMemoryRecord): ModuleMemoryRecord {
+  return {
+    ...record,
+    moduleKey: normalizeModuleKey(record.moduleKey),
+  };
+}
+
 export function loadMemoryIndex(projectRoot: string): ModuleMemoryIndex {
   const path = memoryIndexPath(projectRoot);
   if (!fileExists(path)) {
     return {
+      schemaVersion: MEMORY_SCHEMA_VERSION,
       updatedAt: new Date().toISOString(),
-      modules: [],
+      items: [],
     };
   }
-  return readJson<ModuleMemoryIndex>(path);
+  const raw = readJson<any>(path);
+  const items = Array.isArray(raw?.items)
+    ? raw.items
+    : Array.isArray(raw?.modules)
+      ? raw.modules
+      : [];
+  return {
+    schemaVersion: raw?.schemaVersion || MEMORY_SCHEMA_VERSION,
+    updatedAt: raw?.updatedAt || new Date().toISOString(),
+    items,
+  };
 }
 
 export function saveMemoryIndex(projectRoot: string, index: ModuleMemoryIndex): void {
   ensureDir(memoriesDir(projectRoot));
-  writeJson(memoryIndexPath(projectRoot), index);
+  writeJson(memoryIndexPath(projectRoot), {
+    schemaVersion: index.schemaVersion || MEMORY_SCHEMA_VERSION,
+    updatedAt: index.updatedAt,
+    items: index.items,
+  });
 }
 
 export function loadModuleMemory(projectRoot: string, moduleKey: string): ModuleMemoryRecord | null {
@@ -412,12 +661,13 @@ export function loadModuleMemory(projectRoot: string, moduleKey: string): Module
 function upsertMemoryIndexEntry(projectRoot: string, record: ModuleMemoryRecord): void {
   const index = loadMemoryIndex(projectRoot);
   const entry = memoryIndexEntryFromRecord(record);
-  const next = index.modules.filter((item) => item.key !== record.moduleKey);
+  const next = index.items.filter((item) => item.key !== record.moduleKey);
   next.push(entry);
   next.sort((a, b) => a.key.localeCompare(b.key));
   saveMemoryIndex(projectRoot, {
+    schemaVersion: MEMORY_SCHEMA_VERSION,
     updatedAt: new Date().toISOString(),
-    modules: next,
+    items: next,
   });
 }
 
@@ -428,8 +678,82 @@ function memoryIndexEntryFromRecord(record: ModuleMemoryRecord): ModuleMemoryInd
     summary: record.summary,
     keywords: topItems([record.moduleKey, record.title, ...record.keywords], 12),
     paths: filterMeaningfulPaths([...record.entryFiles, ...record.relatedPaths], 12),
+    tickets: topItems(
+      [...(record.tickets || [])]
+        .map((ticket) => ticket.ticket || ticket.branch || '')
+        .filter(Boolean),
+      8,
+    ),
     updatedAt: record.updatedAt,
   };
+}
+
+function mergeTicketReferences(
+  existing: ModuleMemoryReference[],
+  incoming: ModuleMemoryReference[],
+): ModuleMemoryReference[] {
+  const byKey = new Map<string, ModuleMemoryReference>();
+  for (const ticket of [...existing, ...incoming]) {
+    const summary = ticket.summary.trim();
+    if (!summary) continue;
+    const key = `${ticket.ticket || ''}|${ticket.branch || ''}`;
+    const current = byKey.get(key);
+    if (!current) {
+      byKey.set(key, {
+        ticket: ticket.ticket,
+        branch: ticket.branch,
+        summary,
+        updatedAt: ticket.updatedAt,
+      });
+      continue;
+    }
+    const useIncoming = latestIso(current.updatedAt, ticket.updatedAt) === ticket.updatedAt;
+    byKey.set(key, {
+      ticket: current.ticket || ticket.ticket,
+      branch: current.branch || ticket.branch,
+      summary: useIncoming ? summary : current.summary,
+      updatedAt: latestIso(current.updatedAt, ticket.updatedAt),
+    });
+  }
+  return [...byKey.values()].sort((a, b) =>
+    `${b.updatedAt || ''}`.localeCompare(a.updatedAt || '') || `${a.ticket || a.branch || ''}`.localeCompare(`${b.ticket || b.branch || ''}`),
+  );
+}
+
+function mergeChangeEntries(
+  existing: ModuleChangeEntry[],
+  incoming: ModuleChangeEntry[],
+): ModuleChangeEntry[] {
+  const byKey = new Map<string, ModuleChangeEntry>();
+  for (const change of [...existing, ...incoming]) {
+    const summary = change.summary.trim();
+    if (!summary) continue;
+    const key = change.ticket || change.branch
+      ? `${change.ticket || ''}|${change.branch || ''}`
+      : `${change.title || ''}|${summary}`;
+    const current = byKey.get(key);
+    if (!current) {
+      byKey.set(key, {
+        ticket: change.ticket,
+        branch: change.branch,
+        title: change.title,
+        summary,
+        updatedAt: change.updatedAt,
+      });
+      continue;
+    }
+    const useIncoming = latestIso(current.updatedAt, change.updatedAt) === change.updatedAt;
+    byKey.set(key, {
+      ticket: current.ticket || change.ticket,
+      branch: current.branch || change.branch,
+      title: useIncoming ? (change.title || current.title) : (current.title || change.title),
+      summary: useIncoming ? summary : current.summary,
+      updatedAt: latestIso(current.updatedAt, change.updatedAt),
+    });
+  }
+  return [...byKey.values()]
+    .sort((a, b) => `${b.updatedAt}`.localeCompare(`${a.updatedAt}`))
+    .slice(0, 20);
 }
 
 function mergeMemoryIndexEntry(
@@ -443,6 +767,7 @@ function mergeMemoryIndexEntry(
     summary: next.summary || existing.summary,
     keywords: topItems([...(existing.keywords || []), ...(next.keywords || [])], 12),
     paths: filterMeaningfulPaths([...(existing.paths || []), ...(next.paths || [])], 12),
+    tickets: topItems([...(existing.tickets || []), ...(next.tickets || [])], 8),
     updatedAt: next.updatedAt || existing.updatedAt,
   };
 }
@@ -459,6 +784,7 @@ function moduleMemoryRecordFromMarkdown(raw: string): ModuleMemoryRecord | null 
   const summary = sections.get('summary') || '';
 
   return {
+    schemaVersion: MEMORY_SCHEMA_VERSION,
     moduleKey,
     title: raw.match(/^- Title:\s+(.+)$/m)?.[1]?.trim() || moduleKey,
     summary,
@@ -471,6 +797,7 @@ function moduleMemoryRecordFromMarkdown(raw: string): ModuleMemoryRecord | null 
     pitfalls: parseListSection(raw, 'pitfalls'),
     relatedRules: parseListSection(raw, 'related rules'),
     tickets: [],
+    changes: [],
     updatedAt: raw.match(/^- Updated At:\s+(.+)$/m)?.[1]?.trim() || new Date().toISOString(),
   };
 }
@@ -479,28 +806,48 @@ export function rebuildMemoryIndexFromDisk(projectRoot: string): ModuleMemoryInd
   ensureDir(moduleMemoriesDir(projectRoot));
   migrateLegacyNestedModuleMemoryLayout(projectRoot);
   const byKey = new Map<string, ModuleMemoryIndexEntry>();
-
-  for (const entry of loadMemoryIndex(projectRoot).modules || []) {
-    byKey.set(entry.key, entry);
-  }
+  const expectedMarkdownViews = new Set<string>();
 
   for (const file of walkJsonFiles(moduleMemoriesDir(projectRoot))) {
     if (basename(file) === 'index.json') continue;
-    const record = readJson<ModuleMemoryRecord>(file);
+    const original = readJson<ModuleMemoryRecord>(file);
+    const record = normalizeModuleMemoryRecord(original);
+    if (record.moduleKey !== original.moduleKey) {
+      saveModuleMemory(projectRoot, record);
+      rmSync(file, { force: true });
+    }
     const entry = memoryIndexEntryFromRecord(record);
     byKey.set(record.moduleKey, mergeMemoryIndexEntry(byKey.get(record.moduleKey), entry));
+    expectedMarkdownViews.add(moduleMemoryViewPath(projectRoot, record.moduleKey));
   }
 
   for (const file of walkMarkdownFiles(moduleMemoriesDir(projectRoot))) {
     const record = moduleMemoryRecordFromMarkdown(readText(file));
     if (!record) continue;
-    const entry = memoryIndexEntryFromRecord(record);
-    byKey.set(record.moduleKey, mergeMemoryIndexEntry(byKey.get(record.moduleKey), entry));
+    const normalized = normalizeModuleMemoryRecord(record);
+    if (normalized.moduleKey !== record.moduleKey) {
+      const targetViewPath = moduleMemoryViewPath(projectRoot, normalized.moduleKey);
+      ensureDir(dirname(targetViewPath));
+      if (!fileExists(targetViewPath)) {
+        writeText(targetViewPath, renderModuleMemoryMarkdown(normalized));
+      }
+      rmSync(file, { force: true });
+    }
+    const entry = memoryIndexEntryFromRecord(normalized);
+    byKey.set(normalized.moduleKey, mergeMemoryIndexEntry(byKey.get(normalized.moduleKey), entry));
+    expectedMarkdownViews.add(moduleMemoryViewPath(projectRoot, normalized.moduleKey));
+  }
+
+  for (const file of walkMarkdownFiles(moduleMemoriesDir(projectRoot))) {
+    if (!expectedMarkdownViews.has(file)) {
+      rmSync(file, { force: true });
+    }
   }
 
   const index = {
+    schemaVersion: MEMORY_SCHEMA_VERSION,
     updatedAt: new Date().toISOString(),
-    modules: [...byKey.values()].sort((a, b) => a.key.localeCompare(b.key)),
+    items: [...byKey.values()].sort((a, b) => a.key.localeCompare(b.key)),
   };
   saveMemoryIndex(projectRoot, index);
   return index;
@@ -509,7 +856,10 @@ export function rebuildMemoryIndexFromDisk(projectRoot: string): ModuleMemoryInd
 export function saveModuleMemory(projectRoot: string, record: ModuleMemoryRecord): void {
   const path = moduleMemoryPath(projectRoot, record.moduleKey);
   ensureDir(dirname(path));
-  writeJson(path, record);
+  writeJson(path, {
+    schemaVersion: record.schemaVersion || MEMORY_SCHEMA_VERSION,
+    ...record,
+  });
   upsertMemoryIndexEntry(projectRoot, record);
 }
 
@@ -551,6 +901,12 @@ export function renderModuleMemoryMarkdown(record: ModuleMemoryRecord): string {
     renderListSection('Pitfalls', record.pitfalls).trimEnd(),
     '',
     renderListSection('Related Rules', record.relatedRules).trimEnd(),
+    '',
+    '## Changes',
+    '',
+    ...((record.changes || []).length > 0
+      ? (record.changes || []).map((change) => `- ${[change.ticket || change.branch, change.title, change.summary].filter(Boolean).join(' | ')}`)
+      : ['- None']),
     '',
     '## Related Tickets',
     '',
@@ -624,41 +980,24 @@ export function buildMemoryViews(projectRoot: string): BuildMemoryViewsResult {
   let moduleViews = 0;
   for (const file of walkJsonFiles(moduleMemoriesDir(projectRoot))) {
     if (basename(file) === 'index.json') continue;
-    const record = readJson<ModuleMemoryRecord>(file);
+    const original = readJson<ModuleMemoryRecord>(file);
+    const record = normalizeModuleMemoryRecord(original);
+    if (record.moduleKey !== original.moduleKey) {
+      saveModuleMemory(projectRoot, record);
+      rmSync(file, { force: true });
+    }
     const viewPath = moduleMemoryViewPath(projectRoot, record.moduleKey);
     ensureDir(dirname(viewPath));
     writeText(viewPath, renderModuleMemoryMarkdown(record));
     moduleViews++;
   }
 
-  let contextViews = 0;
-  let packViews = 0;
-  const root = runsDir(projectRoot);
-  if (!fileExists(root)) {
-    rebuildMemoryIndexFromDisk(projectRoot);
-    return { moduleViews, contextViews, packViews };
-  }
-  for (const branchName of readdirSync(root)) {
-    const safeBranchDir = resolve(root, branchName);
-    if (!fileExists(safeBranchDir) || !statSync(safeBranchDir).isDirectory()) continue;
-    const contextPath = resolve(safeBranchDir, 'context.json');
-    if (!fileExists(contextPath)) continue;
-    const record = readJson<RunContextRecord>(contextPath);
-    writeText(runContextViewPath(projectRoot, record.branch), renderRunContextMarkdown(record));
-    contextViews++;
-
-    const modules = record.modules
-      .map((moduleName) => loadModuleMemory(projectRoot, moduleName))
-      .filter((item): item is ModuleMemoryRecord => item !== null);
-    writeText(runMemoryPackViewPath(projectRoot, record.branch), renderRunMemoryPackMarkdown(record, modules));
-    packViews++;
-  }
-
   rebuildMemoryIndexFromDisk(projectRoot);
-  return { moduleViews, contextViews, packViews };
+  return { moduleViews, contextViews: 0, packViews: 0 };
 }
 
 export function buildRunContextFromBranch(projectRoot: string, branchName: string): RunContextRecord | null {
+  const existing = loadRunContext(projectRoot, branchName);
   const requirement = loadRequirement(projectRoot, branchName);
   const analysis = loadAnalysis(projectRoot, branchName);
   const runs = loadBranchRuns(projectRoot, branchName);
@@ -667,7 +1006,7 @@ export function buildRunContextFromBranch(projectRoot: string, branchName: strin
     return null;
   }
 
-  const modules = inferModules(requirement, runs);
+  const moduleDescriptors = inferModuleDescriptors(requirement, runs);
   const completed = topItems(runs.flatMap((run) => run.tasks || []).filter((task) => task.status === 'done').map((task) => task.title));
   const inProgress = topItems(runs.flatMap((run) => run.tasks || []).filter((task) => task.status === 'in-progress').map((task) => task.title));
   const next = topItems(runs.flatMap((run) => run.tasks || []).filter((task) => task.status === 'pending').map((task) => task.title));
@@ -679,27 +1018,46 @@ export function buildRunContextFromBranch(projectRoot: string, branchName: strin
     ...runs.flatMap((run) => run.deviations || []).map((deviation) => deviation.title),
   ];
   const title = requirement?.title || extractTicket(branchName) || branchName;
+  const derivedPhase = deriveCurrentPhase(runs);
+  const derivedModules = moduleDescriptors.map((descriptor) => descriptor.key);
+  const derivedKeyFiles = pickKeyFiles(runs);
+  const derivedRisks = topItems([...analysisRisks, ...runRisks]);
+  const existingModules = existing?.modules || [];
+  const fallbackPathModules = inferModuleDescriptorsFromPaths([
+    ...derivedKeyFiles,
+    ...(existing?.keyFiles || []),
+  ]).map((descriptor) => descriptor.key);
+  const nextModules = derivedModules.length > 0
+    ? derivedModules
+    : areAllModulesGeneric(existingModules) && fallbackPathModules.length > 0
+      ? fallbackPathModules
+      : existingModules;
+  const nextTitle = isPlaceholderBranchText(existing?.title, branchName) ? title : (existing?.title || title);
+  const nextSummary = requirement?.summary
+    || extractSummaryFromAnalysis(analysis)
+    || (!isPlaceholderBranchText(existing?.summary, branchName) ? existing!.summary : '')
+    || (nextModules.length > 0 ? `涉及模块: ${nextModules.join(', ')}` : title);
 
   return {
     branch: branchName,
     ticket: extractTicket(requirement?.title || '') || extractTicket(branchName),
-    title,
-    summary: requirement?.summary || extractSummaryFromAnalysis(analysis) || title,
-    currentPhase: deriveCurrentPhase(runs),
-    modules,
-    completed,
-    inProgress,
-    next,
-    decisions,
-    constraints,
-    keyFiles: pickKeyFiles(runs),
-    risks: topItems([...analysisRisks, ...runRisks]),
+    title: nextTitle,
+    summary: nextSummary,
+    currentPhase: derivedPhase === 'Not Started' && existing?.currentPhase ? existing.currentPhase : derivedPhase,
+    modules: nextModules,
+    completed: completed.length > 0 ? completed : (existing?.completed || []),
+    inProgress: inProgress.length > 0 ? inProgress : (existing?.inProgress || []),
+    next: next.length > 0 ? next : (existing?.next || []),
+    decisions: decisions.length > 0 ? decisions : (existing?.decisions || []),
+    constraints: constraints.length > 0 ? constraints : (existing?.constraints || []),
+    keyFiles: derivedKeyFiles.length > 0 ? derivedKeyFiles : (existing?.keyFiles || []),
+    risks: derivedRisks.length > 0 ? derivedRisks : (existing?.risks || []),
     updatedAt: new Date().toISOString(),
   };
 }
 
-function collectRelatedPaths(moduleName: string, branchContext: RunContextRecord, runs: RunData[]): string[] {
-  const query = moduleName.toLowerCase();
+function collectRelatedPaths(moduleDescriptor: ModuleDescriptor, branchContext: RunContextRecord, runs: RunData[]): string[] {
+  const query = moduleDescriptor.key.toLowerCase();
   const tokens = splitQueryTokens(query);
   const scored = new Map<string, number>();
 
@@ -710,9 +1068,10 @@ function collectRelatedPaths(moduleName: string, branchContext: RunContextRecord
 
   for (const run of runs) {
     for (const task of run.tasks || []) {
-      if (task.stageName !== moduleName) continue;
+      const taskDescriptor = deriveModuleDescriptor(task.stageName || '', (run.files || []).map((file) => file.path));
+      if (taskDescriptor.key !== moduleDescriptor.key) continue;
       for (const file of run.files || []) {
-        if (isAidaRuntimePath(file.path)) continue;
+        if (isAidaRuntimePath(file.path) || isNoisePath(file.path) || isGeneratedToolingPath(file.path)) continue;
         const path = normalizeRepoPath(file.path);
         const bonus = (file.linesAdded || 0) + (file.linesRemoved || 0) + 10;
         scored.set(path, (scored.get(path) || 0) + bonus);
@@ -727,27 +1086,34 @@ function collectRelatedPaths(moduleName: string, branchContext: RunContextRecord
 export function upsertModuleMemory(projectRoot: string, input: ModuleMemoryUpsertInput): ModuleMemoryRecord {
   const moduleKey = normalizeModuleKey(input.moduleKey);
   const existing = loadModuleMemory(projectRoot, moduleKey);
+  const existingEntryFiles = filterMeaningfulPaths(existing?.entryFiles || [], 8);
+  const existingRelatedPaths = filterMeaningfulPaths(existing?.relatedPaths || [], 12);
+  const nextChanges: ModuleChangeEntry[] = ((input.tickets || []).filter((ticket) => ticket.summary.trim().length > 0))
+    .map((ticket) => ({
+      ticket: ticket.ticket,
+      branch: ticket.branch,
+      title: input.changeTitle || ticket.ticket || ticket.branch || input.title || existing?.title || moduleKey,
+      summary: ticket.summary,
+      updatedAt: ticket.updatedAt || new Date().toISOString(),
+    }));
   const record: ModuleMemoryRecord = {
+    schemaVersion: MEMORY_SCHEMA_VERSION,
     moduleKey,
     title: input.title || existing?.title || moduleKey,
     summary: input.summary || existing?.summary || '',
     keywords: topItems([...(existing?.keywords || []), ...(input.keywords || []), moduleKey, input.title || ''], 16),
-    entryFiles: filterMeaningfulPaths([...(existing?.entryFiles || []), ...(input.entryFiles || [])], 8),
-    relatedPaths: filterMeaningfulPaths([...(existing?.relatedPaths || []), ...(input.relatedPaths || [])], 12),
+    entryFiles: filterMeaningfulPaths([...existingEntryFiles, ...(input.entryFiles || [])], 8),
+    relatedPaths: filterMeaningfulPaths([...existingRelatedPaths, ...(input.relatedPaths || [])], 12),
     dataFlow: topItems([...(existing?.dataFlow || []), ...(input.dataFlow || [])]),
     decisions: topItems([...(existing?.decisions || []), ...(input.decisions || [])]),
     constraints: topItems([...(existing?.constraints || []), ...(input.constraints || [])]),
     pitfalls: topItems([...(existing?.pitfalls || []), ...(input.pitfalls || [])]),
     relatedRules: topItems([...(existing?.relatedRules || []), ...(input.relatedRules || [])], 12),
-    tickets: [
-      ...(existing?.tickets || []),
-      ...((input.tickets || []).filter((ticket) => ticket.summary.trim().length > 0)),
-    ].filter((ticket, index, array) =>
-      array.findIndex((item) =>
-        item.ticket === ticket.ticket
-        && item.branch === ticket.branch
-        && item.summary === ticket.summary,
-      ) === index),
+    tickets: mergeTicketReferences(
+      existing?.tickets || [],
+      (input.tickets || []).filter((ticket) => ticket.summary.trim().length > 0),
+    ),
+    changes: mergeChangeEntries(existing?.changes || [], nextChanges),
     updatedAt: new Date().toISOString(),
   };
   saveModuleMemory(projectRoot, record);
@@ -786,11 +1152,11 @@ export function searchModuleMemories(
   const tokens = splitQueryTokens(normalizedQuery);
   const hints = pathHints.map((hint) => hint.toLowerCase());
   let index = loadMemoryIndex(projectRoot);
-  if (index.modules.length === 0 && fileExists(moduleMemoriesDir(projectRoot))) {
+  if (index.items.length === 0 && fileExists(moduleMemoriesDir(projectRoot))) {
     index = rebuildMemoryIndexFromDisk(projectRoot);
   }
 
-  return index.modules
+  return index.items
     .map((entry) => {
       let score = 0;
       score += scoreText(normalizedQuery, tokens, entry.key) * 2;
@@ -831,7 +1197,18 @@ export function migrateLegacyMemories(projectRoot: string): LegacyMemoryMigratio
     const requirementData = requirement
       ? readJson<RequirementData>(resolve(branchPath, 'requirement.json'))
       : null;
-    const branchName = requirementData?.branch || safeBranch.replace(/-/g, '/');
+    const branchRunsFromFiles = runFiles
+      .map((path) => {
+        try {
+          return readJson<RunData>(path);
+        } catch {
+          return null;
+        }
+      })
+      .filter((item): item is RunData => item !== null);
+    const branchName = requirementData?.branch
+      || branchRunsFromFiles.find((run) => run.meta?.branch)?.meta?.branch
+      || safeBranch;
     const context = buildRunContextFromBranch(projectRoot, branchName);
     if (!context) continue;
 
@@ -841,24 +1218,22 @@ export function migrateLegacyMemories(projectRoot: string): LegacyMemoryMigratio
 
     const runs = loadBranchRuns(projectRoot, branchName);
     const req = loadRequirement(projectRoot, branchName);
-    const moduleCandidates = req?.modules?.length
-      ? req.modules.map((module) => ({ name: module.name, description: module.description }))
-      : context.modules.map((name) => ({ name, description: '' }));
+    const moduleDescriptors = inferModuleDescriptors(req, runs);
 
-    for (const candidate of moduleCandidates) {
-      if (!candidate.name.trim()) continue;
-      const moduleKey = normalizeModuleKey(candidate.name);
-      const relatedPaths = collectRelatedPaths(candidate.name, context, runs);
+    for (const descriptor of moduleDescriptors) {
+      if (!descriptor.key.trim()) continue;
+      const relatedPaths = collectRelatedPaths(descriptor, context, runs);
       upsertModuleMemory(projectRoot, {
-        moduleKey,
-        title: candidate.name,
-        summary: candidate.description || context.summary,
-        keywords: [candidate.name, moduleKey, context.title],
+        moduleKey: descriptor.key,
+        title: descriptor.title,
+        summary: descriptor.description || context.summary,
+        keywords: [descriptor.title, descriptor.key, context.title],
         entryFiles: relatedPaths.slice(0, 5),
         relatedPaths,
         decisions: context.decisions,
         constraints: context.constraints,
         pitfalls: context.risks,
+        changeTitle: context.title,
         tickets: [{
           ticket: context.ticket,
           branch: branchName,
@@ -867,7 +1242,7 @@ export function migrateLegacyMemories(projectRoot: string): LegacyMemoryMigratio
         }],
       });
       moduleMemoriesWritten++;
-      modulesTouched.add(moduleKey);
+      modulesTouched.add(descriptor.key);
     }
   }
 
@@ -896,18 +1271,19 @@ export function rebuildCurrentBranchMemory(projectRoot: string, branchName: stri
   const runs = loadBranchRuns(projectRoot, branchName);
   const modules: ModuleMemoryRecord[] = [];
 
-  for (const moduleName of inferModules(req, runs)) {
-    const relatedPaths = collectRelatedPaths(moduleName, context, runs);
+  for (const descriptor of inferModuleDescriptors(req, runs)) {
+    const relatedPaths = collectRelatedPaths(descriptor, context, runs);
     modules.push(upsertModuleMemory(projectRoot, {
-      moduleKey: moduleName,
-      title: moduleName,
-      summary: req?.modules?.find((module) => module.name === moduleName)?.description || context.summary,
-      keywords: [moduleName, context.title],
+      moduleKey: descriptor.key,
+      title: descriptor.title,
+      summary: descriptor.description || context.summary,
+      keywords: [descriptor.title, descriptor.key, context.title],
       entryFiles: relatedPaths.slice(0, 5),
       relatedPaths,
       decisions: context.decisions,
       constraints: context.constraints,
       pitfalls: context.risks,
+      changeTitle: context.title,
       tickets: [{
         ticket: context.ticket,
         branch: branchName,

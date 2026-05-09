@@ -5,7 +5,8 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { ensureDir, writeJson, readJson, fileExists } from '../src/utils/fs.js';
 import { buildIndex } from '../src/cli/commands/reindex.js';
-import type { IndexData, RequirementData } from '../src/schemas/run-json.js';
+import type { RequirementData } from '../src/schemas/run-json.js';
+import { readRegistryItems } from './helpers.js';
 
 let tmpRoot: string;
 
@@ -22,6 +23,7 @@ function addBranch(root: string, branch: string, opts: {
   developers?: Array<{ name: string; tasks: number; completedTasks: number; bugs: number; deviations: number }>;
   status?: string;
   title?: string;
+  modules?: string[];
 }): void {
   const branchDir = resolve(root, '.aida', 'runs', branch);
   ensureDir(branchDir);
@@ -35,7 +37,12 @@ function addBranch(root: string, branch: string, opts: {
     title: opts.title || branch,
     summary: `Summary for ${branch}`,
     prdPhases: [],
-    modules: [],
+    modules: (opts.modules || []).map((name, index) => ({
+      id: `MOD-${index + 1}`,
+      name,
+      description: `${name} module`,
+      assignee: null,
+    })),
     highlights: [{ content: `Highlight for ${branch}`, source: 'auto', createdAt: now }],
     developers: devs.map(d => ({
       name: d.name,
@@ -102,18 +109,65 @@ describe('buildIndex', () => {
 
   it('should index a single branch', () => {
     const root = setupProject();
-    addBranch(root, 'feat-1', { title: 'Feature 1' });
+    addBranch(root, 'feat-1', { title: 'Feature 1', modules: ['profile'] });
 
     const count = buildIndex(root);
     assert.equal(count, 1);
 
-    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
-    assert.equal(idx.project, 'test-proj');
-    assert.equal(idx.runs.length, 1);
-    assert.equal(idx.runs[0].branch, 'feat-1');
-    assert.equal(idx.runs[0].title, 'Feature 1');
-    assert.ok(idx.runs[0].developers.length > 0);
-    assert.ok(idx.runs[0].highlights.length > 0);
+    const summary = readRegistryItems<any>(resolve(root, '.aida', 'summary.json'));
+    assert.equal(summary.length, 1);
+    assert.deepEqual(summary[0].modules, ['profile']);
+    assert.equal(summary[0].branch, 'feat-1');
+    assert.equal(summary[0].title, 'Feature 1');
+    assert.ok(summary[0].highlights.length > 0);
+  });
+
+  it('should fall back to branch context modules when requirement modules are empty', () => {
+    const root = setupProject();
+    addBranch(root, 'feat-context-mods', { title: 'Feature Context Mods', modules: [] });
+    writeJson(resolve(root, '.aida', 'runs', 'feat-context-mods', 'context.json'), {
+      branch: 'feat-context-mods',
+      title: 'Feature Context Mods',
+      summary: 'Context fallback',
+      currentPhase: 'In Progress',
+      modules: ['auth-login', 'pow-check'],
+      completed: [],
+      inProgress: [],
+      next: [],
+      decisions: [],
+      constraints: [],
+      keyFiles: [],
+      risks: [],
+      updatedAt: new Date().toISOString(),
+    });
+
+    buildIndex(root);
+    const summary = readRegistryItems<any>(resolve(root, '.aida', 'summary.json'));
+    assert.deepEqual(summary[0].modules, ['auth-login', 'pow-check']);
+  });
+
+  it('should keep requirement summary when branch context summary is only a branch placeholder', () => {
+    const root = setupProject();
+    addBranch(root, 'feat-summary', { title: 'Feature Summary', modules: ['profile'] });
+    writeJson(resolve(root, '.aida', 'runs', 'feat-summary', 'context.json'), {
+      branch: 'feat-summary',
+      title: 'feat-summary',
+      summary: 'feat-summary',
+      currentPhase: 'In Progress',
+      modules: ['profile'],
+      completed: [],
+      inProgress: [],
+      next: [],
+      decisions: [],
+      constraints: [],
+      keyFiles: ['src/pages/profile/index.tsx'],
+      risks: [],
+      updatedAt: new Date().toISOString(),
+    });
+
+    buildIndex(root);
+    const summary = readRegistryItems<any>(resolve(root, '.aida', 'summary.json'));
+    assert.equal(summary[0].summary, 'Summary for feat-summary');
   });
 
   it('should index multiple branches', () => {
@@ -125,11 +179,11 @@ describe('buildIndex', () => {
     const count = buildIndex(root);
     assert.equal(count, 3);
 
-    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
-    assert.equal(idx.runs.length, 3);
+    const summary = readRegistryItems<any>(resolve(root, '.aida', 'summary.json'));
+    assert.equal(summary.length, 3);
   });
 
-  it('should preserve totals from requirement.json', () => {
+  it('should preserve branch summary entries from requirement.json', () => {
     const root = setupProject();
     addBranch(root, 'feat-1', {
       developers: [
@@ -139,14 +193,9 @@ describe('buildIndex', () => {
     });
 
     buildIndex(root);
-    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
-    const run = idx.runs[0];
-
-    assert.equal(run.totals.tasks, 15);
-    assert.equal(run.totals.completedTasks, 13);
-    assert.equal(run.totals.bugs, 2);
-    assert.equal(run.totals.deviations, 1);
-    assert.equal(run.developers.length, 2);
+    const summary = readRegistryItems<any>(resolve(root, '.aida', 'summary.json'));
+    assert.equal(summary.length, 1);
+    assert.equal(summary[0].branch, 'feat-1');
   });
 
   it('should set status to completed when all developers are completed', () => {
@@ -154,8 +203,8 @@ describe('buildIndex', () => {
     addBranch(root, 'feat-done', { status: 'completed' });
 
     buildIndex(root);
-    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
-    assert.equal(idx.runs[0].status, 'completed');
+    const summary = readRegistryItems<any>(resolve(root, '.aida', 'summary.json'));
+    assert.equal(summary[0].status, 'completed');
   });
 
   it('should set status to running when any developer is not completed', () => {
@@ -181,8 +230,8 @@ describe('buildIndex', () => {
     }
 
     buildIndex(root);
-    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
-    assert.equal(idx.runs[0].status, 'running');
+    const summary = readRegistryItems<any>(resolve(root, '.aida', 'summary.json'));
+    assert.equal(summary[0].status, 'running');
   });
 
   it('should skip branches without requirement.json', () => {
@@ -202,9 +251,8 @@ describe('buildIndex', () => {
     addBranch(root, 'feat-1', {});
     buildIndex(root);
 
-    const idx = readJson<IndexData>(resolve(root, '.aida', 'index.json'));
-    assert.ok(idx.updatedAt);
-    // Should be a valid ISO date
-    assert.ok(!isNaN(new Date(idx.updatedAt).getTime()));
+    const summary = readJson<any>(resolve(root, '.aida', 'summary.json'));
+    assert.ok(summary.updatedAt);
+    assert.ok(!isNaN(new Date(summary.updatedAt).getTime()));
   });
 });

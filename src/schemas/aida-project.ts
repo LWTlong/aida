@@ -38,7 +38,16 @@ export interface ModuleMemoryReference {
   updatedAt?: string
 }
 
+export interface ModuleChangeEntry {
+  ticket?: string
+  branch?: string
+  title?: string
+  summary: string
+  updatedAt: string
+}
+
 export interface ModuleMemoryRecord {
+  schemaVersion?: string
   moduleKey: string
   title: string
   summary: string
@@ -51,6 +60,7 @@ export interface ModuleMemoryRecord {
   pitfalls: string[]
   relatedRules: string[]
   tickets: ModuleMemoryReference[]
+  changes?: ModuleChangeEntry[]
   updatedAt: string
 }
 
@@ -60,12 +70,14 @@ export interface ModuleMemoryIndexEntry {
   summary: string
   keywords: string[]
   paths: string[]
+  tickets?: string[]
   updatedAt: string
 }
 
 export interface ModuleMemoryIndex {
+  schemaVersion?: string
   updatedAt: string
-  modules: ModuleMemoryIndexEntry[]
+  items: ModuleMemoryIndexEntry[]
 }
 
 export interface RunContextRecord {
@@ -82,5 +94,17 @@ export interface RunContextRecord {
   constraints: string[]
   keyFiles: string[]
   risks: string[]
+  updatedAt: string
+}
+
+export interface SummaryEntry {
+  branch: string
+  ticket?: string
+  title: string
+  summary: string
+  modules: string[]
+  highlights: string[]
+  status: string
+  keyFiles?: string[]
   updatedAt: string
 }

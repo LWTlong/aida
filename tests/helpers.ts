@@ -6,6 +6,8 @@ import { tmpdir } from 'node:os';
 import { resolve, join } from 'node:path';
 import { execSync } from 'node:child_process';
 import { ensureDir, writeJson, writeText, readJson } from '../src/utils/fs.js';
+import { parseRegistryEnvelope } from '../src/utils/registry.js';
+import type { ModuleMemoryIndex } from '../src/schemas/aida-project.js';
 
 export interface TestProject {
   root: string;
@@ -190,4 +192,25 @@ export function runCliWithInput(project: TestProject, args: string, input: strin
   } catch (e: any) {
     return e.stdout || '';
   }
+}
+
+export function readRegistryItems<T>(path: string): T[] {
+  return parseRegistryEnvelope<T>(readJson<unknown>(path)).items;
+}
+
+export function readRuleRegistryItems(projectRoot: string): any[] {
+  return readRegistryItems(resolve(projectRoot, '.aida', 'rules.json'));
+}
+
+export function readSkillRegistryItems(projectRoot: string): any[] {
+  return readRegistryItems(resolve(projectRoot, '.aida', 'skills.json'));
+}
+
+export function readMemoryIndex(projectRoot: string): ModuleMemoryIndex {
+  const raw = readJson<any>(resolve(projectRoot, '.aida', 'memories', 'index.json'));
+  return {
+    schemaVersion: raw?.schemaVersion || '2.0',
+    updatedAt: raw?.updatedAt || '',
+    items: Array.isArray(raw?.items) ? raw.items : Array.isArray(raw?.modules) ? raw.modules : [],
+  };
 }

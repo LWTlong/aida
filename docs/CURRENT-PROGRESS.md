@@ -1,167 +1,133 @@
 # Current Progress
 
-This file captures the current implementation state of AIDA so work can continue on another machine without relying on local chat history.
+This file captures the current implementation state of AIDA 2.0 so work can continue on another machine without relying on local chat history.
 
-Last updated: 2026-04-15
+Last updated: 2026-05-09
 
-## Current Released Version
+## Current Release Target
 
-- npm: `ai-dev-analytics@1.1.2`
-- git commit already pushed before this note: `f3bf5e3`
+- package version in this branch: `2.0.0`
+- branch: `design-aida-2.0`
+- status: release preparation
 
-## What Is Done
+## 2.0 Core Truth Sources
 
-### JSON source of truth
+These are the only long-lived project truth sources in AIDA 2.0:
 
-These are now the authoritative project assets:
-
+- `.aida/config.json`
 - `.aida/rules.json`
 - `.aida/skills.json`
-- `.aida/config.json`
-- `.aida/tool-configs.json`
+- `.aida/summary.json`
 - `.aida/memories/index.json`
 - `.aida/memories/modules/*.json`
-- `.aida/runs/*/context.json`
 
-### Generated views and tool artifacts
+2.0 explicitly discards the 1.x runtime ledger model:
 
-`aida build` now generates:
+- `.aida/runs/**`
+- `.aida/index.json`
+- `.aida/tool-configs.json`
+- `run.json`
+- task persistence
+- timeline / events / workflow history
 
-- AI tool rules / skills / MCP config under `.claude`, `.cursor`, `.codex`, `.lingma`, etc.
+## Generated Artifacts
+
+`aida build` and `aida sync` generate or refresh:
+
+- AI tool rule bundles under `.claude`, `.cursor`, `.codex`, `.lingma`, etc.
+- AI tool skill bundles from `.aida/skills.json`
+- MCP config files for enabled tools
+- `.aida/rules/*.md`
 - `.aida/memories/modules/*.md`
-- `.aida/runs/*/context.md`
-- `.aida/runs/*/memory.md`
+- root instruction files such as `CLAUDE.md` or `AGENTS.md` for enabled tools only
 
-Generated local artifacts are added to `.gitignore`.
+Generated artifacts are projections. They are not the source of truth.
 
-### Legacy migration
+## What 2.0 Migration Does
 
-`aida migrate-legacy` now performs:
+`aida migrate-legacy` is now a cleaning migration, not a structural carry-over.
 
-1. `.aidevos -> .aida`
-2. baseline rules / skills import
-3. tool config snapshot import
-4. run schema migration
-5. legacy memory migration from:
-   - `run.json`
-   - `requirement.json`
-   - `analysis.md`
-6. rebuild of generated artifacts
+It performs:
 
-### Memory runtime
+1. legacy `.aidevos -> .aida` normalization
+2. legacy rules / skills import into 2.0 registries
+3. module memory extraction and cleanup
+4. requirement / branch summary extraction into `.aida/summary.json`
+5. removal of 1.x runtime noise and obsolete directories
+6. rebuild of 2.0 generated artifacts
 
-Added CLI:
+The migration keeps only data that still matters in 2.0:
 
-- `aida memory rebuild`
-- `aida memory migrate-legacy`
-- `aida memory build`
-- `aida memory search`
-- `aida memory show`
-- `aida memory context`
-- `aida memory pack`
-- `aida memory upsert`
-- `aida memory context-update`
+- rules
+- project skills
+- module business memory
+- demand / branch summaries
 
-Added MCP tools:
+It discards:
 
-- `aida_memory_search`
-- `aida_memory_get`
-- `aida_memory_upsert`
-- `aida_memory_pack`
-- `aida_context_get`
-- `aida_context_update`
-- `aida_context_rebuild`
+- task ledgers
+- workflow stage history
+- event / timeline noise
+- old runtime-derived indexes
 
-### Runtime ergonomics already implemented
+## Runtime and Retrieval Model
 
-- branch-level aggregated memory pack exists
-- MCP write operations trigger best-effort branch memory refresh
-- guide text now instructs AI to search memory before coding
-- if context is missing, runtime can rebuild it
+The runtime contract in 2.0 is:
 
-## What Is Not Done Yet
+1. read rules
+2. search module memory index
+3. read `summary.json`
+4. only read matched `memories/modules/*.json`
+5. implement
+6. write back only final useful memory / summary / rule changes
 
-These are still open and should be considered phase 2+ work.
+This keeps token usage low and avoids replaying noisy process history.
 
-### Heavier orchestration / agent runtime
+## Commands That Matter in 2.0
 
-- automatic module inference from user request without explicit search query
-- runtime context packing with stronger token budgeting and ranking
-- automatic decision of which module memories to include
-- automatic post-task memory summarization instead of only refresh / rebuild
-- evaluator / reviewer style orchestration on top of MCP runtime
+Primary commands:
 
-### Better retrieval quality
+- `aida init`
+- `aida sync`
+- `aida build`
+- `aida doctor`
+- `aida migrate-legacy`
 
-- stronger semantic retrieval
-- optional embeddings / reranking
-- better path-aware retrieval when module naming is weak or inconsistent
+Legacy commands may still exist for compatibility, but they are not the main product path.
 
-### Import / migration refinement
+## Validation Status
 
-- more selective import UX for non-bundled skills and custom MCP configs
-- stronger normalization for unusual historical project structures
-- explicit migration from old report outputs if a team stored extra derived report docs outside standard branch data
+Validated in this branch:
 
-## Recommended Next Steps
+- full test suite passing
+- 2.0 guide generation passing
+- 2.0 merge / doctor / sync flow passing
+- real migrated project verification completed on:
+  - `/Users/longwentao/project/frontend-msg-admin`
 
-If continuing implementation, do work in this order:
+The verified real-project expectations were:
 
-1. Add smarter `memory search -> pack` recommendation flow
-2. Add task-end memory suggestion / summary generation
-3. Improve retrieval quality and ranking
-4. Decide whether to evolve into a fuller agent orchestration layer
+- 1.x runtime directories removed after cleanup
+- 2.0 truth sources preserved
+- guide text switched to 2.0 semantics
+- no default bundled workflow skills
 
-## Recommended Real Project Test Cases
+## Phase 2 Candidates
 
-### Legacy project upgrade
+These are intentionally out of the 2.0.0 release scope:
 
-```bash
-aida migrate-legacy
-aida memory search "模块名"
-aida memory pack
-aida build
-```
+- reverse sync from hand-edited tool markdown back into JSON
+- richer dashboard refresh based on 2.0 summary-only model
+- stronger semantic retrieval / embeddings
+- automatic detection of external tool-side skill changes
 
-Verify:
+## Recommended Starting Point For The Next Session
 
-- old `.aidevos` content becomes `.aida`
-- rules / skills / tool configs are preserved
-- `context.json` and module memory JSON are created
-- generated tool artifacts are rebuilt
+If continuing work from another machine, start with:
 
-### Already migrated project
+1. `README.md`
+2. `COMMANDS.md`
+3. `docs/AIDA-2.0-DESIGN.md`
+4. `docs/CURRENT-PROGRESS.md`
 
-```bash
-aida memory rebuild
-aida memory pack
-aida build
-```
-
-Verify:
-
-- branch context reflects latest `run.json` / `requirement.json` / `analysis.md`
-- `memory.md` aggregates relevant modules
-- tool artifacts remain in sync
-
-### MCP runtime behavior
-
-Verify during real coding:
-
-- AI calls `aida_memory_search` before coding
-- AI prefers `aida_memory_pack` for restoration
-- after task / bug / review / rule operations, branch memory refreshes without manual rebuild
-
-## Key Design References
-
-- `docs/PRD-MEMORY-RUNTIME.md`
-- `docs/TECH-DESIGN-MEMORY-RUNTIME.md`
-
-## Notes For Next Session
-
-- current architecture is stable enough for real project testing
-- this is not the final agent runtime yet
-- if continuing from another machine, start by reading:
-  1. `docs/CURRENT-PROGRESS.md`
-  2. `docs/PRD-MEMORY-RUNTIME.md`
-  3. `docs/TECH-DESIGN-MEMORY-RUNTIME.md`
+Treat the older run/workflow documents in `docs/` as historical reference only.

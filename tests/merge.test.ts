@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { extractConflictSections, parseConflictJsonArray, readJson, writeText } from '../src/utils/fs.js';
-import { createTestProject, runCliOutput } from './helpers.js';
+import { createTestProject, runCliOutput, readRuleRegistryItems, readSkillRegistryItems } from './helpers.js';
 
 describe('parseConflictJsonArray', () => {
   it('should normalize empty object to empty array', () => {
@@ -103,7 +103,7 @@ describe('aida merge', () => {
       );
 
       const stdout = runCliOutput(project, 'merge');
-      const merged = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const merged = readRuleRegistryItems(project.root);
 
       assert.ok(stdout.includes('AIDA merge completed'));
       assert.equal(merged.length, 1);
@@ -167,13 +167,113 @@ describe('aida merge', () => {
       );
 
       const stdout = runCliOutput(project, 'merge');
-      const mergedRules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
-      const mergedSkills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const mergedRules = readRuleRegistryItems(project.root);
+      const mergedSkills = readSkillRegistryItems(project.root);
 
       assert.ok(stdout.includes('rules.json: merged'));
       assert.equal(mergedRules.length, 2);
       assert.equal(mergedSkills.length, 1);
       assert.equal(mergedSkills[0].name, 'workflow-orchestrator');
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should merge 2.0 envelope conflicts for rules.json and skills.json', () => {
+    const project = createTestProject();
+    try {
+      writeText(
+        resolve(project.root, '.aida', 'rules.json'),
+        `<<<<<<< HEAD
+{
+  "schemaVersion": "2.0",
+  "updatedAt": "2026-05-08T10:00:00.000Z",
+  "items": [
+    {
+      "id": "RULE-001",
+      "category": "process",
+      "content": "Rule A",
+      "fingerprint": "fp-rule-a",
+      "source": { "branch": "feat-a", "deviation": null, "author": "dev-a" },
+      "createdAt": "2026-04-13T00:00:00.000Z",
+      "status": "active"
+    }
+  ]
+}
+=======
+{
+  "schemaVersion": "2.0",
+  "updatedAt": "2026-05-08T10:01:00.000Z",
+  "items": [
+    {
+      "id": "RULE-001",
+      "category": "api",
+      "content": "Rule B",
+      "fingerprint": "fp-rule-b",
+      "source": { "branch": "feat-b", "deviation": null, "author": "dev-b" },
+      "createdAt": "2026-04-13T00:00:00.000Z",
+      "status": "active"
+    }
+  ]
+}
+>>>>>>> uat
+`,
+      );
+
+      writeText(
+        resolve(project.root, '.aida', 'skills.json'),
+        `<<<<<<< HEAD
+{
+  "schemaVersion": "2.0",
+  "updatedAt": "2026-05-08T10:00:00.000Z",
+  "items": [
+    {
+      "id": "SKILL-001",
+      "name": "workflow-orchestrator",
+      "content": "Workflow content",
+      "fingerprint": "fp-skill-a",
+      "source": { "kind": "bundled", "path": "a" },
+      "updatedAt": "2026-04-13T00:00:00.000Z",
+      "status": "active"
+    }
+  ]
+}
+=======
+{
+  "schemaVersion": "2.0",
+  "updatedAt": "2026-05-08T10:01:00.000Z",
+  "items": [
+    {
+      "id": "SKILL-001",
+      "name": "rules-evolver",
+      "content": "Rules content",
+      "fingerprint": "fp-skill-b",
+      "source": { "kind": "bundled", "path": "b" },
+      "updatedAt": "2026-04-13T00:00:00.000Z",
+      "status": "active"
+    }
+  ]
+}
+>>>>>>> uat
+`,
+      );
+
+      const stdout = runCliOutput(project, 'merge');
+      const mergedRulesRaw = readJson<any>(resolve(project.root, '.aida', 'rules.json'));
+      const mergedSkillsRaw = readJson<any>(resolve(project.root, '.aida', 'skills.json'));
+      const mergedRules = readRuleRegistryItems(project.root);
+      const mergedSkills = readSkillRegistryItems(project.root);
+
+      assert.ok(stdout.includes('rules.json: merged'));
+      assert.ok(stdout.includes('skills.json: merged'));
+      assert.equal(mergedRulesRaw.schemaVersion, '2.0');
+      assert.equal(mergedSkillsRaw.schemaVersion, '2.0');
+      assert.equal(mergedRules.length, 2);
+      assert.equal(mergedSkills.length, 2);
+      assert.ok(mergedRules.some((entry) => entry.content === 'Rule A'));
+      assert.ok(mergedRules.some((entry) => entry.content === 'Rule B'));
+      assert.ok(mergedSkills.some((entry) => entry.name === 'workflow-orchestrator'));
+      assert.ok(mergedSkills.some((entry) => entry.name === 'rules-evolver'));
     } finally {
       project.cleanup();
     }

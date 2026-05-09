@@ -1,5 +1,7 @@
 # AIDA Memory Runtime PRD
 
+> Historical design reference. This document captures an earlier transition design between 1.x runtime memory and the later 2.0 truth-source model. For the current public behavior, use [README.md](../README.md), [COMMANDS.md](../COMMANDS.md), and [docs/AIDA-2.0-DESIGN.md](./AIDA-2.0-DESIGN.md) as the canonical references.
+
 ## Background
 
 AIDA already manages project rules, skills, MCP access, and development observability. What is still missing is stable context recovery across:

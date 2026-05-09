@@ -3,6 +3,7 @@ import { readdirSync, statSync } from 'node:fs';
 import { fileExists, readJson, writeJson } from '../../utils/fs.js';
 import { green, cyan, red, yellow } from '../../utils/display.js';
 import { normalizeRunData, recalcMetrics } from '../../utils/run-data.js';
+import { normalizeProjectTruthSources } from '../../utils/project-health.js';
 import type { RunData } from '../../schemas/run-json.js';
 
 /**
@@ -177,7 +178,7 @@ function migrateRunJson(data: any, projectName?: string): RunData {
   // Migrate meta
   const newMeta = {
     schemaVersion: '2.0',
-    runId: meta.runId || meta.branch || '',
+    runId: meta.branch || meta.runId || '',
     project: meta.project || projectName || '',
     developer: meta.developer || '',
     branch: meta.branch || '',
@@ -384,5 +385,8 @@ export async function migrate(): Promise<void> {
   if (errorCount > 0) {
     console.log(`    ${red(`Errors: ${errorCount}`)}`);
   }
+
+  const normalized = normalizeProjectTruthSources(projectRoot);
+  console.log(`    Truth sources normalized: ${normalized.rules} rules, ${normalized.skills} skills, ${normalized.memories} memories, ${normalized.summary} summaries`);
   console.log(`\n  ${yellow('Note:')} Original files backed up as *.backup.json\n`);
 }

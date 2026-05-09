@@ -12,13 +12,21 @@ import {
   branchDir,
   configPath,
   indexPath,
+  legacyModuleMemoryPath,
   memoryIndexPath,
   moduleMemoriesDir,
+  moduleMemoryPath,
   requirementPath,
   runContextPath,
   runsDir,
 } from '../../utils/paths.js';
-import { buildMemoryViews } from '../../utils/memory.js';
+import {
+  buildMemoryViews,
+  loadMemoryIndex,
+  loadModuleMemory,
+  normalizeModuleKey,
+  saveModuleMemory,
+} from '../../utils/memory.js';
 import { buildIndex } from './reindex.js';
 import { normalizeRunData, recalcMetrics, resolveCurrentTaskId } from '../../utils/run-data.js';
 import type {
@@ -114,28 +122,79 @@ function mergeIndexEntry(current: ModuleMemoryIndexEntry, incoming: ModuleMemory
     summary: pickLatestString(current.summary, incoming.summary, current.updatedAt, incoming.updatedAt),
     keywords: uniqueStrings([...current.keywords, ...incoming.keywords]),
     paths: uniqueStrings([...current.paths, ...incoming.paths]),
+    tickets: uniqueStrings([...(current.tickets || []), ...(incoming.tickets || [])]),
     updatedAt: useIncoming ? incoming.updatedAt : current.updatedAt,
   };
 }
 
 function mergeMemoryIndex(ours: ModuleMemoryIndex | null, theirs: ModuleMemoryIndex | null): ModuleMemoryIndex {
   const mergedModules = mergeByKey<ModuleMemoryIndexEntry>(
-    [...(ours?.modules || []), ...(theirs?.modules || [])],
-    (item) => item.key,
-    mergeIndexEntry,
+    [...((ours?.items || (ours as any)?.modules || [])), ...((theirs?.items || (theirs as any)?.modules || []))],
+    (item) => normalizeModuleKey(item.key),
+    (current, incoming) => mergeIndexEntry(
+      { ...current, key: normalizeModuleKey(current.key) },
+      { ...incoming, key: normalizeModuleKey(incoming.key) },
+    ),
   ).sort((a, b) => a.key.localeCompare(b.key));
 
   return {
+    schemaVersion: '2.0',
     updatedAt: latestIso(ours?.updatedAt, theirs?.updatedAt),
-    modules: mergedModules,
+    items: mergedModules,
   };
+}
+
+function hydrateModuleMemoryFromIndex(projectRoot: string, entry: ModuleMemoryIndexEntry): void {
+  const moduleKey = normalizeModuleKey(entry.key);
+  if (!moduleKey) return;
+  const existing = loadModuleMemory(projectRoot, moduleKey);
+  if (existing) {
+    saveModuleMemory(projectRoot, {
+      ...existing,
+      moduleKey,
+      title: existing.title || entry.title || moduleKey,
+      summary: existing.summary || entry.summary || '',
+      keywords: uniqueStrings([...(existing.keywords || []), moduleKey, entry.title, ...(entry.keywords || [])]),
+      entryFiles: uniqueStrings([...(existing.entryFiles || []), ...(entry.paths || [])]),
+      relatedPaths: uniqueStrings([...(existing.relatedPaths || []), ...(entry.paths || [])]),
+      updatedAt: latestIso(existing.updatedAt, entry.updatedAt) || existing.updatedAt || entry.updatedAt || new Date().toISOString(),
+    });
+    return;
+  }
+  if (fileExists(moduleMemoryPath(projectRoot, moduleKey))) return;
+  if (fileExists(legacyModuleMemoryPath(projectRoot, moduleKey))) return;
+
+  saveModuleMemory(projectRoot, {
+    schemaVersion: '2.0',
+    moduleKey,
+    title: entry.title || moduleKey,
+    summary: entry.summary || '',
+    keywords: uniqueStrings([moduleKey, entry.title, ...(entry.keywords || [])]),
+    entryFiles: uniqueStrings(entry.paths || []),
+    relatedPaths: uniqueStrings(entry.paths || []),
+    dataFlow: [],
+    decisions: [],
+    constraints: [],
+    pitfalls: [],
+    relatedRules: [],
+    tickets: [],
+    changes: [],
+    updatedAt: entry.updatedAt || new Date().toISOString(),
+  });
+}
+
+function hydrateMissingModuleMemoriesFromIndex(projectRoot: string): void {
+  const index = loadMemoryIndex(projectRoot);
+  for (const entry of index.items) {
+    hydrateModuleMemoryFromIndex(projectRoot, entry);
+  }
 }
 
 function mergeModuleMemoryRecord(current: ModuleMemoryRecord, incoming: ModuleMemoryRecord): ModuleMemoryRecord {
   const useIncoming = latestIso(current.updatedAt, incoming.updatedAt) === incoming.updatedAt;
   const mergedTickets = mergeByKey(
     [...current.tickets, ...incoming.tickets],
-    (item) => `${item.ticket || ''}|${item.branch || ''}|${item.summary}`,
+    (item) => `${item.ticket || ''}|${item.branch || ''}`,
     (left, right) => ({
       ticket: left.ticket || right.ticket,
       branch: left.branch || right.branch,
@@ -143,8 +202,22 @@ function mergeModuleMemoryRecord(current: ModuleMemoryRecord, incoming: ModuleMe
       updatedAt: latestIso(left.updatedAt, right.updatedAt),
     }),
   );
+  const mergedChanges = mergeByKey(
+    [...(current.changes || []), ...(incoming.changes || [])],
+    (item) => item.ticket || item.branch
+      ? `${item.ticket || ''}|${item.branch || ''}`
+      : `${item.title || ''}|${item.summary}`,
+    (left, right) => ({
+      ticket: left.ticket || right.ticket,
+      branch: left.branch || right.branch,
+      title: pickLatestString(left.title, right.title, left.updatedAt, right.updatedAt) || undefined,
+      summary: pickLatestString(left.summary, right.summary, left.updatedAt, right.updatedAt),
+      updatedAt: latestIso(left.updatedAt, right.updatedAt),
+    }),
+  );
 
   return {
+    schemaVersion: '2.0',
     moduleKey: current.moduleKey || incoming.moduleKey,
     title: pickLatestString(current.title, incoming.title, current.updatedAt, incoming.updatedAt),
     summary: pickLatestString(current.summary, incoming.summary, current.updatedAt, incoming.updatedAt),
@@ -157,6 +230,7 @@ function mergeModuleMemoryRecord(current: ModuleMemoryRecord, incoming: ModuleMe
     pitfalls: uniqueStrings([...current.pitfalls, ...incoming.pitfalls]),
     relatedRules: uniqueStrings([...current.relatedRules, ...incoming.relatedRules]),
     tickets: mergedTickets,
+    changes: mergedChanges,
     updatedAt: useIncoming ? incoming.updatedAt : current.updatedAt,
   };
 }
@@ -616,6 +690,7 @@ export function mergeAidaJsonData(projectRoot: string): MergeDataSummary {
   ].some((item) => item.status === 'merged');
 
   if (hasAnyMerge) {
+    hydrateMissingModuleMemoriesFromIndex(projectRoot);
     buildMemoryViews(projectRoot);
     summary.rebuiltMemoryViews = true;
     buildIndex(projectRoot);

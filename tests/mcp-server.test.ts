@@ -84,8 +84,8 @@ class McpClient {
     this.proc.stdin!.write(msg);
   }
 
-  async callTool(name: string, args: Record<string, any> = {}): Promise<any> {
-    const resp = await this.rpc('tools/call', { name, arguments: args });
+  async callTool(name: string, args: Record<string, any> = {}, timeoutMs = 30000): Promise<any> {
+    const resp = await this.rpc('tools/call', { name, arguments: args }, timeoutMs);
     assert.ok(resp.result, `Expected result in response for tool ${name}`);
     const text = resp.result.content?.[0]?.text;
     assert.ok(text, `Expected text content in response for tool ${name}`);
@@ -117,22 +117,23 @@ class McpClient {
 
 // ─── Test suite ───────────────────────────────────────────
 
-let project: TestProject;
-let client: McpClient;
+describe('MCP Server', { concurrency: false }, () => {
+  let project: TestProject;
+  let client: McpClient;
 
-beforeEach(() => {
-  project = createTestProject();
-  client = new McpClient(project.root);
-});
+  beforeEach(() => {
+    project = createTestProject();
+    client = new McpClient(project.root);
+  });
 
-afterEach(() => {
-  client.kill();
-  project.cleanup();
-});
+  afterEach(() => {
+    client.kill();
+    project.cleanup();
+  });
 
-// ─── initialize ───────────────────────────────────────────
+  // ─── initialize ───────────────────────────────────────────
 
-describe('MCP Server - initialize', () => {
+  describe('MCP Server - initialize', () => {
   it('should respond with protocolVersion and serverInfo', async () => {
     const resp = await client.initialize();
 
@@ -143,11 +144,11 @@ describe('MCP Server - initialize', () => {
     assert.ok(resp.result.capabilities.tools);
     assert.ok(resp.result.capabilities.prompts);
   });
-});
+  });
 
-// ─── tools/list ───────────────────────────────────────────
+  // ─── tools/list ───────────────────────────────────────────
 
-describe('MCP Server - tools/list', () => {
+  describe('MCP Server - tools/list', () => {
   it('should return all registered tools', async () => {
     await client.initialize();
 
@@ -182,9 +183,9 @@ describe('MCP Server - tools/list', () => {
     ];
     assert.deepEqual(names, expected);
   });
-});
+  });
 
-describe('MCP Server - aida_bootstrap', () => {
+  describe('MCP Server - aida_bootstrap', () => {
   it('should return bootstrap manifest and persist local bootstrap state', async () => {
     await client.initialize();
 
@@ -238,9 +239,9 @@ describe('MCP Server - aida_bootstrap', () => {
     assert.equal(manifest.configured, false);
     assert.equal(manifest.sessionAvailable, true);
   });
-});
+  });
 
-describe('MCP Server - memory tools', () => {
+  describe('MCP Server - memory tools', () => {
   it('should rebuild branch memory and return an aggregated memory pack', async () => {
     await client.initialize();
 
@@ -265,16 +266,16 @@ describe('MCP Server - memory tools', () => {
     const rebuild = await client.callTool('aida_context_rebuild', {});
     assert.equal(rebuild.success, true);
 
-    const pack = await client.callTool('aida_memory_pack', {});
+    const pack = await client.callTool('aida_memory_pack', {}, 30000);
     assert.equal(pack.success, true);
     assert.equal(pack.pack.context.branch, project.branch);
     assert.ok(Array.isArray(pack.pack.modules));
   });
-});
+  });
 
 // ─── aida_task_start ───────────────────────────────────
 
-describe('MCP Server - aida_task_start', () => {
+  describe('MCP Server - aida_task_start', () => {
   it('should create a task and run.json via lazy init', async () => {
     await client.initialize();
 
@@ -296,9 +297,9 @@ describe('MCP Server - aida_task_start', () => {
     assert.equal(data.summary.totalTasks, 1);
     assert.equal(data.context.currentTaskId, 'TASK-01');
   });
-});
+  });
 
-describe('MCP Server - aggregated tools', () => {
+  describe('MCP Server - aggregated tools', () => {
   it('should support task, record, and memory operations through grouped tools', async () => {
     await client.initialize();
 
@@ -330,11 +331,11 @@ describe('MCP Server - aggregated tools', () => {
     });
     assert.equal(done.success, true);
   });
-});
+  });
 
 // ─── aida_task_done ────────────────────────────────────
 
-describe('MCP Server - aida_task_done', () => {
+  describe('MCP Server - aida_task_done', () => {
   it('should mark task as done', async () => {
     await client.initialize();
 
@@ -370,11 +371,11 @@ describe('MCP Server - aida_task_done', () => {
     const result = await client.callTool('aida_task_done', { taskId: 'TASK-99' });
     assert.equal(result.success, false);
   });
-});
+  });
 
 // ─── aida_log_bug ──────────────────────────────────────
 
-describe('MCP Server - aida_log_bug', () => {
+  describe('MCP Server - aida_log_bug', () => {
   it('should record a bug with defaults', async () => {
     await client.initialize();
 
@@ -408,11 +409,11 @@ describe('MCP Server - aida_log_bug', () => {
     assert.equal(data.bugs[0].severity, 'critical');
     assert.equal(data.bugs[0].source, 'testing');
   });
-});
+  });
 
 // ─── aida_log_files ────────────────────────────────────
 
-describe('MCP Server - aida_log_files', () => {
+  describe('MCP Server - aida_log_files', () => {
   it('should handle no git diff gracefully', async () => {
     await client.initialize();
 
@@ -421,11 +422,11 @@ describe('MCP Server - aida_log_files', () => {
     assert.equal(result.success, true);
     assert.equal(result.filesLogged, 0);
   });
-});
+  });
 
 // ─── aida_status ───────────────────────────────────────
 
-describe('MCP Server - aida_status', () => {
+  describe('MCP Server - aida_status', () => {
   it('should return current state with summary', async () => {
     await client.initialize();
 
@@ -444,11 +445,11 @@ describe('MCP Server - aida_status', () => {
     assert.ok(Array.isArray(result.openBugs));
     assert.equal(result.openBugs.length, 1);
   });
-});
+  });
 
 // ─── prompts/list ─────────────────────────────────────────
 
-describe('MCP Server - prompts/list', () => {
+  describe('MCP Server - prompts/list', () => {
   it('should return aida-guide prompt', async () => {
     await client.initialize();
 
@@ -469,5 +470,6 @@ describe('MCP Server - prompts/list', () => {
     assert.equal(resp.result.messages[0].role, 'user');
     assert.ok(resp.result.messages[0].content.text.includes('aida_bootstrap'));
     assert.ok(resp.result.messages[0].content.text.includes('aida_task'));
+  });
   });
 });

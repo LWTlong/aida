@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readJson } from '../src/utils/fs.js';
-import { createTestProject, runCli, type TestProject } from './helpers.js';
+import { createTestProject, runCli, readRuleRegistryItems, type TestProject } from './helpers.js';
 
 let project: TestProject;
 
@@ -185,7 +185,7 @@ describe('aidevos log rule', () => {
     assert.equal(data.summary.rulesSedimented, 1);
 
     // Check registry file also exists
-    const registry = readJson<any[]>(project.root + '/.aida/rules.json');
+    const registry = readRuleRegistryItems(project.root);
     assert.equal(registry.length, 1);
     assert.equal(registry[0].category, 'component');
   });
