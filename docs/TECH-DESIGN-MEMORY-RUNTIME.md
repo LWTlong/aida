@@ -1,5 +1,7 @@
 # AIDA Memory Runtime Technical Design
 
+> Historical design reference. This document describes an earlier transition architecture before the final 2.0 truth-source cleanup. For the current public behavior, use [README.md](../README.md), [COMMANDS.md](../COMMANDS.md), and [docs/AIDA-2.0-DESIGN.md](./AIDA-2.0-DESIGN.md) as the canonical references.
+
 ## Objective
 
 Refactor AIDA so future context recovery and runtime orchestration can evolve on top of a stable architecture instead of scattered command-specific logic.

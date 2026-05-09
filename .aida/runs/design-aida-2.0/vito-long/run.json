@@ -1,0 +1,643 @@
+{
+  "meta": {
+    "schemaVersion": "2.0",
+    "runId": "design-aida-2.0",
+    "project": "ai-dev-analytics",
+    "developer": "vito-long",
+    "branch": "design-aida-2.0",
+    "aiModel": "gpt-5.4",
+    "aiTool": "codex",
+    "startTime": "2026-05-09T06:33:34.814Z",
+    "status": "running",
+    "prdPhases": []
+  },
+  "summary": {
+    "totalTasks": 1,
+    "completedTasks": 0,
+    "bugCount": 0,
+    "deviationCount": 0,
+    "reviewCount": 1,
+    "reviewPassCount": 1,
+    "reviewFailCount": 0,
+    "rulesSedimented": 0,
+    "prdPhaseCount": 0,
+    "filesChanged": 65,
+    "linesAdded": 2407,
+    "linesRemoved": 7477
+  },
+  "workflow": [],
+  "tasks": [
+    {
+      "taskId": "TASK-01",
+      "title": "Update all user-facing docs to AIDA 2.0 and prepare release commit",
+      "status": "in-progress",
+      "stageName": "Docs",
+      "prdPhase": "",
+      "acceptance": "",
+      "createdAt": "2026-05-09T07:21:18.130Z",
+      "startedAt": "2026-05-09T07:21:18.133Z",
+      "completedAt": null
+    }
+  ],
+  "bugs": [],
+  "deviations": [],
+  "reviews": [
+    {
+      "reviewId": "REV-01",
+      "taskId": "TASK-17",
+      "result": "pass",
+      "issueCount": 0,
+      "scope": "AIDA 2.0 truth-source cleanup, tool artifact pruning, guide generation, legacy runtime removal, real-project validation",
+      "reviewedAt": "2026-05-09T06:33:35.049Z",
+      "issues": []
+    }
+  ],
+  "files": [
+    {
+      "path": ".aida/aida-guide.md",
+      "changeType": "modified",
+      "linesAdded": 19,
+      "linesRemoved": 19,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/index.json",
+      "changeType": "modified",
+      "linesAdded": 447,
+      "linesRemoved": 447,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/aida.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/cli.json",
+      "changeType": "modified",
+      "linesAdded": 34,
+      "linesRemoved": 34,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/cli/mcp.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/docs.json",
+      "changeType": "modified",
+      "linesAdded": 33,
+      "linesRemoved": 33,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/git.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 56,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/import.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 53,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/mcp.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 50,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/mcp/rules.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/merge.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 50,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/migration.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 50,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/process.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".../memories/modules/qa-/-manual-verification.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/qa.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 52,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/qa/manual-verification.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/qa/mcp.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/release.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/run-data-/-mcp.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 51,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/memories/modules/skills.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 53,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/rules.json",
+      "changeType": "modified",
+      "linesAdded": 576,
+      "linesRemoved": 576,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/runs/main/context.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 64,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/runs/main/requirement.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 60,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/runs/main/vito-long/run.json",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 4343,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": ".aida/skills.json",
+      "changeType": "modified",
+      "linesAdded": 121,
+      "linesRemoved": 121,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "AGENTS.md",
+      "changeType": "modified",
+      "linesAdded": 1,
+      "linesRemoved": 1,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "docs/INDEX.md",
+      "changeType": "created",
+      "linesAdded": 1,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "package-lock.json",
+      "changeType": "modified",
+      "linesAdded": 2,
+      "linesRemoved": 2,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "package.json",
+      "changeType": "modified",
+      "linesAdded": 1,
+      "linesRemoved": 1,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/build.ts",
+      "changeType": "modified",
+      "linesAdded": 0,
+      "linesRemoved": 1,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/init.ts",
+      "changeType": "modified",
+      "linesAdded": 11,
+      "linesRemoved": 11,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/merge-data.ts",
+      "changeType": "modified",
+      "linesAdded": 44,
+      "linesRemoved": 44,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/merge.ts",
+      "changeType": "modified",
+      "linesAdded": 1,
+      "linesRemoved": 1,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/migrate-legacy.ts",
+      "changeType": "modified",
+      "linesAdded": 8,
+      "linesRemoved": 8,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/migrate.ts",
+      "changeType": "modified",
+      "linesAdded": 3,
+      "linesRemoved": 3,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/reindex.ts",
+      "changeType": "modified",
+      "linesAdded": 43,
+      "linesRemoved": 43,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/report.ts",
+      "changeType": "modified",
+      "linesAdded": 7,
+      "linesRemoved": 7,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/rules.ts",
+      "changeType": "modified",
+      "linesAdded": 10,
+      "linesRemoved": 10,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/skills.ts",
+      "changeType": "modified",
+      "linesAdded": 5,
+      "linesRemoved": 5,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/commands/update.ts",
+      "changeType": "modified",
+      "linesAdded": 2,
+      "linesRemoved": 2,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/cli/index.ts",
+      "changeType": "modified",
+      "linesAdded": 18,
+      "linesRemoved": 18,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/schemas/aida-project.ts",
+      "changeType": "modified",
+      "linesAdded": 13,
+      "linesRemoved": 13,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/server/api.ts",
+      "changeType": "modified",
+      "linesAdded": 5,
+      "linesRemoved": 5,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/server/index.ts",
+      "changeType": "modified",
+      "linesAdded": 2,
+      "linesRemoved": 2,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/utils/ai-build.ts",
+      "changeType": "modified",
+      "linesAdded": 67,
+      "linesRemoved": 67,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/utils/guide.ts",
+      "changeType": "modified",
+      "linesAdded": 52,
+      "linesRemoved": 52,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/utils/memory.ts",
+      "changeType": "modified",
+      "linesAdded": 385,
+      "linesRemoved": 193,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/utils/paths.ts",
+      "changeType": "created",
+      "linesAdded": 5,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/utils/rules.ts",
+      "changeType": "modified",
+      "linesAdded": 31,
+      "linesRemoved": 31,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "src/utils/skills.ts",
+      "changeType": "modified",
+      "linesAdded": 19,
+      "linesRemoved": 19,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "tests/build-cli.test.ts",
+      "changeType": "modified",
+      "linesAdded": 14,
+      "linesRemoved": 14,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "tests/build.test.ts",
+      "changeType": "modified",
+      "linesAdded": 80,
+      "linesRemoved": 80,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "tests/cli-log.test.ts",
+      "changeType": "modified",
+      "linesAdded": 2,
+      "linesRemoved": 2,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "tests/helpers.ts",
+      "changeType": "created",
+      "linesAdded": 23,
+      "linesRemoved": 0,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.897Z"
+    },
+    {
+      "path": "tests/import-cli.test.ts",
+      "changeType": "modified",
+      "linesAdded": 20,
+      "linesRemoved": 20,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/init-cli.test.ts",
+      "changeType": "modified",
+      "linesAdded": 1,
+      "linesRemoved": 1,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/mcp-server.test.ts",
+      "changeType": "modified",
+      "linesAdded": 37,
+      "linesRemoved": 37,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/memory-cli.test.ts",
+      "changeType": "modified",
+      "linesAdded": 39,
+      "linesRemoved": 39,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/merge-data.test.ts",
+      "changeType": "modified",
+      "linesAdded": 53,
+      "linesRemoved": 53,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/merge.test.ts",
+      "changeType": "modified",
+      "linesAdded": 54,
+      "linesRemoved": 54,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/migrate-legacy-cli.test.ts",
+      "changeType": "modified",
+      "linesAdded": 12,
+      "linesRemoved": 12,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/reindex.test.ts",
+      "changeType": "modified",
+      "linesAdded": 53,
+      "linesRemoved": 53,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/rules-cli.test.ts",
+      "changeType": "modified",
+      "linesAdded": 5,
+      "linesRemoved": 5,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/rules.test.ts",
+      "changeType": "modified",
+      "linesAdded": 45,
+      "linesRemoved": 45,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    },
+    {
+      "path": "tests/skills-cli.test.ts",
+      "changeType": "modified",
+      "linesAdded": 3,
+      "linesRemoved": 3,
+      "changeCount": 1,
+      "lastModified": "2026-05-09T06:33:34.898Z"
+    }
+  ],
+  "metrics": {
+    "aiDeviationRate": 0,
+    "bugRate": 0,
+    "reviewPassRate": 100,
+    "rulesSedimentedCount": 0,
+    "averageLinesPerTask": 9884,
+    "totalDevelopmentTimeSeconds": 2863,
+    "developmentVelocity": 0,
+    "nodeTimeBreakdown": {},
+    "actualWorkSeconds": 0
+  },
+  "timeline": [
+    {
+      "type": "review",
+      "title": "REV-01: pass",
+      "timestamp": "2026-05-09T06:33:35.049Z"
+    },
+    {
+      "type": "task",
+      "title": "TASK-01: Update all user-facing docs to AIDA 2.0 and prepare release commit",
+      "timestamp": "2026-05-09T07:21:18.134Z"
+    }
+  ],
+  "events": [
+    {
+      "type": "files_scanned",
+      "time": "2026-05-09T06:33:34.898Z",
+      "data": {
+        "count": 65
+      }
+    },
+    {
+      "type": "review_created",
+      "time": "2026-05-09T06:33:35.049Z",
+      "data": {
+        "reviewId": "REV-01",
+        "result": "pass"
+      }
+    },
+    {
+      "type": "task_created",
+      "time": "2026-05-09T07:21:18.133Z",
+      "data": {
+        "taskId": "TASK-01"
+      }
+    },
+    {
+      "type": "task_started",
+      "time": "2026-05-09T07:21:18.133Z",
+      "data": {
+        "taskId": "TASK-01"
+      }
+    }
+  ],
+  "rules": [],
+  "context": {
+    "lastUpdated": "2026-05-09T07:21:18.135Z",
+    "currentTaskId": "TASK-01"
+  },
+  "cost": {
+    "totalTokens": 0,
+    "estimatedManualHours": 0,
+    "actualHours": 0,
+    "tokenBreakdown": []
+  },
+  "highlights": []
+}

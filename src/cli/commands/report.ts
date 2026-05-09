@@ -1,10 +1,10 @@
-import { readdirSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { configPath, indexPath, runsDir } from '../../utils/paths.js';
-import { fileExists, readJson, writeText } from '../../utils/fs.js';
+import { configPath, indexPath } from '../../utils/paths.js';
+import { fileExists, writeText } from '../../utils/fs.js';
 import { green, red, cyan, yellow } from '../../utils/display.js';
 import { getDevName } from '../../utils/git.js';
-import type { IndexData, IndexRunEntry, RunData } from '../../schemas/run-json.js';
+import type { IndexRunEntry, RunData } from '../../schemas/run-json.js';
+import { loadIndexData } from '../../utils/summary.js';
 
 function parseReportFlags(args: string[]): Record<string, string> {
   const flags: Record<string, string> = {};
@@ -211,7 +211,11 @@ export async function report(): Promise<void> {
     return;
   }
 
-  const index = readJson<IndexData>(idxPath);
+  const index = loadIndexData(projectRoot);
+  if (!index) {
+    console.log(red('\n  No data available for report.\n'));
+    return;
+  }
   let runs = index.runs || [];
 
   // Filter by period

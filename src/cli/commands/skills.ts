@@ -2,7 +2,8 @@ import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { green, red, yellow, cyan, dim } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
-import { extractConflictSections, fileExists, readText, parseConflictJsonArray, ensureDir, writeText } from '../../utils/fs.js';
+import { extractConflictSections, fileExists, readText, ensureDir, writeText } from '../../utils/fs.js';
+import { parseConflictRegistryItems } from '../../utils/registry.js';
 import {
   loadSkillRegistry,
   mergeSkillRegistries,
@@ -58,8 +59,8 @@ export async function mergeSkillsRegistry(projectRoot: string): Promise<{ status
     return { status: 'error' };
   }
 
-  const ours = parseConflictJsonArray<SkillRegistryEntry>(sections.ours);
-  const theirs = parseConflictJsonArray<SkillRegistryEntry>(sections.theirs);
+  const ours = parseConflictRegistryItems<SkillRegistryEntry>(sections.ours);
+  const theirs = parseConflictRegistryItems<SkillRegistryEntry>(sections.theirs);
   const { merged, added } = mergeSkillRegistries(ours, theirs);
   saveSkillRegistry(projectRoot, merged);
 
@@ -88,7 +89,7 @@ async function skillsMerge(): Promise<void> {
     return;
   }
   if (result.status === 'merged') {
-    buildProjectArtifacts(projectRoot);
+    buildProjectArtifacts(projectRoot, [], { skipMcpConfig: true });
     console.log(
       green('  ✓ Merged successfully') +
       `: ${result.total} total skills (${result.added} new from incoming branch)\n`,

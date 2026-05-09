@@ -41,6 +41,16 @@ async function main() {
       await build();
       break;
     }
+    case 'sync': {
+      const { sync } = await import('./commands/sync.js');
+      await sync();
+      break;
+    }
+    case 'doctor': {
+      const { doctor } = await import('./commands/doctor.js');
+      await doctor();
+      break;
+    }
     case 'import': {
       const { importSources } = await import('./commands/import.js');
       await importSources();
@@ -122,24 +132,26 @@ async function main() {
 
   Usage:
     aida init        Initialize AIDA in current project
-    aida start       Create a new development run
     aida mcp         Start MCP server (stdio mode, for AI tools)
-    aida build       Build rules/skills/tool configs from .aida sources
-    aida import      Reverse-read existing rules/skills/tool configs into JSON sources
-    aida log         Write structured data to run.json
-    aida dashboard   Launch the visualization dashboard
-    aida status      Show current run status
-    aida update      Update all skills to latest version
-    aida migrate     Migrate old run.json data to new schema
-    aida migrate-dir Rename legacy .aidevos projects to .aida
-    aida migrate-legacy One-shot legacy migration: rename, import, build, migrate
-    aida reindex     Rebuild project-level index from all runs
-    aida report      Generate performance report data
+    aida build       Build rules/skills/tool outputs from 2.0 JSON sources
+    aida sync        Rebuild memory views and AI tool outputs from 2.0 truth sources
+    aida doctor      Inspect and normalize 2.0 JSON truth sources
+    aida migrate     Rewrite legacy run data and normalize truth sources
+    aida migrate-legacy One-shot 1.x -> 2.0 migration and data cleaning
     aida memory      Manage branch context and module memory
     aida merge       Merge rules.json and skills.json conflicts together
     aida merge-data  Merge AIDA JSON data conflicts (memories/context/requirement/run)
     aida rules       Manage project rules registry (build/dedupe/merge)
     aida skills      Manage project skills registry (build/merge/list)
+    aida import      Reverse-read existing rules/skills/tool configs into JSON sources
+    aida dashboard   Launch the visualization dashboard
+    aida start       Legacy runtime flow command
+    aida log         Legacy runtime flow command
+    aida status      Legacy runtime flow command
+    aida report      Generate performance report data
+    aida update      Legacy skills refresh command
+    aida migrate-dir Rename legacy .aidevos projects to .aida
+    aida reindex     Legacy index rebuild command (prefer aida sync / doctor)
     aida -v          Show version
 `);
     }

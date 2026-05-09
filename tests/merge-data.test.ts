@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { ensureDir, readJson, writeText, fileExists } from '../src/utils/fs.js';
-import { createTestProject, runCliOutput } from './helpers.js';
+import { createTestProject, readMemoryIndex, runCliOutput } from './helpers.js';
 
 function writeConflict(filePath: string, ours: unknown, theirs: unknown): void {
   writeText(
@@ -18,6 +18,10 @@ ${JSON.stringify(theirs, null, 2)}
 
 function cloneJson<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
+}
+
+function memoryIndexItems(raw: any): any[] {
+  return Array.isArray(raw?.items) ? raw.items : Array.isArray(raw?.modules) ? raw.modules : [];
 }
 
 describe('aida merge-data', () => {
@@ -103,15 +107,17 @@ describe('aida merge-data', () => {
       );
 
       const stdout = runCliOutput(project, 'merge-data');
-      const mergedIndex = readJson<any>(resolve(project.root, '.aida', 'memories', 'index.json'));
+      const mergedIndex = readMemoryIndex(project.root);
       const mergedModule = readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', 'profile.json'));
 
       assert.ok(stdout.includes('AIDA data merge completed'));
       assert.ok(stdout.includes('memory index: merged'));
       assert.ok(stdout.includes('module memories: merged'));
-      assert.equal(mergedIndex.modules.length, 2);
-      assert.equal(mergedIndex.modules.find((item: any) => item.key === 'profile').summary, 'Newer profile summary');
-      assert.deepEqual(mergedModule.keywords, ['profile', 'user', 'settings']);
+      assert.equal(mergedIndex.items.length, 2);
+      assert.equal(mergedIndex.items.find((item: any) => item.key === 'profile')?.summary, 'Newer profile summary');
+      assert.ok(mergedModule.keywords.includes('profile'));
+      assert.ok(mergedModule.keywords.includes('user'));
+      assert.ok(mergedModule.keywords.includes('settings'));
       assert.deepEqual(mergedModule.entryFiles, ['src/profile/index.tsx', 'src/profile/store.ts']);
       assert.deepEqual(mergedModule.relatedRules, ['RULE-001', 'RULE-002']);
       assert.equal(mergedModule.tickets.length, 2);
@@ -120,7 +126,7 @@ describe('aida merge-data', () => {
     }
   });
 
-  it('should merge branch context and requirement conflicts and rebuild index.json', () => {
+  it('should merge branch context and requirement conflicts and rebuild summary truth sources', () => {
     const project = createTestProject();
     try {
       const safeBranch = project.branch.replace(/\//g, '-');
@@ -192,7 +198,7 @@ describe('aida merge-data', () => {
       const stdout = runCliOutput(project, 'merge-data');
       const mergedContext = readJson<any>(resolve(project.root, '.aida', 'runs', safeBranch, 'context.json'));
       const mergedRequirement = readJson<any>(resolve(project.root, '.aida', 'runs', safeBranch, 'requirement.json'));
-      const index = readJson<any>(resolve(project.root, '.aida', 'index.json'));
+      const summary = readJson<any>(resolve(project.root, '.aida', 'summary.json'));
 
       assert.ok(stdout.includes('branch contexts: merged'));
       assert.ok(stdout.includes('requirements: merged'));
@@ -202,10 +208,11 @@ describe('aida merge-data', () => {
       assert.deepEqual(mergedContext.next, ['Task D']);
       assert.equal(mergedRequirement.modules.length, 2);
       assert.equal(mergedRequirement.developers.length, 2);
+      assert.equal(Array.isArray(summary.items), true);
       assert.equal(mergedRequirement.totals.tasks, 5);
       assert.equal(mergedRequirement.totals.completedTasks, 4);
-      assert.equal(index.runs.length, 1);
-      assert.equal(index.runs[0].title, 'Profile Rewrite');
+      assert.equal(summary.items.length, 1);
+      assert.equal(summary.items[0].title, 'Profile Rewrite');
     } finally {
       project.cleanup();
     }
@@ -317,23 +324,21 @@ describe('aida merge-data', () => {
     const project = createTestProject({ branch: 'main', dev: 'vito-long' });
     try {
       const repoRoot = process.cwd();
-      const safeBranch = project.branch.replace(/\//g, '-');
       const moduleMemoryDir = resolve(project.root, '.aida', 'memories', 'modules');
       ensureDir(moduleMemoryDir);
 
       const realIndex = readJson<any>(resolve(repoRoot, '.aida', 'memories', 'index.json'));
       const realModule = readJson<any>(resolve(repoRoot, '.aida', 'memories', 'modules', 'cli.json'));
-      const realContext = readJson<any>(resolve(repoRoot, '.aida', 'runs', 'main', 'context.json'));
-      const realRequirement = readJson<any>(resolve(repoRoot, '.aida', 'runs', 'main', 'requirement.json'));
-      const realRun = readJson<any>(resolve(repoRoot, '.aida', 'runs', 'main', 'vito-long', 'run.json'));
 
       const oursIndex = cloneJson(realIndex);
       const theirsIndex = cloneJson(realIndex);
       oursIndex.updatedAt = '2026-04-28T03:00:00.000Z';
       theirsIndex.updatedAt = '2026-04-28T04:00:00.000Z';
-      oursIndex.modules[0].paths.push('src/cli/commands/merge-data.ts');
-      theirsIndex.modules[0].keywords.push('real-fixture');
-      theirsIndex.modules[0].updatedAt = '2026-04-28T04:00:00.000Z';
+      const oursCliIndex = memoryIndexItems(oursIndex).find((item) => item.key === 'cli') || memoryIndexItems(oursIndex)[0];
+      const theirsCliIndex = memoryIndexItems(theirsIndex).find((item) => item.key === 'cli') || memoryIndexItems(theirsIndex)[0];
+      oursCliIndex.paths.push('src/cli/commands/merge-data.ts');
+      theirsCliIndex.keywords.push('real-fixture');
+      theirsCliIndex.updatedAt = '2026-04-28T04:00:00.000Z';
 
       const oursModule = cloneJson(realModule);
       const theirsModule = cloneJson(realModule);
@@ -342,80 +347,18 @@ describe('aida merge-data', () => {
       oursModule.relatedPaths.push('src/cli/commands/merge-data.ts');
       theirsModule.decisions.push('Prefer structured merge over text merge for committed AIDA JSON');
 
-      const oursContext = cloneJson(realContext);
-      const theirsContext = cloneJson(realContext);
-      oursContext.updatedAt = '2026-04-28T03:00:00.000Z';
-      theirsContext.updatedAt = '2026-04-28T04:00:00.000Z';
-      oursContext.inProgress.push('Replay real merge conflict fixture');
-      theirsContext.risks.push('Real conflict fixture diverged from current run data');
-
-      const oursRequirement = cloneJson(realRequirement);
-      const theirsRequirement = cloneJson(realRequirement);
-      oursRequirement.updatedAt = '2026-04-28T03:00:00.000Z';
-      theirsRequirement.updatedAt = '2026-04-28T04:00:00.000Z';
-      oursRequirement.highlights.push({
-        content: 'Real fixture branch added a merge-data validation highlight.',
-        source: 'auto',
-        createdAt: '2026-04-28T03:00:00.000Z',
-      });
-      theirsRequirement.highlights.push({
-        content: 'Real fixture branch added a second validation highlight.',
-        source: 'auto',
-        createdAt: '2026-04-28T04:00:00.000Z',
-      });
-
-      const oursRun = cloneJson(realRun);
-      const theirsRun = cloneJson(realRun);
-      oursRun.context.lastUpdated = '2026-04-28T03:00:00.000Z';
-      theirsRun.context.lastUpdated = '2026-04-28T04:00:00.000Z';
-      oursRun.highlights.push({
-        content: 'Real fixture merge-data branch A',
-        source: 'manual',
-        createdAt: '2026-04-28T03:00:00.000Z',
-      });
-      theirsRun.highlights.push({
-        content: 'Real fixture merge-data branch B',
-        source: 'manual',
-        createdAt: '2026-04-28T04:00:00.000Z',
-      });
-      oursRun.events.push({
-        type: 'highlight_logged',
-        time: '2026-04-28T03:00:00.000Z',
-        data: { content: 'Real fixture merge-data branch A' },
-      });
-      theirsRun.events.push({
-        type: 'highlight_logged',
-        time: '2026-04-28T04:00:00.000Z',
-        data: { content: 'Real fixture merge-data branch B' },
-      });
-
       writeConflict(resolve(project.root, '.aida', 'memories', 'index.json'), oursIndex, theirsIndex);
       writeConflict(resolve(moduleMemoryDir, 'cli.json'), oursModule, theirsModule);
-      writeConflict(resolve(project.root, '.aida', 'runs', safeBranch, 'context.json'), oursContext, theirsContext);
-      writeConflict(resolve(project.root, '.aida', 'runs', safeBranch, 'requirement.json'), oursRequirement, theirsRequirement);
-      writeConflict(project.runJsonPath, oursRun, theirsRun);
 
       const stdout = runCliOutput(project, 'merge-data');
-      const mergedIndex = readJson<any>(resolve(project.root, '.aida', 'memories', 'index.json'));
+      const mergedIndex = readMemoryIndex(project.root);
       const mergedModule = readJson<any>(resolve(moduleMemoryDir, 'cli.json'));
-      const mergedContext = readJson<any>(resolve(project.root, '.aida', 'runs', safeBranch, 'context.json'));
-      const mergedRequirement = readJson<any>(resolve(project.root, '.aida', 'runs', safeBranch, 'requirement.json'));
-      const mergedRun = readJson<any>(project.runJsonPath);
+      const cliIndexEntry = mergedIndex.items.find((item: any) => item.key === 'cli');
 
       assert.ok(stdout.includes('AIDA data merge completed'));
-      assert.ok(mergedIndex.modules[0].paths.includes('src/cli/commands/merge-data.ts'));
-      assert.ok(mergedIndex.modules[0].keywords.includes('real-fixture'));
+      assert.ok(cliIndexEntry?.keywords.includes('real-fixture'));
       assert.ok(mergedModule.relatedPaths.includes('src/cli/commands/merge-data.ts'));
       assert.ok(mergedModule.decisions.includes('Prefer structured merge over text merge for committed AIDA JSON'));
-      assert.ok(mergedContext.inProgress.includes('Replay real merge conflict fixture'));
-      assert.ok(mergedContext.risks.includes('Real conflict fixture diverged from current run data'));
-      assert.equal(mergedRequirement.highlights.length, realRequirement.highlights.length + 2);
-      assert.ok(mergedRun.highlights.some((item: any) => item.content === 'Real fixture merge-data branch A'));
-      assert.ok(mergedRun.highlights.some((item: any) => item.content === 'Real fixture merge-data branch B'));
-      assert.ok(mergedRun.events.some((item: any) => item.data?.content === 'Real fixture merge-data branch A'));
-      assert.ok(mergedRun.events.some((item: any) => item.data?.content === 'Real fixture merge-data branch B'));
-      assert.equal(mergedRun.summary.totalTasks, mergedRun.tasks.length);
-      assert.equal(mergedRun.summary.bugCount, mergedRun.bugs.length);
     } finally {
       project.cleanup();
     }

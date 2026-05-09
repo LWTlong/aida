@@ -24,7 +24,7 @@ export async function update(): Promise<void> {
   const aidevos = resolve(projectRoot, '.aida');
   const configPath = resolve(aidevos, 'config.json');
 
-  console.log(`\n  ${bold('AIDA')} - Update Skills\n`);
+  console.log(`\n  ${bold('AIDA')} - Update Skills ${dim('(legacy command)')}\n`);
 
   // Check if initialized
   if (!fileExists(configPath)) {
@@ -48,6 +48,7 @@ export async function update(): Promise<void> {
   const existingSkills = loadSkillRegistry(projectRoot);
 
   console.log(`  Found ${existingSkills.length} skills in .aida/skills.json`);
+  console.log(dim('  Prefer `aida sync` / `aida doctor` in 2.0 flows; this command only refreshes bundled skills.\n'));
   console.log('');
 
   // Ask confirmation

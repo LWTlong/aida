@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "2.0",
+  "moduleKey": "tests/merge-data-test",
+  "title": "tests/merge-data-test",
+  "summary": "涉及模块: cli, cli/commands, docs, package, schemas/aida-project, server, tests, tests/build-test, tests/cli-log-test, tests/import-cli-test, tests/mcp-server-test, tests/memory-cli-test, tests/merge-data-test, tests/merge-test, tests/migrate-legacy-cli-test, tests/reindex-test, tests/rules-cli-test, tests/rules-test, tests/skills-cli-test, utils/ai-build, utils/guide, utils/memory, utils/paths, utils/rules, utils/skills",
+  "keywords": [
+    "tests/merge-data-test",
+    "design-aida-2.0"
+  ],
+  "entryFiles": [
+    "tests/merge.test.ts",
+    "tests/rules.test.ts",
+    "src/cli/commands/merge-data.ts",
+    "tests/memory-cli.test.ts",
+    "tests/reindex.test.ts"
+  ],
+  "relatedPaths": [
+    "tests/merge.test.ts",
+    "tests/rules.test.ts",
+    "src/cli/commands/merge-data.ts",
+    "tests/memory-cli.test.ts",
+    "tests/reindex.test.ts"
+  ],
+  "dataFlow": [],
+  "decisions": [],
+  "constraints": [],
+  "pitfalls": [],
+  "relatedRules": [],
+  "tickets": [
+    {
+      "branch": "design-aida-2.0",
+      "summary": "涉及模块: cli, cli/commands, docs, package, schemas/aida-project, server, tests, tests/build-test, tests/cli-log-test, tests/import-cli-test, tests/mcp-server-test, tests/memory-cli-test, tests/merge-data-test, tests/merge-test, tests/migrate-legacy-cli-test, tests/reindex-test, tests/rules-cli-test, tests/rules-test, tests/skills-cli-test, utils/ai-build, utils/guide, utils/memory, utils/paths, utils/rules, utils/skills",
+      "updatedAt": "2026-05-09T06:03:40.223Z"
+    }
+  ],
+  "changes": [
+    {
+      "branch": "design-aida-2.0",
+      "title": "design-aida-2.0",
+      "summary": "涉及模块: cli, cli/commands, docs, package, schemas/aida-project, server, tests, tests/build-test, tests/cli-log-test, tests/import-cli-test, tests/mcp-server-test, tests/memory-cli-test, tests/merge-data-test, tests/merge-test, tests/migrate-legacy-cli-test, tests/reindex-test, tests/rules-cli-test, tests/rules-test, tests/skills-cli-test, utils/ai-build, utils/guide, utils/memory, utils/paths, utils/rules, utils/skills",
+      "updatedAt": "2026-05-09T06:03:40.223Z"
+    }
+  ],
+  "updatedAt": "2026-05-09T06:03:40.237Z"
+}

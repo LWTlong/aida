@@ -2,6 +2,7 @@ import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from '
 import { resolve } from 'node:path';
 import type { IndexData, RequirementData } from '../schemas/run-json.js';
 import { recalcMetrics } from '../utils/run-data.js';
+import { loadIndexData as loadProjectIndexData } from '../utils/summary.js';
 
 export interface RunSummary {
   runId: string;
@@ -136,13 +137,7 @@ export function getRequirementData(
 }
 
 export function getIndexData(projectRoot: string): IndexData | null {
-  const idxPath = resolve(projectRoot, '.aida', 'index.json');
-  if (!existsSync(idxPath)) return null;
-  try {
-    return JSON.parse(readFileSync(idxPath, 'utf-8'));
-  } catch {
-    return null;
-  }
+  return loadProjectIndexData(projectRoot);
 }
 
 export function updateRunCost(

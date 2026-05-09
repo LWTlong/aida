@@ -1,5 +1,5 @@
 import { configPath } from '../../utils/paths.js';
-import { fileExists, readText, extractConflictSections, parseConflictJsonArray, writeText } from '../../utils/fs.js';
+import { fileExists, readText, extractConflictSections } from '../../utils/fs.js';
 import { green, red, cyan, yellow, dim } from '../../utils/display.js';
 import {
   addRule,
@@ -11,6 +11,7 @@ import {
   mergeRegistries,
   registryPath,
 } from '../../utils/rules.js';
+import { parseConflictRegistryItems } from '../../utils/registry.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { updateGuide, updateGuideReferences } from '../../utils/guide.js';
 import { RULE_CATEGORIES, type RuleRegistryEntry } from '../../schemas/run-json.js';
@@ -73,7 +74,7 @@ async function rulesDedupe(): Promise<void> {
   const { entries, removed } = dedupeExactRules(existing);
   if (removed.length > 0) {
     saveRegistry(projectRoot, entries);
-    buildProjectArtifacts(projectRoot);
+    buildProjectArtifacts(projectRoot, [], { skipMcpConfig: true });
     console.log(green(`\n  ✓ Removed ${removed.length} exact duplicate(s):\n`));
     for (const entry of removed) {
       console.log(`  - ${cyan(entry.id)} ${entry.content.substring(0, 80)}`);
@@ -109,7 +110,10 @@ async function rulesDedupe(): Promise<void> {
   );
 }
 
-export async function mergeRuleRegistryFile(filePath: string): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
+export async function mergeRuleRegistryFile(
+  projectRoot: string,
+  filePath: string,
+): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
   if (!fileExists(filePath)) {
     return { status: 'missing' };
   }
@@ -124,21 +128,21 @@ export async function mergeRuleRegistryFile(filePath: string): Promise<{ status:
     return { status: 'error' };
   }
 
-  const ours = parseConflictJsonArray<RuleRegistryEntry>(sections.ours);
-  const theirs = parseConflictJsonArray<RuleRegistryEntry>(sections.theirs);
+  const ours = parseConflictRegistryItems<RuleRegistryEntry>(sections.ours);
+  const theirs = parseConflictRegistryItems<RuleRegistryEntry>(sections.theirs);
   if (ours.length === 0 && theirs.length === 0) {
     return { status: 'error' };
   }
 
   const { merged, added } = mergeRegistries(ours, theirs);
   const sorted = merged.sort((a, b) => a.id.localeCompare(b.id));
-  writeText(filePath, `${JSON.stringify(sorted, null, 2)}\n`);
+  saveRegistry(projectRoot, sorted);
 
   return { status: 'merged', added, total: sorted.length };
 }
 
 export async function mergeRulesRegistry(projectRoot: string): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
-  return mergeRuleRegistryFile(registryPath(projectRoot));
+  return mergeRuleRegistryFile(projectRoot, registryPath(projectRoot));
 }
 
 async function rulesMerge(): Promise<void> {
@@ -160,7 +164,7 @@ async function rulesMerge(): Promise<void> {
     return;
   }
   if (result.status === 'merged') {
-    buildProjectArtifacts(projectRoot);
+    buildProjectArtifacts(projectRoot, [], { skipMcpConfig: true });
     updateGuideReferences(projectRoot);
     console.log(
       green('  ✓ Merged successfully') +

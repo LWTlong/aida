@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { ensureDir, readJson, readText, writeText } from '../src/utils/fs.js';
-import { createTestProject, runCliOutput } from './helpers.js';
+import { createTestProject, runCliOutput, readSkillRegistryItems } from './helpers.js';
 
 describe('aida skills list/edit', () => {
   it('should list skills from registry', () => {
@@ -52,7 +52,7 @@ describe('aida skills list/edit', () => {
       writeText(resolve(project.root, '.aida', '.edit', 'skills', 'workflow-orchestrator.md'), 'New workflow content');
 
       const stdout = runCliOutput(project, 'skills edit workflow-orchestrator --apply');
-      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const skills = readSkillRegistryItems(project.root);
       const skillView = readText(resolve(project.root, '.claude', 'skills', 'workflow-orchestrator.md'));
 
       assert.ok(stdout.includes('Skill updated'));
@@ -84,7 +84,7 @@ describe('aida skills list/edit', () => {
       writeText(inputFile, 'Workflow content from explicit file');
 
       const stdout = runCliOutput(project, `skills edit workflow-orchestrator --from-file ${inputFile}`);
-      const skills = readJson<any[]>(resolve(project.root, '.aida', 'skills.json'));
+      const skills = readSkillRegistryItems(project.root);
 
       assert.ok(stdout.includes('Skill updated'));
       assert.equal(skills[0].content, 'Workflow content from explicit file');

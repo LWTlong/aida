@@ -2,19 +2,19 @@
 
 # AIDA
 
-### 让 Vibe Coding 数据化。
+### 让 AI 项目规则、技能和模块记忆真正成为真源。
 
-每一次 Vibe Coding 都在产生大量信号 —— 偏差、模式、质量数据。<br>
-*但你关掉终端，这些全部消失。下次对话，继续盲写。*<br>
-**AIDA 在每个开发节点采集结构化数据，用看板可视化，再把偏差规律沉淀成规则 —— 让你的 AI 每次运行都写出更符合预期的代码。**
+项目里真正长期有价值的，不是 task 流水账，而是：<br>
+*规则、技能、模块业务记忆，以及需求最终改了什么。*<br>
+**AIDA 2.0 把这些资产统一沉淀到 `.aida/*.json`，再稳定分发到 Claude / Cursor / Codex 等工具。**
 
-一行配置接入，零工作流改变。
+一行配置接入，最少命令，围绕 JSON 真源工作。
 
 ```json
 { "mcpServers": { "aida": { "command": "npx", "args": ["--registry=https://registry.npmjs.org/", "-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-[![npm version](https://img.shields.io/badge/npm-v1.1.7-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
+[![npm version](https://img.shields.io/badge/npm-v2.0.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen)](#测试)
@@ -23,7 +23,7 @@
 
 [![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/card.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
-[一行接入](#-30-秒上手) · [场景操作指南](#-场景操作指南) · [数据驱动闭环](#-数据驱动闭环) · [命令速览](#-命令速览) · [重复执行与覆盖策略](#-重复执行与覆盖策略) · [规则去重与冲突判断](#-规则去重与冲突判断) · [命令文档](./COMMANDS.md) · [文档导航](./docs/INDEX.md) · [English](./README.en.md)
+[一行接入](#-30-秒上手) · [2.0 真源模型](#-20-真源模型) · [场景操作指南](#-场景操作指南) · [命令速览](#-命令速览) · [重复执行与覆盖策略](#-重复执行与覆盖策略) · [规则去重与冲突判断](#-规则去重与冲突判断) · [命令文档](./COMMANDS.md) · [文档导航](./docs/INDEX.md) · [English](./README.en.md)
 
 </div>
 
@@ -31,62 +31,52 @@
 
 ## 一个洞察
 
-Vibe Coding 很强。但它是一个黑箱。
+AI 编码很强，但项目记忆往往是散的。
 
-你让 Claude 写一个功能，它写了，你 ship 了。但你对过程**零可见性**：
+你让 Claude 写一个功能，它写了，你 ship 了。但长期真正缺的是这些：
 
-- AI 完成了多少任务？每个任务花了多长时间？
-- AI 在哪里偏离了你的项目规范？为什么？
-- 哪些偏差反复出现？加什么规则能根治？
-- Bug 率多少？哪个阶段产出最多 Bug？
+- 这个项目有哪些长期有效的规则？
+- 这个项目有哪些真正要保留的 skills？
+- 某个模块以前为什么这么写？
+- 上一个需求改了哪些模块、为什么改？
 
-没有数据，你就无法改进。你只是在一遍又一遍地 vibe —— 带着同样的盲区。
+没有这些真源，AI 每次都像新同事第一次进项目，靠重新扫代码碰运气。
 
-**AIDA 让不可见变可见。** 它在每次 vibe coding 过程中采集结构化数据，用实时看板渲染，再把偏差模式沉淀成项目规则。你的 AI 不再只是写代码 —— 它**学习你的项目**。
+**AIDA 2.0 让这些资产固定下来。** 它把规则、技能、模块记忆和需求摘要沉淀成统一 JSON 真源，再分发到你实际使用的 AI 工具里。你的 AI 不再只是写代码，它开始**继承你的项目上下文**。
 
 ---
 
-## 🔄 数据驱动闭环
+## 🧱 2.0 真源模型
 
-这是 AIDA 的核心 —— **数据进来，规则出去，代码越来越好。**
+2.0 的核心不是 run/task 流水账，而是这 5 类真源：
 
 ```
-Vibe Coding 过程
-        ↓
-   AIDA 静默采集结构化数据
-   （任务、偏差、Bug、自检、文件变更、时间线）
-        ↓
-   看板可视化呈现规律
-   "9 个偏差 → 56% 幻觉, 44% 规则缺失"
-        ↓
-   发现偏差规律 → AI 建议沉淀规则 → 用户确认 → 写入规则库
-   .aida/rules.json ← 你的 AI 知识库在成长
-        ↓
-   AI 下次读取规则 → 同样的错误被消除
-        ↓
-   循环往复 —— 每一轮，AI 输出都更接近你的预期
+.aida/
+  config.json
+  rules.json
+  skills.json
+  summary.json
+  aida-guide.md
+  memories/
+    index.json
+    modules/*.json
+  rules/*.md
 ```
 
-**来自真实生产项目的数据：**
+- `rules.json`：项目级技术规范真源
+- `skills.json`：项目级技能真源
+- `memories/index.json`：模块目录索引，低 token 检索入口
+- `memories/modules/*.json`：模块正文，记录为什么这么实现、改过什么
+- `summary.json`：需求/分支级轻量摘要，记录这次最终改了什么
 
-| 运行 | 偏差情况 | 发生了什么 | 沉淀的规则 |
-|------|---------|-----------|-----------|
-| 第 1 轮 | 47 个任务产生 23 个偏差 | AI 组件用错、布局写反、API 模式不对 | 沉淀 6 条项目专属规则 |
-| 第 2 轮 | **零重复偏差** | AI 读了规则，相同模式的错误归零 | — |
+2.0 会主动丢弃这些 1.x 噪音：
 
-**第一步：看清 AI *为什么*出错** —— 根因分布一目了然：是 AI 幻觉、规则缺失、还是上下文不足？
-
-![偏差根因分布](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-root-cause.png)
-
-**第二步：看清 AI *在哪*出错** —— 类别分布精准定位：UI 间距、布局结构、组件使用、API 模式。
-
-![偏差类别分布](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-category.png)
-
-**第三步：看规则的复利效应** —— 随着规则积累，重复偏差会逐步下降。
-
-![偏差与规则趋势](https://raw.githubusercontent.com/LWTlong/ai-dev-analytics/main/docs/deviation-rule-trend.png)
-
-`.aida/rules.json` 就是你的**项目专属 AI 知识库**。用 AI 写得越多，它对*你的项目*就越懂。
+- `run.json`
+- `task` 持久化流水账
+- `timeline / events / workflow`
+- `.aida/runs/**`
+- `.aida/index.json`
+- `.aida/tool-configs.json`
 
 ---
 
@@ -216,7 +206,6 @@ aida init
 
 你会在交互里选择：
 
-- `collect` 或 `full` 模式
 - 需要接入的 AI 工具
 - 是否导入现有工具的规则 / skills 作为 baseline
 
@@ -224,7 +213,7 @@ aida init
 
 ```bash
 aida build
-aida status
+aida doctor
 ```
 
 ### 2. 老项目迁移到 AIDA
@@ -531,7 +520,6 @@ AIDA 用 `fingerprint` 判断 exact duplicate。生成规则如下：
 
 - `.aida/rules/*.md`
 - `.aida/memories/modules/*.md`
-- `.aida/runs/*/context.md`
 - `.cursor/rules/aida/*`
 - `.codex/rules/aida/*`
 - `.claude/rules/aida/*`
@@ -548,14 +536,15 @@ AIDA 用 `fingerprint` 判断 exact duplicate。生成规则如下：
 
 ---
 
-## 📁 数据沉淀与绩效汇报
+## 📁 数据沉淀与需求回顾
 
-AIDA 不只是可视化 —— 它**沉淀数据**。每次运行都积累结构化数据，时间越长价值越大。
+AIDA 2.0 沉淀的重点不是过程流水账，而是长期有价值的结果：
 
-```
-第 1 周：47 个任务、23 个偏差、5 个 Bug、6 条规则、4064 行代码
-第 4 周：180+ 任务、偏差率持续下降、15 条规则、完整质量历史
-一个季度：完整的开发记录 —— 可导出、可分析、可汇报
-```
+- 项目级规则
+- 项目技能
+- 模块业务记忆
+- 需求 / 分支级摘要
 
-所有数据都在 `.aida/` 里，格式是结构化 JSON。没有厂商锁定，随时可以导出、查询或接入别的报表系统。
+这些数据全部都在 `.aida/` 里，以结构化 JSON 保存。你可以直接查询、导出，或接到自己的报表系统里。
+
+更重要的是，AI 下次再改同一个模块时，不需要重新从头猜项目背景，而是可以先通过 memory 索引找到这个模块以前改过什么、为什么改。

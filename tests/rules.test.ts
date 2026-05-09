@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { ensureDir, readJson, fileExists, readText } from '../src/utils/fs.js';
+import { ensureDir, readJson, fileExists, readText, writeJson } from '../src/utils/fs.js';
 import {
   fingerprint,
   addRule,
@@ -109,6 +109,45 @@ describe('addRule', () => {
     const registry = loadRegistry(tmpRoot);
     assert.equal(registry.length, 1);
     assert.equal(registry[0].id, 'RULE-001');
+  });
+
+  it('should persist rules.json with a 2.0 registry envelope', () => {
+    addRule(tmpRoot, {
+      content: 'Persisted via envelope',
+      category: 'general',
+      branch: 'main',
+      deviation: null,
+      author: 'test-dev',
+      status: 'active',
+    });
+
+    const raw = readJson<any>(registryPath(tmpRoot));
+    assert.equal(raw.schemaVersion, '2.0');
+    assert.ok(raw.updatedAt);
+    assert.equal(Array.isArray(raw.items), true);
+    assert.equal(raw.items.length, 1);
+    assert.equal(raw.items[0].content, 'Persisted via envelope');
+  });
+
+  it('should still load legacy array registries for backward compatibility', () => {
+    const legacyEntries: RuleRegistryEntry[] = [
+      {
+        id: 'RULE-001',
+        category: 'general',
+        content: 'Legacy array rule',
+        fingerprint: fingerprint('Legacy array rule'),
+        source: { branch: 'legacy', deviation: null, author: 'legacy' },
+        createdAt: '2026-04-30T00:00:00.000Z',
+        status: 'active',
+      },
+    ];
+
+    ensureDir(resolve(tmpRoot, '.aida'));
+    writeJson(registryPath(tmpRoot), legacyEntries);
+
+    const loaded = loadRegistry(tmpRoot);
+    assert.equal(loaded.length, 1);
+    assert.equal(loaded[0].content, 'Legacy array rule');
   });
 
   it('should detect duplicate by fingerprint', () => {
@@ -237,6 +276,34 @@ describe('dedupeExactRules', () => {
     assert.equal(result.entries.length, 1);
     assert.equal(result.entries[0].id, 'RULE-002');
     assert.equal(result.entries[0].status, 'active');
+  });
+});
+
+describe('findSimilarRules', () => {
+  it('should ignore generic AIDA command wording when rules are materially different', () => {
+    const entries = [
+      {
+        id: 'RULE-001',
+        category: 'process',
+        content: 'Log bugs with `aida_log_bug`',
+        fingerprint: fingerprint('Log bugs with `aida_log_bug`'),
+        source: { branch: 'main', deviation: null, author: 'test' },
+        createdAt: '2026-05-01T10:00:00.000Z',
+        status: 'active',
+      },
+      {
+        id: 'RULE-002',
+        category: 'process',
+        content: 'Log deviations with `aida_log_deviation`',
+        fingerprint: fingerprint('Log deviations with `aida_log_deviation`'),
+        source: { branch: 'main', deviation: null, author: 'test' },
+        createdAt: '2026-05-01T10:01:00.000Z',
+        status: 'active',
+      },
+    ] as RuleRegistryEntry[];
+
+    const similar = findSimilarRules(entries);
+    assert.equal(similar.length, 0);
   });
 });
 
@@ -382,5 +449,26 @@ describe('findSimilarRules', () => {
 
     const similar = findSimilarRules(entries);
     assert.equal(similar.length, 0);
+  });
+
+  it('should detect similar Chinese rules in the same category', () => {
+    const entries: RuleRegistryEntry[] = [
+      {
+        id: 'RULE-001', category: 'process', content: '提交前必须运行相关测试并确认通过',
+        fingerprint: 'fp1',
+        source: { branch: 'a', deviation: null, author: 'x' },
+        createdAt: '2024-01-01', status: 'active',
+      },
+      {
+        id: 'RULE-002', category: 'process', content: '提交代码前先执行相关测试并确保通过',
+        fingerprint: 'fp2',
+        source: { branch: 'b', deviation: null, author: 'y' },
+        createdAt: '2024-01-02', status: 'active',
+      },
+    ];
+
+    const similar = findSimilarRules(entries);
+    assert.ok(similar.length > 0);
+    assert.ok(similar[0].similarity >= 0.3);
   });
 });

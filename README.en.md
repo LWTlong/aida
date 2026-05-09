@@ -2,90 +2,98 @@
 
 # AIDA
 
-### Make Vibe Coding Measurable.
+### Make project rules, skills, and module memory the real source of truth.
 
-Every vibe coding session generates massive insights — deviations, patterns, quality signals.<br>
-*But you close the terminal, and all of it vanishes. Next session, you start blind again.*<br>
-**AIDA captures structured data at every development checkpoint, visualizes it in a live dashboard, and distills deviation patterns into rules that make your AI write better code — every single run.**
-
-One line to integrate. Zero workflow changes.
+AIDA 2.0 is no longer centered on task ledgers or run timelines. It keeps the assets that actually matter over time:
+**rules, skills, module memory, and branch-level demand summaries.**
 
 ```json
-{ "mcpServers": { "aida": { "command": "npx", "args": ["-y", "ai-dev-analytics", "mcp"] } } }
+{ "mcpServers": { "aida": { "command": "npx", "args": ["--registry=https://registry.npmjs.org/", "-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-[![npm version](https://img.shields.io/badge/npm-v1.1.7-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
+[![npm version](https://img.shields.io/badge/npm-v2.0.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen)](#testing)
-[![Live Demo](https://img.shields.io/badge/🎯_Live_Demo-Interactive_Dashboard-FF4B4B)](https://lwtlong.github.io/ai-dev-analytics/)
-[![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/score.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
-[![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/card.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
-
-[Quick Start](#-30-second-setup) · [Data Loop](#-the-data-driven-loop) · [Dashboard](#-the-dashboard) · [Command Reference](./COMMANDS.md) · [Docs](./docs/INDEX.md) · [中文](./README.md)
+[Chinese README](./README.md) · [Command Reference](./COMMANDS.md) · [Docs](./docs/INDEX.md)
 
 </div>
 
 ---
 
-## The Insight
+## What AIDA 2.0 Keeps
 
-Vibe coding is powerful. But it's a black box.
+The durable truth sources are:
 
-You tell Claude to build a feature. It writes code. You ship it. But you have **zero visibility** into what actually happened:
-
-- How many tasks did AI complete? How long did each take?
-- Where did AI deviate from your project conventions? Why?
-- Which deviations keep recurring? What rules would prevent them?
-- What's the bug rate? Which phases produce the most bugs?
-
-Without data, you can't improve. You're just vibing — over and over, with the same blind spots.
-
-**AIDA makes the invisible visible.** It collects structured data from every vibe coding session, renders it in a real-time dashboard, and turns deviation patterns into project rules. Your AI doesn't just code — it **learns your project**.
-
----
-
-## 🔄 The Data-Driven Loop
-
-```
-Vibe Coding Session
-        ↓
-   AIDA silently collects structured data
-   (tasks, deviations, bugs, reviews, files, timeline)
-        ↓
-   Dashboard visualizes patterns
-        ↓
-   Deviation patterns identified → AI suggests rules → user confirms → sedimented
-   .aida/rules.json
-        ↓
-   AI reads rules next session → same mistakes eliminated
+```text
+.aida/
+  config.json
+  rules.json
+  skills.json
+  summary.json
+  aida-guide.md
+  memories/
+    index.json
+    modules/*.json
+  rules/*.md
 ```
 
-See the Chinese main README for the latest product positioning and examples: [README.md](./README.md).
+- `rules.json`: project-level technical rules
+- `skills.json`: project-level skills registry
+- `memories/index.json`: low-cost memory lookup index
+- `memories/modules/*.json`: module-level business memory
+- `summary.json`: branch / demand summaries
 
----
+## What AIDA 2.0 Discards
 
-## 📊 The Dashboard
+2.0 intentionally removes the heavy 1.x runtime ledger model:
 
-Run:
+- `run.json`
+- persistent task ledgers
+- timeline / events / workflow history
+- `.aida/runs/**`
+- `.aida/index.json`
+- `.aida/tool-configs.json`
+
+Migration is a cleaning rebuild, not a full carry-over.
+
+## Command Model
+
+The main 2.0 commands are:
 
 ```bash
-npx ai-dev-analytics dashboard
+aida init
+aida sync
+aida build
+aida doctor
+aida migrate-legacy
 ```
 
-Then open `http://localhost:2375`.
+- `init`: create the 2.0 truth-source layout
+- `sync`: refresh memories, summaries, and generated tool artifacts
+- `build`: rebuild generated artifacts from JSON truth sources
+- `doctor`: inspect and normalize project state
+- `migrate-legacy`: migrate 1.x / legacy projects into the 2.0 structure
 
-Live demo: [https://lwtlong.github.io/ai-dev-analytics/](https://lwtlong.github.io/ai-dev-analytics/)
+## Context Recovery
 
----
+Memory recovery is intentionally layered:
 
-## ⚡ 30-Second Setup
+1. read `memories/index.json`
+2. read `summary.json`
+3. only read matched `memories/modules/*.json`
 
-Add one MCP entry:
+This keeps token usage low and prevents loading the full memory corpus every time.
 
-```json
-{ "mcpServers": { "aida": { "command": "npx", "args": ["-y", "ai-dev-analytics", "mcp"] } } }
-```
+## Notes
 
-For detailed command behavior, migration notes, dedupe rules, and rerun semantics, see [COMMANDS.md](./COMMANDS.md).
+- MCP is an optional structured execution channel, not the system foundation.
+- CLI and MCP should operate on the same JSON truth sources.
+- Built-in bundled workflow skills are no longer seeded by default in 2.0.
+
+For full product explanation, migration behavior, and Chinese examples, use:
+
+- [README.md](./README.md)
+- [COMMANDS.md](./COMMANDS.md)
+- [docs/AIDA-2.0-DESIGN.md](./docs/AIDA-2.0-DESIGN.md)

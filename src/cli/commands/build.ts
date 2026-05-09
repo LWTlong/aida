@@ -62,7 +62,6 @@ export async function build(): Promise<void> {
   if (result.mcpFiles.length > 0) {
     console.log(`  MCP: ${result.mcpFiles.join(', ')}`);
   }
-  console.log(`  Tool config snapshot: ${result.toolConfigSnapshot}`);
   if (result.gitignoreAdded.length > 0) {
     console.log(`  .gitignore: added ${result.gitignoreAdded.join(', ')}`);
   }

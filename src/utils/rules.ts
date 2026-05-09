@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
-import { fileExists, readJson, writeJson, writeText, ensureDir, readText, resetDir } from './fs.js';
+import { fileExists, writeText, ensureDir, readText, resetDir } from './fs.js';
 import { aidaDir } from './paths.js';
 import type { RuleRegistryEntry } from '../schemas/run-json.js';
 import { RULE_CATEGORIES } from '../schemas/run-json.js';
+import { readRegistryEnvelope, writeRegistryEnvelope } from './registry.js';
 
 // ─── Paths ────────────────────────────────────────────────
 
@@ -35,8 +36,7 @@ export function loadRegistry(projectRoot: string): RuleRegistryEntry[] {
   const p = registryPath(projectRoot);
   if (!fileExists(p)) return [];
   try {
-    const data = readJson<RuleRegistryEntry[]>(p);
-    return Array.isArray(data) ? data : [];
+    return readRegistryEnvelope<RuleRegistryEntry>(p).items;
   } catch {
     return [];
   }
@@ -162,7 +162,7 @@ export function renderRuleMarkdownFiles(entries: RuleRegistryEntry[]): Map<strin
 }
 
 export function saveRegistry(projectRoot: string, entries: RuleRegistryEntry[]): void {
-  writeJson(registryPath(projectRoot), entries);
+  writeRegistryEnvelope(registryPath(projectRoot), entries);
 }
 
 function categoryFromTitle(title: string): RuleRegistryEntry['category'] {
@@ -424,13 +424,54 @@ export function findSimilarRules(
   entries: RuleRegistryEntry[],
 ): { a: RuleRegistryEntry; b: RuleRegistryEntry; similarity: number }[] {
   const results: { a: RuleRegistryEntry; b: RuleRegistryEntry; similarity: number }[] = [];
+  const englishStopwords = new Set([
+    'aida',
+    'after',
+    'and',
+    'before',
+    'for',
+    'from',
+    'into',
+    'log',
+    'mark',
+    'of',
+    'or',
+    'read',
+    'record',
+    'run',
+    'start',
+    'the',
+    'then',
+    'through',
+    'to',
+    'update',
+    'use',
+    'with',
+    'write',
+  ]);
 
   function tokenize(s: string): Set<string> {
-    return new Set(
-      normalize(s)
-        .split(' ')
-        .filter((w) => w.length > 1),
-    );
+    const normalized = normalize(s);
+    const tokens = new Set<string>();
+
+    for (const part of normalized.split(' ').filter((w) => w.length > 1)) {
+      if (part.startsWith('aida_')) continue;
+      if (englishStopwords.has(part)) continue;
+      tokens.add(part);
+    }
+
+    const cjkChunks = normalized.match(/[\u4e00-\u9fa5]+/g) || [];
+    for (const chunk of cjkChunks) {
+      if (chunk.length <= 2) {
+        tokens.add(chunk);
+        continue;
+      }
+      for (let i = 0; i < chunk.length - 1; i++) {
+        tokens.add(chunk.slice(i, i + 2));
+      }
+    }
+
+    return tokens;
   }
 
   function jaccard(setA: Set<string>, setB: Set<string>): number {
@@ -453,7 +494,7 @@ export function findSimilarRules(
       const tokensB = tokenize(entries[j].content);
       const sim = jaccard(tokensA, tokensB);
 
-      if (sim >= 0.4) {
+      if (sim >= 0.3) {
         results.push({ a: entries[i], b: entries[j], similarity: sim });
       }
     }

@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { execSync } from 'node:child_process';
 import { ensureDir, fileExists, readJson, readText, writeJson, writeText } from '../src/utils/fs.js';
+import { readRuleRegistryItems, readSkillRegistryItems } from './helpers.js';
 
 describe('aida migrate-legacy', () => {
   it('should migrate a legacy project in one command', () => {
@@ -89,19 +90,23 @@ describe('aida migrate-legacy', () => {
       assert.ok(readText(resolve(root, '.gitignore')).includes('.codex/config.toml'));
       assert.ok(fileExists(resolve(root, '.cursor', 'rules', 'aida', 'aida-guide.md')));
 
-      const rules = readJson<any[]>(resolve(root, '.aida', 'rules.json'));
-      const skills = readJson<any[]>(resolve(root, '.aida', 'skills.json'));
-      const migratedRun = readJson<any>(resolve(root, '.aida', 'runs', 'feature-big', 'tester', 'run.json'));
+      const rules = readRuleRegistryItems(root);
+      const skills = readSkillRegistryItems(root);
+      const memoryIndex = readJson<any>(resolve(root, '.aida', 'memories', 'index.json'));
+      const summary = readJson<any>(resolve(root, '.aida', 'summary.json'));
 
       assert.ok(rules.some((entry) => entry.content === 'Must follow imported cursor rule'));
       assert.ok(skills.some((entry) => entry.name === 'custom-flow'));
-      assert.equal(migratedRun.meta.schemaVersion, '2.0');
-      assert.ok(Array.isArray(migratedRun.highlights));
+      assert.equal(fileExists(resolve(root, '.aida', 'runs')), false);
+      assert.equal(fileExists(resolve(root, '.aida', 'index.json')), false);
       assert.ok(fileExists(resolve(root, '.cursor', 'rules', 'aida', '_all.md')));
-      assert.ok(fileExists(resolve(root, '.aida', 'runs', 'feature-big', 'context.json')));
-      assert.ok(fileExists(resolve(root, '.aida', 'runs', 'feature-big', 'context.md')));
-      assert.ok(fileExists(resolve(root, '.aida', 'memories', 'modules', '首页.json')));
-      assert.ok(fileExists(resolve(root, '.aida', 'memories', 'modules', '首页.md')));
+      assert.ok(memoryIndex.items.length > 0);
+      assert.equal(Array.isArray(summary.items), true);
+      assert.equal(summary.items.length, 1);
+      const moduleKey = memoryIndex.items[0].key;
+      const storageName = moduleKey.replace(/_/g, '__').replace(/\//g, '_s_');
+      assert.ok(fileExists(resolve(root, '.aida', 'memories', 'modules', `${storageName}.json`)));
+      assert.ok(fileExists(resolve(root, '.aida', 'memories', 'modules', `${storageName}.md`)));
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

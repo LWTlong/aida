@@ -3,7 +3,7 @@ import { configPath } from '../../utils/paths.js';
 import { fileExists, readJson } from '../../utils/fs.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { CLOSED_LOOP_BASELINE_TOOLS, detectClosedLoopImportableTools, importProjectSources, importProjectSourcesWithBaseline } from '../../utils/import.js';
-import { migrateLegacyMemories } from '../../utils/memory.js';
+import { normalizeProjectTruthSources } from '../../utils/project-health.js';
 import { promptSingleSelect } from '../../utils/prompt.js';
 import { migrate } from './migrate.js';
 import { migrateLegacyDirectory } from './migrate-dir.js';
@@ -110,7 +110,7 @@ export async function migrateLegacy(): Promise<void> {
   if (baselineTool) {
     const imported = importProjectSourcesWithBaseline(projectRoot, baselineTool);
     await migrate();
-    const memory = migrateLegacyMemories(projectRoot);
+    const normalized = normalizeProjectTruthSources(projectRoot);
     const built = buildProjectArtifacts(projectRoot, imported.tools);
 
     console.log(green('\n  ✓ Imported baseline') + ` ${toolLabel(baselineTool)}`);
@@ -120,9 +120,8 @@ export async function migrateLegacy(): Promise<void> {
     console.log(`    Rules: ${imported.baseline.rulesImported}`);
     console.log(`    Skills: ${imported.baseline.skillsImported}`);
     console.log(`    Tool configs discovered: ${imported.tools.join(', ') || '-'}`);
-    console.log(`    Tool config snapshot: ${imported.snapshotPath}`);
-    console.log(`    Memory contexts: ${memory.contextsWritten}`);
-    console.log(`    Module memories: ${memory.moduleMemoriesWritten}`);
+    console.log(`    Memories: ${normalized.memories}`);
+    console.log(`    Summary: ${normalized.summary}`);
 
     console.log(green('\n  ✓ Rebuilt artifacts') + ` ${built.tools.join(', ')}`);
     if (built.gitignoreAdded.length > 0) {
@@ -131,14 +130,13 @@ export async function migrateLegacy(): Promise<void> {
   } else {
     const imported = importProjectSources(projectRoot);
     await migrate();
-    const memory = migrateLegacyMemories(projectRoot);
+    const normalized = normalizeProjectTruthSources(projectRoot);
     const built = buildProjectArtifacts(projectRoot, imported.tools);
 
     console.log(yellow('\n  No baseline tool detected. Imported structured AIDA sources only.'));
     console.log(`    Tool configs discovered: ${imported.tools.join(', ') || '-'}`);
-    console.log(`    Tool config snapshot: ${imported.snapshotPath}`);
-    console.log(`    Memory contexts: ${memory.contextsWritten}`);
-    console.log(`    Module memories: ${memory.moduleMemoriesWritten}`);
+    console.log(`    Memories: ${normalized.memories}`);
+    console.log(`    Summary: ${normalized.summary}`);
 
     console.log(green('\n  ✓ Rebuilt artifacts') + ` ${built.tools.join(', ')}`);
     if (built.gitignoreAdded.length > 0) {

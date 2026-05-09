@@ -64,6 +64,11 @@ export function indexPath(projectRoot: string = process.cwd()): string {
   return resolve(projectRoot, '.aida', 'index.json');
 }
 
+/** Project-level summary.json path */
+export function summaryPath(projectRoot: string = process.cwd()): string {
+  return resolve(projectRoot, '.aida', 'summary.json');
+}
+
 /** Config file path */
 export function configPath(projectRoot: string = process.cwd()): string {
   return resolve(projectRoot, '.aida', 'config.json');

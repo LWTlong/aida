@@ -1,35 +1,36 @@
 {
   "moduleKey": "docs",
   "title": "Docs",
-  "summary": "main",
+  "summary": "design-aida-2.0",
   "keywords": [
-    "Docs",
+    "docs",
+    "design-aida-2.0",
     "main",
-    "docs"
+    "Docs"
   ],
   "entryFiles": [
-    "src/cli/commands/init.ts",
-    "src/utils/guide.ts",
-    "tests/build-cli.test.ts",
-    "README.zh-CN.md",
+    "src/utils/memory.ts",
+    "src/cli/commands/reindex.ts",
+    "tests/rules.test.ts",
+    "src/cli/commands/merge-data.ts",
+    "tests/merge.test.ts",
     "README.md",
-    "COMMANDS.md",
-    "src/utils/import.ts",
-    "tests/build.test.ts"
+    "README.zh-CN.md",
+    "COMMANDS.md"
   ],
   "relatedPaths": [
-    "src/cli/commands/init.ts",
-    "src/utils/guide.ts",
-    "tests/build-cli.test.ts",
+    "src/utils/memory.ts",
+    "src/cli/commands/reindex.ts",
+    "tests/rules.test.ts",
+    "src/cli/commands/merge-data.ts",
     "tests/merge.test.ts",
-    "README.zh-CN.md",
     "README.md",
+    "README.zh-CN.md",
     "COMMANDS.md",
-    "tests/build.test.ts",
     "src/utils/import.ts",
-    "src/mcp/server.ts",
-    "src/utils/skills.ts",
-    "tests/migrate-legacy-cli.test.ts"
+    "tests/build.test.ts",
+    ".aida/rules.json",
+    ".aida/skills.json"
   ],
   "dataFlow": [],
   "decisions": [],
@@ -42,15 +43,25 @@
     "currentTaskId remains pinned to a completed task after aida_task_done even when other tasks are still in progress",
     "migrate-legacy fails on module memory write when module key contains slash such as CLI/MCP",
     "aida_bootstrap status 在当前会话已可调用 AIDA MCP 时仍可能返回 available=false",
-    "发布 npm 包时未先在隔离环境执行发布验证，直接在当前工作树发包"
+    "真实项目迁移产物缺失 .aida_corrupted_bak 中存在的 MTR-2376 历史运行数据"
   ],
   "relatedRules": [],
   "tickets": [
     {
       "branch": "main",
-      "summary": "main",
-      "updatedAt": "2026-04-27T02:23:37.450Z"
+      "summary": "涉及模块: cli, cli/commands, commands, docs, mcp/server, package, readme, readme-zh-cn, tests/build-cli-test, tests/build-test, tests/cli-log-test, tests/cli-start-test, tests/import-cli-test, tests/init-cli-test, tests/mcp-server-test, tests/memory-cli-test, tests/memory-paths-test, tests/merge-test, tests/migrate-legacy-cli-test, tests/rules-cli-test, tests/rules-test, utils/ai-build, utils/bootstrap, utils/fs, utils/guide, utils/import, utils/memory, utils/paths, utils/prompt, utils/rules, utils/run-data, utils/skills",
+      "updatedAt": "2026-05-09T06:03:40.247Z"
+    },
+    {
+      "branch": "design-aida-2.0",
+      "summary": "涉及模块: cli, cli/commands, docs, package, schemas/aida-project, server, tests, tests/build-test, tests/cli-log-test, tests/import-cli-test, tests/mcp-server-test, tests/memory-cli-test, tests/merge-data-test, tests/merge-test, tests/migrate-legacy-cli-test, tests/reindex-test, tests/rules-cli-test, tests/rules-test, tests/skills-cli-test, utils/ai-build, utils/guide, utils/memory, utils/paths, utils/rules, utils/skills",
+      "updatedAt": "2026-05-09T06:03:40.223Z"
+    },
+    {
+      "branch": "design-aida-2.0",
+      "summary": "design-aida-2.0",
+      "updatedAt": "2026-05-09T07:21:18.154Z"
     }
   ],
-  "updatedAt": "2026-04-29T02:19:54.757Z"
+  "updatedAt": "2026-05-09T07:21:18.158Z"
 }

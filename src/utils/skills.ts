@@ -1,8 +1,9 @@
 import { createHash } from 'node:crypto';
 import { readdirSync, statSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
-import { ensureDir, fileExists, listDirs, readJson, readText, resetDir, writeJson, writeText } from './fs.js';
+import { ensureDir, fileExists, listDirs, readText, resetDir, writeText } from './fs.js';
 import { aidaDir, SKILLS_DIR } from './paths.js';
+import { readRegistryEnvelope, writeRegistryEnvelope } from './registry.js';
 
 export interface SkillCompanionFile {
   path: string
@@ -120,8 +121,7 @@ export function loadSkillRegistry(projectRoot: string): SkillRegistryEntry[] {
   const p = skillsRegistryPath(projectRoot);
   if (!fileExists(p)) return [];
   try {
-    const data = readJson<SkillRegistryEntry[]>(p);
-    return Array.isArray(data) ? data : [];
+    return readRegistryEnvelope<SkillRegistryEntry>(p).items;
   } catch {
     return [];
   }
@@ -136,14 +136,21 @@ export function skillFiles(entries: SkillRegistryEntry[]): Array<{ name: string;
 }
 
 export function saveSkillRegistry(projectRoot: string, entries: SkillRegistryEntry[]): void {
-  writeJson(skillsRegistryPath(projectRoot), entries);
+  writeRegistryEnvelope(skillsRegistryPath(projectRoot), entries);
 }
 
-function bundledSkillNames(): string[] {
+const BUNDLED_SKILL_ALLOWLIST = new Set<string>();
+
+function allBundledSkillNames(): string[] {
   return readdirSync(SKILLS_DIR)
     .filter((name) => name.endsWith('.md'))
     .map((name) => name.replace(/\.md$/, ''))
     .sort();
+}
+
+function bundledSkillNames(): string[] {
+  return allBundledSkillNames()
+    .filter((name) => BUNDLED_SKILL_ALLOWLIST.has(name))
 }
 
 export function isBundledSkillName(name: string): boolean {
@@ -173,6 +180,22 @@ export function seedBundledSkillRegistry(projectRoot: string): SkillRegistryEntr
   const entries = bundledSkillEntries();
   saveSkillRegistry(projectRoot, entries);
   return entries;
+}
+
+export function pruneSkillRegistryFor2(entries: SkillRegistryEntry[]): SkillRegistryEntry[] {
+  const deprecatedBundledNames = new Set(
+    allBundledSkillNames().filter((name) => !BUNDLED_SKILL_ALLOWLIST.has(name)),
+  );
+
+  return entries.filter((entry) => {
+    if (!deprecatedBundledNames.has(entry.name)) return true;
+    const sourcePath = entry.source.path || '';
+    return !(
+      sourcePath === `.codex/skills/${entry.name}.md`
+      || sourcePath === `src/assets/skills/${entry.name}.md`
+      || sourcePath === `.aida/skills/${entry.name}/SKILL.md`
+    );
+  });
 }
 
 export function bootstrapSkillRegistry(projectRoot: string): SkillRegistryEntry[] {

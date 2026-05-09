@@ -2,14 +2,14 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { readJson, readText, writeJson } from '../src/utils/fs.js';
-import { createTestProject, runCliOutput } from './helpers.js';
+import { createTestProject, runCliOutput, readRuleRegistryItems } from './helpers.js';
 
 describe('aida rules add/delete', () => {
   it('should add a rule with default category and rebuild tool rule files', () => {
     const project = createTestProject();
     try {
       const stdout = runCliOutput(project, 'rules add "禁止直接修改生成产物文件"');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const rules = readRuleRegistryItems(project.root);
       const allRules = readText(resolve(project.root, '.claude', 'rules', 'aida', '_all.md'));
 
       assert.ok(stdout.includes('Rule added'));
@@ -26,7 +26,7 @@ describe('aida rules add/delete', () => {
     const project = createTestProject();
     try {
       const stdout = runCliOutput(project, 'rules add "API 请求必须走统一封装" --category api');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const rules = readRuleRegistryItems(project.root);
 
       assert.ok(stdout.includes('Rule added'));
       assert.equal(rules[0].category, 'api');
@@ -40,7 +40,7 @@ describe('aida rules add/delete', () => {
     try {
       runCliOutput(project, 'rules add "禁止直接修改生成产物文件"');
       const stdout = runCliOutput(project, 'rules delete RULE-001');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const rules = readRuleRegistryItems(project.root);
 
       assert.ok(stdout.includes('Rule deprecated'));
       assert.equal(rules[0].status, 'deprecated');
@@ -88,7 +88,7 @@ describe('aida rules add/delete', () => {
       ]);
 
       const stdout = runCliOutput(project, 'rules dedupe');
-      const rules = readJson<any[]>(resolve(project.root, '.aida', 'rules.json'));
+      const rules = readRuleRegistryItems(project.root);
       const allRules = readText(resolve(project.root, '.claude', 'rules', 'aida', '_all.md'));
 
       assert.ok(stdout.includes('Removed 1 exact duplicate'));

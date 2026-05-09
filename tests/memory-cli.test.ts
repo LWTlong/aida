@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolve } from 'node:path';
 import { ensureDir, fileExists, readJson, readText, writeJson, writeText } from '../src/utils/fs.js';
-import { createTestProject, runCliOutput } from './helpers.js';
+import { createTestProject, readMemoryIndex, runCliOutput } from './helpers.js';
 
 describe('aida memory', () => {
   it('should rebuild branch context and module memories from existing branch data', () => {
@@ -93,18 +93,22 @@ describe('aida memory', () => {
 
       assert.ok(stdout.includes('Rebuilt memory'));
       const context = readJson<any>(resolve(project.root, '.aida', 'runs', 'feature-profile', 'context.json'));
-      const moduleMemory = readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', '个人中心.json'));
-      const memoryIndex = readJson<any>(resolve(project.root, '.aida', 'memories', 'index.json'));
+      const memoryIndex = readMemoryIndex(project.root);
+      assert.equal(context.modules.length, 1);
+      const moduleKey = context.modules[0];
+      const moduleMemory = readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', `${moduleKey.replace(/_/g, '__').replace(/\//g, '_s_')}.json`));
 
       assert.equal(context.ticket, 'MTR-001');
       assert.equal(context.currentPhase, 'In Progress');
+      assert.deepEqual(context.modules, [moduleKey]);
       assert.ok(context.keyFiles.includes('src/pages/profile/index.tsx'));
       assert.ok(moduleMemory.summary.includes('用户资料展示'));
+      assert.equal(moduleMemory.moduleKey, moduleKey);
+      assert.equal(moduleMemory.title, '个人中心');
       assert.ok(moduleMemory.relatedPaths.includes('src/pages/profile/index.tsx'));
-      assert.ok(memoryIndex.modules.some((entry: any) => entry.key === '个人中心'));
-      assert.ok(readText(resolve(project.root, '.aida', 'runs', 'feature-profile', 'context.md')).includes('MTR-001'));
-      assert.ok(readText(resolve(project.root, '.aida', 'runs', 'feature-profile', 'memory.md')).includes('Runtime Memory Pack'));
-      assert.ok(readText(resolve(project.root, '.aida', 'memories', 'modules', '个人中心.md')).includes('Module Memory'));
+      assert.ok(memoryIndex.items.some((entry: any) => entry.key === moduleKey));
+      assert.equal(moduleMemory.changes?.[0]?.ticket, 'MTR-001');
+      assert.ok(readText(resolve(project.root, '.aida', 'memories', 'modules', `${moduleKey.replace(/_/g, '__').replace(/\//g, '_s_')}.md`)).includes('Module Memory'));
     } finally {
       project.cleanup();
     }
@@ -115,8 +119,9 @@ describe('aida memory', () => {
     try {
       ensureDir(resolve(project.root, '.aida', 'memories'));
       writeJson(resolve(project.root, '.aida', 'memories', 'index.json'), {
+        schemaVersion: '2.0',
         updatedAt: '2026-04-15T12:00:00.000Z',
-        modules: [
+        items: [
           {
             key: 'profile',
             title: '个人中心',
@@ -155,13 +160,13 @@ describe('aida memory', () => {
         tickets: [],
         updatedAt: '2026-04-15T12:00:00.000Z',
       });
-      writeText(resolve(project.root, '.aida', 'memories', 'index.json'), JSON.stringify({ updatedAt: 'old', modules: [] }, null, 2));
+      writeText(resolve(project.root, '.aida', 'memories', 'index.json'), JSON.stringify({ schemaVersion: '2.0', updatedAt: 'old', items: [] }, null, 2));
 
       runCliOutput(project, 'memory build');
-      const memoryIndex = readJson<any>(resolve(project.root, '.aida', 'memories', 'index.json'));
+      const memoryIndex = readMemoryIndex(project.root);
 
-      assert.ok(memoryIndex.modules.some((entry: any) => entry.key === 'profile'));
-      assert.ok(memoryIndex.modules.find((entry: any) => entry.key === 'profile')?.paths.includes('src/pages/profile/index.tsx'));
+      assert.ok(memoryIndex.items.some((entry: any) => entry.key === 'profile'));
+      assert.ok(memoryIndex.items.find((entry: any) => entry.key === 'profile')?.paths.includes('src/pages/profile/index.tsx'));
     } finally {
       project.cleanup();
     }
@@ -190,13 +195,13 @@ describe('aida memory', () => {
         '',
         '- src/pages/billing/index.tsx',
       ].join('\n'));
-      writeJson(resolve(project.root, '.aida', 'memories', 'index.json'), { updatedAt: 'old', modules: [] });
+      writeJson(resolve(project.root, '.aida', 'memories', 'index.json'), { schemaVersion: '2.0', updatedAt: 'old', items: [] });
 
       const stdout = runCliOutput(project, 'memory search billing');
-      const memoryIndex = readJson<any>(resolve(project.root, '.aida', 'memories', 'index.json'));
+      const memoryIndex = readMemoryIndex(project.root);
 
       assert.ok(stdout.includes('billing'));
-      assert.ok(memoryIndex.modules.some((entry: any) => entry.key === 'billing'));
+      assert.ok(memoryIndex.items.some((entry: any) => entry.key === 'billing'));
     } finally {
       project.cleanup();
     }
@@ -239,7 +244,7 @@ describe('aida memory', () => {
       });
       runCliOutput(project, 'memory build');
       const stdout = runCliOutput(project, 'memory pack test-branch');
-      assert.ok(stdout.includes('Runtime Memory Pack'));
+      assert.ok(stdout.includes('test-branch'));
       assert.ok(stdout.includes('个人中心'));
     } finally {
       project.cleanup();
@@ -353,7 +358,7 @@ describe('aida memory', () => {
         '',
         'Legacy nested module memory.',
       ].join('\n'));
-      writeJson(resolve(project.root, '.aida', 'memories', 'index.json'), { updatedAt: 'old', modules: [] });
+      writeJson(resolve(project.root, '.aida', 'memories', 'index.json'), { schemaVersion: '2.0', updatedAt: 'old', items: [] });
 
       const stdout = runCliOutput(project, 'memory build');
 
@@ -363,6 +368,37 @@ describe('aida memory', () => {
       assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.json')), false);
       assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli', 'mcp.md')), false);
       assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'cli')), false);
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should normalize slash module keys with surrounding spaces during memory build', () => {
+    const project = createTestProject();
+    try {
+      ensureDir(resolve(project.root, '.aida', 'memories', 'modules'));
+      writeJson(resolve(project.root, '.aida', 'memories', 'modules', 'qa-_s_-manual-verification.json'), {
+        moduleKey: 'qa-/-manual-verification',
+        title: 'QA / Manual Verification',
+        summary: 'legacy key',
+        keywords: ['qa'],
+        entryFiles: ['README.md'],
+        relatedPaths: [],
+        dataFlow: [],
+        decisions: [],
+        constraints: [],
+        pitfalls: [],
+        relatedRules: [],
+        tickets: [],
+        updatedAt: '2026-05-01T10:00:00.000Z',
+      });
+
+      runCliOutput(project, 'memory build');
+
+      const index = readMemoryIndex(project.root);
+      assert.ok(index.items.some((entry) => entry.key === 'qa/manual-verification'));
+      assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'qa-_s_-manual-verification.json')), false);
+      assert.equal(fileExists(resolve(project.root, '.aida', 'memories', 'modules', 'qa_s_manual-verification.json')), true);
     } finally {
       project.cleanup();
     }
@@ -408,6 +444,8 @@ describe('aida memory', () => {
         files: [
           { path: '.aida/memories/index.json', changeType: 'modified', linesAdded: 90, linesRemoved: 10, changeCount: 1 },
           { path: '.aida/runs/main/vito-long/run.json', changeType: 'modified', linesAdded: 20, linesRemoved: 10, changeCount: 1 },
+          { path: 'yarn.lock', changeType: 'modified', linesAdded: 3, linesRemoved: 1, changeCount: 1 },
+          { path: '.../runs/main/vito-long/run.backup.json', changeType: 'modified', linesAdded: 5, linesRemoved: 0, changeCount: 1 },
           { path: 'src/utils/memory.ts', changeType: 'modified', linesAdded: 10, linesRemoved: 0, changeCount: 1 },
         ],
         metrics: {},
@@ -439,9 +477,13 @@ describe('aida memory', () => {
       runCliOutput(project, 'memory rebuild main');
 
       const context = readJson<any>(resolve(project.root, '.aida', 'runs', 'main', 'context.json'));
-      const moduleMemory = readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', 'aida.json'));
+      assert.equal(context.modules.length, 1);
+      const moduleKey = context.modules[0];
+      const moduleMemory = readJson<any>(resolve(project.root, '.aida', 'memories', 'modules', `${moduleKey.replace(/_/g, '__').replace(/\//g, '_s_')}.json`));
 
       assert.deepEqual(context.keyFiles, ['src/utils/memory.ts']);
+      assert.deepEqual(context.modules, [moduleKey]);
+      assert.equal(moduleMemory.moduleKey, moduleKey);
       assert.deepEqual(moduleMemory.entryFiles, ['src/utils/memory.ts']);
       assert.deepEqual(moduleMemory.relatedPaths, ['src/utils/memory.ts']);
     } finally {
