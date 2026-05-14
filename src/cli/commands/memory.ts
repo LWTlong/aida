@@ -1,6 +1,6 @@
 import { cyan, green, red, yellow } from '../../utils/display.js';
 import { getBranchName } from '../../utils/git.js';
-import { buildMemoryViews, loadModuleMemory, loadRunContext, loadRunMemoryPack, migrateLegacyMemories, rebuildCurrentBranchMemory, searchModuleMemories, updateRunContext, upsertModuleMemory } from '../../utils/memory.js';
+import { buildMemoryViews, loadModuleMemory, loadRunContext, loadRunMemoryPack, rebuildCurrentBranchMemory, searchModuleMemories, updateRunContext, upsertModuleMemory } from '../../utils/memory.js';
 import { fileExists, readText } from '../../utils/fs.js';
 import { moduleMemoryViewPath, runContextViewPath, runMemoryPackViewPath } from '../../utils/paths.js';
 
@@ -34,13 +34,12 @@ function parseFlags(args: string[]): Record<string, string> {
 
 function printUsage(): void {
   console.log(`
-  aida memory rebuild [branch]           Rebuild current branch context + module memories from run/requirement data
-  aida memory migrate-legacy             Migrate contexts/memories from existing .aida/.aidevos run data
+  aida memory rebuild [branch]           Rebuild current branch context + module memories from branch data
   aida memory build                      Render markdown views from memory JSON source
   aida memory search <query>             Search module memory index
   aida memory show <moduleKey>           Show a module memory markdown view
   aida memory context [branch]           Show branch context markdown view
-  aida memory pack [branch]              Show aggregated runtime memory pack
+  aida memory pack [branch]              Show aggregated branch memory pack
   aida memory upsert <moduleKey> [--title ... --summary ... --keywords a,b]
   aida memory context-update [branch] [--summary ... --phase ... --modules a,b]
 `);
@@ -61,15 +60,6 @@ export async function memory(): Promise<void> {
       console.log(green('\n  ✓ Rebuilt memory') + ` for ${branchName}`);
       console.log(`    Context: ${runContextViewPath(projectRoot, branchName)}`);
       console.log(`    Modules: ${result.modules.length}`);
-      return;
-    }
-    case 'migrate-legacy': {
-      const result = migrateLegacyMemories(projectRoot);
-      console.log(green('\n  ✓ Migrated legacy memory data'));
-      console.log(`    Branches: ${result.branches}`);
-      console.log(`    Contexts: ${result.contextsWritten}`);
-      console.log(`    Module memories: ${result.moduleMemoriesWritten}`);
-      console.log(`    Modules touched: ${result.modulesTouched.join(', ') || '-'}`);
       return;
     }
     case 'build': {

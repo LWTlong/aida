@@ -1,5 +1,5 @@
 import { configPath } from '../../utils/paths.js';
-import { fileExists, readText, extractConflictSections } from '../../utils/fs.js';
+import { fileExists, readText } from '../../utils/fs.js';
 import { green, red, cyan, yellow, dim } from '../../utils/display.js';
 import {
   addRule,
@@ -8,13 +8,12 @@ import {
   loadRegistry,
   saveRegistry,
   findSimilarRules,
-  mergeRegistries,
   registryPath,
+  mergeRuleRegistry,
 } from '../../utils/rules.js';
-import { parseConflictRegistryItems } from '../../utils/registry.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { updateGuide, updateGuideReferences } from '../../utils/guide.js';
-import { RULE_CATEGORIES, type RuleRegistryEntry } from '../../schemas/run-json.js';
+import { RULE_CATEGORIES, type RuleRegistryEntry } from '../../schemas/rules.js';
 
 function subcommand(): string {
   return process.argv[3] || '';
@@ -106,43 +105,8 @@ async function rulesDedupe(): Promise<void> {
 
   console.log(
     dim('  To resolve: manually edit .aida/rules.json,') +
-    dim(' then run `aida rules build`.\n'),
+    dim(' then run `aida sync`.\n'),
   );
-}
-
-export async function mergeRuleRegistryFile(
-  projectRoot: string,
-  filePath: string,
-): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
-  if (!fileExists(filePath)) {
-    return { status: 'missing' };
-  }
-
-  const raw = readText(filePath);
-  if (!raw.includes('<<<<<<<') && !raw.includes('>>>>>>>')) {
-    return { status: 'no-conflict' };
-  }
-
-  const sections = extractConflictSections(raw);
-  if (!sections) {
-    return { status: 'error' };
-  }
-
-  const ours = parseConflictRegistryItems<RuleRegistryEntry>(sections.ours);
-  const theirs = parseConflictRegistryItems<RuleRegistryEntry>(sections.theirs);
-  if (ours.length === 0 && theirs.length === 0) {
-    return { status: 'error' };
-  }
-
-  const { merged, added } = mergeRegistries(ours, theirs);
-  const sorted = merged.sort((a, b) => a.id.localeCompare(b.id));
-  saveRegistry(projectRoot, sorted);
-
-  return { status: 'merged', added, total: sorted.length };
-}
-
-export async function mergeRulesRegistry(projectRoot: string): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
-  return mergeRuleRegistryFile(projectRoot, registryPath(projectRoot));
 }
 
 async function rulesMerge(): Promise<void> {
@@ -158,7 +122,7 @@ async function rulesMerge(): Promise<void> {
     return;
   }
   console.log(yellow('\n  Merge conflict detected in rules.json. Resolving...\n'));
-  const result = await mergeRulesRegistry(projectRoot);
+  const result = mergeRuleRegistry(projectRoot);
   if (result.status === 'error') {
     console.log(red('  Could not parse conflict markers. Please resolve manually.\n'));
     return;
@@ -281,7 +245,7 @@ async function rulesDelete(): Promise<void> {
   buildProjectArtifacts(projectRoot);
 
   console.log(green(`\n  ✓ Rule deprecated`) + `: ${ruleId}`);
-  console.log(dim('  Re-run `aida rules list` to verify status, or `aida build` to rebuild all targets.\n'));
+  console.log(dim('  Re-run `aida rules list` to verify status, or `aida sync` to rebuild all targets.\n'));
 }
 
 export async function rules(): Promise<void> {
@@ -323,7 +287,7 @@ export async function rules(): Promise<void> {
     list      List all rules grouped by category (--json supported)
 
   The source of truth is .aida/rules.json (committed to git).
-  aida build distributes generated rule files into each configured AI tool directory.
+  aida sync distributes generated rule files into each configured AI tool directory.
 `);
   }
 }

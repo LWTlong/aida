@@ -77,10 +77,10 @@ describe('aida sync', () => {
       writeText(resolve(project.root, '.aida', 'skills.json'), JSON.stringify([
         {
           id: 'SKILL-001',
-          name: 'workflow-orchestrator',
-          content: 'Workflow content',
+          name: 'team-playbook',
+          content: 'Playbook content',
           fingerprint: 'fp-skill-a',
-          source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+          source: { kind: 'local', path: '.aida/skills/team-playbook/SKILL.md' },
           updatedAt: '2026-04-30T10:00:00.000Z',
           status: 'active',
         },

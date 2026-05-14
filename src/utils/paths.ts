@@ -1,26 +1,4 @@
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-/** AIDevOS package root */
-export const PACKAGE_ROOT = resolve(__dirname, '..', '..');
-
-/** Bundled assets directory */
-export const ASSETS_DIR = existsSync(resolve(PACKAGE_ROOT, 'src', 'assets'))
-  ? resolve(PACKAGE_ROOT, 'src', 'assets')
-  : resolve(PACKAGE_ROOT, '..', 'src', 'assets');
-
-/** Bundled skill files */
-export const SKILLS_DIR = resolve(ASSETS_DIR, 'skills');
-
-/** Bundled template files */
-export const TEMPLATES_DIR = resolve(ASSETS_DIR, 'templates');
-
-/** Dashboard HTML file */
-export const DASHBOARD_FILE = resolve(PACKAGE_ROOT, 'src', 'dashboard', 'index.html');
+import { resolve } from 'node:path';
 
 /** .aida directory in user's project */
 export function aidaDir(projectRoot: string = process.cwd()): string {

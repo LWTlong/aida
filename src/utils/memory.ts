@@ -24,7 +24,7 @@ import type {
   ModuleMemoryReference,
   RunContextRecord,
 } from '../schemas/aida-project.js';
-import type { RequirementData, RunData } from '../schemas/run-json.js';
+import type { RequirementData, RunData } from '../internal/runtime/schema.js';
 
 export interface MemorySearchResult extends ModuleMemoryIndexEntry {
   score: number

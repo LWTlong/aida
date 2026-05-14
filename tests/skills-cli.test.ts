@@ -13,10 +13,10 @@ describe('aida skills list/edit', () => {
         JSON.stringify([
           {
             id: 'SKILL-001',
-            name: 'workflow-orchestrator',
-            content: 'Workflow content',
+            name: 'team-playbook',
+            content: 'Playbook content',
             fingerprint: 'fp-1',
-            source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+            source: { kind: 'local', path: '.aida/skills/team-playbook/SKILL.md' },
             updatedAt: '2026-04-13T00:00:00.000Z',
             status: 'active',
           },
@@ -24,7 +24,7 @@ describe('aida skills list/edit', () => {
       );
 
       const stdout = runCliOutput(project, 'skills list');
-      assert.ok(stdout.includes('workflow-orchestrator'));
+      assert.ok(stdout.includes('team-playbook'));
       assert.ok(stdout.includes('SKILL-001'));
     } finally {
       project.cleanup();
@@ -39,25 +39,25 @@ describe('aida skills list/edit', () => {
         JSON.stringify([
           {
             id: 'SKILL-001',
-            name: 'workflow-orchestrator',
-            content: 'Old workflow content',
+            name: 'team-playbook',
+            content: 'Old playbook content',
             fingerprint: 'fp-1',
-            source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+            source: { kind: 'local', path: '.aida/skills/team-playbook/SKILL.md' },
             updatedAt: '2026-04-13T00:00:00.000Z',
             status: 'active',
           },
         ], null, 2),
       );
       ensureDir(resolve(project.root, '.aida', '.edit', 'skills'));
-      writeText(resolve(project.root, '.aida', '.edit', 'skills', 'workflow-orchestrator.md'), 'New workflow content');
+      writeText(resolve(project.root, '.aida', '.edit', 'skills', 'team-playbook.md'), 'New playbook content');
 
-      const stdout = runCliOutput(project, 'skills edit workflow-orchestrator --apply');
+      const stdout = runCliOutput(project, 'skills edit team-playbook --apply');
       const skills = readSkillRegistryItems(project.root);
-      const skillView = readText(resolve(project.root, '.claude', 'skills', 'workflow-orchestrator.md'));
+      const skillView = readText(resolve(project.root, '.claude', 'skills', 'team-playbook.md'));
 
       assert.ok(stdout.includes('Skill updated'));
-      assert.equal(skills[0].content, 'New workflow content');
-      assert.ok(skillView.includes('New workflow content'));
+      assert.equal(skills[0].content, 'New playbook content');
+      assert.ok(skillView.includes('New playbook content'));
     } finally {
       project.cleanup();
     }
@@ -71,23 +71,23 @@ describe('aida skills list/edit', () => {
         JSON.stringify([
           {
             id: 'SKILL-001',
-            name: 'workflow-orchestrator',
-            content: 'Old workflow content',
+            name: 'team-playbook',
+            content: 'Old playbook content',
             fingerprint: 'fp-1',
-            source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+            source: { kind: 'local', path: '.aida/skills/team-playbook/SKILL.md' },
             updatedAt: '2026-04-13T00:00:00.000Z',
             status: 'active',
           },
         ], null, 2),
       );
-      const inputFile = resolve(project.root, 'workflow-update.md');
-      writeText(inputFile, 'Workflow content from explicit file');
+      const inputFile = resolve(project.root, 'playbook-update.md');
+      writeText(inputFile, 'Playbook content from explicit file');
 
-      const stdout = runCliOutput(project, `skills edit workflow-orchestrator --from-file ${inputFile}`);
+      const stdout = runCliOutput(project, `skills edit team-playbook --from-file ${inputFile}`);
       const skills = readSkillRegistryItems(project.root);
 
       assert.ok(stdout.includes('Skill updated'));
-      assert.equal(skills[0].content, 'Workflow content from explicit file');
+      assert.equal(skills[0].content, 'Playbook content from explicit file');
     } finally {
       project.cleanup();
     }
@@ -101,10 +101,10 @@ describe('aida skills list/edit', () => {
         JSON.stringify([
           {
             id: 'SKILL-001',
-            name: 'workflow-orchestrator',
-            content: 'Workflow content',
+            name: 'team-playbook',
+            content: 'Playbook content',
             fingerprint: 'fp-1',
-            source: { kind: 'bundled', path: 'src/assets/skills/workflow-orchestrator.md' },
+            source: { kind: 'local', path: '.aida/skills/team-playbook/SKILL.md' },
             updatedAt: '2026-04-13T00:00:00.000Z',
             status: 'active',
           },
@@ -115,7 +115,7 @@ describe('aida skills list/edit', () => {
       const parsed = JSON.parse(stdout);
 
       assert.equal(parsed.length, 1);
-      assert.equal(parsed[0].name, 'workflow-orchestrator');
+      assert.equal(parsed[0].name, 'team-playbook');
     } finally {
       project.cleanup();
     }

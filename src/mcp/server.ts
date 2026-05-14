@@ -17,7 +17,7 @@ import type {
   ReviewItem,
   FileItem,
   HighlightItem,
-} from '../schemas/run-json.js';
+} from '../internal/runtime/schema.js';
 import {
   SEVERITY_VALUES,
   BUG_SOURCE_VALUES,
@@ -25,8 +25,7 @@ import {
   DEVIATION_CAT_VALUES,
   REVIEW_RESULT_VALUES,
   CHANGE_TYPE_VALUES,
-  RULE_CATEGORIES,
-} from '../schemas/run-json.js';
+} from '../internal/runtime/schema.js';
 import {
   now,
   nextId,
@@ -35,14 +34,15 @@ import {
   resolveCurrentTaskId,
   saveRunData,
   ensureRunJson as ensureRunJsonShared,
-} from '../utils/run-data.js';
-import { collectClaudeTokens, collectClaudeTokensBetween } from '../utils/tokens.js';
+} from '../internal/runtime/state.js';
+import { collectClaudeTokens, collectClaudeTokensBetween } from '../internal/runtime/tokens.js';
 import { getBranchName, getDevName } from '../utils/git.js';
 import { addRule } from '../utils/rules.js';
-import { buildProjectArtifacts } from '../utils/ai-build.js';
+import { RULE_CATEGORIES } from '../schemas/rules.js';
 import { buildMemoryViews, loadModuleMemory, loadRunContext, loadRunMemoryPack, rebuildCurrentBranchMemory, searchModuleMemories, updateRunContext, upsertModuleMemory } from '../utils/memory.js';
 import { BOOTSTRAP_MANIFEST, type BootstrapDecision, type BootstrapHost, getBootstrapStatus, saveBootstrapDecision } from '../utils/bootstrap.js';
 import { configPath } from '../utils/paths.js';
+import { buildProject } from '../services/project-build.js';
 
 // ─── JSON-RPC / MCP Protocol ─────────────────────────────
 
@@ -96,8 +96,8 @@ function save(path: string, data: RunData): void {
 // ─── Token Auto-Collection ───────────────────────────────
 
 /**
- * Collect tokens from Claude Code session since run started,
- * and update run.json cost data.
+ * Collect tokens from Claude Code session since bookkeeping started,
+ * and update internal runtime cost data.
  */
 function syncTokenUsage(path: string, data: RunData): void {
   try {
@@ -1027,7 +1027,7 @@ function handleLogRule(args: any): any {
     return { success: true, message: `规则已存在: ${entry.id}（fingerprint 重复）`, ruleId: entry.id, isDuplicate: true };
   }
 
-  // Also record in run.json.rules[] for per-run tracking
+  // Also record in internal runtime rule history for per-session tracking
   const localId = nextId(data.rules, 'RULE');
   data.rules.push({
     ruleId: localId,
@@ -1044,7 +1044,7 @@ function handleLogRule(args: any): any {
   refreshCurrentBranchMemory(data.meta.branch);
 
   // Rebuild AI tool artifacts from JSON source
-  buildProjectArtifacts(projectRoot);
+  buildProject(projectRoot);
 
   return { success: true, ruleId: entry.id, message: `规则已沉淀: ${entry.id} [${category}] ${content.substring(0, 60)}` };
 }

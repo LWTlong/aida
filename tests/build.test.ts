@@ -26,15 +26,15 @@ afterEach(() => {
 
 describe('bootstrapSkillRegistry', () => {
   it('should create skills.json from existing .aida/skills content', () => {
-    const skillDir = resolve(tmpRoot, '.aida', 'skills', 'workflow-orchestrator');
+    const skillDir = resolve(tmpRoot, '.aida', 'skills', 'team-playbook');
     ensureDir(skillDir);
-    writeText(resolve(skillDir, 'SKILL.md'), '# Workflow\n\nTest content\n');
+    writeText(resolve(skillDir, 'SKILL.md'), '# Team Playbook\n\nTest content\n');
     writeText(resolve(skillDir, 'run.py'), 'print("hello")\n');
 
     const entries = bootstrapSkillRegistry(tmpRoot);
 
     assert.equal(entries.length, 1);
-    assert.equal(entries[0].name, 'workflow-orchestrator');
+    assert.equal(entries[0].name, 'team-playbook');
     assert.equal(entries[0].files?.length, 1);
     assert.equal(entries[0].files?.[0].path, 'run.py');
     assert.ok(fileExists(skillsRegistryPath(tmpRoot)));
@@ -451,10 +451,10 @@ describe('mergeSkillRegistries', () => {
     const base: SkillRegistryEntry[] = [
       {
         id: 'SKILL-001',
-        name: 'workflow-orchestrator',
-        content: 'Workflow content',
+        name: 'team-playbook',
+        content: 'Playbook content',
         fingerprint: 'fp-1',
-        source: { kind: 'bundled', path: 'a' },
+        source: { kind: 'local', path: '.aida/skills/team-playbook/SKILL.md' },
         updatedAt: '2026-01-01T00:00:00.000Z',
         status: 'active',
       },
@@ -462,10 +462,10 @@ describe('mergeSkillRegistries', () => {
     const incoming: SkillRegistryEntry[] = [
       {
         id: 'SKILL-001',
-        name: 'audit',
-        content: 'Audit content',
+        name: 'custom-flow',
+        content: 'Custom flow content',
         fingerprint: 'fp-2',
-        source: { kind: 'bundled', path: 'b' },
+        source: { kind: 'local', path: '.aida/skills/custom-flow/SKILL.md' },
         updatedAt: '2026-01-01T00:00:00.000Z',
         status: 'active',
       },

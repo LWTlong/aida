@@ -13,6 +13,7 @@ import { buildProjectArtifacts } from '../../utils/ai-build.js';
 import { detectClosedLoopImportableTools, importExistingToolConfigs, importFromTool, mergeConfiguredTools } from '../../utils/import.js';
 import { promptMultiSelect, promptSingleSelect, promptText } from '../../utils/prompt.js';
 import type { AiToolChoice } from '../../schemas/aida-project.js';
+import { defaultSkillScanPaths } from '../../services/security-audit.js';
 
 function printManualUntrackNotice(): void {
   console.log(dim('  Note: If any ignored AI files were already tracked by git before init, untrack them manually.'));
@@ -158,6 +159,9 @@ export async function init(): Promise<void> {
     mode,
     aiTools: selectedTools,
     project: projectName,
+    security: {
+      skillScanPaths: defaultSkillScanPaths(),
+    },
   };
   if (aiModel) configData.aiModel = aiModel;
   if (baselineTool) configData.baselineTool = baselineTool;

@@ -1,18 +1,13 @@
 import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { bootstrapRuleRegistry, renderRuleMarkdownFiles } from './rules.js';
-import { activeSkills, bootstrapSkillRegistry, getSkillContent } from './skills.js';
+import { activeSkills, bootstrapSkillRegistry } from './skills.js';
 import { buildRuleViews } from './rules.js';
 import { ensureGuide, syncGuideReference, updateGuide, updateGuideReferences } from './guide.js';
 import { buildMemoryViews } from './memory.js';
 import { configPath } from './paths.js';
 import { ensureDir, fileExists, readJson, readText, resetDir, writeJson, writeText } from './fs.js';
 import type { AiToolChoice, AidaConfig } from '../schemas/aida-project.js';
-
-export const QUICK_COMMANDS: { name: string; skill: string }[] = [
-  { name: 'audit', skill: 'audit' },
-  { name: 'rules-evolver', skill: 'rules-evolver' },
-];
 
 const MCP_SERVER_ENTRY = {
   command: 'npx',
@@ -287,38 +282,10 @@ export function writeMcpConfig(projectRoot: string, tools: AiToolChoice[]): stri
   return written;
 }
 
-function buildClaudeCommands(projectRoot: string): number {
-  const dir = resolve(projectRoot, '.claude', 'commands');
-  resetDir(dir);
-  let written = 0;
-
-  for (const cmd of QUICK_COMMANDS) {
-    const content = getSkillContent(projectRoot, cmd.skill);
-    if (!content) continue;
-    writeText(resolve(dir, `${cmd.name}.md`), content);
-    written++;
-  }
-
-  return written;
-}
-
-function buildCursorCommands(projectRoot: string): number {
-  let written = 0;
-
-  for (const cmd of QUICK_COMMANDS) {
-    const content = getSkillContent(projectRoot, cmd.skill);
-    if (!content) continue;
-    const dir = resolve(projectRoot, '.cursor', 'skills', cmd.name);
-    ensureDir(dir);
-    writeText(resolve(dir, 'SKILL.md'), content);
-    written++;
-  }
-
-  return written;
-}
-
 function pruneInactiveToolArtifacts(projectRoot: string, tools: AiToolChoice[]): void {
   const active = new Set(tools);
+
+  rmSync(resolve(projectRoot, '.claude', 'commands'), { recursive: true, force: true });
 
   if (!active.has('claude-code')) {
     rmSync(resolve(projectRoot, 'CLAUDE.md'), { force: true });
@@ -415,7 +382,6 @@ export function buildProjectArtifacts(
   ruleFiles: number
   skillFiles: number
   mcpFiles: string[]
-  commandFiles: number
   gitignoreAdded: string[]
   ruleViewFiles: number
   memoryViews: {
@@ -431,16 +397,13 @@ export function buildProjectArtifacts(
 
   let ruleFiles = 0;
   let skillFiles = 0;
-  let commandFiles = 0;
   if (tools.includes('claude-code')) {
     ruleFiles += buildClaudeRules(projectRoot, rules);
     skillFiles += buildClaudeSkills(projectRoot);
-    commandFiles += buildClaudeCommands(projectRoot);
   }
   if (tools.includes('cursor')) {
     ruleFiles += buildCursorRules(projectRoot, rules);
     skillFiles += buildCursorSkills(projectRoot);
-    commandFiles += buildCursorCommands(projectRoot);
   }
   if (tools.includes('lingma')) {
     ruleFiles += buildLingmaRules(projectRoot, rules);
@@ -463,7 +426,6 @@ export function buildProjectArtifacts(
     ruleFiles,
     skillFiles,
     mcpFiles,
-    commandFiles,
     gitignoreAdded,
     ruleViewFiles,
     memoryViews,

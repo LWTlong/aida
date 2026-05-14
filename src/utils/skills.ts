@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
 import { readdirSync, statSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
-import { ensureDir, fileExists, listDirs, readText, resetDir, writeText } from './fs.js';
-import { aidaDir, SKILLS_DIR } from './paths.js';
+import { ensureDir, fileExists, listDirs, readText, resetDir, writeText, extractConflictSections } from './fs.js';
+import { aidaDir } from './paths.js';
 import { readRegistryEnvelope, writeRegistryEnvelope } from './registry.js';
+import { parseConflictRegistryItems } from './registry.js';
 
 export interface SkillCompanionFile {
   path: string
@@ -17,7 +18,7 @@ export interface SkillRegistryEntry {
   fingerprint: string
   files?: SkillCompanionFile[]
   source: {
-    kind: 'bundled' | 'local'
+    kind: 'local'
     path?: string
   }
   updatedAt: string
@@ -139,63 +140,29 @@ export function saveSkillRegistry(projectRoot: string, entries: SkillRegistryEnt
   writeRegistryEnvelope(skillsRegistryPath(projectRoot), entries);
 }
 
-const BUNDLED_SKILL_ALLOWLIST = new Set<string>();
+export function mergeSkillRegistry(projectRoot: string): { status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number } {
+  const regPath = skillsRegistryPath(projectRoot);
 
-function allBundledSkillNames(): string[] {
-  return readdirSync(SKILLS_DIR)
-    .filter((name) => name.endsWith('.md'))
-    .map((name) => name.replace(/\.md$/, ''))
-    .sort();
-}
+  if (!fileExists(regPath)) {
+    return { status: 'missing' };
+  }
 
-function bundledSkillNames(): string[] {
-  return allBundledSkillNames()
-    .filter((name) => BUNDLED_SKILL_ALLOWLIST.has(name))
-}
+  const raw = readText(regPath);
+  if (!raw.includes('<<<<<<<') && !raw.includes('>>>>>>>')) {
+    return { status: 'no-conflict' };
+  }
 
-export function isBundledSkillName(name: string): boolean {
-  return bundledSkillNames().includes(name);
-}
+  const sections = extractConflictSections(raw);
+  if (!sections) {
+    return { status: 'error' };
+  }
 
-export function bundledSkillEntries(): SkillRegistryEntry[] {
-  const now = new Date().toISOString();
-  return bundledSkillNames().map((name, index) => {
-    const content = readText(resolve(SKILLS_DIR, `${name}.md`));
-    return {
-      id: `SKILL-${String(index + 1).padStart(3, '0')}`,
-      name,
-      content,
-      fingerprint: skillFingerprint(content, []),
-      source: {
-        kind: 'bundled' as const,
-        path: `src/assets/skills/${name}.md`,
-      },
-      updatedAt: now,
-      status: 'active' as const,
-    };
-  });
-}
+  const ours = parseConflictRegistryItems<SkillRegistryEntry>(sections.ours);
+  const theirs = parseConflictRegistryItems<SkillRegistryEntry>(sections.theirs);
+  const { merged, added } = mergeSkillRegistries(ours, theirs);
+  saveSkillRegistry(projectRoot, merged);
 
-export function seedBundledSkillRegistry(projectRoot: string): SkillRegistryEntry[] {
-  const entries = bundledSkillEntries();
-  saveSkillRegistry(projectRoot, entries);
-  return entries;
-}
-
-export function pruneSkillRegistryFor2(entries: SkillRegistryEntry[]): SkillRegistryEntry[] {
-  const deprecatedBundledNames = new Set(
-    allBundledSkillNames().filter((name) => !BUNDLED_SKILL_ALLOWLIST.has(name)),
-  );
-
-  return entries.filter((entry) => {
-    if (!deprecatedBundledNames.has(entry.name)) return true;
-    const sourcePath = entry.source.path || '';
-    return !(
-      sourcePath === `.codex/skills/${entry.name}.md`
-      || sourcePath === `src/assets/skills/${entry.name}.md`
-      || sourcePath === `.aida/skills/${entry.name}/SKILL.md`
-    );
-  });
+  return { status: 'merged', added, total: merged.length };
 }
 
 export function bootstrapSkillRegistry(projectRoot: string): SkillRegistryEntry[] {
@@ -211,7 +178,8 @@ export function bootstrapSkillRegistry(projectRoot: string): SkillRegistryEntry[
     .filter((entry) => fileExists(entry.path));
 
   if (localSkills.length === 0) {
-    return seedBundledSkillRegistry(projectRoot);
+    saveSkillRegistry(projectRoot, []);
+    return [];
   }
 
   const now = new Date().toISOString();
@@ -332,11 +300,6 @@ export function buildSkillViews(projectRoot: string): number {
   return written;
 }
 
-export function getSkillContent(projectRoot: string, skillName: string): string | null {
-  const entry = bootstrapSkillRegistry(projectRoot).find((item) => item.name === skillName && item.status === 'active');
-  return entry?.content || null;
-}
-
 export function updateSkillContent(
   projectRoot: string,
   skillName: string,
@@ -372,19 +335,4 @@ export function mergeSkillRegistries(
   }
 
   return { merged, added };
-}
-
-export function ensureBundledSkills(projectRoot: string): { total: number; added: number } {
-  const existing = loadSkillRegistry(projectRoot);
-  if (existing.length === 0) {
-    const seeded = seedBundledSkillRegistry(projectRoot);
-    return { total: seeded.length, added: seeded.length };
-  }
-
-  const bundled = bundledSkillEntries();
-  const { merged, added } = mergeSkillRegistries(existing, bundled);
-  if (added > 0) {
-    saveSkillRegistry(projectRoot, merged);
-  }
-  return { total: merged.length, added };
 }

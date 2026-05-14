@@ -1,28 +1,28 @@
 {
   "name": "ai-dev-analytics",
-  "version": "2.0.0",
-  "description": "AIDA 2.0 - JSON truth-source management for AI project rules, skills, memories, and summaries",
+  "version": "2.0.1",
+  "description": "AIDA 2.0 - AI asset truth-source management for rules, skills, memories, and summaries",
   "type": "module",
   "bin": {
     "aida": "dist/cli/index.js"
   },
   "scripts": {
-    "build": "tsc",
-    "build:test": "tsc -p tsconfig.test.json",
+    "build": "rm -rf dist && tsc",
+    "build:test": "rm -rf dist-test && tsc -p tsconfig.test.json",
     "test": "npm run build:test && node --test dist-test/tests/*.test.js",
     "dev": "tsc --watch",
     "start": "node dist/cli/index.js",
-    "prepublishOnly": "npm run build && cd dashboard && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "ai",
-    "development",
-    "analytics",
-    "observability",
-    "claude",
+    "aida",
+    "rules",
+    "skills",
+    "memory",
+    "mcp",
     "cursor",
-    "devops",
-    "dashboard"
+    "codex"
   ],
   "author": "wen tao",
   "license": "MIT",
@@ -38,9 +38,7 @@
     "node": ">=18.0.0"
   },
   "files": [
-    "dist",
-    "src/assets",
-    "src/dashboard"
+    "dist"
   ],
   "devDependencies": {
     "@types/node": "^25.4.0",

@@ -2,9 +2,9 @@ import { readdirSync, statSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { ensureDir, fileExists, readJson, readText, writeJson } from './fs.js';
 import { configPath, toolConfigStorePath } from './paths.js';
-import { QUICK_COMMANDS, ensureBuildGitignore } from './ai-build.js';
+import { ensureBuildGitignore } from './ai-build.js';
 import { importRulesFromViews, loadRegistry, saveRegistry, fingerprint, nextRuleId } from './rules.js';
-import { importSkillsFromViews, isBundledSkillName, loadSkillRegistry, saveSkillRegistry, skillFingerprint, nextSkillId, type SkillCompanionFile, type SkillRegistryEntry } from './skills.js';
+import { importSkillsFromViews, loadSkillRegistry, saveSkillRegistry, skillFingerprint, nextSkillId, type SkillCompanionFile, type SkillRegistryEntry } from './skills.js';
 import type { AidaConfig, AiToolChoice, ToolConfigSnapshot } from '../schemas/aida-project.js';
 
 interface ImportOptions {
@@ -22,8 +22,6 @@ const GENERATED_RULE_MARKERS = [
   'AIDA 数据采集与规则沉淀指南',
   'AIDevOS Iron Rules',
 ];
-const QUICK_COMMAND_NAME_TO_SKILL = new Map(QUICK_COMMANDS.map((cmd) => [cmd.name, cmd.skill]));
-
 const TOOL_SOURCES: Array<{
   tool: AiToolChoice
   path: (projectRoot: string) => string
@@ -290,7 +288,7 @@ function isGeneratedRuleFile(filePath: string, raw: string): boolean {
 }
 
 function normalizeImportedSkillName(originalName: string): string {
-  return QUICK_COMMAND_NAME_TO_SKILL.get(originalName) || originalName;
+  return originalName;
 }
 
 function mergeImportedRules(
@@ -415,7 +413,6 @@ export function detectImportableTools(projectRoot: string, tools: AiToolChoice[]
     switch (tool) {
       case 'claude-code':
         return fileExists(resolve(projectRoot, 'CLAUDE.md'))
-          || fileExists(resolve(projectRoot, '.claude', 'commands'))
           || fileExists(resolve(projectRoot, '.claude', 'rules'))
           || fileExists(resolve(projectRoot, '.claude', 'skills'))
           || fileExists(resolve(projectRoot, '.mcp.json'));
@@ -477,15 +474,6 @@ export function importFromToolWithOptions(
       }
       const skillsDir = resolve(projectRoot, '.claude', 'skills');
       skills.push(...collectToolSkills(projectRoot, skillsDir));
-      const commandDir = resolve(projectRoot, '.claude', 'commands');
-      for (const file of walkMarkdownFiles(commandDir)) {
-        const name = normalizeImportedSkillName(file.split('/').pop()!.replace(/\.md$/, ''));
-        skills.push({
-          name,
-          content: readText(file),
-          sourcePath: file.replace(`${projectRoot}/`, ''),
-        });
-      }
       break;
     }
     case 'cursor': {
@@ -544,7 +532,7 @@ export function importFromToolWithOptions(
 
   const selectedSkills = includeExternalSkills
     ? skills
-    : skills.filter((entry) => isBundledSkillName(entry.name));
+    : [];
 
   const rulesResult = mergeImportedRules(projectRoot, [...new Set(ruleContents)], tool);
   const skillResult = mergeImportedSkills(projectRoot, selectedSkills, tool);
