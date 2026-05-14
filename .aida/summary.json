@@ -1,35 +1,16 @@
 {
   "schemaVersion": "2.0",
-  "updatedAt": "2026-05-14T10:29:29.216Z",
+  "updatedAt": "2026-05-14T12:15:08.605Z",
   "items": [
     {
       "branch": "design-aida-2.0",
-      "title": "AIDA 2.0 repository cleanup and security audit",
-      "summary": "AIDA 2.0 is a lightweight AI asset truth-source manager focused on rules, skills, memories, summaries, and warning-only security auditing. The repository has been cleaned to keep 2.0 as the public product model while isolating any remaining internal runtime compatibility code.",
-      "modules": [
-        "cli",
-        "services",
-        "mcp/server",
-        "schemas",
-        "utils",
-        "internal/runtime",
-        "tests"
-      ],
-      "highlights": [
-        "Top-level CLI reduced to init, sync, doctor, rules, skills, memory, and mcp.",
-        "Security audit supports package-manager-native dependency auditing plus recursive skill risk scanning.",
-        "Repository-local truth sources were rebuilt to remove 1.0 dashboard and run-data noise."
-      ],
-      "status": "completed",
-      "keyFiles": [
-        "src/cli/index.ts",
-        "src/services/security-audit.ts",
-        "src/services/project-health.ts",
-        "src/mcp/server.ts",
-        "README.md",
-        "COMMANDS.md"
-      ],
-      "updatedAt": "2026-05-14T10:29:29.216Z"
+      "title": "design-aida-2.0",
+      "summary": "design-aida-2.0",
+      "modules": [],
+      "highlights": [],
+      "status": "running",
+      "keyFiles": [],
+      "updatedAt": "2026-05-14T12:15:08.600Z"
     }
   ]
 }

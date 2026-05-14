@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2.0",
-  "updatedAt": "2026-05-14T10:29:29.216Z",
+  "updatedAt": "2026-05-14T12:15:28.859Z",
   "items": [
     {
       "id": "RULE-001",
@@ -221,6 +221,19 @@
         "author": "manual"
       },
       "createdAt": "2026-05-14T10:29:29.216Z",
+      "status": "active"
+    },
+    {
+      "id": "RULE-018",
+      "category": "process",
+      "content": "npm 发包到公共源时，必须显式隔离全局 .npmrc 和私有 registry 配置，使用官方 registry、独立 cache 与一次性命令参数完成认证；严禁将 token、_authToken 或任何敏感认证信息写入仓库文件。",
+      "fingerprint": "948d4aa0d09d",
+      "source": {
+        "branch": "design-aida-2.0",
+        "deviation": null,
+        "author": "vito-long"
+      },
+      "createdAt": "2026-05-14T12:14:22.361Z",
       "status": "active"
     }
   ]
