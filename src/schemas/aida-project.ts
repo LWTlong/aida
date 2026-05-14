@@ -14,6 +14,10 @@ export interface AidaConfig {
   aiModel?: string
   hourlyRate?: number
   tokenPricePer1M?: number
+  security?: {
+    skillScanPaths?: string[]
+    [key: string]: unknown
+  }
   [key: string]: unknown
 }
 

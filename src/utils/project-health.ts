@@ -1,12 +1,14 @@
 import { readdirSync, rmSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileExists, readJson, writeJson } from './fs.js';
-import { buildSummary, loadSummary } from './summary.js';
+import { buildSummary, loadSummary } from '../internal/runtime/summary.js';
 import { buildMemoryViews, loadMemoryIndex, migrateLegacyMemories, rebuildMemoryIndexFromDisk } from './memory.js';
 import { rulesRegistryPath, skillsRegistryPath, moduleMemoriesDir, runsDir, configPath, summaryPath, toolConfigStorePath } from './paths.js';
 import { loadRegistry, saveRegistry } from './rules.js';
-import { loadSkillRegistry, pruneSkillRegistryFor2, saveSkillRegistry } from './skills.js';
-import type { RunData } from '../schemas/run-json.js';
+import { loadSkillRegistry, saveSkillRegistry } from './skills.js';
+import type { RunData } from '../internal/runtime/schema.js';
+import type { AidaConfig } from '../schemas/aida-project.js';
+import { defaultSkillScanPaths } from '../services/security-audit.js';
 
 export interface ProjectHealthReport {
   initialized: boolean
@@ -31,10 +33,33 @@ export interface ProjectHealthReport {
 }
 
 export interface ProjectNormalizationResult {
+  configUpgraded: boolean
   rules: number
   skills: number
   memories: number
   summary: number
+}
+
+function normalizeProjectConfig(projectRoot: string): boolean {
+  if (!fileExists(configPath(projectRoot))) return false;
+
+  const raw = readJson<AidaConfig>(configPath(projectRoot));
+  const next: AidaConfig = {
+    ...raw,
+    schemaVersion: '2.0',
+    security: {
+      ...(raw.security && typeof raw.security === 'object' ? raw.security : {}),
+      skillScanPaths: Array.isArray(raw.security?.skillScanPaths)
+        ? [...new Set(raw.security.skillScanPaths.map((item) => String(item).trim()).filter(Boolean))]
+        : defaultSkillScanPaths(),
+    },
+  };
+
+  const changed = JSON.stringify(raw) !== JSON.stringify(next);
+  if (changed) {
+    writeJson(configPath(projectRoot), next);
+  }
+  return changed;
 }
 
 function scanRunJsonFiles(rootDir: string): string[] {
@@ -267,10 +292,11 @@ export function inspectProjectHealth(projectRoot: string): ProjectHealthReport {
 }
 
 export function normalizeProjectTruthSources(projectRoot: string): ProjectNormalizationResult {
+  const configUpgraded = normalizeProjectConfig(projectRoot);
   const rules = loadRegistry(projectRoot);
   saveRegistry(projectRoot, rules);
 
-  const skills = pruneSkillRegistryFor2(loadSkillRegistry(projectRoot));
+  const skills = loadSkillRegistry(projectRoot);
   saveSkillRegistry(projectRoot, skills);
 
   const hasRuntime = scanRunJsonFiles(runsDir(projectRoot)).length > 0;
@@ -292,6 +318,7 @@ export function normalizeProjectTruthSources(projectRoot: string): ProjectNormal
   pruneLegacyProjectArtifacts(projectRoot);
 
   return {
+    configUpgraded,
     rules: rules.length,
     skills: skills.length,
     memories: memoryIndex.items.length,

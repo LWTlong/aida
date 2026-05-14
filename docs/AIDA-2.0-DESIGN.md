@@ -247,7 +247,7 @@ MCP 和 CLI 不能各自维护一套逻辑。两者必须共用同一套 domain/
 - memories service
 - summary service
 - sync service
-- migration service
+- health service
 
 MCP 和 CLI 只是不同通道，不是两套系统。
 
@@ -257,9 +257,10 @@ MCP 和 CLI 只是不同通道，不是两套系统。
 
 - `aida init`
 - `aida sync`
-- `aida build`
 - `aida doctor`
-- `aida migrate`
+- `aida rules`
+- `aida skills`
+- `aida memory`
 
 ### 命令语义
 
@@ -272,13 +273,9 @@ MCP 和 CLI 只是不同通道，不是两套系统。
 统一承担：
 
 - JSON 真源同步
-- tools <-> JSON 差异处理
+- tools 投影重建
 - memory / summary 更新
-- 冲突检测与安全合并
-
-#### `aida build`
-
-只负责从 JSON 真源生成工具视图和 Markdown 视图，不允许反向改写真源。
+- 工具侧分发
 
 #### `aida doctor`
 
@@ -286,17 +283,16 @@ MCP 和 CLI 只是不同通道，不是两套系统。
 
 - schema 不一致
 - memory 索引断链
-- 旧结构未迁移
+- 旧结构残留
 - 工具视图缺失
-
-#### `aida migrate`
-
-专门负责 1.x -> 2.0 升级、数据清洗和兼容转换。
 
 ### 废弃方向
 
 2.0 中应废弃或弱化：
 
+- `build`
+- `migrate`
+- `merge`
 - `update`
 - `import`
 - `reindex`

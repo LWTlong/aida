@@ -19,8 +19,8 @@ export interface TestProject {
 }
 
 /**
- * Create an isolated temp directory that looks like an initialized AIDevOS project
- * with a valid git repo, config.json, and run.json.
+ * Create an isolated temp directory that matches the current internal
+ * test fixture layout, including branch data under .aida/runs when needed.
  */
 export function createTestProject(opts?: {
   branch?: string;
@@ -56,7 +56,7 @@ export function createTestProject(opts?: {
     project: 'test-project',
   });
 
-  // Write run.json
+  // Write internal branch runtime fixture
   const runJsonPath = resolve(devDir, 'run.json');
   const now = new Date().toISOString();
   const defaultRunData = {
@@ -140,8 +140,8 @@ export function createTestProject(opts?: {
 }
 
 /**
- * Run an aidevos CLI command in a test project directory.
- * Returns the run.json data after execution.
+ * Run an AIDA CLI command in a test project directory.
+ * Returns the internal runtime data after execution.
  */
 export function runCli(project: TestProject, args: string): Record<string, any> {
   const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');

@@ -82,6 +82,9 @@ describe('aida doctor', () => {
       assert.equal(summary[0].branch, project.branch);
       assert.equal(summary[0].modules.length, 0);
       assert.equal(summary[0].highlights.length, 0);
+      const config = readJson<any>(resolve(project.root, '.aida', 'config.json'));
+      assert.equal(config.schemaVersion, '2.0');
+      assert.ok(Array.isArray(config.security.skillScanPaths));
     } finally {
       project.cleanup();
     }
@@ -124,6 +127,87 @@ describe('aida doctor', () => {
       assert.ok(stdout.includes('Potential duplicate rules (1)'));
       assert.ok(stdout.includes('RULE-001 ↔ RULE-002'));
       assert.deepEqual(after, before);
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should print skill security warnings without mutating project truth sources', () => {
+    const project = createTestProject();
+
+    try {
+      writeJson(resolve(project.root, '.aida', 'config.json'), {
+        schemaVersion: '2.0',
+        project: 'test-project',
+        aiTools: ['claude-code'],
+        security: {
+          skillScanPaths: ['.cursor/skills'],
+        },
+      });
+      ensureDir(resolve(project.root, '.cursor', 'skills', 'networked-skill'));
+      writeText(
+        resolve(project.root, '.cursor', 'skills', 'networked-skill', 'SKILL.md'),
+        '# Networked Skill\n\nUse curl https://example.com/bootstrap\n',
+      );
+
+      const stdout = runCliOutput(project, 'doctor --security=skills');
+
+      assert.ok(stdout.includes('Skill security audit'));
+      assert.ok(stdout.includes('networked-skill'));
+      assert.ok(stdout.includes('tool-instruction'));
+      assert.ok(stdout.includes('curl'));
+    } finally {
+      project.cleanup();
+    }
+  });
+
+  it('should still run security audits when project health is otherwise clean', () => {
+    const project = createTestProject();
+
+    try {
+      writeJson(resolve(project.root, '.aida', 'config.json'), {
+        schemaVersion: '2.0',
+        project: 'test-project',
+        aiTools: ['codex'],
+        security: {
+          skillScanPaths: ['.codex/skills'],
+        },
+      });
+      writeJson(resolve(project.root, '.aida', 'rules.json'), {
+        schemaVersion: '2.0',
+        updatedAt: '2026-05-01T10:00:00.000Z',
+        items: [],
+      });
+      writeJson(resolve(project.root, '.aida', 'skills.json'), {
+        schemaVersion: '2.0',
+        updatedAt: '2026-05-01T10:00:00.000Z',
+        items: [],
+      });
+      ensureDir(resolve(project.root, '.aida', 'memories'));
+      writeJson(resolve(project.root, '.aida', 'memories', 'index.json'), {
+        schemaVersion: '2.0',
+        updatedAt: '2026-05-01T10:00:00.000Z',
+        items: [],
+      });
+      writeJson(resolve(project.root, '.aida', 'summary.json'), {
+        schemaVersion: '2.0',
+        updatedAt: '2026-05-01T10:00:00.000Z',
+        items: [],
+      });
+      ensureDir(resolve(project.root, '.codex', 'skills', 'networked-skill'));
+      writeText(
+        resolve(project.root, '.codex', 'skills', 'networked-skill', 'SKILL.md'),
+        '# Networked Skill\n\nRun curl https://example.com/bootstrap before use.\n',
+      );
+
+      const stdout = runCliOutput(project, 'doctor --fix');
+      assert.ok(stdout.includes('Project health looks good'));
+
+      const securityStdout = runCliOutput(project, 'doctor --security=skills');
+      assert.ok(securityStdout.includes('Project health looks good.'));
+      assert.ok(securityStdout.includes('Skill security audit'));
+      assert.ok(securityStdout.includes('networked-skill'));
+      assert.ok(securityStdout.includes('curl'));
     } finally {
       project.cleanup();
     }

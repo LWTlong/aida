@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
-import { fileExists, writeText, ensureDir, readText, resetDir } from './fs.js';
+import { fileExists, writeText, ensureDir, readText, resetDir, extractConflictSections } from './fs.js';
 import { aidaDir } from './paths.js';
-import type { RuleRegistryEntry } from '../schemas/run-json.js';
-import { RULE_CATEGORIES } from '../schemas/run-json.js';
+import type { RuleRegistryEntry } from '../schemas/rules.js';
+import { RULE_CATEGORIES } from '../schemas/rules.js';
 import { readRegistryEnvelope, writeRegistryEnvelope } from './registry.js';
+import { parseConflictRegistryItems } from './registry.js';
 
 // ─── Paths ────────────────────────────────────────────────
 
@@ -163,6 +164,41 @@ export function renderRuleMarkdownFiles(entries: RuleRegistryEntry[]): Map<strin
 
 export function saveRegistry(projectRoot: string, entries: RuleRegistryEntry[]): void {
   writeRegistryEnvelope(registryPath(projectRoot), entries);
+}
+
+export function mergeRuleRegistryAtPath(
+  projectRoot: string,
+  filePath: string,
+): { status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number } {
+  if (!fileExists(filePath)) {
+    return { status: 'missing' };
+  }
+
+  const raw = readText(filePath);
+  if (!raw.includes('<<<<<<<') && !raw.includes('>>>>>>>')) {
+    return { status: 'no-conflict' };
+  }
+
+  const sections = extractConflictSections(raw);
+  if (!sections) {
+    return { status: 'error' };
+  }
+
+  const ours = parseConflictRegistryItems<RuleRegistryEntry>(sections.ours);
+  const theirs = parseConflictRegistryItems<RuleRegistryEntry>(sections.theirs);
+  if (ours.length === 0 && theirs.length === 0) {
+    return { status: 'error' };
+  }
+
+  const { merged, added } = mergeRegistries(ours, theirs);
+  const sorted = merged.sort((a, b) => a.id.localeCompare(b.id));
+  saveRegistry(projectRoot, sorted);
+
+  return { status: 'merged', added, total: sorted.length };
+}
+
+export function mergeRuleRegistry(projectRoot: string) {
+  return mergeRuleRegistryAtPath(projectRoot, registryPath(projectRoot));
 }
 
 function categoryFromTitle(title: string): RuleRegistryEntry['category'] {

@@ -16,7 +16,7 @@ import {
   findSimilarRules,
   registryPath,
 } from '../src/utils/rules.js';
-import type { RuleRegistryEntry } from '../src/schemas/run-json.js';
+import type { RuleRegistryEntry } from '../src/schemas/rules.js';
 
 let tmpRoot: string;
 

@@ -2,15 +2,12 @@ import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { green, red, yellow, cyan, dim } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
-import { extractConflictSections, fileExists, readText, ensureDir, writeText } from '../../utils/fs.js';
-import { parseConflictRegistryItems } from '../../utils/registry.js';
+import { fileExists, readText, ensureDir, writeText } from '../../utils/fs.js';
 import {
   loadSkillRegistry,
-  mergeSkillRegistries,
-  saveSkillRegistry,
+  mergeSkillRegistry,
   skillsRegistryPath,
   bootstrapSkillRegistry,
-  type SkillRegistryEntry,
   updateSkillContent,
 } from '../../utils/skills.js';
 import { buildProjectArtifacts } from '../../utils/ai-build.js';
@@ -42,31 +39,6 @@ async function skillsBuild(): Promise<void> {
   );
 }
 
-export async function mergeSkillsRegistry(projectRoot: string): Promise<{ status: 'merged' | 'no-conflict' | 'missing' | 'error'; added?: number; total?: number }> {
-  const regPath = skillsRegistryPath(projectRoot);
-
-  if (!fileExists(regPath)) {
-    return { status: 'missing' };
-  }
-
-  const raw = readText(regPath);
-  if (!raw.includes('<<<<<<<') && !raw.includes('>>>>>>>')) {
-    return { status: 'no-conflict' };
-  }
-
-  const sections = extractConflictSections(raw);
-  if (!sections) {
-    return { status: 'error' };
-  }
-
-  const ours = parseConflictRegistryItems<SkillRegistryEntry>(sections.ours);
-  const theirs = parseConflictRegistryItems<SkillRegistryEntry>(sections.theirs);
-  const { merged, added } = mergeSkillRegistries(ours, theirs);
-  saveSkillRegistry(projectRoot, merged);
-
-  return { status: 'merged', added, total: merged.length };
-}
-
 async function skillsMerge(): Promise<void> {
   const projectRoot = process.cwd();
   const regPath = skillsRegistryPath(projectRoot);
@@ -83,7 +55,7 @@ async function skillsMerge(): Promise<void> {
   }
 
   console.log(yellow('\n  Merge conflict detected in skills.json. Resolving...\n'));
-  const result = await mergeSkillsRegistry(projectRoot);
+  const result = mergeSkillRegistry(projectRoot);
   if (result.status === 'error') {
     console.log(red('  Could not parse conflict markers. Please resolve manually.\n'));
     return;
@@ -218,7 +190,7 @@ export async function skills(): Promise<void> {
     list      List all skills in the registry (--json supported)
 
   The source of truth is .aida/skills.json (committed to git).
-  aida build distributes generated skill files into each configured AI tool directory.
+  aida sync distributes generated skill files into each configured AI tool directory.
 `);
   }
 }
