@@ -64,6 +64,11 @@ async function main() {
       await skills();
       break;
     }
+    case 'merge': {
+      const { merge } = await import('./commands/merge.js');
+      await merge();
+      break;
+    }
     case 'mcp': {
       const { startMcpServer } = await import('../mcp/server.js');
       startMcpServer();
@@ -78,6 +83,7 @@ async function main() {
     aida mcp         Start MCP server (stdio mode, for AI tools)
     aida sync        Rebuild memory views and AI-tool artifacts from truth sources
     aida doctor      Inspect and normalize 2.0 JSON truth sources
+    aida merge       Resolve git merge conflicts in AIDA JSON files
     aida memory      Manage branch context and module memory
     aida rules       Manage project rules registry
     aida skills      Manage project skills registry

@@ -1,7 +1,9 @@
 import { green, red, yellow, cyan, dim } from '../../utils/display.js';
-import { configPath } from '../../utils/paths.js';
-import { fileExists } from '../../utils/fs.js';
+import { configPath, aidaDir } from '../../utils/paths.js';
+import { fileExists, readText } from '../../utils/fs.js';
 import { inspectProject, inspectSecurity, normalizeProject } from '../../services/project-health.js';
+import { readdirSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 function hasFixFlag(): boolean {
   return process.argv.slice(3).includes('--fix');
@@ -20,6 +22,35 @@ function line(ok: boolean, label: string, detail: string): void {
   console.log(`${ok ? green('  ✓') : yellow('  !')} ${label}: ${detail}`);
 }
 
+function walkJsonFiles(rootDir: string): string[] {
+  if (!fileExists(rootDir)) return [];
+  const results: string[] = [];
+  const stack = [rootDir];
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    for (const name of readdirSync(current)) {
+      const fullPath = resolve(current, name);
+      const stat = statSync(fullPath);
+      if (stat.isDirectory()) stack.push(fullPath);
+      else if (name.endsWith('.json')) results.push(fullPath);
+    }
+  }
+  return results;
+}
+
+function findConflictedFiles(projectRoot: string): string[] {
+  const dir = aidaDir(projectRoot);
+  if (!fileExists(dir)) return [];
+  return walkJsonFiles(dir).filter((f) => {
+    try {
+      const raw = readText(f);
+      return raw.includes('<<<<<<<') || raw.includes('>>>>>>>');
+    } catch {
+      return false;
+    }
+  });
+}
+
 export async function doctor(): Promise<void> {
   const projectRoot = process.cwd();
 
@@ -27,6 +58,16 @@ export async function doctor(): Promise<void> {
 
   if (!fileExists(configPath(projectRoot))) {
     console.log(red('  AIDA not initialized. Run `npx aida init` first.\n'));
+    return;
+  }
+
+  const conflicted = findConflictedFiles(projectRoot);
+  if (conflicted.length > 0) {
+    console.log(yellow(`  ⚠ ${conflicted.length} AIDA JSON file(s) have unresolved git merge conflicts:`));
+    for (const f of conflicted) {
+      console.log(`    - ${f.replace(projectRoot + '/', '')}`);
+    }
+    console.log(yellow('\n  Run `aida merge` to auto-resolve conflicts before running doctor.\n'));
     return;
   }
 
