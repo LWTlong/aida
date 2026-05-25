@@ -1,5 +1,7 @@
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
+import { readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { green, red, yellow, cyan, dim } from '../../utils/display.js';
 import { configPath } from '../../utils/paths.js';
 import { fileExists, readText, ensureDir, writeText } from '../../utils/fs.js';
@@ -10,7 +12,9 @@ import {
   bootstrapSkillRegistry,
   updateSkillContent,
 } from '../../utils/skills.js';
-import { buildProjectArtifacts } from '../../utils/ai-build.js';
+import { buildProjectArtifacts, readConfiguredTools } from '../../utils/ai-build.js';
+import { promptMultiSelect } from '../../utils/prompt.js';
+import type { AiToolChoice } from '../../schemas/aida-project.js';
 
 function subcommand(): string {
   return process.argv[3] || '';
@@ -162,14 +166,165 @@ async function skillsEdit(): Promise<void> {
   console.log(dim('  skills.json has been updated and targets rebuilt.\n'));
 }
 
+// ─── Preset skills ──────────────────────────────────────────────────────────
+
+/** Path templates for each supported AI tool. {name} is replaced with the skill name. */
+const PRESET_TOOL_PATHS: Record<string, string> = {
+  'claude-code': '.claude/commands/{name}.md',
+  'cursor': '.cursor/skills/{name}/SKILL.md',
+  'codex': '.codex/skills/{name}/SKILL.md',
+};
+
+const PRESET_TOOL_LABELS: Record<string, string> = {
+  'claude-code': 'Claude Code (.claude/commands/)',
+  'cursor': 'Cursor (.cursor/skills/)',
+  'codex': 'Codex (.codex/skills/)',
+};
+
+/** Resolve the directory that contains preset skill markdown files. */
+function presetSkillsDir(): string {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  // dist/cli/commands/ → dist/assets/skills/
+  return resolve(__dirname, '../../assets/skills');
+}
+
+interface PresetSkill {
+  name: string
+  content: string
+}
+
+function loadPresetSkills(): PresetSkill[] {
+  const dir = presetSkillsDir();
+  let files: string[];
+  try {
+    files = readdirSync(dir).filter((f) => f.endsWith('.md'));
+  } catch {
+    return [];
+  }
+  return files.map((file) => ({
+    name: file.replace(/\.md$/, ''),
+    content: readText(resolve(dir, file)),
+  }));
+}
+
+function resolvePresetPath(projectRoot: string, tool: string, skillName: string): string {
+  const template = PRESET_TOOL_PATHS[tool];
+  if (!template) throw new Error(`Unknown tool: ${tool}`);
+  return resolve(projectRoot, template.replace('{name}', skillName));
+}
+
+async function resolveTargetTools(projectRoot: string): Promise<string[]> {
+  // Check configured tools from config.json, but only those that have a preset path
+  const configured = readConfiguredTools(projectRoot).filter((t) => PRESET_TOOL_PATHS[t]);
+  if (configured.length > 0) return configured;
+
+  // No config found — ask the user
+  const options = Object.entries(PRESET_TOOL_LABELS).map(([value, label]) => ({ value, label }));
+  const selected = await promptMultiSelect<string>(
+    '\n  Which AI tools do you want to install preset skills into?',
+    options,
+    { required: true },
+  );
+  return selected;
+}
+
+async function skillsPreset(): Promise<void> {
+  const projectRoot = process.cwd();
+  const presets = loadPresetSkills();
+
+  if (presets.length === 0) {
+    console.log(red('\n  No preset skills found. Package may need a rebuild.\n'));
+    return;
+  }
+
+  const tools = await resolveTargetTools(projectRoot);
+  if (tools.length === 0) {
+    console.log(yellow('\n  No tools selected. Nothing to install.\n'));
+    return;
+  }
+
+  console.log('');
+  let installed = 0;
+  let skipped = 0;
+
+  for (const tool of tools) {
+    for (const skill of presets) {
+      const destPath = resolvePresetPath(projectRoot, tool, skill.name);
+      if (fileExists(destPath)) {
+        console.log(dim(`  ~ Skipped (already exists): ${destPath.replace(projectRoot + '/', '')}`));
+        skipped++;
+        continue;
+      }
+      ensureDir(resolve(destPath, '..'));
+      writeText(destPath, skill.content);
+      console.log(green(`  ✓ Installed`) + `: ${destPath.replace(projectRoot + '/', '')}`);
+      installed++;
+    }
+  }
+
+  console.log('');
+  if (installed > 0) {
+    console.log(green(`  ${installed} skill(s) installed`) + (skipped > 0 ? dim(`, ${skipped} skipped (already exist — use \`aida skills update\` to overwrite)`) : '') + '\n');
+  } else {
+    console.log(yellow(`  All preset skills already installed.`) + dim(' Use `aida skills update` to overwrite with latest version.\n'));
+  }
+}
+
+async function skillsUpdate(): Promise<void> {
+  const projectRoot = process.cwd();
+  const presets = loadPresetSkills();
+
+  if (presets.length === 0) {
+    console.log(red('\n  No preset skills found. Package may need a rebuild.\n'));
+    return;
+  }
+
+  const tools = await resolveTargetTools(projectRoot);
+  if (tools.length === 0) {
+    console.log(yellow('\n  No tools selected. Nothing to update.\n'));
+    return;
+  }
+
+  console.log('');
+  let updated = 0;
+  let fresh = 0;
+
+  for (const tool of tools) {
+    for (const skill of presets) {
+      const destPath = resolvePresetPath(projectRoot, tool, skill.name);
+      const isNew = !fileExists(destPath);
+      ensureDir(resolve(destPath, '..'));
+      writeText(destPath, skill.content);
+      if (isNew) {
+        console.log(green(`  ✓ Installed`) + `: ${destPath.replace(projectRoot + '/', '')}`);
+        fresh++;
+      } else {
+        console.log(green(`  ✓ Updated`) + `: ${destPath.replace(projectRoot + '/', '')}`);
+        updated++;
+      }
+    }
+  }
+
+  console.log('');
+  console.log(green(`  ${updated + fresh} skill(s) written`) + dim(` (${updated} updated, ${fresh} new)\n`));
+}
+
+// ─── Main export ────────────────────────────────────────────────────────────
+
 export async function skills(): Promise<void> {
   const projectRoot = process.cwd();
+  const sub = subcommand();
+
+  // preset and update don't require AIDA to be initialized
+  if (sub === 'preset') return skillsPreset();
+  if (sub === 'update') return skillsUpdate();
+
   if (!fileExists(configPath(projectRoot))) {
     console.log(red('\n  AIDA not initialized. Run `npx aida init` first.\n'));
     return;
   }
 
-  switch (subcommand()) {
+  switch (sub) {
     case 'build':
       return skillsBuild();
     case 'merge':
@@ -188,6 +343,8 @@ export async function skills(): Promise<void> {
     edit      Edit one skill and save back to skills.json
     merge     Auto-resolve git merge conflicts in skills.json
     list      List all skills in the registry (--json supported)
+    preset    Install preset skills into AI tool directories
+    update    Update installed preset skills to the latest version
 
   The source of truth is .aida/skills.json (committed to git).
   aida sync distributes generated skill files into each configured AI tool directory.

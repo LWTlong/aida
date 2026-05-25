@@ -1,13 +1,13 @@
 {
   "name": "ai-dev-analytics",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "AIDA 2.0 - AI asset truth-source management for rules, skills, memories, and summaries",
   "type": "module",
   "bin": {
     "aida": "dist/cli/index.js"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc",
+    "build": "rm -rf dist && tsc && cp -r src/assets dist/",
     "build:test": "rm -rf dist-test && tsc -p tsconfig.test.json",
     "test": "npm run build:test && node --test dist-test/tests/*.test.js",
     "dev": "tsc --watch",
