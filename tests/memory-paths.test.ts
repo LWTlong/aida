@@ -7,8 +7,6 @@ import {
   moduleMemoryPath,
   moduleMemoryViewPath,
   runContextPath,
-  runContextViewPath,
-  runMemoryPackViewPath,
 } from '../src/utils/paths.js';
 import { normalizeModuleKey } from '../src/utils/memory.js';
 
@@ -29,7 +27,5 @@ describe('memory path helpers', () => {
     assert.equal(legacyModuleMemoryPath(root, 'order/detail'), '/tmp/example-project/.aida/memories/modules/order/detail.json');
     assert.equal(legacyModuleMemoryViewPath(root, 'order/detail'), '/tmp/example-project/.aida/memories/modules/order/detail.md');
     assert.equal(runContextPath(root, 'feature/profile'), '/tmp/example-project/.aida/runs/feature-profile/context.json');
-    assert.equal(runContextViewPath(root, 'feature/profile'), '/tmp/example-project/.aida/runs/feature-profile/context.md');
-    assert.equal(runMemoryPackViewPath(root, 'feature/profile'), '/tmp/example-project/.aida/runs/feature-profile/memory.md');
   });
 });

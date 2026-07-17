@@ -1,214 +1,227 @@
-import { useState } from 'react'
-import { useRunData, ALL_PROJECT_ID } from './hooks/useRunData'
-import { useOverviewData } from './hooks/useOverviewData'
-import { Header } from './components/Header'
-import { KpiRow } from './components/KpiRow'
-import { ChartCard } from './components/ChartCard'
-import { TaskChart } from './components/charts/TaskChart'
-import { DeviationPie } from './components/charts/DeviationPie'
-import { DeviationBar } from './components/charts/DeviationBar'
-import { FileHotspot } from './components/charts/FileHotspot'
-import { DeviationTrend } from './components/charts/DeviationTrend'
-import { NodeTimeChart } from './components/charts/NodeTimeChart'
-import { TaskTimeRanking } from './components/charts/TaskTimeRanking'
-import { StageTimeDistribution } from './components/charts/StageTimeDistribution'
-import { FirstPassRateTrend } from './components/charts/FirstPassRateTrend'
-import { ReviewIssueTypes } from './components/charts/ReviewIssueTypes'
-import { BugSeverityChart } from './components/charts/BugSeverityChart'
-import { Timeline } from './components/Timeline'
-import { RulesTable } from './components/RulesTable'
-import { ProjectOverview } from './components/ProjectOverview'
-import { LocaleContext, getTranslations, getStoredLocale, storeLocale, type Locale } from './i18n'
+import { useEffect, useMemo, useState } from 'react';
+import { auditPlugin, buildPlugin, buildSelfPlugin, fetchAssets, fetchDecisions, scanAssets } from './api';
+import { Shell } from './components/Shell';
+import { AssetsPage } from './pages/AssetsPage';
+import { MemoriesPage } from './pages/MemoriesPage';
+import { OverviewPage } from './pages/OverviewPage';
+import { PluginPage } from './pages/PluginPage';
+import type { BuildPluginResult, DashboardAsset, DashboardAssetIndex, DashboardDecision, PluginRiskReport } from './types';
+import { ASSET_LIMIT, assetLabel, filterAssets, type PageKey } from './viewHelpers';
+
+type ThemeMode = 'system' | 'light' | 'dark';
+type AssetView = 'all' | 'rule' | 'skill' | 'memory' | 'doc' | 'mcp-config' | 'command' | 'tool-config' | 'plugin';
+
+function getStoredThemeMode(): ThemeMode {
+  const value = window.localStorage.getItem('aida-dashboard-theme');
+  return value === 'light' || value === 'dark' || value === 'system' ? value : 'system';
+}
 
 function App() {
-  const [locale, setLocaleState] = useState<Locale>(getStoredLocale)
-  const t = getTranslations(locale)
+  const [activePage, setActivePage] = useState<PageKey>('overview');
+  const [assets, setAssets] = useState<DashboardAssetIndex | null>(null);
+  const [query, setQuery] = useState('');
+  const [themeMode, setThemeMode] = useState<ThemeMode>(getStoredThemeMode);
+  const [assetView, setAssetView] = useState<AssetView>('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [pluginPath, setPluginPath] = useState('');
+  const [pluginRisk, setPluginRisk] = useState<PluginRiskReport | null>(null);
+  const [pluginLoading, setPluginLoading] = useState(false);
+  const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
+  const [pluginName, setPluginName] = useState('');
+  const [pluginDescription, setPluginDescription] = useState('');
+  const [pluginVersion, setPluginVersion] = useState('0.1.0');
+  const [pluginBuildResult, setPluginBuildResult] = useState<BuildPluginResult | null>(null);
+  const [pluginBuildLoading, setPluginBuildLoading] = useState(false);
+  const [decisions, setDecisions] = useState<DashboardDecision[]>([]);
+  const [selfBuildLoading, setSelfBuildLoading] = useState(false);
+  const [selfBuildResult, setSelfBuildResult] = useState<{ outputPath: string; skills: string[]; files: number } | null>(null);
 
-  const setLocale = (l: Locale) => {
-    setLocaleState(l)
-    storeLocale(l)
-  }
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const syncTheme = () => {
+      const resolved = themeMode === 'system' ? (media.matches ? 'dark' : 'light') : themeMode;
+      document.documentElement.dataset.theme = resolved;
+    };
+    syncTheme();
+    window.localStorage.setItem('aida-dashboard-theme', themeMode);
+    media.addEventListener('change', syncTheme);
+    return () => media.removeEventListener('change', syncTheme);
+  }, [themeMode]);
 
-  const { runs, currentRunId, setCurrentRunId, runData, loading, connected } = useRunData()
-  const { data: overviewData, loading: overviewLoading } = useOverviewData()
+  useEffect(() => {
+    void loadAll(true);
+  }, []);
 
-  const isOverview = currentRunId === ALL_PROJECT_ID
-
-  if (loading && !runData && !isOverview && runs.length !== 0) {
-    return (
-      <LocaleContext.Provider value={{ locale, setLocale, t }}>
-        <div className="min-h-screen flex items-center justify-center text-[#6b7b8d]">
-          {t.loading}
-        </div>
-      </LocaleContext.Provider>
-    )
-  }
-
-  if (isOverview && overviewLoading && !overviewData) {
-    return (
-      <LocaleContext.Provider value={{ locale, setLocale, t }}>
-        <div className="min-h-screen flex items-center justify-center text-[#6b7b8d]">
-          {t.loading}
-        </div>
-      </LocaleContext.Provider>
-    )
-  }
-
-  // Handle selecting a branch from overview table
-  const handleSelectBranch = (branch: string) => {
-    const run = runs.find((r) => r.branch === branch)
-    if (run) {
-      setCurrentRunId(run.runId)
+  async function loadAll(initial = false) {
+    try {
+      if (initial) setIsLoading(true);
+      else setIsRefreshing(true);
+      setError('');
+      const [assetData, decisionsData] = await Promise.all([fetchAssets(), fetchDecisions()]);
+      setAssets(assetData);
+      setDecisions(decisionsData.decisions);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '加载治理面板失败');
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
     }
   }
 
-  // No data at all
-  if (!isOverview && !runData) {
-    return (
-      <LocaleContext.Provider value={{ locale, setLocale, t }}>
-        <div>
-          <Header
-            runs={runs}
-            currentRunId={currentRunId}
-            onSelectRun={setCurrentRunId}
-            meta={null}
-            connected={connected}
-          />
-          <div className="text-center py-20 text-[#6b7b8d]">
-            <h2 className="text-lg mb-2 text-[#e0e6ed]">{t.noRunData}</h2>
-            <p dangerouslySetInnerHTML={{ __html: t.noRunDataHint }} className="[&_code]:bg-[#162231] [&_code]:px-2 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[13px]" />
-          </div>
-        </div>
-      </LocaleContext.Provider>
-    )
+  async function handleScan() {
+    try {
+      setNotice('');
+      setError('');
+      setIsRefreshing(true);
+      setAssets(await scanAssets());
+      setNotice('资产已重新扫描，面板数据已刷新。');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '重新扫描失败');
+    } finally {
+      setIsRefreshing(false);
+    }
   }
 
-  // Project overview mode
-  if (isOverview) {
-    return (
-      <LocaleContext.Provider value={{ locale, setLocale, t }}>
-        <div>
-          <Header
-            runs={runs}
-            currentRunId={currentRunId}
-            onSelectRun={setCurrentRunId}
-            meta={null}
-            connected={connected}
-          />
-          {overviewData ? (
-            <ProjectOverview data={overviewData} onSelectBranch={handleSelectBranch} />
-          ) : (
-            <div className="text-center py-20 text-[#6b7b8d]">
-              <h2 className="text-lg mb-2 text-[#e0e6ed]">{t.noOverviewData}</h2>
-              <p dangerouslySetInnerHTML={{ __html: t.noOverviewDataHint }} className="[&_code]:bg-[#162231] [&_code]:px-2 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-[13px]" />
-            </div>
-          )}
-          <div className="text-center py-6 text-[#3d4f5f] text-xs border-t border-[#1e2d3d] mt-5">
-            {t.footerOverview}
-          </div>
-        </div>
-      </LocaleContext.Provider>
-    )
+  async function handleAuditPlugin() {
+    if (!pluginPath.trim()) {
+      setError('请先输入要审计的插件目录。');
+      return;
+    }
+    try {
+      setError('');
+      setPluginLoading(true);
+      setPluginRisk(await auditPlugin(pluginPath.trim()));
+    } catch (err) {
+      setPluginRisk(null);
+      setError(err instanceof Error ? err.message : '插件审计失败');
+    } finally {
+      setPluginLoading(false);
+    }
   }
 
-  // Branch detail mode
+  async function handleBuildPlugin() {
+    if (!pluginName.trim()) { setError('请先填写 plugin 名称。'); return; }
+    if (!pluginDescription.trim()) { setError('请先填写 plugin 描述。'); return; }
+    if (selectedAssetIds.length === 0) { setError('请至少勾选一个资产后再导出 plugin。'); return; }
+    try {
+      setError('');
+      setPluginBuildLoading(true);
+      const result = await buildPlugin({
+        name: pluginName.trim(),
+        description: pluginDescription.trim(),
+        version: pluginVersion.trim() || undefined,
+        assetIds: selectedAssetIds,
+      });
+      setPluginBuildResult(result);
+      setNotice(result.message);
+    } catch (err) {
+      setPluginBuildResult(null);
+      setError(err instanceof Error ? err.message : '导出 plugin 失败');
+    } finally {
+      setPluginBuildLoading(false);
+    }
+  }
+
+  async function handleBuildSelf() {
+    try {
+      setError('');
+      setSelfBuildLoading(true);
+      setSelfBuildResult(await buildSelfPlugin());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '打包 AIDA 失败');
+    } finally {
+      setSelfBuildLoading(false);
+    }
+  }
+
+  function toggleAssetSelection(asset: DashboardAsset) {
+    setSelectedAssetIds((current) =>
+      current.includes(asset.id) ? current.filter((id) => id !== asset.id) : [...current, asset.id],
+    );
+  }
+
+  const filtered = useMemo(() => filterAssets(assets?.assets || [], assetView, query), [assets, assetView, query]);
+  const displayedAssets = filtered.slice(0, ASSET_LIMIT);
+  const selectedAssets = useMemo(
+    () => (assets?.assets || []).filter((item) => selectedAssetIds.includes(item.id)),
+    [assets, selectedAssetIds],
+  );
+
+  const assetTypeTabs = useMemo(() => {
+    const keys = ['all', 'rule', 'skill', 'memory', 'doc', 'mcp-config', 'command', 'tool-config', 'plugin'] as AssetView[];
+    return keys.map((key) => ({
+      key,
+      label: assetLabel(key),
+      count: key === 'all' ? assets?.assets.length || 0 : assets?.summary[key] || 0,
+    }));
+  }, [assets]);
+
+  if (isLoading) return <div className="shell-state">正在加载 AIDA 治理面板…</div>;
+
   return (
-    <LocaleContext.Provider value={{ locale, setLocale, t }}>
-      <div>
-        <Header
-          runs={runs}
-          currentRunId={currentRunId}
-          onSelectRun={setCurrentRunId}
-          meta={runData!.meta}
-          connected={connected}
+    <Shell
+      activePage={activePage}
+      generatedAt={assets?.generatedAt}
+      isRefreshing={isRefreshing}
+      onNavigate={setActivePage}
+      onRefresh={() => void loadAll()}
+      onScan={handleScan}
+      onThemeChange={setThemeMode}
+      themeMode={themeMode}
+    >
+      {(notice || error) && <section className={error ? 'banner error' : 'banner'}>{error || notice}</section>}
+
+      {activePage === 'overview' && (
+        <OverviewPage
+          assets={assets}
+          onNavigate={setActivePage}
         />
-
-        <KpiRow data={runData!} />
-
-        <div className="grid grid-cols-2 gap-4 px-8 pb-5 max-md:grid-cols-1">
-          {Object.keys(runData!.metrics.nodeTimeBreakdown || {}).length > 0 && (
-            <ChartCard title={t.chartNodeTime}>
-              <NodeTimeChart metrics={runData!.metrics} />
-            </ChartCard>
-          )}
-
-          {runData!.tasks.length > 0 && (
-            <ChartCard title={t.chartTaskRanking}>
-              <TaskTimeRanking tasks={runData!.tasks} />
-            </ChartCard>
-          )}
-
-          {runData!.workflow.length > 0 && (
-            <ChartCard title={t.chartStageTime}>
-              <StageTimeDistribution workflow={runData!.workflow} />
-            </ChartCard>
-          )}
-
-          <ChartCard title={t.chartTimeline}>
-            <Timeline items={runData!.timeline} prdPhases={runData!.meta.prdPhases} />
-          </ChartCard>
-
-          {runData!.tasks.length > 0 && (
-            <ChartCard title={t.chartTaskCompletion}>
-              <TaskChart tasks={runData!.tasks} prdPhases={runData!.meta.prdPhases} />
-            </ChartCard>
-          )}
-
-          {runData!.reviews.length > 0 && (
-            <ChartCard title={t.chartFirstPassRate}>
-              <FirstPassRateTrend reviews={runData!.reviews} />
-            </ChartCard>
-          )}
-
-          {runData!.deviations.length > 0 && (
-            <ChartCard title={t.chartDeviationPie}>
-              <DeviationPie deviations={runData!.deviations} />
-            </ChartCard>
-          )}
-
-          {runData!.deviations.length > 0 && (
-            <ChartCard title={t.chartDeviationBar}>
-              <DeviationBar deviations={runData!.deviations} />
-            </ChartCard>
-          )}
-
-          {runData!.bugs.length > 0 && (
-            <ChartCard title={t.chartBugSeverity}>
-              <BugSeverityChart bugs={runData!.bugs} />
-            </ChartCard>
-          )}
-
-          {runData!.reviews.length > 0 && (
-            <ChartCard title={t.chartReviewIssues}>
-              <ReviewIssueTypes reviews={runData!.reviews} />
-            </ChartCard>
-          )}
-
-          {(runData!.deviations.length > 0 || runData!.bugs.length > 0) && (
-            <ChartCard title={t.chartFileHotspot}>
-              <FileHotspot deviations={runData!.deviations} bugs={runData!.bugs} />
-            </ChartCard>
-          )}
-
-          {runData!.deviations.length > 0 && (
-            <ChartCard title={t.chartDeviationTrend}>
-              <DeviationTrend deviations={runData!.deviations} rules={runData!.rules} />
-            </ChartCard>
-          )}
-
-          {runData!.rules.length > 0 && (
-            <ChartCard title={t.chartRulesTable} full>
-              <RulesTable rules={runData!.rules} deviations={runData!.deviations} />
-            </ChartCard>
-          )}
-        </div>
-
-        <div className="text-center py-6 text-[#3d4f5f] text-xs border-t border-[#1e2d3d] mt-5">
-          {t.footerDashboard}
-        </div>
-      </div>
-    </LocaleContext.Provider>
-  )
+      )}
+      {activePage === 'assets' && (
+        <AssetsPage
+          assetView={assetView}
+          assets={assets}
+          displayedAssets={displayedAssets}
+          filteredCount={filtered.length}
+          query={query}
+          selectedAssetIds={selectedAssetIds}
+          tabs={assetTypeTabs}
+          onAssetViewChange={(view) => setAssetView(view as AssetView)}
+          onQueryChange={setQuery}
+          onToggleAsset={toggleAssetSelection}
+        />
+      )}
+      {activePage === 'memories' && (
+        <MemoriesPage decisions={decisions} />
+      )}
+      {activePage === 'plugin' && (
+        <PluginPage
+          pluginBuildLoading={pluginBuildLoading}
+          pluginBuildResult={pluginBuildResult}
+          pluginDescription={pluginDescription}
+          pluginLoading={pluginLoading}
+          pluginName={pluginName}
+          pluginPath={pluginPath}
+          pluginRisk={pluginRisk}
+          pluginVersion={pluginVersion}
+          selectedAssets={selectedAssets}
+          selfBuildLoading={selfBuildLoading}
+          selfBuildResult={selfBuildResult}
+          onAuditPlugin={() => void handleAuditPlugin()}
+          onBuildPlugin={() => void handleBuildPlugin()}
+          onBuildSelf={() => void handleBuildSelf()}
+          onPluginDescriptionChange={setPluginDescription}
+          onPluginNameChange={setPluginName}
+          onPluginPathChange={setPluginPath}
+          onPluginVersionChange={setPluginVersion}
+          onToggleAsset={toggleAssetSelection}
+        />
+      )}
+    </Shell>
+  );
 }
 
-export default App
+export default App;

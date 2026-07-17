@@ -3,9 +3,6 @@ import {
   mkdirSync,
   readFileSync,
   writeFileSync,
-  readdirSync,
-  rmSync,
-  statSync,
 } from 'node:fs';
 import { resolve, basename } from 'node:path';
 
@@ -13,11 +10,6 @@ export function ensureDir(dir: string): void {
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
-}
-
-export function resetDir(dir: string): void {
-  rmSync(dir, { recursive: true, force: true });
-  mkdirSync(dir, { recursive: true });
 }
 
 export function readJson<T = unknown>(filePath: string): T {
@@ -51,89 +43,4 @@ export function getProjectName(): string {
     /* no package.json */
   }
   return basename(process.cwd());
-}
-
-export function listDirs(dir: string): string[] {
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir).filter((name) => {
-    const full = resolve(dir, name);
-    return statSync(full).isDirectory();
-  });
-}
-
-/**
- * Extract ours/theirs sections from a file with git conflict markers.
- * Handles standard format and diff3 format (with ||||||| base section).
- * Returns null if no conflict markers found.
- */
-export function extractConflictSections(
-  raw: string,
-): { ours: string; theirs: string } | null {
-  const lines = raw.split('\n');
-  type State = 'before' | 'ours' | 'base' | 'theirs';
-  let state: State = 'before';
-  let hasConflict = false;
-  const oursLines: string[] = [];
-  const theirsLines: string[] = [];
-
-  for (const line of lines) {
-    const marker = line.trimStart();
-    if (marker.startsWith('<<<<<<<')) {
-      hasConflict = true;
-      state = 'ours';
-    } else if (marker.startsWith('|||||||')) {
-      state = 'base'; // diff3 base section — skip
-    } else if (marker.startsWith('=======')) {
-      state = 'theirs';
-    } else if (marker.startsWith('>>>>>>>')) {
-      state = 'before'; // reset after conflict block
-    } else {
-      if (state === 'ours') {
-        oursLines.push(line);
-      } else if (state === 'theirs') {
-        theirsLines.push(line);
-      } else if (state === 'before') {
-        // Preserve shared lines on both sides so interleaved conflict blocks
-        // can still be reconstructed into complete JSON payloads.
-        oursLines.push(line);
-        theirsLines.push(line);
-      }
-    }
-  }
-
-  if (!hasConflict) return null;
-  return {
-    ours: oursLines.join('\n').trim(),
-    theirs: theirsLines.join('\n').trim(),
-  };
-}
-
-/**
- * Parse one side of a JSON merge-conflict section into a normalized array payload.
- * Supports:
- * - full arrays: `[{}, {}]`
- * - single objects: `{}`
- * - empty object / null / empty string => `[]`
- * - array fragments extracted from inside a larger array: `{...}, {...}`
- */
-export function parseConflictJsonArray<T = Record<string, unknown>>(raw: string): T[] {
-  const trimmed = raw.trim();
-  if (!trimmed || trimmed === 'null' || trimmed === '{}') return [];
-
-  try {
-    const parsed = JSON.parse(trimmed);
-    if (Array.isArray(parsed)) return parsed as T[];
-    if (parsed && typeof parsed === 'object') {
-      return Object.keys(parsed as object).length === 0 ? [] : [parsed as T];
-    }
-  } catch {
-    // Fall through to fragment parsing.
-  }
-
-  try {
-    const parsed = JSON.parse(`[${trimmed}]`);
-    return Array.isArray(parsed) ? parsed as T[] : [];
-  } catch {
-    return [];
-  }
 }

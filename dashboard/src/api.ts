@@ -1,96 +1,64 @@
-import type { RunSummary, RunData, RequirementData, IndexData } from './types'
+import type {
+  BuildPluginResult,
+  DashboardAssetIndex,
+  DashboardDecision,
+  PluginRiskReport,
+} from './types';
 
-const BASE = ''
-export const isDemo = import.meta.env.VITE_DEMO === 'true'
-const DEMO_BASE = `${import.meta.env.BASE_URL}demo`
+const BASE = '';
 
-function getDemoLocale(): string {
-  try { return localStorage.getItem('aida-locale') || 'zh' } catch { return 'zh' }
-}
-
-function getDemoRunFile(): string {
-  return `run.${getDemoLocale()}.json`
-}
-
-async function demoFetch<T>(file: string, fallback: T): Promise<T> {
-  try {
-    const res = await fetch(`${DEMO_BASE}/${file}`)
-    if (!res.ok) return fallback
-    return res.json()
-  } catch { return fallback }
-}
-
-export async function fetchRuns(): Promise<RunSummary[]> {
-  if (isDemo) return demoFetch('runs.json', [])
-  const res = await fetch(`${BASE}/api/runs`)
-  if (!res.ok) return []
-  return res.json()
-}
-
-export async function fetchRunData(runId: string): Promise<RunData | null> {
-  if (isDemo) return demoFetch(getDemoRunFile(), null)
-  const res = await fetch(`${BASE}/api/runs/${runId}`)
-  if (!res.ok) return null
-  return res.json()
-}
-
-export async function fetchAggregatedData(): Promise<RunData | null> {
-  if (isDemo) return demoFetch(getDemoRunFile(), null)
-  const res = await fetch(`${BASE}/api/aggregate`)
-  if (!res.ok) return null
-  return res.json()
-}
-
-export async function fetchOverview(): Promise<IndexData | null> {
-  if (isDemo) return demoFetch('overview.json', null)
-  const res = await fetch(`${BASE}/api/overview`)
-  if (!res.ok) return null
-  return res.json()
-}
-
-export async function fetchRequirement(branch: string): Promise<RequirementData | null> {
-  if (isDemo) return null
-  const res = await fetch(`${BASE}/api/requirement/${encodeURIComponent(branch)}`)
-  if (!res.ok) return null
-  return res.json()
-}
-
-export async function updateRunCost(
-  runId: string,
-  updates: { estimatedManualHours?: number },
-): Promise<boolean> {
-  if (isDemo) return true
-  const res = await fetch(`${BASE}/api/runs/${runId}/cost`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates),
-  })
-  if (!res.ok) return false
-  const data = await res.json()
-  return data.success === true
-}
-
-export async function updateConfig(
-  updates: { hourlyRate?: number },
-): Promise<boolean> {
-  if (isDemo) return true
-  const res = await fetch(`${BASE}/api/config`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates),
-  })
-  if (!res.ok) return false
-  const data = await res.json()
-  return data.success === true
-}
-
-export function subscribeSSE(onUpdate: (data: unknown) => void): () => void {
-  if (isDemo) return () => {}
-  const es = new EventSource(`${BASE}/api/events`)
-  es.onmessage = (e) => {
+async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${BASE}${path}`, init);
+  if (!response.ok) {
+    const text = await response.text();
     try {
-      onUpdate(JSON.parse(e.data))
-    } catch { /* ignore */ }
+      const parsed = JSON.parse(text) as { error?: string };
+      throw new Error(parsed.error || `请求失败：${response.status}`);
+    } catch {
+      throw new Error(text || `请求失败：${response.status}`);
+    }
   }
-  return () => es.close()
+  return response.json();
+}
+
+export function buildSelfPlugin(version?: string): Promise<{ outputPath: string; skills: string[]; files: number }> {
+  return fetchJson('/api/plugin/build-self', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version: version || '3.0.0' }),
+  });
+}
+
+export function fetchDecisions(): Promise<{ decisions: DashboardDecision[] }> {
+  return fetchJson('/api/decisions');
+}
+
+export function fetchAssets(): Promise<DashboardAssetIndex> {
+  return fetchJson('/api/assets');
+}
+
+export function scanAssets(): Promise<DashboardAssetIndex> {
+  return fetchJson('/api/scan', { method: 'POST' });
+}
+
+export async function auditPlugin(path: string): Promise<PluginRiskReport> {
+  const data = await fetchJson<{ risk: PluginRiskReport }>('/api/plugin/audit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path }),
+  });
+  return data.risk;
+}
+
+export function buildPlugin(input: {
+  name: string;
+  description: string;
+  version?: string;
+  assetIds: string[];
+}): Promise<BuildPluginResult> {
+  return fetchJson('/api/plugin/build', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
 }

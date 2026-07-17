@@ -1,13 +1,13 @@
 {
   "name": "ai-dev-analytics",
-  "version": "2.0.3",
-  "description": "AIDA 2.0 - AI asset truth-source management for rules, skills, memories, and summaries",
+  "version": "3.0.0",
+  "description": "AIDA 3.0 — Local AI Asset Manager. MCP-first governance for rules, skills, docs, and plugins accumulated through long-term vibe coding.",
   "type": "module",
   "bin": {
     "aida": "dist/cli/index.js"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc && cp -r src/assets dist/",
+    "build": "npm --prefix dashboard run build && rm -rf dist && tsc && cp -r src/assets dist/ && cp -r src/dashboard dist/",
     "build:test": "rm -rf dist-test && tsc -p tsconfig.test.json",
     "test": "npm run build:test && node --test dist-test/tests/*.test.js",
     "dev": "tsc --watch",
