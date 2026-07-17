@@ -2,70 +2,41 @@
 
 # AIDA
 
-### 管理 AI 工具资产的 JSON 真源。
-
-AIDA 2.0 只关注长期有价值的项目资产：
-**rules、skills、memories、summary。**
+### AI 工具资产治理层 — 规则、技能、决策记忆、插件
 
 ```json
 { "mcpServers": { "aida": { "command": "npx", "args": ["--registry=https://registry.npmjs.org/", "-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-[![npm version](https://img.shields.io/badge/npm-v2.0.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
+[![npm version](https://img.shields.io/badge/npm-v3.0.0-0066ff)](https://www.npmjs.com/package/ai-dev-analytics)
 [![license](https://img.shields.io/github/license/LWTlong/ai-dev-analytics?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/node/v/ai-dev-analytics?color=%23339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen)](#验证)
 [![ai-dev-analytics MCP server](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics/badges/score.svg)](https://glama.ai/mcp/servers/LWTlong/ai-dev-analytics)
 
-[30 秒上手](#30-秒上手) · [真源模型](#20-真源模型) · [命令模型](#命令模型) · [命令文档](./COMMANDS.md) · [文档导航](./docs/INDEX.md) · [English](./README.en.md)
-
 </div>
 
 ---
 
-## 为什么是 2.0
+## 三大能力
 
-2.0 不再围绕 task 流水账、运行态 timeline 或 dashboard。
+### 1. 规则治理
 
-它只保留真正需要长期沉淀的内容：
+扫描 `.claude/rules/`、`.cursor/rules/` 等目录，找出重复、矛盾、失效的规则，用 `aida_apply_governance` MCP 工具一键删行/批注。
 
-- 项目规则 `rules`
-- 项目技能 `skills`
-- 模块记忆 `memories`
-- 需求摘要 `summary`
+**核心 skill：** `/aida:analyze` → `/aida:cleanup`
 
-这些 JSON 真源统一存放在 `.aida/` 下，再按需分发到 `.cursor`、`.claude`、`.codex`、`.lingma` 等工具目录。工具目录只是 projection，不是主数据。
+### 2. 分层决策记忆
 
----
+用 MADR 格式把 "为什么这段代码这么写" 记录到 `.claude/rules/decisions/`。Claude Code 通过 `paths` 前置元数据在相关文件打开时自动加载，无需背景说明。
 
-## 2.0 真源模型
+**核心 skill：** `/aida:remember`（单条）、`/aida:remember-branch`（从 diff 批量提取）
 
-```text
-.aida/
-  config.json
-  rules.json
-  skills.json
-  summary.json
-  aida-guide.md
-  memories/
-    index.json
-    modules/*.json
-```
+### 3. AI 资产总览
 
-- `rules.json`：项目级技术规范真源
-- `skills.json`：项目级技能真源
-- `summary.json`：需求级摘要
-- `memories/index.json`：低成本检索索引
-- `memories/modules/*.json`：模块级上下文与约束
+本地 Dashboard（`aida dashboard`）提供 package.json 风格的资产清单：规则/技能/决策/MCP 配置/插件，一屏看完，支持搜索和 Plugin 打包导出。
 
-2.0 会主动清理这些 1.x 噪音：
-
-- `run.json`
-- task 持久化流水账
-- `timeline / workflow / events`
-- `.aida/runs/**`
-- `.aida/index.json`
-- `.aida/tool-configs.json`
+**核心 skill：** `/aida:ui`
 
 ---
 
@@ -79,13 +50,11 @@ AIDA 2.0 只关注长期有价值的项目资产：
 { "mcpServers": { "aida": { "command": "npx", "args": ["--registry=https://registry.npmjs.org/", "-y", "ai-dev-analytics", "mcp"] } } }
 ```
 
-如果你更喜欢全局命令：
+或全局安装后把 `command` 改为 `"aida"`：
 
 ```bash
-npm install -g ai-dev-analytics
+npm install -g ai-dev-analytics --registry=https://registry.npmjs.org
 ```
-
-然后把 `command` 改为 `"aida"`。
 
 ### 2. 初始化项目
 
@@ -93,50 +62,57 @@ npm install -g ai-dev-analytics
 aida init
 ```
 
-### 3. 重建投影
+### 3. 分析规则（AI 会话内）
+
+```
+/aida:analyze
+```
+
+AI 扫描资产、找出问题，等待确认后执行 `/aida:cleanup`。
+
+### 4. 打开治理 Dashboard
 
 ```bash
-aida sync
+aida dashboard
 ```
 
 ---
 
-## 命令模型
+## MCP 工具清单
 
-当前主命令只保留这几类：
-
-```bash
-aida init
-aida sync
-aida doctor
-aida rules
-aida skills
-aida memory
-aida mcp
-```
-
-心智很简单：
-
-- `init`：初始化 2.0 真源和工具接入
-- `sync`：日常收口，刷新 memory/summary/工具投影
-- `doctor`：检查并清洗项目状态
-- `rules / skills / memory`：直接管理资产本身
-
-详细行为见 [COMMANDS.md](./COMMANDS.md)。
+| 工具 | 作用 |
+|------|------|
+| `aida_bootstrap` | 初始化 / 状态检查 |
+| `aida_scan_assets` | 扫描所有 AI 资产 |
+| `aida_list_assets` / `aida_get_asset` | 浏览资产 |
+| `aida_write_analysis` | 写分析报告（aida-analyze 使用） |
+| `aida_apply_governance` | 执行规则治理动作 |
+| `aida_remember` / `aida_recall` | 读写决策记忆 |
+| `aida_undo` | 撤销上一次治理操作 |
+| `aida_build_plugin` | 打包项目资产为 Claude Plugin |
+| `aida_build_self_plugin` | 打包 AIDA 内置技能为 Plugin |
+| `aida_parse_plugin` / `aida_audit_plugin_risk` | 解析/审计外部 Plugin |
 
 ---
 
-如果你的项目已经是 2.0 结构，日常只需要：
+## 项目结构（关键路径）
 
-```bash
-aida sync
+```text
+.claude/
+  rules/
+    decisions/          # MADR 决策记忆（Claude Code 自动加载）
+    aida/               # AIDA 自身的项目规则
+
+.aida/
+  cache/
+    assets-index.json   # 最近一次扫描结果
+    undo-journal.jsonl  # 可撤销的治理操作日志
+  plugins/              # 本地打包的 Claude Plugin
 ```
 
 ---
 
 ## 验证
-
-本仓库当前通过：
 
 ```bash
 npm test

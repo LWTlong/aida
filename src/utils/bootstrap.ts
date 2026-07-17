@@ -1,6 +1,5 @@
 import { fileExists, readJson, writeJson } from './fs.js';
 import { bootstrapStatePath, configPath } from './paths.js';
-import type { AiToolChoice, AidaConfig } from '../schemas/aida-project.js';
 
 export type BootstrapHost = 'codex' | 'cursor' | 'claude-code';
 export type BootstrapDecision = 'approved' | 'declined' | 'deferred';
@@ -173,10 +172,12 @@ export function detectBootstrapHostAvailability(projectRoot: string, host: Boots
   }
 }
 
-function readProjectConfig(projectRoot: string): AidaConfig {
+type ProjectConfig = { aiTool?: string; aiTools?: string[]; [key: string]: unknown };
+
+function readProjectConfig(projectRoot: string): ProjectConfig {
   if (!fileExists(configPath(projectRoot))) return {};
   try {
-    return readJson<AidaConfig>(configPath(projectRoot));
+    return readJson<ProjectConfig>(configPath(projectRoot));
   } catch {
     return {};
   }

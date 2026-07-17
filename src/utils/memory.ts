@@ -12,35 +12,89 @@ import {
   moduleMemoryViewPath,
   requirementPath,
   runContextPath,
-  runMemoryPackViewPath,
-  runContextViewPath,
   runsDir,
 } from './paths.js';
-import type {
-  ModuleChangeEntry,
-  ModuleMemoryIndex,
-  ModuleMemoryIndexEntry,
-  ModuleMemoryRecord,
-  ModuleMemoryReference,
-  RunContextRecord,
-} from '../schemas/aida-project.js';
-import type { RequirementData, RunData } from '../internal/runtime/schema.js';
+// ─── Types inlined from deleted 2.0 schema files ─────────────────────────────
 
-export interface MemorySearchResult extends ModuleMemoryIndexEntry {
+interface ModuleMemoryReference {
+  ticket?: string;
+  branch?: string;
+  summary: string;
+  updatedAt?: string;
+}
+
+interface ModuleChangeEntry {
+  ticket?: string;
+  branch?: string;
+  title?: string;
+  summary: string;
+  updatedAt: string;
+}
+
+interface ModuleMemoryRecord {
+  schemaVersion?: string;
+  moduleKey: string;
+  title: string;
+  summary: string;
+  keywords: string[];
+  entryFiles: string[];
+  relatedPaths: string[];
+  dataFlow: string[];
+  decisions: string[];
+  constraints: string[];
+  pitfalls: string[];
+  relatedRules: string[];
+  tickets: ModuleMemoryReference[];
+  changes?: ModuleChangeEntry[];
+  updatedAt: string;
+}
+
+interface ModuleMemoryIndexEntry {
+  key: string;
+  title: string;
+  summary: string;
+  keywords: string[];
+  paths: string[];
+  tickets?: string[];
+  updatedAt: string;
+}
+
+interface ModuleMemoryIndex {
+  schemaVersion?: string;
+  updatedAt: string;
+  items: ModuleMemoryIndexEntry[];
+}
+
+interface RunContextRecord {
+  branch: string;
+  ticket?: string;
+  title: string;
+  summary: string;
+  currentPhase: string;
+  modules: string[];
+  completed: string[];
+  inProgress: string[];
+  next: string[];
+  decisions: string[];
+  constraints: string[];
+  keyFiles: string[];
+  risks: string[];
+  updatedAt: string;
+}
+
+// Legacy 2.0 runtime types — used only by rebuildCurrentBranchMemory internals
+// ponytail: any is intentional here, these schemas are 2.0 read-only legacy
+type RequirementData = any;
+type RunData = any;
+
+interface MemorySearchResult extends ModuleMemoryIndexEntry {
   score: number
 }
 
-export interface BuildMemoryViewsResult {
+interface BuildMemoryViewsResult {
   moduleViews: number
   contextViews: number
   packViews: number
-}
-
-export interface LegacyMemoryMigrationResult {
-  branches: number
-  contextsWritten: number
-  moduleMemoriesWritten: number
-  modulesTouched: string[]
 }
 
 interface ModuleDescriptor {
@@ -564,7 +618,7 @@ function inferModuleDescriptorsFromPaths(paths: Array<string | null | undefined>
   return [...byKey.values()];
 }
 
-export function deriveModuleKeyFromPaths(paths: Array<string | null | undefined>): string {
+function deriveModuleKeyFromPaths(paths: Array<string | null | undefined>): string {
   for (const value of paths) {
     const normalized = stripKnownSourcePrefix(value || '');
     if (!normalized) continue;
@@ -614,7 +668,7 @@ function normalizeModuleMemoryRecord(record: ModuleMemoryRecord): ModuleMemoryRe
   };
 }
 
-export function loadMemoryIndex(projectRoot: string): ModuleMemoryIndex {
+function loadMemoryIndex(projectRoot: string): ModuleMemoryIndex {
   const path = memoryIndexPath(projectRoot);
   if (!fileExists(path)) {
     return {
@@ -636,7 +690,7 @@ export function loadMemoryIndex(projectRoot: string): ModuleMemoryIndex {
   };
 }
 
-export function saveMemoryIndex(projectRoot: string, index: ModuleMemoryIndex): void {
+function saveMemoryIndex(projectRoot: string, index: ModuleMemoryIndex): void {
   ensureDir(memoriesDir(projectRoot));
   writeJson(memoryIndexPath(projectRoot), {
     schemaVersion: index.schemaVersion || MEMORY_SCHEMA_VERSION,
@@ -802,7 +856,7 @@ function moduleMemoryRecordFromMarkdown(raw: string): ModuleMemoryRecord | null 
   };
 }
 
-export function rebuildMemoryIndexFromDisk(projectRoot: string): ModuleMemoryIndex {
+function rebuildMemoryIndexFromDisk(projectRoot: string): ModuleMemoryIndex {
   ensureDir(moduleMemoriesDir(projectRoot));
   migrateLegacyNestedModuleMemoryLayout(projectRoot);
   const byKey = new Map<string, ModuleMemoryIndexEntry>();
@@ -853,7 +907,7 @@ export function rebuildMemoryIndexFromDisk(projectRoot: string): ModuleMemoryInd
   return index;
 }
 
-export function saveModuleMemory(projectRoot: string, record: ModuleMemoryRecord): void {
+function saveModuleMemory(projectRoot: string, record: ModuleMemoryRecord): void {
   const path = moduleMemoryPath(projectRoot, record.moduleKey);
   ensureDir(dirname(path));
   writeJson(path, {
@@ -869,12 +923,12 @@ export function loadRunContext(projectRoot: string, branchName: string): RunCont
   return readJson<RunContextRecord>(path);
 }
 
-export function saveRunContext(projectRoot: string, branchName: string, record: RunContextRecord): void {
+function saveRunContext(projectRoot: string, branchName: string, record: RunContextRecord): void {
   ensureDir(branchDir(projectRoot, branchName));
   writeJson(runContextPath(projectRoot, branchName), record);
 }
 
-export function renderModuleMemoryMarkdown(record: ModuleMemoryRecord): string {
+function renderModuleMemoryMarkdown(record: ModuleMemoryRecord): string {
   const lines: string[] = [
     '# Module Memory',
     '',
@@ -918,7 +972,7 @@ export function renderModuleMemoryMarkdown(record: ModuleMemoryRecord): string {
   return `${lines.join('\n').trimEnd()}\n`;
 }
 
-export function renderRunContextMarkdown(record: RunContextRecord): string {
+function renderRunContextMarkdown(record: RunContextRecord): string {
   const lines: string[] = [
     '# Run Context',
     '',
@@ -952,7 +1006,7 @@ export function renderRunContextMarkdown(record: RunContextRecord): string {
   return `${lines.join('\n').trimEnd()}\n`;
 }
 
-export function renderRunMemoryPackMarkdown(
+function renderRunMemoryPackMarkdown(
   context: RunContextRecord,
   modules: ModuleMemoryRecord[],
 ): string {
@@ -996,7 +1050,7 @@ export function buildMemoryViews(projectRoot: string): BuildMemoryViewsResult {
   return { moduleViews, contextViews: 0, packViews: 0 };
 }
 
-export function buildRunContextFromBranch(projectRoot: string, branchName: string): RunContextRecord | null {
+function buildRunContextFromBranch(projectRoot: string, branchName: string): RunContextRecord | null {
   const existing = loadRunContext(projectRoot, branchName);
   const requirement = loadRequirement(projectRoot, branchName);
   const analysis = loadAnalysis(projectRoot, branchName);
@@ -1068,7 +1122,7 @@ function collectRelatedPaths(moduleDescriptor: ModuleDescriptor, branchContext: 
 
   for (const run of runs) {
     for (const task of run.tasks || []) {
-      const taskDescriptor = deriveModuleDescriptor(task.stageName || '', (run.files || []).map((file) => file.path));
+      const taskDescriptor = deriveModuleDescriptor(task.stageName || '', (run.files || []).map((file: any) => file.path as string));
       if (taskDescriptor.key !== moduleDescriptor.key) continue;
       for (const file of run.files || []) {
         if (isAidaRuntimePath(file.path) || isNoisePath(file.path) || isGeneratedToolingPath(file.path)) continue;
@@ -1174,88 +1228,6 @@ export function searchModuleMemories(
     .slice(0, 8);
 }
 
-export function migrateLegacyMemories(projectRoot: string): LegacyMemoryMigrationResult {
-  ensureDir(moduleMemoriesDir(projectRoot));
-  const branchesDir = runsDir(projectRoot);
-  if (!fileExists(branchesDir)) {
-    return { branches: 0, contextsWritten: 0, moduleMemoriesWritten: 0, modulesTouched: [] };
-  }
-
-  let branches = 0;
-  let contextsWritten = 0;
-  let moduleMemoriesWritten = 0;
-  const modulesTouched = new Set<string>();
-
-  for (const safeBranch of readdirSync(branchesDir)) {
-    const branchPath = resolve(branchesDir, safeBranch);
-    if (!statSync(branchPath).isDirectory()) continue;
-    const requirement = fileExists(resolve(branchPath, 'requirement.json'));
-    const analysis = fileExists(resolve(branchPath, 'analysis.md'));
-    const runFiles = walkRunJsonFiles(branchesDir).filter((file) => file.includes(`/${safeBranch}/`));
-    if (!requirement && !analysis && runFiles.length === 0) continue;
-
-    const requirementData = requirement
-      ? readJson<RequirementData>(resolve(branchPath, 'requirement.json'))
-      : null;
-    const branchRunsFromFiles = runFiles
-      .map((path) => {
-        try {
-          return readJson<RunData>(path);
-        } catch {
-          return null;
-        }
-      })
-      .filter((item): item is RunData => item !== null);
-    const branchName = requirementData?.branch
-      || branchRunsFromFiles.find((run) => run.meta?.branch)?.meta?.branch
-      || safeBranch;
-    const context = buildRunContextFromBranch(projectRoot, branchName);
-    if (!context) continue;
-
-    branches++;
-    saveRunContext(projectRoot, branchName, context);
-    contextsWritten++;
-
-    const runs = loadBranchRuns(projectRoot, branchName);
-    const req = loadRequirement(projectRoot, branchName);
-    const moduleDescriptors = inferModuleDescriptors(req, runs);
-
-    for (const descriptor of moduleDescriptors) {
-      if (!descriptor.key.trim()) continue;
-      const relatedPaths = collectRelatedPaths(descriptor, context, runs);
-      upsertModuleMemory(projectRoot, {
-        moduleKey: descriptor.key,
-        title: descriptor.title,
-        summary: descriptor.description || context.summary,
-        keywords: [descriptor.title, descriptor.key, context.title],
-        entryFiles: relatedPaths.slice(0, 5),
-        relatedPaths,
-        decisions: context.decisions,
-        constraints: context.constraints,
-        pitfalls: context.risks,
-        changeTitle: context.title,
-        tickets: [{
-          ticket: context.ticket,
-          branch: branchName,
-          summary: context.summary,
-          updatedAt: context.updatedAt,
-        }],
-      });
-      moduleMemoriesWritten++;
-      modulesTouched.add(descriptor.key);
-    }
-  }
-
-  buildMemoryViews(projectRoot);
-  rebuildMemoryIndexFromDisk(projectRoot);
-
-  return {
-    branches,
-    contextsWritten,
-    moduleMemoriesWritten,
-    modulesTouched: [...modulesTouched].sort(),
-  };
-}
 
 export function rebuildCurrentBranchMemory(projectRoot: string, branchName: string): {
   context: RunContextRecord | null

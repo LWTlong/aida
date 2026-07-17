@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "3.0",
+  "id": "report-asset-audit-20260708121031",
+  "type": "asset-audit",
+  "title": "AIDA 3.0 Asset Audit for ai-dev-analytics",
+  "summary": "Found 981 assets. 945 rules (undefined from cursor auto-generation), 461 duplicate groups, 10 skills, 18 docs. Rules are severely overloaded.",
+  "createdAt": "2026-07-08T12:10:31.894Z",
+  "createdBy": "model-via-aida-skill",
+  "findings": [
+    {
+      "kind": "rule-overload",
+      "title": "945 rules detected — severe overload",
+      "assetIds": [
+        "rule:aida:8c7f718dff4c",
+        "rule:aida:3df342c4c134",
+        "rule:aida:5a91a4d9c6fc",
+        "rule:aida:7426468f3a19",
+        "rule:aida:61551ca616b9"
+      ],
+      "reason": "Most rules come from auto-generated cursor _all.md. Many are component tutorials, not hard constraints.",
+      "recommendedNextStep": "Use aida-govern-overloaded-rules skill.",
+      "riskLevel": "high"
+    },
+    {
+      "kind": "duplicate-content",
+      "title": "461 duplicate content groups across tools",
+      "assetIds": [
+        "command:claude:55c014d4aa28",
+        "skill:codex:95ac4f35388c",
+        "skill:cursor:05dd6cc6d9ff",
+        "mcp-config:codex:24c4640ad307",
+        "tool-config:codex:ab1644b34632"
+      ],
+      "reason": "Same content exists in claude/cursor/codex tool directories.",
+      "recommendedNextStep": "Use aida-sync-assets-across-tools skill.",
+      "riskLevel": "medium"
+    },
+    {
+      "kind": "tool-split",
+      "title": "Assets unevenly distributed: cursor=929, aida=18, codex=12, claude=6",
+      "assetIds": [],
+      "reason": "Cursor has 929 assets, Claude only 6. Cross-tool alignment needed.",
+      "recommendedNextStep": "Use aida-sync-assets-across-tools skill.",
+      "riskLevel": "medium"
+    },
+    {
+      "kind": "unknown-dirs",
+      "title": "Unknown dot-directories: .github, .vscode",
+      "assetIds": [],
+      "reason": "These may contain AI tool configs but are not recognized.",
+      "recommendedNextStep": "Review manually or mark as generic.",
+      "riskLevel": "low"
+    }
+  ],
+  "nextSteps": [
+    "Run aida-govern-overloaded-rules skill",
+    "Run aida-rules-to-skills skill on component usage rules",
+    "Run aida-sync-assets-across-tools skill to align Cursor/Claude/Codex",
+    "Open aida dashboard to review proposals"
+  ],
+  "metadata": {}
+}

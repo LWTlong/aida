@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "3.0",
+  "id": "report-asset-audit-20260708122449",
+  "type": "asset-audit",
+  "title": "AIDA 3.0 Asset Audit for ai-dev-analytics",
+  "summary": "Scanned the current project as a real AIDA 3.0 MCP flow. The project has severe rules overload and heavy cross-tool duplication caused by long-term vibe coding and multi-tool history. Cursor dominates the asset footprint, while Claude now contains the newly installed AIDA 3.0 skills and local MCP wiring.",
+  "createdAt": "2026-07-08T12:24:49.572Z",
+  "createdBy": "model-via-aida-skill",
+  "findings": [
+    {
+      "kind": "rule-overload",
+      "title": "945 rule assets detected — severe overload",
+      "assetIds": [
+        "rule:aida:8c7f718dff4c",
+        "rule:aida:3df342c4c134",
+        "rule:aida:5a91a4d9c6fc"
+      ],
+      "reason": "The project currently exposes 945 rule assets. This is far beyond a healthy always-on rule set and strongly suggests that many items are either duplicated projections, over-expanded generated views, or task-level guidance that should be extracted into skills.",
+      "recommendedNextStep": "Use the aida-govern-overloaded-rules and aida-rules-to-skills skills to classify keep/merge/convert/archive candidates.",
+      "riskLevel": "high"
+    },
+    {
+      "kind": "cross-tool-duplication",
+      "title": "Cursor dominates the asset graph and likely contains many duplicated projections",
+      "assetIds": [
+        "doc:cursor:bb223dc53178",
+        "doc:cursor:1b9984116048",
+        "doc:cursor:a7219afbc906"
+      ],
+      "reason": "Asset distribution is highly uneven: cursor contains the overwhelming majority of scanned assets, while Claude and Codex contain much smaller sets. This usually indicates generated projection files or legacy tool-specific assets accumulating without a canonical governance pass.",
+      "recommendedNextStep": "Use the aida-sync-assets-across-tools skill to compare Claude, Cursor, and Codex assets before proposing sync or archive actions.",
+      "riskLevel": "medium"
+    },
+    {
+      "kind": "skills-gap",
+      "title": "Only 10 skill assets vs 945 rules",
+      "assetIds": [
+        "skill:claude:5c2c2ecf0541",
+        "skill:claude:c459e04b4452",
+        "skill:cursor:05dd6cc6d9ff"
+      ],
+      "reason": "The ratio of rules to skills is heavily skewed. Many project conventions described in rules likely represent procedural knowledge or component workflows that should become skills rather than permanent hard constraints.",
+      "recommendedNextStep": "Ask the model to identify component/API/layout/debugging rules that are actually task skills and generate proposals only.",
+      "riskLevel": "high"
+    },
+    {
+      "kind": "mcp-config-drift",
+      "title": "MCP configuration is inconsistent across tools",
+      "assetIds": [
+        "mcp-config:claude:a770cc2f4765",
+        "mcp-config:cursor:5a88ba47d4a7",
+        "mcp-config:codex:24c4640ad307",
+        "mcp-config:generic:6b810ca710db"
+      ],
+      "reason": "Claude now points to the local 3.0 build via node dist/cli/index.js mcp, while Cursor/Codex/VSCode still point to the old npm-installed ai-dev-analytics MCP entry. This is expected during migration but means tool behavior differs by host.",
+      "recommendedNextStep": "Decide whether to sync other tools to the local 3.0 MCP target now or leave them on legacy config temporarily.",
+      "riskLevel": "medium"
+    },
+    {
+      "kind": "unknown-dot-dir",
+      "title": "Unknown dot-directories need confirmation before any write proposal",
+      "assetIds": [
+        "doc:unknown:a1f34631fff4",
+        "doc:unknown:030717a27111"
+      ],
+      "reason": "Unknown/generic assets were found under .github and .vscode. .github/workflows/demo.yml is almost certainly CI configuration rather than an AI asset. .vscode/mcp.json likely contains AI-related MCP configuration but comes from a non-primary host path. These should be treated as evidence only until confirmed.",
+      "recommendedNextStep": "Do not generate write proposals against unknown directories until the user confirms whether they should be governed by AIDA.",
+      "riskLevel": "low"
+    }
+  ],
+  "nextSteps": [
+    "Run aida-govern-overloaded-rules to classify the 945 rules into keep/merge/convert/archive groups.",
+    "Run aida-rules-to-skills to extract component and workflow knowledge out of rules into reusable skills.",
+    "Run aida-sync-assets-across-tools to compare legacy Cursor/Codex projections with the new Claude/AIDA 3.0 setup.",
+    "Open `aida dashboard` to inspect this report and any proposals before applying changes."
+  ],
+  "metadata": {
+    "project": "ai-dev-analytics",
+    "rules": 945,
+    "skills": 10,
+    "docs": 18,
+    "mcpConfigs": 4,
+    "toolConfigs": 3,
+    "commands": 1,
+    "unknownDirs": [
+      ".github",
+      ".vscode"
+    ]
+  }
+}

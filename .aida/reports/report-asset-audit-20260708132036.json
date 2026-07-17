@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "3.0",
+  "id": "report-asset-audit-20260708132036",
+  "type": "asset-audit",
+  "title": "AI 资产治理快照",
+  "summary": "项目 AI 资产规模大但结构清晰，当前首要治理点不是缺资产，而是规则投影重复和 2.0/3.0 文档并存带来的认知噪音。",
+  "createdAt": "2026-07-08T13:20:36.904Z",
+  "createdBy": "model-via-aida-skill",
+  "findings": [
+    {
+      "severity": "high",
+      "category": "rules",
+      "title": "规则资产数量远高于其他类型",
+      "detail": "981 个资产中有 945 个被识别为规则，且 453 组重复主要来自 _all.md 与 component/general/process 投影重叠，说明当前最需要治理的是规则过载与投影重复。",
+      "evidence": [
+        "945 rule assets",
+        "453 projected-rules-overlap duplicate groups"
+      ]
+    },
+    {
+      "severity": "medium",
+      "category": "docs",
+      "title": "2.0 历史文档仍与 3.0 实现并存",
+      "detail": "COMMANDS.md、docs/AIDA-2.0-DESIGN.md、docs/INDEX.md、README.en.md 等仍强调 2.0，而模块记忆已表明当前分支在实现 AIDA 3.0 MCP-first，存在版本叙事混杂风险。",
+      "evidence": [
+        "COMMANDS.md",
+        "docs/AIDA-2.0-DESIGN.md",
+        "docs/INDEX.md",
+        "README.en.md"
+      ]
+    },
+    {
+      "severity": "medium",
+      "category": "tooling",
+      "title": "跨工具配置有重复投影",
+      "detail": "dev-flow 同时存在于 Claude command、Cursor skill、Codex skill；MCP 配置同时存在于 .cursor/mcp.json 与 .vscode/mcp.json。虽然合理，但会增加跨工具同步与漂移治理成本。",
+      "evidence": [
+        ".claude/commands/dev-flow.md",
+        ".cursor/skills/dev-flow/SKILL.md",
+        ".codex/skills/dev-flow/SKILL.md",
+        ".cursor/mcp.json",
+        ".vscode/mcp.json"
+      ]
+    }
+  ],
+  "nextSteps": [
+    "优先治理规则过载，确认哪些规则应保留为硬约束、哪些应提炼成技能",
+    "清理或归档 2.0 历史文档，避免与 3.0 当前实现混淆",
+    "梳理跨工具重复投影，决定哪些配置保留为真源、哪些仅作为可重建分发结果"
+  ],
+  "metadata": {
+    "totalAssets": 981,
+    "rules": 945,
+    "skills": 10,
+    "docs": 18,
+    "duplicateGroups": 460,
+    "toolCounts": {
+      "aida": 18,
+      "claude": 14,
+      "codex": 12,
+      "cursor": 929,
+      "generic": 6,
+      "unknown": 2
+    }
+  }
+}
