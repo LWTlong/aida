@@ -1,0 +1,442 @@
+# General Rules
+
+- [RULE-015] 禁止任何形式的臆想，不清楚必须询问
+- [RULE-016] 禁止随意生成文档，如需生成文档，必须询问用户是否需要
+- [RULE-017] 生成测试脚本，在测试验证通过后必须删除测试脚本，保持项目清爽
+- [RULE-018] **后端控制路由**: 路由介转后端 API 动态加载（`src/router/backEnd.ts`）
+- [RULE-019] 路由在 `router.beforeEach` 守卫中通过 `initBackEndControlRoutes()` 初始化
+- [RULE-020] 采用两级路由扁平化处理以支持 keep-alive（Vue 的 keep-alive 缓存最多支持 2 级）
+- [RULE-021] 带参数的动态路由（如 `/:id/:name`）会被标记 `isDynamic` meta 标志
+- [RULE-022] `routesList.ts` - 动态路由存储
+- [RULE-023] `keepAliveNames.ts` - 路由缓存管理
+- [RULE-024] `themeConfig.ts` - 主题配置
+- [RULE-025] `userInfo.ts` - 用户认证状态
+- [RULE-026] `role.ts` - 角色和权限管理
+- [RULE-027] `commonCache.ts` - 通用缓存
+- [RULE-028] `internationalManager.ts` - 国际化管理
+- [RULE-029] `plan.d.ts` - 运营计划类型
+- [RULE-030] 每个模块应有自己的 `.d.ts` 文件
+- [RULE-031] **必须** 显式导出类型，避免全局命名空间污染
+- [RULE-032] 组件中通过 import 引入类型，而不是依赖全局声明
+- [RULE-033] `auto-imports.d.ts` - 自动导入的类型声明（Vue、Router、Pinia）
+- [RULE-034] `src/types/components.d.ts` - 自动导入的组件类型
+- [RULE-035] **请求工具**: `src/utils/request.ts`（Axios 实例）
+- [RULE-036] **Base URL**: 通过 `VITE_API_URL` 环境变量设置
+- [RULE-037] **身份认证**: 自动注入 `Authorization: Bearer {token}` 请求头
+- [RULE-038] **多租户**: 自动从 Session 添加 `TENANT-ID` 请求头
+- [RULE-039] **时区**: 使用 moment-timezone 自动添加 `zone` 请求头
+- [RULE-040] **国际化**: 自动添加 `Accept-Language` 请求头
+- [RULE-041] **请求签名**: 通过 `ts` + `sign` 请求头进行 MD5 签名以保证安全
+- [RULE-042] **防重复请求**: 靐 GET 请求有 3 秒间隔限制
+- [RULE-043] **Token 过期处理**: 424 状态码触发重新认证
+- [RULE-044] `/@/` 映射到 `src/`（在 `vite.config.ts` 和 `tsconfig.json` 中配置）
+- [RULE-045] `src/components/` - 可复用的共享组件（TreeSelect、Pagination、DictTag 等）
+- [RULE-046] `src/views/` - 按模块组织的功能视图（plan、template、channel 等）
+- [RULE-047] `src/layout/` - 应用布局组件（navMenu、navBars、logo 等）
+- [RULE-048] `src/theme/element.scss` - Element Plus 全局样式覆盖（间距、字体大小等）
+- [RULE-049] 样式修改随需求开发逐步进行
+- [RULE-050] `vue-vendor`: Vue 核心（vue、vue-router、pinia）
+- [RULE-051] `element-vendor`: Element Plus UI 库
+- [RULE-052] `echarts-vendor`: 图表库
+- [RULE-053] `grid-vendor`: VXE Table 表格组件
+- [RULE-054] `wangeditor-vendor`: 富文本编辑器
+- [RULE-055] `json-vendor`: JSON 编辑器组件
+- [RULE-056] `utils-vendor`: 通用工具（axios、lodash 等）
+- [RULE-057] 为 moment、moment-timezone、crypto-js 单独分包
+- [RULE-058] Terser 压缩并移除 console 和 debugger
+- [RULE-059] 启用 Gzip 压缩
+- [RULE-060] 通过 `yarn analyze` 可查看打包分析
+- [RULE-061] 环境详情（UAT、测试、生产）
+- [RULE-062] 部署流程
+- [RULE-063] Jenkins CI/CD
+- [RULE-064] Release Note 模板
+- [RULE-065] 核心项目规则：`.cursor/rules/project-rules.md`
+- [RULE-066] 编码风格规范：`.cursor/rules/coding-style.md`
+- [RULE-067] 组件使用规范：`.cursor/rules/component-usage.md`
+- [RULE-068] 国际化规则：`.cursor/rules/i18n-rule.md`
+- [RULE-069] **AIDA 数据采集规范：`.aida/aida-guide.md`（严禁跳过，任何任务开始前必须读取并执行）**
+- [RULE-070] **框架**：Vue 3 + Vite + TypeScript
+- [RULE-071] **UI 库**：Element Plus
+- [RULE-072] **状态管理**：Pinia
+- [RULE-073] **路由**：Vue Router 4
+- [RULE-074] **国际化**：Vue I18n 9
+- [RULE-075] **HTTP 客户端**：Axios
+- [RULE-076] **构建工具**：Vite 5.4+
+- [RULE-077] moment
+- [RULE-078] moment-timezone
+- [RULE-079] crypto-js
+- [RULE-080] 新代码必须有类型
+- [RULE-081] 旧代码逐步补充类型
+- [RULE-082] 禁止滥用 `any`
+- [RULE-083] **必须**显式导出类型，避免全局命名空间污染
+- [RULE-084] 组件中通过 `import` 引入类型
+- [RULE-085] `Authorization: Bearer {token}` - 身份认证
+- [RULE-086] `TENANT-ID` - 多租户标识
+- [RULE-087] `Accept-Language` - 国际化语言
+- [RULE-088] `zone` - 时区信息（moment-timezone）
+- [RULE-089] `ts` + `sign` - MD5 签名防篡改
+- [RULE-090] 缩进：4 空格
+- [RULE-091] 引号：单引号 (`'`)
+- [RULE-092] 分号：强制使用分号 (`;`)
+- [RULE-093] 行宽：建议不超过 120 字符
+- [RULE-094] **强制要求：** 使用 Vue 3 Composition API 和 `<script setup lang="ts">`。绝对不要使用 Options API。
+- [RULE-095] **类型声明：** 所有的 props, emits, 以及关键响应式变量应具备 TypeScript 声明。
+- [RULE-096] **样式隔离：** 组件级 CSS/SCSS 须附加 `scoped` (如 `<style lang="scss" scoped>`).
+- [RULE-097] **组件命名：** 强依赖 PascalCase 命名 (例如 `MyComponent.vue`)。内部目录名若代表单页或模块建议用 camelCase。
+- [RULE-098] **变量/函数：** 采用 camelCase。
+- [RULE-099] **常量：** 采用 UPPER_SNAKE_CASE。
+- [RULE-100] **路径别名：** 全局禁止使用相对路径向上回溯 (`../../`)，一律使用别名 `/@/` 代表 `src/`。
+- [RULE-101] **生命周期 Hook：** 推荐逻辑分离，优先在 setup 顶部处理静态声明，接着是响应式状态，最后是函数逻辑及生命周期钩子（如 `onMounted`）。
+- [RULE-102] **作用：** 标准化页面整体布局（顶层搜索、中间操作栏、底部表格区）。
+- [RULE-103] **必须的插槽结构：**
+- [RULE-104] `#actionsRight`: 必须放置"查询"与"重置"按颁。
+- [RULE-105] `#table`: 必须放置展示数据的表格及分页组件。
+- [RULE-106] `#query`: 搜索区，通常包裹 `FormJ` 组件。
+- [RULE-107] **作用：** 根据配置文件快速生成筛選表单项。
+- [RULE-108] **强制约束：**
+- [RULE-109] `formJson` 数组必须声明为一个 Vue `computed` 属性，以保障多语言 `t()` 宏能够随语言环境响应切换。
+- [RULE-110] **编辑页/表单页的 FormJ 必须使用上下布局（`labelPosition: 'top'`）**，即 label 在上、输入框在下。这是为了在中英文切换时 label 不会因为过长而导致布局拥挤。列表页筛選区的 FormJ 不受此约束。
+- [RULE-111] **FormJ 的 el-form 属性必须直接以 attrs 形式传入**，而不是包裹在 `:formProps` 对象中。因为 FormJ 通过 `v-bind="$attrs"` + `inheritAttrs: false` 透传给 `el-form`，只有直接写属性才能被 `$attrs` 正确捕获。示例：`<FormJ label-position="top" />`，而鉩 ~~`:formProps="{ labelPosition: 'top' }`~~。
+- [RULE-112] **作用：** 根据配置渲染列数据。
+- [RULE-113] `columns` 数组必须为 `computed` 属性。
+- [RULE-114] 在 `#action` 这类操作列插槽内，**严禁手写 `el-button`**。必须导入并使用专用的 `<TableBtns :btns="tableBtns" :record-data="scope.row" />` 组件，由数组驱动按颁展现及权限控制 (`auth`)。
+- [RULE-115] 操作列宽度统一设置为 `width: 120`，`TableBtns` 会自动通过 `...` 下拉收纳多余按颁。
+- [RULE-116] **作用：** 用于表单编辑页、查看详情等二级页面的统一布局壳。与 PageLayout（列表页）对齐外层的鷊辻和白色卡片背景。
+- [RULE-117] **布局策略：** 最小高度撡满视口，内容超出时 body 区域自动滚动，一齼固定在下方。
+- [RULE-118] **插槽：**
+- [RULE-119] `default`：页面主体内容
+- [RULE-120] `#footer`：下部操作栏（如保存按颁），sticky 定位
+- [RULE-121] **適用场景：** 所有非列表的二级页面（新增/编辑表单、详情查看等）。列表页继续使用 `PageLayout`。
+- [RULE-122] **Element Plus 优先：** UI 实现必须优先使用 Element Plus 提供的标准组件（如 `el-radio-group`、`el-dialog`、`el-table`、`el-tag`、`el-message-box` 等），保持与项目现有主题风格一致。只有当 Element Plus 没有满足需求的组件时，才考虑自定义实现。
+- [RULE-123] **主题一致性：** 所有新增 UI 必须贴合项目现有的颜色主题风格（Element Plus 主题变量），禁止引入与现有风格不协上的自定义配色。
+- [RULE-124] **禁止过度自定义：** 不要为了"好看"而用自定义 CSS 重写 Element Plus 组件的默认样式。只在确实需要微调时使用 `:deep()` 覆盖。
+- [RULE-125] 筛選区：使用 `FormJ`，`formJson` 必须是 `computed<FormItemConfig[]>`
+- [RULE-126] 表格：使用二次封装的 `Table`，`columns` 必须是 `computed<TableColumn[]>`，数据驱动
+- [RULE-127] 分页：使用二次封装的 `Pagination`
+- [RULE-128] 查询/重置按颁：放在 `FormJ` 外部的操作区（弹窗内没有 `PageLayout`，按颁单独一行）
+- [RULE-129] **异步加载：** 对话框 (`el-dialog` / `el-drawer` 等) 组件强制要求使用 `defineAsyncComponent` 进行异步注册引入，并在 `PageLayout` 的 `#append` 插槽中渲染。
+- [RULE-130] **禁止硬编码文字：** 组件模板和脚本逻辑中不允许使用死编码的中文字符或任何提示语（如 Placeholder, Button Name 等）。
+- [RULE-131] 基础操作项：`common.add`, `common.edit`, `common.delete`, `common.queryBtn`, `common.action`
+- [RULE-132] 短语：`common.startTime`, `common.endTime`
+- [RULE-133] 提示文案：`common.delConfirmText`, `common.delSuccessText`
+- [RULE-134] 使用 PascalCase
+- [RULE-135] 语义清晰，描述组件功能
+- [RULE-136] 示例：`UserManagement`, `PlanList`, `EmailDialog`
+- [RULE-137] 使用 camelCase
+- [RULE-138] 动词开头（fetch, get, set, handle, load 等）
+- [RULE-139] 语义清晰
+- [RULE-140] 示例：`fetchUserList`, `handleSubmit`, `loadConfig`
+- [RULE-141] 布尔值使用 is/has/should 开头
+- [RULE-142] 列表数据使用 `[entity]List` 而非 `data`
+- [RULE-143] 详情数据使用 `[entity]Detail` 而非 `detail`
+- [RULE-144] 查询参数使用 `queryForm` 或 `[entity]Query`
+- [RULE-145] 示例：`loading`, `isConfigured`, `hasError`, `userList`, `userDetail`, `queryForm`
+- [RULE-146] 使用 UPPER_SNAKE_CASE
+- [RULE-147] 分组管理
+- [RULE-148] 示例：`STORAGE_KEYS`, `API_BASE_URL`, `DEFAULT_PAGE_SIZE`
+- [RULE-149] 使用 kebab-case
+- [RULE-150] 示例：`.user-container`, `.header-title`, `.form-item`
+- [RULE-151] 使用 2 个空格缩进
+- [RULE-152] 不使用 Tab
+- [RULE-153] 使用单引号 `'`
+- [RULE-154] Vue 模板属性使用双引号 `"`
+- [RULE-155] 语句末尾使用分号
+- [RULE-156] 操作符前后加空格
+- [RULE-157] 逗号后加空格
+- [RULE-158] 对象字面量的冶号后加空格
+- [RULE-159] 函数之间空一行
+- [RULE-160] 逻辑块之间空一行
+- [RULE-161] import 分组之间空一行
+- [RULE-162] 使用 JSDoc 格式
+- [RULE-163] 必须包含：描述、参数、返回值
+- [RULE-164] 如有异常，说明异常情况
+- [RULE-165] 必须添加注释的函数：
+- [RULE-166] 所有导出函数
+- [RULE-167] 所有公共方法
+- [RULE-168] 复杂的内部函数（超过 10 行）
+- [RULE-169] 可选注释的函数：
+- [RULE-170] 简单的事件处理函数（少于 5 行）
+- [RULE-171] 简单的计算函数（少于 5 行）
+- [RULE-172] 复杂逻辑必须添加注释
+- [RULE-173] 使用中文注释
+- [RULE-174] 注释在代码上方或行尾
+- [RULE-175] 复杂文件添加文件头注释
+- [RULE-176] 说明文件用途
+- [RULE-177] Vue 组件使用 `.vue`
+- [RULE-178] TypeScript 文件使用 `.ts`
+- [RULE-179] 类型定义文件使用 `.d.ts`
+- [RULE-180] 样式文件使用 `.scss`
+- [RULE-181] Vue 相关
+- [RULE-182] 第三方库
+- [RULE-183] 项目服务/API
+- [RULE-184] 项目配置
+- [RULE-185] 项目组件
+- [RULE-186] 项目工具
+- [RULE-187] 类型定义
+- [RULE-188] 样式
+- [RULE-189] 组件使用 `export default`
+- [RULE-190] 工具函数使用 `export`
+- [RULE-191] 常量使用 `export const`
+- [RULE-192] 单个函数不超过 30 行
+- [RULE-193] 超过 30 行必须拆分
+- [RULE-194] 单个文件不超过 300 行
+- [RULE-195] 超过 300 行考虑拆分
+- [RULE-196] 避免深层嵌套（不超过 3 层）
+- [RULE-197] 避免过长的条件判断
+- [RULE-198] 使用提前返回减少嵌套
+- [RULE-199] 避免代码重复
+- [RULE-200] 提取公共逻辑
+- [RULE-201] 使用工具函数
+- [RULE-202] 使用 `<script setup>` 语法
+- [RULE-203] 正确使用 ref、reactive、computed、watch
+- [RULE-204] 依赖项数组完整
+- [RULE-205] 使用 defineProps、defineEmits 定义 props 和 emits
+- [RULE-206] template、script、style 顺序
+- [RULE-207] State 声明在前
+- [RULE-208] Effect 钩子在中
+- [RULE-209] 事件处理函数在后
+- [RULE-210] 渲染逻辑清晰
+- [RULE-211] 使用 computed 缓存计算结果
+- [RULE-212] 使用 v-memo 优化列表渲染（如需要）
+- [RULE-213] 避免不必要的响应式数据
+- [RULE-214] 正确使用 v-if 和 v-show
+- [RULE-215] 所有函数参数有类型定义
+- [RULE-216] 所有函数返回值有类型定义
+- [RULE-217] 所有变量有类型推断或定义
+- [RULE-218] 使用 interface 定义对象类型
+- [RULE-219] 使用 type 定义联合类型、交叉类型
+- [RULE-220] 避免使用 any（除非必要）
+- [RULE-221] 使用 `import type` 导入类型
+- [RULE-222] 类型定义文件使用 `.d.ts` 后缀
+- [RULE-223] 所有异步操作必须有 try-catch
+- [RULE-224] 使用 console.warn 记录错误日志
+- [RULE-225] 向用户提示错误信息（ElMessage.error）
+- [RULE-226] 错误信息包含上下文
+- [RULE-227] 处理空数据情况
+- [RULE-228] 处理加载失败情况
+- [RULE-229] 处理网络错误情况
+- [RULE-230] 处理权限不足情况
+- [RULE-231] 加载数据
+- [RULE-232] 搜索
+- [RULE-233] 重置
+- [RULE-234] 编辑
+- [RULE-235] @param row 行数据
+- [RULE-236] 删除
+- [RULE-237] [ ] 命名规范正确
+- [RULE-238] [ ] 代码格式正确
+- [RULE-239] [ ] 注释完整
+- [RULE-240] [ ] 导入顺序正确
+- [RULE-241] [ ] 函数长度合理
+- [RULE-242] [ ] 无代码重复
+- [RULE-243] [ ] 错误处理完整
+- [RULE-244] [ ] 类型定义完整
+- [RULE-245] [ ] 性能优化合理
+- [RULE-246] **强制约束：** `formJson` 数组必须声明为一个 Vue `computed` 属性，以保障多语言 `t()` 宏能够随语言环境响应切换。
+- [RULE-247] 主要操作使用 `type="primary"`
+- [RULE-248] 危险操作使用 `danger`
+- [RULE-249] 加载状态使用 `loading`
+- [RULE-250] 链接按颁使用 `link`
+- [RULE-251] 必须设置 rowKey（使用 `row-key` 或在 el-table-column 中设置 key）
+- [RULE-252] 使用 loading 属性显示加载状态
+- [RULE-253] 使用 border 和 stripe 提升可读性
+- [RULE-254] 使用 template 自定义列
+- [RULE-255] 对于简单表格，使用 el-table
+- [RULE-256] 对于复杂表格（大数据量、树形结构、复杂编辑），使用 vxe-table
+- [RULE-257] 使用 `:model` 绑定表单数据
+- [RULE-258] 使用 `:rules` 定义验证规则
+- [RULE-259] 使用 `ref` 获取表单实例
+- [RULE-260] 提交前调用 `validate` 方法验证
+- [RULE-261] 使用 `:inline="true"` 创建行内表单（搜索表单）
+- [RULE-262] 使用 `v-model` 控制显示/隐藏
+- [RULE-263] 使用 `title` 设置标题
+- [RULE-264] 使用 `width` 设置宽度
+- [RULE-265] 使用 `@close` 处理关闭p事件
+- [RULE-266] 使用 `destroy-on-close` 关闭时销毁内容
+- [RULE-267] 成功使用 `ElMessage.success`
+- [RULE-268] 错误使用 `ElMessage.error`
+- [RULE-269] 警告使用 `ElMessage.warning`
+- [RULE-270] 信息使用 `ElMessage.info`
+- [RULE-271] 所有提示文本使用 i18n
+- [RULE-272] 使用 `ElMessageBox.confirm` 确认操作
+- [RULE-273] 使用 `type` 设置类型（warning、error、info、success）
+- [RULE-274] 处理取消操作（catch 'cancel'）
+- [RULE-275] 使用 `v-model:current-page` 绑定当前页
+- [RULE-276] 使用 `v-model:page-size` 绑定每页条数
+- [RULE-277] 使用 `:total` 设置总条数
+- [RULE-278] 使用 `:page-sizes` 设置每页条数选项
+- [RULE-279] 使用 `layout` 自定义布局
+- [RULE-280] 监听 `@size-change` 和 `@current-change` 事件
+- [RULE-281] 数据量大（超过 1000 条）
+- [RULE-282] 需要虚拟滚动
+- [RULE-283] 需要树形结构
+- [RULE-284] 需要复杂的单元格编辑
+- [RULE-285] 需要复杂的筛選和排序
+- [RULE-286] 简单表格（数据量少于 1000 条）
+- [RULE-287] 只需要基本的增删改查
+- [RULE-288] 必须设置 `row-id`
+- [RULE-289] 使用 `loading` 属性显示加载状态
+- [RULE-290] 使用 `template` 自定义列
+- [RULE-291] 对于简单表格，优先使用 `el-table`
+- [RULE-292] 组件名使用 PascalCase
+- [RULE-293] 文件名与组件名一致
+- [RULE-294] 目录名与组件名一致
+- [RULE-295] 主组件使用 `export default`
+- [RULE-296] 子组件可以使用 `export`
+- [RULE-297] 使用 TypeScript 定义 Props 类型
+- [RULE-298] 设置默认值
+- [RULE-299] 添加注释说明
+- [RULE-300] [ ] 优先使用 Element Plus 组件
+- [RULE-301] [ ] 正确使用 v-loading 显示加载状态
+- [RULE-302] [ ] 正确使用 el-empty 显示空状态
+- [RULE-303] [ ] Table 设置 rowKey
+- [RULE-304] [ ] Form 添加验证规则
+- [RULE-305] [ ] Dialog 使用 v-model 控制
+- [RULE-306] [ ] Message 使用 i18n
+- [RULE-307] [ ] 复杂表格使用 vxe-table
+- [RULE-308] [ ] 组件结构清晰
+- [RULE-309] [ ] 组件命名规范
+- [RULE-310] 所有用户界面文本必须使用 i18n
+- [RULE-311] 使用 `$t()` 或 `t()` 函数获取翻译
+- [RULE-312] 不允许硬编码文本
+- [RULE-313] 使用 i18n
+- [RULE-314] 描述清晰
+- [RULE-315] 提供解决建议
+- [RULE-316] 支持插值变量
+- [RULE-317] 使用中文
+- [RULE-318] 包含上下文信息
+- [RULE-319] 便于调试
+- [RULE-320] `user.name` - 用户名称
+- [RULE-321] `user.namePlaceholder` - 用户名称占位符
+- [RULE-322] `user.loadError` - 加载错误
+- [RULE-323] `common.submit` - 提交
+- [RULE-324] `common.saveSuccess` - 保存成功
+- [RULE-325] 避免过长
+- [RULE-326] 创建 `src/i18n/pages/[module]/zh-cn.ts`
+- [RULE-327] 创建 `src/i18n/pages/[module]/en.ts`
+- [RULE-328] 在 `src/i18n/lang/zh-cn.ts` 中导入模块翻译
+- [RULE-329] 在 `src/i18n/lang/en.ts` 中导入模块翻译
+- [RULE-330] **所有文本都需要 i18n**：不允许硬编码任何用户界面文本
+- [RULE-331] **同时提供中英文**：创建翻译时必须同时提供中英文版本
+- [RULE-332] **使用插值变量**：动态内容使用插值变量，不要拼接字符串
+- [RULE-333] **翻译 key 命名规范**：使用 camelCase，语义清晰
+- [RULE-334] **分组管理**：按模块组织翻译文件
+- [RULE-335] **翻译完整性**：确保中英文翻译 key 一致
+- [RULE-336] **日志除外**：日志输出可以使用中文，不需要 i18n
+- [RULE-337] [ ] 所有用户界面文本使用 i18n
+- [RULE-338] [ ] 同时提供中英文翻译
+- [RULE-339] [ ] 翻译 key 命名规范
+- [RULE-340] [ ] 使用插值变量处理动态内容
+- [RULE-341] [ ] 错误提示使用 i18n
+- [RULE-342] [ ] 表单验证使用 i18n
+- [RULE-343] [ ] 确认对话框使用 i18n
+- [RULE-344] [ ] 翻译文件结构正确
+- [RULE-345] [ ] 翻译完整性检查通过
+- [RULE-346] ✅ 与现有代码风格一致
+- [RULE-347] ✅ 严格遭守组件使用方式
+- [RULE-348] ✅ 严格遭守页面模式
+- [RULE-349] ✅ 严格遭守 API 封装方式
+- [RULE-350] ✅ 一次生成通过率 ≥ 90%
+- [RULE-351] **配置对象**:
+- [RULE-352] **统一请求函数** (必须命名为 `restApi`):
+- [RULE-353] **业务函数导出**:
+- [RULE-354] 获取 Issue 详情
+- [RULE-355] @param {string} issueKey - Issue Key
+- [RULE-356] @returns {Promise<Object>} Issue 详情对象
+- [RULE-357] ❌ 直接使用 `fetch()` 或 `XMLHttpRequest`
+- [RULE-358] ❌ 直接使用 `chrome.runtime.sendMessage` 发送 API 请求（必须通过 restApi）
+- [RULE-359] ❌ 在组件中直接构建 API 请求
+- [RULE-360] ❌ 直接使用 `chrome.storage.local.get()` 或 `chrome.storage.local.set()`
+- [RULE-361] ❌ 硬编码 storage key 字符串
+- [RULE-362] ❌ 使用 `.then().catch()` 链式调用（必须使用 async/await）
+- [RULE-363] ❌ 忽略错误处理
+- [RULE-364] ❌ 不设置 loading 状态
+- [RULE-365] 组件文件: `index.js` (主组件) 或 `ComponentName.js` (子组件)
+- [RULE-366] 样式文件: `ComponentName.module.less` (CSS Modules)
+- [RULE-367] **禁止使用**: `.jsx` 扩展名（项目使用 `.js`）
+- [RULE-368] ❌ 使用类组件
+- [RULE-369] ❌ 使用 `.jsx` 扩展名
+- [RULE-370] ❌ 组件文件不导出 default
+- [RULE-371] 超过 30 行必须拆分为多个小函数
+- [RULE-372] 所有函数必须使用 JSDoc 注释
+- [RULE-373] 复杂逻辑必须添加行内注释
+- [RULE-374] @throws {Error} 当 API 配置未设置或请求失败时抛出错误
+- [RULE-375] `fetchIssue(issueKey)` - 获取单个 Issue
+- [RULE-376] `fetchIssues(issueKeys)` - 批量获取 Issues
+- [RULE-377] `searchIssues(jql, maxResults, nextPageToken, fields)` - 搜索 Issues
+- [RULE-378] `searchAllIssues(jql, maxResultsPerPage, totalLimit, fields)` - 搜索所有 Issues（自动分页）
+- [RULE-379] `createIssue(issueData)` - 创建 Issue
+- [RULE-380] `updateIssue(issueKey, fields)` - 更新 Issue
+- [RULE-381] `addComment(issueKey, comment)` - 添加评论
+- [RULE-382] `cloneIssue(sourceIssueKey, newSummary)` - 克隆 Issue
+- [RULE-383] `fetchProjects()` - 获取项目列表
+- [RULE-384] `fetchStatusOptions()` - 获取状态选项
+- [RULE-385] `fetchBrandOptions()` - 获取品牌选项
+- [RULE-386] ❌ 忽略错误
+- [RULE-387] ❌ 只使用 `console.error` 而不提示用户
+- [RULE-388] @param {number} maxResults - 最大结果数
+- [RULE-389] @param {Object} options - 选项对象
+- [RULE-390] @param {boolean} options.includeFields - 是否包含字段
+- [RULE-391] @returns {Promise<Object[]>} Issue 数组
+- [RULE-392] @throws {Error} 当配置未设置时抛出错误
+- [RULE-393] @param {Object} config - 配置对象
+- [RULE-394] @param {string} config.email - 邮箱
+- [RULE-395] @param {string} config.token - Token
+- [RULE-396] @param {string} config.domain - 域名
+- [RULE-397] @returns {void}
+- [RULE-398] ✅ `fetchIssue` - 获取 Issue
+- [RULE-399] ✅ `handleRefresh` - 处理刷新
+- [RULE-400] ✅ `loadConfig` - 加载配置
+- [RULE-401] ❌ `getData` - 太泡化
+- [RULE-402] ❌ `doSomething` - 语义不清
+- [RULE-403] 分组管理（在 storage-keys.js 中）
+- [RULE-404] **简单样式**: 使用内联样式 `style={{}}`
+- [RULE-405] **复杂样式**: 使用 CSS Modules `.module.less`
+- [RULE-406] **全局样式**: 使用设计系统变量
+- [RULE-407] CSS Modules: `ComponentName.module.less`
+- [RULE-408] 全局样式: `styles/` 目录下
+- [RULE-409] ❌ `import * as antd from 'antd'`
+- [RULE-410] ❌ `import antd from 'antd'`
+- [RULE-411] ❌ 在 render 中定义 columns（会导致性能问题）
+- [RULE-412] ❌ 直接使用 `chrome.storage.local.get()`
+- [RULE-413] ❌ 硬编码 storage key
+- [RULE-414] 开发时使用 `console.log` 或 `console.warn`
+- [RULE-415] 生产环境移除或使用条件日志
+- [RULE-416] 错误使用 `console.error`
+- [RULE-417] [ ] 所有 API 调用通过 `services/api/` 目录
+- [RULE-418] [ ] 所有 Storage 操作使用 `services/storage.js`
+- [RULE-419] [ ] 所有 Storage Key 从 `config/storage-keys.js` 导入
+- [RULE-420] [ ] 组件使用函数式组件 + Hooks
+- [RULE-421] [ ] 文件使用 `.js` 扩展名（不是 `.jsx`）
+- [RULE-422] [ ] 所有函数有 JSDoc 注释
+- [RULE-423] [ ] 所有异步操作有错误处理
+- [RULE-424] [ ] 所有异步操作有 loading 状态
+- [RULE-425] [ ] 使用 Ant Design 组件（按需导入）
+- [RULE-426] [ ] 样式使用内联或 CSS Modules
+- [RULE-427] [ ] 遭守命名规范
+- [RULE-428] [ ] 无硬编码字符串（Storage Key、URL 等）
+- [RULE-429] API 封装: `src/services/api/jira.js`
+- [RULE-430] Storage 服务: `src/services/storage.js`
+- [RULE-431] Storage Keys: `src/config/storage-keys.js`
+- [RULE-432] 通用组件: `src/components/common/index.js`
+- [RULE-433] Hooks: `src/hooks/index.js`
+- [RULE-434] 组件示例: `src/components/JiraWorkbench/index.js`
+- [RULE-435] Background Script: `src/background.js:279-327`
+- [RULE-436] 设计系统: `src/styles/design-system.less`
+- [RULE-437] Vue 3.3 + Composition API (`<script setup lang="ts">`)
+- [RULE-438] TypeScript 4.9
+- [RULE-439] Element Plus 2.x + VXE-Table 4.x
+- [RULE-440] Pinia 2.x（状态管理）
+- [RULE-441] Vue Router 4.x（后端动态路由）
+- [RULE-442] Axios 1.x（HTTP 请求）
+- [RULE-443] vue-i18n 9.x（国际化）
+- [RULE-444] Vite 5.x（构建工具）
+- [RULE-445] Tailwind CSS 3.x + SCSS
+- [RULE-446] PageLayout 固定高度，不适合表单页（内容超出不会撡开）
+- [RULE-447] 表单页必须使用 `FormPageLayout`（路径：`src/components/FormPageLayout/FormPageLayout.vue`）
+- [RULE-448] 后端路由机制：有 children 的路由自动重定向到第一个子路由（`src/router/backEnd.ts:159`）
+- [RULE-449] 表单页必须和 index 同级（设置 `isHide: true`），不能作为 children
+- [RULE-450] 二级页面不需要手写标题，菜单名和面包屑已承担标题功能
+- [RULE-451] Vue: `ref`, `reactive`, `computed`, `watch`, `onMounted`, `nextTick` 等
+- [RULE-452] Vue Router: `useRoute`, `useRouter`
+- [RULE-453] Pinia: `defineStore`
+- [RULE-454] `/@/` → `src/`（注意：不是 `@/`，是 `/@/`）
