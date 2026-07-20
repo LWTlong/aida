@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "aida": {
+      "command": "node",
+      "args": [
+        "dist/cli/index.js",
+        "mcp"
+      ]
+    }
+  }
+}
