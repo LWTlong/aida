@@ -21,25 +21,40 @@ description: 一站式 AI 资产治理：扫描 → 分析 → 用户确认 → 
 1. `aida_scan_assets`（`writeIndex: true`, `includeContent: false`）。
 2. `aida_list_assets` 汇总类型和工具分布。
 
-3. **准备工作：先读懂项目是什么**。扫一眼根目录（`ls`），读项目的依赖清单（`package.json` / `pom.xml` / `requirements.txt` / `go.mod` / `Cargo.toml`，哪个存在读哪个）。目标是建立"这个项目实际用的技术栈"的认知，供后续判断用。
+3. **先读懂项目**：`ls` 根目录，读项目的依赖清单（`package.json` / `pom.xml` / `requirements.txt` / `go.mod` / `Cargo.toml`，哪个存在读哪个）。建立"这个项目实际技术栈"的认知，供后续语义判断用。
 
-   **必须逐一检查 `.claude/rules/**/*.md`, `.claude/skills/**/*.md`, `.cursor/rules/**/*.md`, `.codex/rules/**/*.md` 的每一个文件。** 这是主战场，不是可选项。用 `aida_get_asset` 或直接 Read。对每个文件判断：
+4. **逐文件做语义分类**。必须逐一读取 `.claude/rules/**/*.md`、`.claude/skills/**/*.md`、`.cursor/rules/**/*.md`、`.codex/rules/**/*.md` 每一个文件（用 `aida_get_asset` 或 Read）。这是主战场，不可跳过。
 
-   | 判断 | 触发条件 | 建议动作 |
+   读完每个文件后，**对文件里的每一条规则/每一组规则，做以下二元判断**：
+
+   **判断 A：这条规则属于 Rule 还是 Skill？**
+
+   | 类型 | 语义特征 | 动作 |
    |---|---|---|
-   | 聚合镜像 | 文件名 `_` 开头（`_all.md`、`_index.md`）；文件头有 `<!-- AUTO-GENERATED -->`；内容明显是同目录其他 md 的拼接 | **`delete-file`（不要犹豫）** |
-   | **无关规则** | 规则里描述的技术/API/框架，在当前项目里**根本不存在**（根据上面读到的项目技术栈判断）。判断标准：如果这条规则在这个项目里 100% 永远不会被触发，它就是无关规则。 | **`remove-lines` 批量删**，把同一来源的无关规则一次删完，不要一条条问 |
-   | **Checklist 条目** | 行内容是 `[ ]` 或 `[x]` 开头的清单项（如 `[ ] 命名规范正确`）。这是 PR 审查模板，不是 AI 约束，对 Claude 执行没有任何意义。 | **`remove-lines` 批量删**（全部删，不保留） |
-   | 规则过载 | **无关规则和 checklist 删完后**，文件条目仍很多；或规则内容大量是编码样式描述（缩进/引号/换行等格式细节） | `modify-file` 整合：把纯格式类规则合并为一个 `## Style Guide` 段落，保留有实际约束力的硬规则 |
-   | **任务型规则（工作流）** | 一组规则放在一起，共同描述一个完整的操作流程（如"新增页面步骤"、"i18n 翻译流程"）。判断标准：这组规则有顺序/依赖关系，或者全部在回答"如何完成 X 任务"，而不是"必须遵守 X 约束"。 | `create-file` 在 `.claude/skills/` 建对应 skill + `remove-lines` 从规则文件删这些行 |
-   | 跨工具重复 | `.codex/rules/**` 或 `.cursor/rules/**` 里内容与 `.claude/rules/**` 完全一致 | `delete-file` 删镜像端，保留 `.claude/` |
+   | **Rule（保留）** | 永远生效的约束：「必须 X」、「禁止 Y」、「凡 Z 情况下一律 W」。读到它，AI 就该遵守，无需用户触发。 | 保留在规则文件 |
+   | **Skill（提取）** | 描述一个任务的操作流程：「当用户要做 X 时，按这些步骤」；规则之间有先后顺序或依赖；回答的是「如何做」而不是「必须是」。 | `create-file` 提取到 `.claude/skills/<name>.md`，同时 `remove-lines` 从规则文件删除 |
+
+   **判断 B：这条规则是否有效？**
+
+   | 类型 | 语义特征 | 动作 |
+   |---|---|---|
+   | **无关规则** | 规则描述的技术/API/框架在当前项目根本不存在（依据步骤 3 读到的技术栈判断）。这条规则在这个项目里永远不会被触发。 | `remove-lines` 批量删，同来源的一次删完 |
+   | **Checklist 条目** | `[ ]` 或 `[x]` 开头的清单项。PR 审查模板，不是 AI 执行约束。 | `remove-lines` 全部删 |
+   | **重复规则** | 与同目录或跨工具目录里另一条规则语义相同（不要求文字完全一致，语义等价即为重复）。 | `remove-lines` 删副本，保留表达更清晰的那条 |
+
+   **判断 C：文件结构问题**
+
+   | 类型 | 触发条件 | 动作 |
+   |---|---|---|
+   | 聚合镜像 | 文件名 `_` 开头；文件头有 `<!-- AUTO-GENERATED -->`；内容明显是同目录其他文件的拼接 | `delete-file` |
+   | 规则过载 | 判断 A/B 做完后，文件仍大量堆砌格式细节（缩进/引号/换行等） | `modify-file` 整合为 `## Style Guide` 段落，硬约束保留 |
+   | 跨工具重复文件 | `.codex/rules/**` 或 `.cursor/rules/**` 内容与 `.claude/rules/**` 完全一致 | `delete-file` 删镜像端，保留 `.claude/` |
    | 合并冲突 | 文件里有 `<<<<<<<` 标记 | 提示用户先处理冲突 |
-   | AI 生成文档冗余 | `docs/` 或根目录 md 文档，内容过时、与规则冲突、明显是 AI 生成的分析报告 | `delete-file` 或 archive |
-   | **2.x 目录嵌套** | `.claude/rules/aida/*.md`（多余的 `aida/` 层级，Claude Code 会加载 `.claude/rules/*.md` 平铺结构） | `create-file` 复制到 `.claude/rules/` 平铺 + `delete-file` 删旧路径。**保留 `.claude/rules/decisions/` 子目录**（MADR 记忆的合法分组）。|
+   | 2.x 目录嵌套 | `.claude/rules/aida/*.md`（多余的 `aida/` 层级） | `create-file` 复制到 `.claude/rules/` 平铺 + `delete-file` 删旧路径；**保留 `decisions/` 子目录** |
 
-   **必须给出的输出**：每个源规则目录（`.claude/rules/aida/` 等）都要在计划表里出现，即使动作是"保留原样"也要明说，不要静默跳过。
+   **必须给出的分析输出**：每个规则文件都要在计划表里出现，说明从中识别出多少条 Skill 候选、多少条无关规则、多少条重复。即使动作是"保留原样"也要明说，不要静默跳过。
 
-3.5. **检查根目录 CLAUDE.md**（如果存在）：
+5. **检查根目录 CLAUDE.md**（如果存在）：
 
    Claude Code 会自动读根目录 `CLAUDE.md` 作为项目指令。**内容必须与项目当前状态一致**。判断：
 
@@ -60,13 +75,13 @@ description: 一站式 AI 资产治理：扫描 → 分析 → 用户确认 → 
    - 沉淀"为什么这么写"用 `/aida-remember`（写入 `.claude/rules/decisions/`，Claude Code 会按 `paths` 前置元数据自动加载）。
    - 所有 AIDA 写操作都通过 `aida_apply_governance`，可 `aida_undo` 回滚。
    ```
-4. **检测 2.x 遗留物**：
+6. **检测 2.x 遗留物**：
    - `.aida/proposals/*.json` — 旧版审批草稿，3.0 已不使用
    - `.aida/memories/index.json` schemaVersion 为 `2.0` 且 `.aida/memories/modules/` 下有 JSON — 旧版模块记忆
    - `.aida/reports/*.json` — 旧版报告
    - 如发现，作为独立分组"归档 2.x 遗留物"纳入清理清单
 
-5. **检测 3.0 迁移状态（只有检测到 2.x 遗迹时才提示，全新项目跳过）**：
+7. **检测 3.0 迁移状态（只有检测到 2.x 遗迹时才提示，全新项目跳过）**：
 
    跑三个检查判断是否处于 2.x → 3.0 迁移期：
 
