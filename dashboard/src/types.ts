@@ -1,52 +1,63 @@
-/**
- * AIDevOS Dashboard Types
- *
- * Re-exports from the unified Schema (Single Source of Truth)
- */
+export interface DashboardAsset {
+  id: string;
+  type: string;
+  name: string;
+  title: string;
+  sourceTool: string;
+  sourcePath: string;
+  confidence: 'high' | 'medium' | 'low';
+  signals: string[];
+  contentExcerpt?: string;
+  metadata?: Record<string, unknown>;
+}
 
-// Import all types from the unified schema
-export type {
-  RunMeta,
-  RunSummaryData,
-  RunMetrics,
-  RunContext,
-  TaskItem,
-  DeviationItem,
-  BugItem,
-  ReviewItem,
-  RuleItem,
-  FileItem,
-  TimelineItem,
-  WorkflowStage,
-  EventItem,
-  RunData,
-  RunCost,
-  HighlightItem,
-  RequirementData,
-  RequirementModule,
-  RequirementPrdPhase,
-  DeveloperSummary,
-  IndexData,
-  IndexRunEntry,
-  RuleRegistryEntry,
-} from '../../src/schemas/run-json.js'
+export interface DashboardAssetIndex {
+  schemaVersion: string;
+  generatedAt: string;
+  projectRoot: string;
+  assets: DashboardAsset[];
+  summary: Record<string, number>;
+  signals: {
+    duplicateContentGroups: Array<{ hash: string; assetIds: string[] }>;
+    unknownDotDirs: string[];
+    nextSteps: string[];
+  };
+}
 
-// Dashboard-specific types (not in run.json)
-// RunSummary is used for displaying runs in the list
-export interface RunSummary {
-  runId: string
-  branch: string
-  developer: string
-  aiModel: string
-  status: string
-  startTime: string
-  totalTasks: number
-  completedTasks: number
-  deviationCount: number
-  bugCount: number
-  reviewPassRate: number
-  rulesSedimented: number
-  filesChanged: number
-  totalDevTimeSeconds: number
-  actualWorkSeconds: number
+export interface DashboardDecision {
+  slug: string;
+  title: string;
+  paths?: string[];
+  status: 'accepted' | 'deprecated' | 'superseded';
+  date: string;
+  tags?: string[];
+  context: string;
+  decision: string;
+  consequences?: string;
+  filePath: string;
+}
+
+export interface PluginRiskFinding {
+  level: 'low' | 'medium' | 'high';
+  kind: string;
+  filePath: string;
+  signal: string;
+  recommendation: string;
+}
+
+export interface PluginRiskReport {
+  schemaVersion: string;
+  pluginPath: string;
+  scannedAt: string;
+  level: 'low' | 'medium' | 'high';
+  findings: PluginRiskFinding[];
+  summary: string;
+  nextSteps: string[];
+}
+
+export interface BuildPluginResult {
+  success: boolean;
+  outputPath: string;
+  filesWritten: string[];
+  message: string;
 }

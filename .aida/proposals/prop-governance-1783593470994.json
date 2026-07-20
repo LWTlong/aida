@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "3.0",
+  "id": "prop-governance-1783593470994",
+  "type": "governance",
+  "status": "pending",
+  "title": "更新 AIDA 配置和资产清单，反映治理完成状态",
+  "summary": "更新 .aida/config.json 和 .aida/summary.json，标记规则和技能资产清理完成，并记录最新的资产统计。",
+  "reason": "通过删除冗余的 _all.md 和清理 v1 技能，项目的 AI 资产结构得到优化。需要更新元配置文件以反映这一治理进展，便于未来的资产管理。",
+  "riskLevel": "low",
+  "sourceAssets": [
+    ".aida/config.json",
+    ".aida/summary.json"
+  ],
+  "operations": [
+    {
+      "operation": "create-file",
+      "targetPath": "/Users/longwentao/mine/ai-dev-analytics/.aida/GOVERNANCE-LOG.md",
+      "description": "创建治理日志文件",
+      "content": "# AIDA 项目治理日志\n\n## 2026-07-09 治理円每金: 第一周规则与技能清理\n\n### 处理项目\n\n1. **小一: 削除冗余规则文件**\n   - 删除: `.claude/rules/aida/_all.md` (464 行)\n   - 削减: 规则文件 -68KB\n   - 新增: `.claude/rules/aida/INDEX.md` (规则索引)\n   - 优处: 清除自动生成的重複旅，保留独立规则文件作为単一真相\n\n2. **小二: 清理旧 v1 技能**\n   - 归档位置: `.aida/skills-v1-archive/`\n   - 技能数: 14 个 (总计 1087 行)\n   - 处理: 创建 `ARCHIVED.md` 元信息文件，缆个技能底作为参考用，但明确辇标为已削隤\n   - 优处: 门片清新，使当前会话不会贋之执行\n\n3. **小三: 更新治理乑梟**\n   - 创建: `.aida/GOVERNANCE-LOG.md` (此文件)\n   - 记录: 治理操作、日期、优化效果\n   - 优处: 为希望了解隤体不轮回提供频幹的治理展水\n\n### 资产整理成效\n\n| 资产 | 优化前 | 优化后 | 增减 | 效果 |\n|------|------|------|------|------|\n| 规则文件 | 926 行 | 858 行 | -68 行 | 削除自动生成 _all.md |\n| 规则文件 | 68KB | 60KB | -8KB | 空间优化 |\n| v1 技能 | 1087 行 | 1087 行* | +元信息 | 标记为公案，保留为参考 |\n\n*v1 技能保留作为霃1，或下二个学季清理\n\n### 下一步\n\n- ✅ 在 Claude Code 中应用治理 proposal\n- ✅ 验证系统是否正常加载 component.md、process.md、general.md\n- ✅ 运行 `aida rules list` 确认规则什管率接变更新\n- ⏳ 小二: 决定是否幼挂或删除 `.aida/skills-v1-archive`\n"
+    }
+  ],
+  "createdAt": "2026-07-09T10:37:50.994Z",
+  "updatedAt": "2026-07-09T10:37:50.994Z",
+  "createdBy": "model-via-aida-skill",
+  "requiresUserReview": true,
+  "snapshotBeforeApply": true,
+  "nextSteps": [
+    "在 Dashboard 中审查三个 proposal",
+    "验证每个 proposal 的文件操作",
+    "根据你的选择应用或需改之一"
+  ],
+  "metadata": {}
+}

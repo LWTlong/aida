@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "2.0",
+  "moduleKey": "aida-3-0-core",
+  "title": "AIDA 3.0 MCP-First Asset Governance Core Implementation",
+  "summary": "AIDA Dashboard 改为由 CLI 启动本地 Node 服务并分发独立构建的 React/Vite 治理控制台，界面重做为中文、支持系统深浅主题；proposal/report/skill/CLI 的 Dashboard 引导文案统一改为直接提示运行 `aida dashboard`。",
+  "keywords": [
+    "AIDA 3.0",
+    "MCP-first",
+    "asset scanner",
+    "proposals",
+    "skills",
+    "plugin builder",
+    "dashboard",
+    "core",
+    "aida-3-0-core",
+    "AIDA 3.0 MCP-First Asset Governance Core Implementation",
+    "react-vite",
+    "governance-console",
+    "theme",
+    "cli",
+    "proposal",
+    "report"
+  ],
+  "entryFiles": [
+    "src/core/",
+    "src/core/assets/scanner.ts",
+    "src/core/assets/types.ts",
+    "src/core/assets/store.ts",
+    "src/core/assets/query.ts",
+    "src/core/assets/paths.ts",
+    "src/core/proposals/proposals.ts",
+    "src/core/reports/reports.ts"
+  ],
+  "relatedPaths": [],
+  "dataFlow": [],
+  "decisions": [
+    "MCP-first: 所有智能治理能力通过 MCP tools 暴露，CLI 只是启动入口",
+    "Code scans, model judges: 代码负责机械扫描和结构化登记，模型通过 built-in skills 做语义判断",
+    "Proposal-first: merge/delete/rewrite/archive/import 等高风险操作必须先生成 proposal",
+    "Scan all tools, write selected: 默认扫描 Claude/Cursor/Codex/unknown dot-dir，写回目标由用户选择",
+    "AIDA managed assets as canonical layer: 默认先写 .aida/assets/ 再按需同步到特定工具",
+    "Plugin: 第一阶段只支持 Claude Plugin exporter，内部用通用 asset bundle model",
+    "内置 Skills 分 plan 步骤，包含目标、Safety Rules、Plan Steps、User Checkpoints、Output Format",
+    "Dashboard 用纯 HTML/JS 内联实现，不依赖 React 构建工具"
+  ],
+  "constraints": [
+    "必须 local-first，不引入云依赖",
+    "不自动删除或覆盖用户文件",
+    "不自动执行导入的 hooks/scripts/MCP servers",
+    "3.0 是破坏性更新，不再兼容 2.0 runtime/task/record/runs 等旧模块",
+    "scan 不修改原始文件，asset index 可重建",
+    "apply 前创建 snapshot",
+    "proposal 必须展示 diff/理由/风险/影响范围",
+    "Dashboard 是本地治理控制台，不需要 SSR/SEO"
+  ],
+  "pitfalls": [
+    "工具名必须用下划线而非点号（如 aida_scan_assets 而非 aida.scan_assets）",
+    "ESM 项目中 Date.now() 在 workflow 中不可用，但代码中可以用",
+    "scanner.ts 中 ?? 和 || 不能混用需加括号",
+    "asset 没有 sourceRoot 字段，应该用 asset.source.root",
+    "安装/卸载 dashboard 依赖需要显式带公共源参数，避免误走私有源",
+    "CLI 启动文案里不能残留占位字符串，必须直接输出可执行命令",
+    "构建前需要清空 `src/dashboard/`，否则旧 demo 产物会残留"
+  ],
+  "relatedRules": [],
+  "tickets": [
+    {
+      "ticket": "design-aida-3.0",
+      "branch": "design-aida-3.0",
+      "summary": "AIDA 3.0 的 dashboard 已从旧分析看板切换为专注 proposal/report/asset/plugin 审核的本地治理控制台。",
+      "updatedAt": "2026-07-09T02:59:23.595Z"
+    },
+    {
+      "branch": "design-aida-3.0",
+      "summary": "AIDA 3.0 MCP-first 核心实现：17 个 MCP tools、资产扫描器、proposal 系统、plugin builder/importer、8 个内置 skills、Dashboard、简化的 CLI",
+      "updatedAt": "2026-07-08T11:13:20.939Z"
+    }
+  ],
+  "changes": [
+    {
+      "ticket": "design-aida-3.0",
+      "branch": "design-aida-3.0",
+      "title": "design-aida-3.0",
+      "summary": "AIDA 3.0 的 dashboard 已从旧分析看板切换为专注 proposal/report/asset/plugin 审核的本地治理控制台。",
+      "updatedAt": "2026-07-09T02:59:23.595Z"
+    },
+    {
+      "branch": "design-aida-3.0",
+      "title": "design-aida-3.0",
+      "summary": "AIDA 3.0 MCP-first 核心实现：17 个 MCP tools、资产扫描器、proposal 系统、plugin builder/importer、8 个内置 skills、Dashboard、简化的 CLI",
+      "updatedAt": "2026-07-08T11:13:20.939Z"
+    }
+  ],
+  "updatedAt": "2026-07-09T02:59:23.612Z"
+}

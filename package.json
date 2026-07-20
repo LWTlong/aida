@@ -1,46 +1,44 @@
 {
-  "name": "ai-dev-analytics",
-  "version": "1.1.12",
-  "description": "AI Development Analytics Platform - Track what AI actually does in your codebase",
+  "name": "aida",
+  "version": "3.0.1",
+  "description": "AIDA — Local AI Asset Manager. MCP-first governance for rules, skills, docs, and plugins accumulated through long-term vibe coding.",
   "type": "module",
   "bin": {
     "aida": "dist/cli/index.js"
   },
   "scripts": {
-    "build": "tsc",
-    "build:test": "tsc -p tsconfig.test.json",
+    "build": "npm --prefix dashboard run build && rm -rf dist && tsc && cp -r src/assets dist/ && cp -r src/dashboard dist/",
+    "build:test": "rm -rf dist-test && tsc -p tsconfig.test.json",
     "test": "npm run build:test && node --test dist-test/tests/*.test.js",
     "dev": "tsc --watch",
     "start": "node dist/cli/index.js",
-    "prepublishOnly": "npm run build && cd dashboard && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "ai",
-    "development",
-    "analytics",
-    "observability",
-    "claude",
+    "aida",
+    "rules",
+    "skills",
+    "memory",
+    "mcp",
     "cursor",
-    "devops",
-    "dashboard"
+    "codex"
   ],
   "author": "wen tao",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LWTlong/ai-dev-analytics.git"
+    "url": "git+https://github.com/LWTlong/aida.git"
   },
-  "homepage": "https://github.com/LWTlong/ai-dev-analytics#readme",
+  "homepage": "https://github.com/LWTlong/aida#readme",
   "bugs": {
-    "url": "https://github.com/LWTlong/ai-dev-analytics/issues"
+    "url": "https://github.com/LWTlong/aida/issues"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "files": [
-    "dist",
-    "src/assets",
-    "src/dashboard"
+    "dist"
   ],
   "devDependencies": {
     "@types/node": "^25.4.0",

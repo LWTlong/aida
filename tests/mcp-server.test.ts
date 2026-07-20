@@ -9,12 +9,6 @@ const cliPath = resolve(import.meta.dirname, '..', 'src', 'cli', 'index.js');
 
 // ─── JSON-RPC over stdio helpers ──────────────────────────
 
-/**
- * Persistent MCP client that accumulates stdout as a Buffer.
- *
- * Key insight: Content-Length is in *bytes*, so we must track bytes,
- * not string characters (CJK chars in tool descriptions are multi-byte).
- */
 class McpClient {
   private proc: ChildProcess;
   private buf = Buffer.alloc(0);
@@ -48,8 +42,8 @@ class McpClient {
       const match = headerStr.match(/Content-Length:\s*(\d+)/i);
       if (!match) return;
 
-      const contentLength = parseInt(match[1]);
-      const bodyStart = headerEndIdx + 4; // skip \r\n\r\n
+      const contentLength = parseInt(match[1], 10);
+      const bodyStart = headerEndIdx + 4;
       if (this.buf.length < bodyStart + contentLength) return;
 
       const bodyBuf = this.buf.subarray(bodyStart, bodyStart + contentLength);
@@ -84,8 +78,8 @@ class McpClient {
     this.proc.stdin!.write(msg);
   }
 
-  async callTool(name: string, args: Record<string, any> = {}): Promise<any> {
-    const resp = await this.rpc('tools/call', { name, arguments: args });
+  async callTool(name: string, args: Record<string, any> = {}, timeoutMs = 30000): Promise<any> {
+    const resp = await this.rpc('tools/call', { name, arguments: args }, timeoutMs);
     assert.ok(resp.result, `Expected result in response for tool ${name}`);
     const text = resp.result.content?.[0]?.text;
     assert.ok(text, `Expected text content in response for tool ${name}`);
@@ -115,359 +109,170 @@ class McpClient {
   }
 }
 
-// ─── Test suite ───────────────────────────────────────────
+// ─── AIDA 3.0 Test suite ──────────────────────────────────
 
-let project: TestProject;
-let client: McpClient;
+describe('MCP Server (AIDA 3.0)', { concurrency: false }, () => {
+  let project: TestProject;
+  let client: McpClient;
 
-beforeEach(() => {
-  project = createTestProject();
-  client = new McpClient(project.root);
-});
-
-afterEach(() => {
-  client.kill();
-  project.cleanup();
-});
-
-// ─── initialize ───────────────────────────────────────────
-
-describe('MCP Server - initialize', () => {
-  it('should respond with protocolVersion and serverInfo', async () => {
-    const resp = await client.initialize();
-
-    assert.ok(resp.result);
-    assert.equal(resp.result.protocolVersion, '2024-11-05');
-    assert.equal(resp.result.serverInfo.name, 'aida');
-    assert.equal(resp.result.serverInfo.version, '1.0.0');
-    assert.ok(resp.result.capabilities.tools);
-    assert.ok(resp.result.capabilities.prompts);
+  beforeEach(() => {
+    project = createTestProject();
+    client = new McpClient(project.root);
   });
-});
 
-// ─── tools/list ───────────────────────────────────────────
-
-describe('MCP Server - tools/list', () => {
-  it('should return all registered tools', async () => {
-    await client.initialize();
-
-    const resp = await client.rpc('tools/list');
-    assert.ok(resp.result);
-    const tools = resp.result.tools;
-    assert.equal(tools.length, 21);
-
-    const names = tools.map((t: any) => t.name).sort();
-    const expected = [
-      'aida_bootstrap',
-      'aida_bug_fix',
-      'aida_context_get',
-      'aida_context_rebuild',
-      'aida_context_update',
-      'aida_highlight',
-      'aida_log_bug',
-      'aida_log_deviation',
-      'aida_log_files',
-      'aida_log_review',
-      'aida_log_rule',
-      'aida_memory',
-      'aida_memory_get',
-      'aida_memory_pack',
-      'aida_memory_search',
-      'aida_memory_upsert',
-      'aida_record',
-      'aida_status',
-      'aida_task',
-      'aida_task_done',
-      'aida_task_start',
-    ];
-    assert.deepEqual(names, expected);
+  afterEach(() => {
+    client.kill();
+    project.cleanup();
   });
-});
 
-describe('MCP Server - aida_bootstrap', () => {
-  it('should return bootstrap manifest and persist local bootstrap state', async () => {
-    await client.initialize();
+  // ─── initialize ───────────────────────────────────────────
 
-    const status = await client.callTool('aida_bootstrap', { action: 'status', host: 'claude-code' });
-    assert.equal(status.success, true);
-    assert.equal(status.host, 'claude-code');
-    assert.equal(typeof status.available, 'boolean');
-    assert.equal(status.cached, null);
+  describe('initialize', () => {
+    it('should respond with protocolVersion and 3.0 serverInfo', async () => {
+      const resp = await client.initialize();
 
-    const manifest = await client.callTool('aida_bootstrap', { action: 'manifest', host: 'claude-code' });
-    assert.equal(manifest.success, true);
-    assert.equal(manifest.required, true);
-    assert.ok(Array.isArray(manifest.groupedTools));
-    assert.ok(manifest.groupedTools.some((item: any) => item.name === 'aida_task'));
-
-    const completed = await client.callTool('aida_bootstrap', {
-      action: 'complete',
-      host: 'claude-code',
-      decision: 'approved',
-      approvedToolNames: ['aida_bootstrap', 'aida_task', 'aida_record', 'aida_memory'],
-      acknowledgedReason: true,
+      assert.ok(resp.result);
+      assert.equal(resp.result.protocolVersion, '2024-11-05');
+      assert.equal(resp.result.serverInfo.name, 'aida');
+      assert.equal(resp.result.serverInfo.version, '3.0.0');
+      assert.ok(resp.result.capabilities.tools);
+      assert.ok(resp.result.capabilities.prompts);
     });
-    assert.equal(completed.success, true);
-    assert.equal(completed.decision, 'approved');
-
-    const bootstrapState = readJson<any>(resolve(project.root, '.aida', 'bootstrap-state.local.json'));
-    assert.ok(Array.isArray(bootstrapState.records));
-    assert.equal(bootstrapState.records[0].host, 'claude-code');
   });
 
-  it('should treat the current MCP session as available even when project config lacks the host', async () => {
-    writeJson(project.configPath, {
-      schemaVersion: '1.0',
-      aiTool: 'cursor',
-      aiTools: ['cursor'],
-      project: 'test-project',
+  // ─── tools/list ───────────────────────────────────────────
+
+  describe('tools/list', () => {
+    it('should return all 3.0 governance tools', async () => {
+      await client.initialize();
+
+      const resp = await client.rpc('tools/list');
+      assert.ok(resp.result);
+      const tools = resp.result.tools;
+      assert.equal(tools.length, 14);
+
+      const names = tools.map((t: any) => t.name).sort();
+      const expected = [
+        'aida_apply_governance',
+        'aida_audit_plugin_risk',
+        'aida_bootstrap',
+        'aida_build_plugin',
+        'aida_build_self_plugin',
+        'aida_get_asset',
+        'aida_list_assets',
+        'aida_memory',
+        'aida_parse_plugin',
+        'aida_recall',
+        'aida_remember',
+        'aida_scan_assets',
+        'aida_undo',
+        'aida_write_analysis',
+      ];
+      assert.deepEqual(names, expected);
     });
-
-    await client.initialize();
-
-    const status = await client.callTool('aida_bootstrap', { action: 'status', host: 'codex' });
-    assert.equal(status.success, true);
-    assert.equal(status.host, 'codex');
-    assert.equal(status.available, true);
-    assert.equal(status.configured, false);
-    assert.equal(status.sessionAvailable, true);
-    assert.equal(status.needsBootstrap, true);
-
-    const manifest = await client.callTool('aida_bootstrap', { action: 'manifest', host: 'codex' });
-    assert.equal(manifest.available, true);
-    assert.equal(manifest.configured, false);
-    assert.equal(manifest.sessionAvailable, true);
   });
-});
 
-describe('MCP Server - memory tools', () => {
-  it('should rebuild branch memory and return an aggregated memory pack', async () => {
-    await client.initialize();
+  // ─── aida_bootstrap ──────────────────────────────────────
 
-    const branchDir = resolve(project.root, '.aida', 'runs', project.branch);
-    const { writeJson, writeText } = await import('../src/utils/fs.js');
-    writeJson(resolve(branchDir, 'requirement.json'), {
-      branch: project.branch,
-      title: 'MTR-001 Profile',
-      summary: 'Profile rebuild',
-      prdPhases: [],
-      modules: [
-        { id: 'MOD-01', name: 'Profile', description: 'User profile module', assignee: project.dev },
-      ],
-      highlights: [],
-      developers: [],
-      totals: { tasks: 0, completedTasks: 0, bugs: 0, deviations: 0, linesAdded: 0, linesRemoved: 0, totalTokens: 0 },
-      createdAt: '2026-04-15T12:00:00.000Z',
-      updatedAt: '2026-04-15T12:00:00.000Z',
+  describe('aida_bootstrap', () => {
+    it('should return bootstrap manifest and persist local bootstrap state', async () => {
+      await client.initialize();
+
+      const status = await client.callTool('aida_bootstrap', { action: 'status', host: 'claude-code' });
+      assert.equal(status.success, true);
+      assert.equal(status.host, 'claude-code');
+      assert.equal(typeof status.available, 'boolean');
+
+      const manifest = await client.callTool('aida_bootstrap', { action: 'manifest', host: 'claude-code' });
+      assert.equal(manifest.success, true);
+      assert.equal(manifest.required, true);
+      assert.ok(Array.isArray(manifest.groupedTools));
+
+      const completed = await client.callTool('aida_bootstrap', {
+        action: 'complete',
+        host: 'claude-code',
+        decision: 'approved',
+        approvedToolNames: ['aida_bootstrap', 'aida_memory'],
+        acknowledgedReason: true,
+      });
+      assert.equal(completed.success, true);
+      assert.equal(completed.decision, 'approved');
+
+      const bootstrapState = readJson<any>(resolve(project.root, '.aida', 'bootstrap-state.local.json'));
+      assert.ok(Array.isArray(bootstrapState.records));
+      assert.equal(bootstrapState.records[0].host, 'claude-code');
     });
-    writeText(resolve(branchDir, 'analysis.md'), '# Summary\n\nProfile rebuild.\n');
-
-    const rebuild = await client.callTool('aida_context_rebuild', {});
-    assert.equal(rebuild.success, true);
-
-    const pack = await client.callTool('aida_memory_pack', {});
-    assert.equal(pack.success, true);
-    assert.equal(pack.pack.context.branch, project.branch);
-    assert.ok(Array.isArray(pack.pack.modules));
   });
-});
 
-// ─── aida_task_start ───────────────────────────────────
+  // ─── aida_memory (compatibility) ─────────────────────────
 
-describe('MCP Server - aida_task_start', () => {
-  it('should create a task and run.json via lazy init', async () => {
-    await client.initialize();
+  describe('aida_memory', () => {
+    it('should support search action', async () => {
+      await client.initialize();
+      const search = await client.callTool('aida_memory', { action: 'search', query: 'test' });
+      assert.equal(search.success, true);
+      assert.ok(Array.isArray(search.hits));
+    });
+  });
 
-    const result = await client.callTool('aida_task_start', {
-      title: 'Implement auth module',
-      stage: 'Authentication',
+  // ─── aida_scan_assets ────────────────────────────────────
+
+  describe('aida_scan_assets', () => {
+    it('should scan project assets and write index', async () => {
+      await client.initialize();
+      const result = await client.callTool('aida_scan_assets', { includeContent: false, writeIndex: true });
+      assert.ok(result.assets);
+      assert.ok(Array.isArray(result.assets));
+      assert.equal(result.schemaVersion, '3.0');
+      assert.ok(result.summary);
+      assert.ok(result.signals);
+    });
+  });
+
+  // ─── aida_list_assets / aida_get_asset ───────────────────
+
+  describe('aida_list_assets / aida_get_asset', () => {
+    it('should list scanned assets', async () => {
+      await client.initialize();
+      await client.callTool('aida_scan_assets', { writeIndex: true });
+      const list = await client.callTool('aida_list_assets', {});
+      assert.equal(list.success, true);
+      assert.ok(Array.isArray(list.assets));
+    });
+  });
+
+  // ─── plugin audit ────────────────────────────────────────
+
+  describe('aida_audit_plugin_risk', () => {
+    it('should audit a local directory for risk signals', async () => {
+      await client.initialize();
+      const result = await client.callTool('aida_audit_plugin_risk', { path: project.root });
+      assert.equal(result.success, true);
+      assert.ok(result.risk.level);
+      assert.ok(Array.isArray(result.risk.findings));
+    });
+  });
+
+  // ─── prompts ─────────────────────────────────────────────
+
+  describe('prompts', () => {
+    it('should return aida-3-guide prompt', async () => {
+      await client.initialize();
+      const resp = await client.rpc('prompts/list');
+      assert.ok(resp.result);
+      const prompts = resp.result.prompts;
+      assert.equal(prompts.length, 1);
+      assert.equal(prompts[0].name, 'aida-3-guide');
     });
 
-    assert.equal(result.success, true);
-    assert.equal(result.taskId, 'TASK-01');
-
-    // Verify run.json on disk
-    const data = readJson<any>(project.runJsonPath);
-    assert.equal(data.tasks.length, 1);
-    assert.equal(data.tasks[0].taskId, 'TASK-01');
-    assert.equal(data.tasks[0].title, 'Implement auth module');
-    assert.equal(data.tasks[0].status, 'in-progress');
-    assert.equal(data.tasks[0].stageName, 'Authentication');
-    assert.equal(data.summary.totalTasks, 1);
-    assert.equal(data.context.currentTaskId, 'TASK-01');
-  });
-});
-
-describe('MCP Server - aggregated tools', () => {
-  it('should support task, record, and memory operations through grouped tools', async () => {
-    await client.initialize();
-
-    const started = await client.callTool('aida_task', {
-      action: 'start',
-      title: 'Implement auth module',
-      stage: 'Authentication',
+    it('should return prompt content via prompts/get', async () => {
+      await client.initialize();
+      const resp = await client.rpc('prompts/get', { name: 'aida-3-guide' });
+      assert.ok(resp.result);
+      assert.ok(Array.isArray(resp.result.messages));
+      assert.equal(resp.result.messages.length, 1);
+      assert.equal(resp.result.messages[0].role, 'user');
+      assert.ok(resp.result.messages[0].content.text.includes('MCP-first'));
     });
-    assert.equal(started.success, true);
-    assert.equal(started.taskId, 'TASK-01');
-
-    const review = await client.callTool('aida_record', {
-      action: 'review',
-      result: 'pass',
-      scope: 'src/auth',
-    });
-    assert.equal(review.success, true);
-    assert.equal(review.reviewId, 'REV-01');
-
-    const search = await client.callTool('aida_memory', {
-      action: 'search',
-      query: 'auth',
-    });
-    assert.equal(search.success, true);
-
-    const done = await client.callTool('aida_task', {
-      action: 'done',
-      taskId: 'TASK-01',
-    });
-    assert.equal(done.success, true);
-  });
-});
-
-// ─── aida_task_done ────────────────────────────────────
-
-describe('MCP Server - aida_task_done', () => {
-  it('should mark task as done', async () => {
-    await client.initialize();
-
-    await client.callTool('aida_task_start', { title: 'Build API', stage: 'Backend' });
-
-    const result = await client.callTool('aida_task_done', { taskId: 'TASK-01' });
-    assert.equal(result.success, true);
-
-    const data = readJson<any>(project.runJsonPath);
-    assert.equal(data.tasks[0].status, 'done');
-    assert.ok(data.tasks[0].completedAt);
-    assert.equal(data.summary.completedTasks, 1);
-  });
-
-  it('should fall back currentTaskId to another in-progress task after completion', async () => {
-    await client.initialize();
-
-    await client.callTool('aida_task_start', { title: 'Task A', stage: 'Backend' });
-    await client.callTool('aida_task_start', { title: 'Task B', stage: 'Frontend' });
-
-    const result = await client.callTool('aida_task_done', { taskId: 'TASK-02' });
-    assert.equal(result.success, true);
-
-    const data = readJson<any>(project.runJsonPath);
-    assert.equal(data.context.currentTaskId, 'TASK-01');
-    assert.equal(data.tasks[0].status, 'in-progress');
-    assert.equal(data.tasks[1].status, 'done');
-  });
-
-  it('should return error for unknown task ID', async () => {
-    await client.initialize();
-
-    const result = await client.callTool('aida_task_done', { taskId: 'TASK-99' });
-    assert.equal(result.success, false);
-  });
-});
-
-// ─── aida_log_bug ──────────────────────────────────────
-
-describe('MCP Server - aida_log_bug', () => {
-  it('should record a bug with defaults', async () => {
-    await client.initialize();
-
-    const result = await client.callTool('aida_log_bug', {
-      title: 'Null pointer in parser',
-    });
-
-    assert.equal(result.success, true);
-    assert.equal(result.bugId, 'BUG-01');
-
-    const data = readJson<any>(project.runJsonPath);
-    assert.equal(data.bugs.length, 1);
-    assert.equal(data.bugs[0].title, 'Null pointer in parser');
-    assert.equal(data.bugs[0].severity, 'medium');
-    assert.equal(data.bugs[0].source, 'self-review');
-    assert.equal(data.bugs[0].status, 'open');
-    assert.equal(data.summary.bugCount, 1);
-  });
-
-  it('should record a bug with explicit severity and source', async () => {
-    await client.initialize();
-
-    const result = await client.callTool('aida_log_bug', {
-      title: 'Critical crash on start',
-      severity: 'critical',
-      source: 'testing',
-    });
-
-    assert.equal(result.success, true);
-    const data = readJson<any>(project.runJsonPath);
-    assert.equal(data.bugs[0].severity, 'critical');
-    assert.equal(data.bugs[0].source, 'testing');
-  });
-});
-
-// ─── aida_log_files ────────────────────────────────────
-
-describe('MCP Server - aida_log_files', () => {
-  it('should handle no git diff gracefully', async () => {
-    await client.initialize();
-
-    const result = await client.callTool('aida_log_files');
-
-    assert.equal(result.success, true);
-    assert.equal(result.filesLogged, 0);
-  });
-});
-
-// ─── aida_status ───────────────────────────────────────
-
-describe('MCP Server - aida_status', () => {
-  it('should return current state with summary', async () => {
-    await client.initialize();
-
-    await client.callTool('aida_task_start', { title: 'Task A' });
-    await client.callTool('aida_log_bug', { title: 'Bug X' });
-
-    const result = await client.callTool('aida_status');
-
-    assert.equal(result.status, 'running');
-    assert.equal(result.summary.totalTasks, 1);
-    assert.equal(result.summary.bugCount, 1);
-    assert.equal(result.currentTaskId, 'TASK-01');
-    assert.ok(Array.isArray(result.tasks));
-    assert.equal(result.tasks.length, 1);
-    assert.equal(result.tasks[0].id, 'TASK-01');
-    assert.ok(Array.isArray(result.openBugs));
-    assert.equal(result.openBugs.length, 1);
-  });
-});
-
-// ─── prompts/list ─────────────────────────────────────────
-
-describe('MCP Server - prompts/list', () => {
-  it('should return aida-guide prompt', async () => {
-    await client.initialize();
-
-    const resp = await client.rpc('prompts/list');
-    assert.ok(resp.result);
-    const prompts = resp.result.prompts;
-    assert.equal(prompts.length, 1);
-    assert.equal(prompts[0].name, 'aida-guide');
-  });
-
-  it('should return prompt content via prompts/get', async () => {
-    await client.initialize();
-
-    const resp = await client.rpc('prompts/get', { name: 'aida-guide' });
-    assert.ok(resp.result);
-    assert.ok(Array.isArray(resp.result.messages));
-    assert.equal(resp.result.messages.length, 1);
-    assert.equal(resp.result.messages[0].role, 'user');
-    assert.ok(resp.result.messages[0].content.text.includes('aida_bootstrap'));
-    assert.ok(resp.result.messages[0].content.text.includes('aida_task'));
   });
 });
