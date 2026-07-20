@@ -1,9 +1,6 @@
 # Component Rules
 
 - [RULE-001] 需要"确认后再切换"的表单控件（radio-group、switch 等），必须使用 :model-value（单向只读绑定）+ @change 组合，在确认回调里手动赋值；禁止使用 v-model + catch 恢复方案，因为 v-model 会立即更新 UI，导致页面在确认框弹出前已切换。
-- [RULE-003] 编辑页 FormJ 必须使用 labelPosition: 'top'，label 在上输入框在下
-- [RULE-004] FormJ 属性必须直接以 attrs 形式传入（如 label-position="top"），不能包裹在 :formProps 对象中
-- [RULE-005] 表单/详情二级页面必须使用 FormPageLayout 组件，不应使用 PageLayout
 - [RULE-007] 列表页刷新必须使用 mittBus 定向事件通知，禁止在 onActivated 中无条件调用 getDataList（破坏 keep-alive 缓存）
 - [RULE-008] UI 实现必须优先使用 Element Plus 标准组件，保持与项目主题风格一致。只有当 Element Plus 没有满足需求的组件时才考虑自定义实现
 - [RULE-009] 运营后台中展示「邮件模板 HTML」只读预览时：禁止在业务页面用 v-html 直接挂载模板片段（避免模板内 <style> / 全局选择器污染主应用）。应使用 iframe（如 srcdoc）形成独立文档，且包装层仅保留最小必要结构（如 <!DOCTYPE> + <meta charset>），不得再注入 viewport、html/body 重置、强制 table 宽度等与制作端不一致的样式。宿主容器仅保留边框与 max-height 溢出滚动，不得设置背景色、圆角、内边距装饰等与邮件无关的样式，不应对正文居中；边框内所见以模板 HTML 自身样式为准。
