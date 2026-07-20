@@ -21,13 +21,17 @@ description: 一站式 AI 资产治理：扫描 → 分析 → 用户确认 → 
 1. `aida_scan_assets`（`writeIndex: true`, `includeContent: false`）。
 2. `aida_list_assets` 汇总类型和工具分布。
 
-3. **必须逐一检查 `.claude/rules/**/*.md`, `.claude/skills/**/*.md`, `.cursor/rules/**/*.md`, `.codex/rules/**/*.md` 的每一个文件。** 这是主战场，不是可选项。用 `aida_get_asset` 或直接 Read。对每个文件判断：
+3. **准备工作：先读 `package.json`（或 `package.json` + `pom.xml`）**，记下 `dependencies` 和 `devDependencies` 里的技术栈。这是后续"无关规则"检测的基准——凡规则里提到的技术不在这里，就是无关规则。
+
+   **必须逐一检查 `.claude/rules/**/*.md`, `.claude/skills/**/*.md`, `.cursor/rules/**/*.md`, `.codex/rules/**/*.md` 的每一个文件。** 这是主战场，不是可选项。用 `aida_get_asset` 或直接 Read。对每个文件判断：
 
    | 判断 | 触发条件 | 建议动作 |
    |---|---|---|
    | 聚合镜像 | 文件名 `_` 开头（`_all.md`、`_index.md`）；文件头有 `<!-- AUTO-GENERATED -->`；内容明显是同目录其他 md 的拼接 | **`delete-file`（不要犹豫）** |
-   | 规则过载 | 条目数 > 200；或大量粒度过细的样板规则（编码风格、命名规范等 UPPER_SNAKE_CASE 说明类） | `modify-file` 整合为一个 style-guide 章节，保留有编号的硬约束 |
-   | 任务型规则 | 规则内容在描述"如何完成任务"而不是"必须遵守"（如"步骤 1 → 步骤 2..."格式） | `create-file` 建 skill + `remove-lines` 从规则文件删 |
+   | **无关规则** | 规则引用了当前项目 `package.json` 里**不存在**的技术/框架（如项目是 Node.js 却有 `chrome.storage`、`antd`、`React`、`.jsx` 的规则；项目是 Vue 却有 `background.js`、`storage-keys.js` 的规则）。用 `cat package.json` 或读取 `package.json` 交叉核对。 | **`remove-lines` 批量删**（不要问，直接删，这些规则在此项目里永远不会被执行） |
+   | **Checklist 条目** | 行内容是 `[ ]` 或 `[x]` 开头的清单项（如 `[ ] 命名规范正确`、`[ ] 错误处理完整`）。这是 PR 审查模板，不是 AI 约束，Claude 读到这些行没有任何执行意义。 | **`remove-lines` 批量删**（全部删除，不保留） |
+   | 规则过载 | **先做上面两步删除后**，文件条目仍 > 100；或大量粒度过细的编码风格描述（缩进/引号/换行规则堆砌） | `modify-file` 整合：把纯样式类规则合并为一个 `## Style Guide` 段落，其余保留带编号的硬约束 |
+   | **任务型规则（工作流）** | 文件里有一组 15 条以上相互关联的规则，共同描述一个完整操作流程（如"新增页面步骤"、"组件接入规范"、"i18n 翻译流程"）。特征：规则之间有顺序/依赖关系，或都在讲"如何用 X 完成 Y"。 | `create-file` 在 `.claude/skills/` 建对应 skill + `remove-lines` 从规则文件删这些行。skill 文件格式参见下方附录。 |
    | 跨工具重复 | `.codex/rules/**` 或 `.cursor/rules/**` 里内容与 `.claude/rules/**` 完全一致 | `delete-file` 删镜像端，保留 `.claude/` |
    | 合并冲突 | 文件里有 `<<<<<<<` 标记 | 提示用户先处理冲突 |
    | AI 生成文档冗余 | `docs/` 或根目录 md 文档，内容过时、与规则冲突、明显是 AI 生成的分析报告 | `delete-file` 或 archive |
@@ -132,6 +136,25 @@ description: 一站式 AI 资产治理：扫描 → 分析 → 用户确认 → 
   - 否 → 分析规则内容，把编码风格类样板规则整合为一个 style-guide 章节（`modify-file`），保留有编号的硬约束
 - 冲突/重复行：`remove-lines`
 - 任务型规则：`create-file` 建 skill + `remove-lines` 从规则文件删
+
+**提取 skill 的文件格式**（`create-file` 时用此格式）：
+```markdown
+---
+name: skill-name
+description: 一句话，描述触发场景
+---
+
+# Skill Title
+
+## Goal
+一句话目标
+
+## Steps
+1. 步骤一
+2. 步骤二
+...
+```
+skill 文件路径：`.claude/skills/<name>.md`
 
 **批次策略**：
 - 每批 ≤ 20 个 op（保持 undo 粒度可控）
