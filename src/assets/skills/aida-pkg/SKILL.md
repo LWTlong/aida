@@ -1,9 +1,9 @@
 ---
-name: aida-package-plugin
-description: Use when the user wants to package AI assets into a Claude Plugin for team reuse, OR wants to build the AIDA tool itself as a plugin for sharing with other developers.
+name: aida-pkg
+description: 打包 AI 资产为 Claude Plugin 供团队复用，或把 AIDA 自身打包成插件分享给其他开发者。当用户说"打包插件"、"打包 AIDA"、"分享 skill 给团队"时触发。
 ---
 
-# AIDA Package Plugin
+# AIDA Package
 
 ## Goal
 Package the right assets into a shareable Claude Plugin with minimal noise and clear risk. Also supports packaging the built-in AIDA skills themselves.

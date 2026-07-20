@@ -7,7 +7,7 @@
     "cursor",
     "vscode-copilot"
   ],
-  "project": "ai-dev-analytics",
+  "project": "aida",
   "aiModel": "gpt-5.4",
   "baselineTool": "codex",
   "security": {

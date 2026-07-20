@@ -1,0 +1,12 @@
+{
+  "name": "aida",
+  "version": "3.0.1",
+  "description": "AIDA — Local AI Asset Manager. MCP-first governance for rules, skills, docs, and plugins accumulated through long-term vibe coding.",
+  "author": {
+    "name": "wen tao",
+    "url": "https://github.com/LWTlong/aida"
+  },
+  "license": "MIT",
+  "keywords": ["ai", "aida", "rules", "skills", "memory", "mcp", "governance"],
+  "skills": "./src/assets/skills/"
+}

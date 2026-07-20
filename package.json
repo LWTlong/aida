@@ -1,7 +1,7 @@
 {
-  "name": "ai-dev-analytics",
-  "version": "3.0.0",
-  "description": "AIDA 3.0 — Local AI Asset Manager. MCP-first governance for rules, skills, docs, and plugins accumulated through long-term vibe coding.",
+  "name": "aida",
+  "version": "3.0.1",
+  "description": "AIDA — Local AI Asset Manager. MCP-first governance for rules, skills, docs, and plugins accumulated through long-term vibe coding.",
   "type": "module",
   "bin": {
     "aida": "dist/cli/index.js"
@@ -28,11 +28,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LWTlong/ai-dev-analytics.git"
+    "url": "git+https://github.com/LWTlong/aida.git"
   },
-  "homepage": "https://github.com/LWTlong/ai-dev-analytics#readme",
+  "homepage": "https://github.com/LWTlong/aida#readme",
   "bugs": {
-    "url": "https://github.com/LWTlong/ai-dev-analytics/issues"
+    "url": "https://github.com/LWTlong/aida/issues"
   },
   "engines": {
     "node": ">=18.0.0"
