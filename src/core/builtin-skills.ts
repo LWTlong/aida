@@ -15,6 +15,7 @@ export const BUILTIN_AIDA_SKILLS = [
   'aida-remember-branch',
   'aida-resolve',
   'aida-sync',
+  'aida-ui',
   'aida-undo',
 ];
 

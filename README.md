@@ -82,6 +82,7 @@ npx aida init
 |  | `/aida-analyze` | 分支/功能开发完后沉淀"改了什么、为什么" |
 |  | `/aida-undo` | 回滚最近一次 AIDA 写操作 |
 | **分享** | `/aida-pkg` | 打包资产为 Claude Plugin |
+|  | `/aida-ui` | 打开本地 Dashboard（检查 npm 包 → 引导安装 → 给出启动命令）|
 |  | `/aida-help` | 显示 skill 参考卡片 |
 
 ---
