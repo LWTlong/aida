@@ -20,18 +20,87 @@ description: 一站式 AI 资产治理：扫描 → 分析 → 用户确认 → 
 ### Phase 1 — 扫描并分析
 1. `aida_scan_assets`（`writeIndex: true`, `includeContent: false`）。
 2. `aida_list_assets` 汇总类型和工具分布。
-3. 识别所有类别的问题（都由本 skill 处理，不外推）：
-   - **规则过载**：单个规则文件 > 200 条，或有大量粒度过细/重复的规则行
-   - **任务型规则**：描述"如何做某事"的规则（应转为 skill 而不是规则）
-   - **文档冗余**：AI 生成的 md 文档过时、重复、与规则冲突
-   - **跨工具重复**：`.claude/`、`.cursor/`、`.codex/` 里内容一样的规则
-   - **git 合并冲突**：AI 资产文件里有 `<<<<<<<` 标记
-   - **聚合镜像**：`_all.md` 类由源文件拼接出来的镜像文件
+
+3. **必须逐一检查 `.claude/rules/**/*.md`, `.claude/skills/**/*.md`, `.cursor/rules/**/*.md`, `.codex/rules/**/*.md` 的每一个文件。** 这是主战场，不是可选项。用 `aida_get_asset` 或直接 Read。对每个文件判断：
+
+   | 判断 | 触发条件 | 建议动作 |
+   |---|---|---|
+   | 聚合镜像 | 文件名 `_` 开头（`_all.md`、`_index.md`）；文件头有 `<!-- AUTO-GENERATED -->`；内容明显是同目录其他 md 的拼接 | **`delete-file`（不要犹豫）** |
+   | 规则过载 | 条目数 > 200；或大量粒度过细的样板规则（编码风格、命名规范等 UPPER_SNAKE_CASE 说明类） | `modify-file` 整合为一个 style-guide 章节，保留有编号的硬约束 |
+   | 任务型规则 | 规则内容在描述"如何完成任务"而不是"必须遵守"（如"步骤 1 → 步骤 2..."格式） | `create-file` 建 skill + `remove-lines` 从规则文件删 |
+   | 跨工具重复 | `.codex/rules/**` 或 `.cursor/rules/**` 里内容与 `.claude/rules/**` 完全一致 | `delete-file` 删镜像端，保留 `.claude/` |
+   | 合并冲突 | 文件里有 `<<<<<<<` 标记 | 提示用户先处理冲突 |
+   | AI 生成文档冗余 | `docs/` 或根目录 md 文档，内容过时、与规则冲突、明显是 AI 生成的分析报告 | `delete-file` 或 archive |
+   | **2.x 目录嵌套** | `.claude/rules/aida/*.md`（多余的 `aida/` 层级，Claude Code 会加载 `.claude/rules/*.md` 平铺结构） | `create-file` 复制到 `.claude/rules/` 平铺 + `delete-file` 删旧路径。**保留 `.claude/rules/decisions/` 子目录**（MADR 记忆的合法分组）。|
+
+   **必须给出的输出**：每个源规则目录（`.claude/rules/aida/` 等）都要在计划表里出现，即使动作是"保留原样"也要明说，不要静默跳过。
+
+3.5. **检查根目录 CLAUDE.md**（如果存在）：
+
+   Claude Code 会自动读根目录 `CLAUDE.md` 作为项目指令。**内容必须与项目当前状态一致**。判断：
+
+   | 触发条件 | 建议动作 |
+   |---|---|
+   | 提到不存在的 MCP tool（如 `aida_record`、`aida rules add`） | `modify-file` 重写 |
+   | 强制读的路径不存在（如 `.aida/aida-guide.md`、`.claude/rules/aida/_all.md` 已被本次治理删除） | `modify-file` 重写 |
+   | 引用的规则路径与实际结构不符（例如指向 `aida/` 子目录，但已扁平化） | `modify-file` 重写 |
+
+   3.0 基准 CLAUDE.md 模板（保留项目自定义的其他内容）：
+   ```markdown
+   # CLAUDE.md
+
+   ## AIDA 使用规范
+
+   - 开发前先跑 `/aida-audit` 了解项目 AI 资产分布。
+   - 需要治理规则/skill 时跑 `/aida-govern`（会先分析，用户确认后落盘，可 `/aida-undo` 回滚）。
+   - 沉淀"为什么这么写"用 `/aida-remember`（写入 `.claude/rules/decisions/`，Claude Code 会按 `paths` 前置元数据自动加载）。
+   - 所有 AIDA 写操作都通过 `aida_apply_governance`，可 `aida_undo` 回滚。
+   ```
 4. **检测 2.x 遗留物**：
    - `.aida/proposals/*.json` — 旧版审批草稿，3.0 已不使用
    - `.aida/memories/index.json` schemaVersion 为 `2.0` 且 `.aida/memories/modules/` 下有 JSON — 旧版模块记忆
    - `.aida/reports/*.json` — 旧版报告
    - 如发现，作为独立分组"归档 2.x 遗留物"纳入清理清单
+
+5. **检测 3.0 迁移状态（只有检测到 2.x 遗迹时才提示，全新项目跳过）**：
+
+   跑三个检查判断是否处于 2.x → 3.0 迁移期：
+
+   **a. `.aida/` 是否被 git track？**（`git ls-files .aida/` 有输出）
+   → 命中 = 2.x 遗留（`.aida` 曾是 canonical store）
+
+   **b. `.claude/` 是否被 git track？**（`git ls-files .claude/` 无输出但目录里有内容）
+   → 命中 = 2.x 遗留（`.claude` 曾是投影产物没 track）
+
+   **c. `.gitignore` 是否有 2.x 反模式？**
+   - 裸 `.claude/` 或 `.claude/rules/` 被 ignore（无对应 `!` 例外）
+   - `.aida/**` + `!.aida/**/*.json` 之类"开洞"写法
+   - 重复 ignore（多次列同一路径）
+
+   **判定**：
+   - a/b/c 全部未命中 → **不输出"3.0 迁移"分组**，跳过 gitignore 相关动作
+   - 任一命中 → 输出"3.0 迁移"分组，包含：
+     - `modify-file` `.gitignore` 到 3.0 基准
+     - Phase 4 追加手动 `git rm --cached` 收尾指令
+
+   `.gitignore` 3.0 基准模板（保留项目原有的非 AI 部分如 `node_modules/`）：
+   ```
+   # Build / deps
+   node_modules/
+   dist/
+   ...（保留项目原有的构建产物 ignore）
+
+   # AIDA local cache (not tracked)
+   .aida/
+
+   # Per-user config (not tracked, use aida init to generate)
+   .mcp.json
+   .vscode/mcp.json
+   CLAUDE.md
+   AGENTS.md
+   ```
+
+   **⚠️ 关键：仅改 `.gitignore` 不够 —— 已被 track 的文件不会自动 untrack。**必须让用户在 Phase 4 手动跑 `git rm --cached`（`aida_apply_governance` 不碰 git 索引）。见 Phase 4。
 
 ### Phase 2 — 展示分析并请求确认
 输出分析结果（见下方 Output Format），然后**调用 AskUserQuestion**（不要用纯文本让用户猜）：
@@ -69,8 +138,23 @@ description: 一站式 AI 资产治理：扫描 → 分析 → 用户确认 → 
 - 每批一个明确的 `description`
 - 大批治理拆多次 `aida_apply_governance` 调用
 
-### Phase 4 — 汇报结果
+### Phase 4 — 汇报结果 + 3.0 迁移收尾指令
 一句话结论 + 一张结果表。**不要提 Dashboard**（3.0 无治理审批 UI）。给出 undo 提示。
+
+**只有 Phase 1 步骤 5 检测到 2.x 遗迹时，才追加"3.0 迁移收尾"段落**。全新项目或已经在 3.0 基准的项目跳过这一段。命中时让用户手动跑：
+
+```bash
+# 1) 从 git 索引移除 .aida/（本地文件保留，git 不再跟踪）
+git rm -r --cached .aida/ 2>/dev/null
+
+# 2) 首次把 .claude/ 加入 git（团队协作源头）
+git add .claude/
+
+# 3) 提交
+git commit -m "chore: 迁移到 AIDA 3.0 gitignore 基准"
+```
+
+明确告诉用户：**这三行只需要跑一次**（3.0 迁移期），之后的正常 `aida-govern` 都不会再输出这段。
 
 ## Response Style
 - 短。结论优先。数字进表格。
@@ -94,16 +178,19 @@ description: 一站式 AI 资产治理：扫描 → 分析 → 用户确认 → 
 | 规则 | ... |
 | Skill | ... |
 | 重复组 | ... |
+| 聚合镜像 | ... |
 | 2.x 遗留物 | ... |
+| .gitignore 策略问题 | ... |
 
 #### 计划动作
 覆盖所有识别出的问题，每一类都有对应的行：
 
 | 分组 | 动作 | 影响文件数 |
 |---|---|---:|
-| A. 去重规则行 | 保留源头，删镜像行 | 3 |
+| A. 删除聚合镜像 | 删除 .claude/rules/aida/_all.md | 1 |
 | B. 归档 2.x 遗留 | 删除 .aida/proposals/*.json 等 | 3 |
-| C. 整合样板规则 | 把 general.md 里 440 条编码风格规则合并为 style-guide 章节 | 1 |
+| C. 修复 .gitignore | 让 .claude/ 被 track、.aida/ 整目录 ignore | 1 |
+| D. 整合样板规则 | 把 general.md 里 440 条编码风格规则合并为 style-guide 章节 | 1 |
 | ... | ... | ... |
 
 #### 确认
