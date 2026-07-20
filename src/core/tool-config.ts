@@ -5,7 +5,7 @@ export type AidaSupportedTool = 'claude' | 'cursor' | 'codex';
 
 const MCP_SERVER_ENTRY = {
   command: 'npx',
-  args: ['-y', '--registry=https://registry.npmjs.org/', 'ai-dev-analytics', 'mcp'],
+  args: ['-y', '--registry=https://registry.npmjs.org/', 'aida', 'mcp'],
 };
 
 function mergeJsonMcp(raw: string): string {
@@ -25,7 +25,7 @@ function mergeJsonMcp(raw: string): string {
 }
 
 function mergeCodexToml(raw: string): string {
-  const block = '[mcp_servers.aida]\ncommand = "npx"\nargs = ["-y", "--registry=https://registry.npmjs.org/", "ai-dev-analytics", "mcp"]\n';
+  const block = '[mcp_servers.aida]\ncommand = "npx"\nargs = ["-y", "--registry=https://registry.npmjs.org/", "aida", "mcp"]\n';
   const lines = raw.split('\n');
   const kept: string[] = [];
   for (let i = 0; i < lines.length; i++) {

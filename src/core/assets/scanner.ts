@@ -383,8 +383,8 @@ export function scanAssets(projectRoot: string = process.cwd(), input: ScanAsset
       duplicateContentGroups,
       unknownDotDirs,
       nextSteps: [
-        'Ask your model to use the built-in aida-audit-ai-assets skill to interpret this asset map.',
-        'Use proposals for every merge, rewrite, archive, import, or tool-sync action before applying changes.',
+        'Ask your model to use the built-in aida-audit skill to interpret this asset map.',
+        'For any merge/rewrite/archive/import/tool-sync action, ask the user first, then call aida_apply_governance to write in one journaled batch (revert via aida_undo).',
       ],
     },
   };

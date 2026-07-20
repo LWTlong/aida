@@ -127,7 +127,7 @@ export function PluginPage({
             ))}
           </div>
         ) : (
-          <div className="empty-state">这里适合先审计外部插件，再决定是否生成导入 proposal。</div>
+          <div className="empty-state">这里适合先审计外部插件，再决定是否导入到项目。</div>
         )}
       </article>
       </div>

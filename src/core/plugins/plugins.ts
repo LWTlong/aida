@@ -70,7 +70,7 @@ export function auditPluginRisk(pluginPath: string): PluginRiskReport {
     summary: findings.length === 0 ? 'No high-risk executable or credential signals were detected by static scan.' : `Detected ${findings.length} risk signal(s). Let the user model review these before installation.`,
     nextSteps: [
       'Do not execute hooks, scripts, MCP servers, or commands during import.',
-      'Use the aida-import-plugin-safely skill to explain risks and create an import proposal for selected assets only.',
+      'Use the aida-import skill to explain risks; after user confirms the selected asset subset, call aida_apply_governance to copy them into the project (revert via aida_undo).',
     ],
   };
 }

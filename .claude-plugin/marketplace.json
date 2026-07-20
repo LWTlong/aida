@@ -1,0 +1,18 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "aida",
+  "id": "aida",
+  "description": "AIDA — Local AI Asset Manager. MCP-first governance for AI assets accumulated through long-term vibe coding.",
+  "owner": {
+    "name": "wen tao",
+    "url": "https://github.com/LWTlong/aida"
+  },
+  "plugins": [
+    {
+      "name": "aida",
+      "source": "./",
+      "description": "AI 资产治理：扫描、清理、去重、跨工具同步、打包分享，所有写操作走 aida_apply_governance + aida_undo。",
+      "category": "productivity"
+    }
+  ]
+}
