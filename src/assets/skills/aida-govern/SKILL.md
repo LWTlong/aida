@@ -21,17 +21,17 @@ description: 一站式 AI 资产治理：扫描 → 分析 → 用户确认 → 
 1. `aida_scan_assets`（`writeIndex: true`, `includeContent: false`）。
 2. `aida_list_assets` 汇总类型和工具分布。
 
-3. **准备工作：先读 `package.json`（或 `package.json` + `pom.xml`）**，记下 `dependencies` 和 `devDependencies` 里的技术栈。这是后续"无关规则"检测的基准——凡规则里提到的技术不在这里，就是无关规则。
+3. **准备工作：先读懂项目是什么**。扫一眼根目录（`ls`），读项目的依赖清单（`package.json` / `pom.xml` / `requirements.txt` / `go.mod` / `Cargo.toml`，哪个存在读哪个）。目标是建立"这个项目实际用的技术栈"的认知，供后续判断用。
 
    **必须逐一检查 `.claude/rules/**/*.md`, `.claude/skills/**/*.md`, `.cursor/rules/**/*.md`, `.codex/rules/**/*.md` 的每一个文件。** 这是主战场，不是可选项。用 `aida_get_asset` 或直接 Read。对每个文件判断：
 
    | 判断 | 触发条件 | 建议动作 |
    |---|---|---|
    | 聚合镜像 | 文件名 `_` 开头（`_all.md`、`_index.md`）；文件头有 `<!-- AUTO-GENERATED -->`；内容明显是同目录其他 md 的拼接 | **`delete-file`（不要犹豫）** |
-   | **无关规则** | 规则引用了当前项目 `package.json` 里**不存在**的技术/框架（如项目是 Node.js 却有 `chrome.storage`、`antd`、`React`、`.jsx` 的规则；项目是 Vue 却有 `background.js`、`storage-keys.js` 的规则）。用 `cat package.json` 或读取 `package.json` 交叉核对。 | **`remove-lines` 批量删**（不要问，直接删，这些规则在此项目里永远不会被执行） |
-   | **Checklist 条目** | 行内容是 `[ ]` 或 `[x]` 开头的清单项（如 `[ ] 命名规范正确`、`[ ] 错误处理完整`）。这是 PR 审查模板，不是 AI 约束，Claude 读到这些行没有任何执行意义。 | **`remove-lines` 批量删**（全部删除，不保留） |
-   | 规则过载 | **先做上面两步删除后**，文件条目仍 > 100；或大量粒度过细的编码风格描述（缩进/引号/换行规则堆砌） | `modify-file` 整合：把纯样式类规则合并为一个 `## Style Guide` 段落，其余保留带编号的硬约束 |
-   | **任务型规则（工作流）** | 文件里有一组 15 条以上相互关联的规则，共同描述一个完整操作流程（如"新增页面步骤"、"组件接入规范"、"i18n 翻译流程"）。特征：规则之间有顺序/依赖关系，或都在讲"如何用 X 完成 Y"。 | `create-file` 在 `.claude/skills/` 建对应 skill + `remove-lines` 从规则文件删这些行。skill 文件格式参见下方附录。 |
+   | **无关规则** | 规则里描述的技术/API/框架，在当前项目里**根本不存在**（根据上面读到的项目技术栈判断）。判断标准：如果这条规则在这个项目里 100% 永远不会被触发，它就是无关规则。 | **`remove-lines` 批量删**，把同一来源的无关规则一次删完，不要一条条问 |
+   | **Checklist 条目** | 行内容是 `[ ]` 或 `[x]` 开头的清单项（如 `[ ] 命名规范正确`）。这是 PR 审查模板，不是 AI 约束，对 Claude 执行没有任何意义。 | **`remove-lines` 批量删**（全部删，不保留） |
+   | 规则过载 | **无关规则和 checklist 删完后**，文件条目仍很多；或规则内容大量是编码样式描述（缩进/引号/换行等格式细节） | `modify-file` 整合：把纯格式类规则合并为一个 `## Style Guide` 段落，保留有实际约束力的硬规则 |
+   | **任务型规则（工作流）** | 一组规则放在一起，共同描述一个完整的操作流程（如"新增页面步骤"、"i18n 翻译流程"）。判断标准：这组规则有顺序/依赖关系，或者全部在回答"如何完成 X 任务"，而不是"必须遵守 X 约束"。 | `create-file` 在 `.claude/skills/` 建对应 skill + `remove-lines` 从规则文件删这些行 |
    | 跨工具重复 | `.codex/rules/**` 或 `.cursor/rules/**` 里内容与 `.claude/rules/**` 完全一致 | `delete-file` 删镜像端，保留 `.claude/` |
    | 合并冲突 | 文件里有 `<<<<<<<` 标记 | 提示用户先处理冲突 |
    | AI 生成文档冗余 | `docs/` 或根目录 md 文档，内容过时、与规则冲突、明显是 AI 生成的分析报告 | `delete-file` 或 archive |
