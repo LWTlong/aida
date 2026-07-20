@@ -6,9 +6,6 @@ import { isoNow } from './shared.js';
 export const BUILTIN_AIDA_SKILLS = [
   'aida-analyze',
   'aida-audit',
-  'aida-audit-docs',
-  'aida-clean-rules',
-  'aida-cleanup',
   'aida-govern',
   'aida-help',
   'aida-import',
@@ -17,7 +14,6 @@ export const BUILTIN_AIDA_SKILLS = [
   'aida-remember',
   'aida-remember-branch',
   'aida-resolve',
-  'aida-rules-to-skills',
   'aida-sync',
   'aida-undo',
 ];

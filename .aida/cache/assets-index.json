@@ -1,6 +1,6 @@
 {
   "schemaVersion": "3.0",
-  "generatedAt": "2026-07-20T03:01:58.669Z",
+  "generatedAt": "2026-07-20T06:07:25.324Z",
   "projectRoot": "/Users/longwentao/mine/ai-dev-analytics",
   "assets": [
     {
@@ -26,6 +26,58 @@
       "confidence": "high",
       "managedByAida": true,
       "needsModelConfirmation": false,
+      "metadata": {}
+    },
+    {
+      "id": "doc:unknown:6b22ac8e6b54",
+      "type": "doc",
+      "name": "marketplace",
+      "title": "marketplace",
+      "sourceTool": "unknown",
+      "sourcePath": ".claude-plugin/marketplace.json",
+      "source": {
+        "tool": "unknown",
+        "root": ".claude-plugin",
+        "path": ".claude-plugin/marketplace.json",
+        "format": "json"
+      },
+      "contentHash": "sha256:64b3074d59dd15ca",
+      "contentExcerpt": "{ \"$schema\": \"https://anthropic.com/claude-code/marketplace.schema.json\", \"name\": \"aida\", \"id\": \"aida\", \"description\": \"AIDA — Local AI Asset Manager. MCP-first governance for AI assets accumulated through long-term vibe coding.\", \"owner\": { \"name\": \"wen tao\", \"url\": \"https://github.com/LWTlong/aida\" }, \"plugins\": [ { \"name\": \"aida\", \"source\": \"./\", \"description\": \"AI 资产治理：扫描、清理、去重、跨工具同步、打包分享，所有写操作走 aida_apply_governance + aida_undo。\", \"category\": \"productivity\" } ] }",
+      "status": "active",
+      "tags": [],
+      "signals": [
+        "unknown-dot-dir",
+        "source-root:.claude-plugin"
+      ],
+      "confidence": "low",
+      "managedByAida": false,
+      "needsModelConfirmation": true,
+      "metadata": {}
+    },
+    {
+      "id": "doc:unknown:c90e2a460b8b",
+      "type": "doc",
+      "name": "plugin",
+      "title": "plugin",
+      "sourceTool": "unknown",
+      "sourcePath": ".claude-plugin/plugin.json",
+      "source": {
+        "tool": "unknown",
+        "root": ".claude-plugin",
+        "path": ".claude-plugin/plugin.json",
+        "format": "json"
+      },
+      "contentHash": "sha256:de9d165226e6e76b",
+      "contentExcerpt": "{ \"name\": \"aida\", \"version\": \"3.0.1\", \"description\": \"AIDA — Local AI Asset Manager. MCP-first governance for rules, skills, docs, and plugins accumulated through long-term vibe coding.\", \"author\": { \"name\": \"wen tao\", \"url\": \"https://github.com/LWTlong/aida\" }, \"license\": \"MIT\", \"keywords\": [\"ai\", \"aida\", \"rules\", \"skills\", \"memory\", \"mcp\", \"governance\"], \"skills\": \"./src/assets/skills/\" }",
+      "status": "active",
+      "tags": [],
+      "signals": [
+        "unknown-dot-dir",
+        "source-root:.claude-plugin"
+      ],
+      "confidence": "low",
+      "managedByAida": false,
+      "needsModelConfirmation": true,
       "metadata": {}
     },
     {
@@ -25634,8 +25686,8 @@
         "path": ".claude/settings.json",
         "format": "json"
       },
-      "contentHash": "sha256:40e512fd8b9fbde0",
-      "contentExcerpt": "{ \"enabledPlugins\": { \"ponytail@ponytail\": true, \"ui-ux-pro-max@ui-ux-pro-max-skill\": true } }",
+      "contentHash": "sha256:e54da55dd46608f9",
+      "contentExcerpt": "{ \"enabledPlugins\": { \"ponytail@ponytail\": true, \"ui-ux-pro-max@ui-ux-pro-max-skill\": true, \"aida@aida\": true } }",
       "status": "active",
       "tags": [],
       "signals": [
@@ -25659,262 +25711,12 @@
         "path": ".claude/settings.local.json",
         "format": "json"
       },
-      "contentHash": "sha256:8863152de044c3f8",
+      "contentHash": "sha256:5f803a27cbcbc6a5",
       "contentExcerpt": "{ \"permissions\": { \"allow\": [ \"Bash(git fetch *)\", \"Bash(git ls-remote *)\", \"Bash(git switch *)\", \"Bash(git push *)\", \"mcp__aida__aida_bootstrap\", \"mcp__aida__aida_memory\", \"Skill(claude-api)\", \"Bash(npm run *)\", \"Bash(node dist/cli/index.js -v)\", \"Bash(node dist/cli/index.js)\", \"Bash(node dist/cli/index.js mcp)\", \"Bash(python3 -c \\\"import json,sys; d=json.load\\\\(sys.stdin\\\\); result=json.loads\\\\(d['result']['content'][0]['text']\\\\); print\\\\(f\\\\\\\\\\\"Assets: {len\\\\(result['assets']\\\\)}\\\\\\\\\\\"\\\\); print\\\\(f\\\\\\\\\\\"Summary: {result['summary']}\\\\\\\\\\\"\\\\)\\\")\", \"Bash(python3 -c ' *)\", \"Bash(node *)\", \"B…",
       "status": "active",
       "tags": [],
       "signals": [
         "claude-settings"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:5c2c2ecf0541",
-      "type": "skill",
-      "name": "aida-audit-ai-assets",
-      "title": "aida-audit-ai-assets",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-audit-ai-assets/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-audit-ai-assets/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:d490c657e4c591e3",
-      "contentExcerpt": "--- name: aida-audit-ai-assets description: 扫描并梳理项目中所有 AI 资产，覆盖 Claude、Cursor、Codex、AIDA 及未知 dot 目录。当用户说\"扫描资产\"、\"有哪些 AI 资产\"、\"帮我梳理规则和 skill\"时触发。 --- # AIDA Audit AI Assets ## Goal Give the user a short, decision-ready AI asset snapshot. ## Safety Rules - Do not modify files during audit. - Treat scan output as evidence, not final semantic truth. - Do not propose writes for unknown dot-directories until confirmed. - Keep the result short and priority-first. ## Plan 1. Call `aida_scan_assets` with `writeIndex: true` and `includeContent: false`. 2. Use `aida_list_assets` to summarize type counts a…",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:4d8f5f43366f",
-      "type": "skill",
-      "name": "aida-audit-ai-generated-docs",
-      "title": "aida-audit-ai-generated-docs",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-audit-ai-generated-docs/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-audit-ai-generated-docs/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:3237e1660dfe87fd",
-      "contentExcerpt": "--- name: aida-audit-ai-generated-docs description: 审计项目中 AI 生成的 Markdown 文档，找出过时、重复或和规则/skill 冲突的文件。当用户说\"清理 AI 文档\"、\"有哪些 AI 生成的文档\"时触发。 --- # AIDA Audit AI-Generated Docs ## Goal Quickly show whether AI-generated docs are mostly useful or mostly clutter. ## Safety Rules - Never delete files during the audit step. - Use archive proposals only. - Let the model classify doc value; filename signals are only hints. ## Plan 1. Call `aida_list_assets` with `type: \"doc\"`. 2. Pull exact content only for likely clutter. 3. Classify docs into keep, convert, archive candidate, or review. 4. Create proposa…",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:d330b32ad092",
-      "type": "skill",
-      "name": "aida-govern-ai-assets",
-      "title": "aida-govern-ai-assets",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-govern-ai-assets/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-govern-ai-assets/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:b5c8f88966e15bc2",
-      "contentExcerpt": "--- name: aida-govern-ai-assets description: 完整的 AIDA 治理流程：扫描资产 → 一次确认 → 批量生成 proposal 推送到 Dashboard。当用户说\"治理 AI 资产\"、\"帮我整理规则\"、\"跑一次完整治理\"时触发。 --- # AIDA Govern AI Assets ## Goal Run one continuous AI asset governance flow without making the user manually chain multiple skills. ## Safety Rules - Start with analysis only. - Do not generate drafts or proposals until the user confirms once. - After drafts are generated, move the user to Dashboard for review and apply. - Keep proposal count small by grouping related actions. ## Flow ### Phase 1: Analyze only 1. Audit the project's AI assets. 2. Ident…",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:c459e04b4452",
-      "type": "skill",
-      "name": "aida-govern-overloaded-rules",
-      "title": "aida-govern-overloaded-rules",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-govern-overloaded-rules/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-govern-overloaded-rules/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:c22618455dbb9c8e",
-      "contentExcerpt": "--- name: aida-govern-overloaded-rules description: 整理过度堆积的规则：合并重复项、拆分过长规则、解决冲突、将任务型规则提取为 skill。当用户说\"规则太多了\"、\"帮我整理规则\"、\"规则有冲突\"时触发。 --- # AIDA Govern Overloaded Rules ## Goal Reduce rules overload and tell the user the few actions that matter most. ## Safety Rules - Do not delete, merge, or rewrite rules directly. - Use proposals for all changes. - The model decides semantic grouping; code-level signals are only evidence. - Before generating drafts, ask once. - Generate grouped proposals, not many tiny ones. ## Plan 1. Call `aida_list_assets` with `type: \"rule\"`, `includeContent: true`. 2. Group…",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:38122fe69580",
-      "type": "skill",
-      "name": "aida-help",
-      "title": "aida-help",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-help/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-help/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:6d49e9deb99f2645",
-      "contentExcerpt": "--- name: aida-help description: AIDA 所有 skill 的快速参考卡片。当用户说\"aida 有哪些功能\"、\"aida help\"、\"aida 怎么用\"、\"/aida-help\"时触发。一次性展示，不修改任何内容。 --- 被调用时立即展示下方参考卡片。一次性，不修改任何文件。 ## AIDA 工具说明 | 命令 | 用途 | |------|------| | `/aida-govern-ai-assets` | **完整治理流程**：扫描资产 → 一次确认 → 批量生成 proposal 推送到 Dashboard | | `/aida-audit-ai-assets` | **资产扫描**：梳理项目中所有 AI 资产（规则、skill、MCP 配置等） | | `/aida-audit-ai-generated-docs` | **文档审计**：找出过时、重复或与规则冲突的 AI 生成文档 | | `/aida-govern-overloaded-rules` | **规则整理**：合并重复项、拆分过长规则、解决冲突 | | `/aida-rules-to-skills` | **规则转 skill**：将任务型规则提取为可复用 skill | | `/aida-package-plugin` | **打包插件**：将资产打包为 Clau…",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:fe89d34ac0a3",
-      "type": "skill",
-      "name": "aida-import-plugin-safely",
-      "title": "aida-import-plugin-safely",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-import-plugin-safely/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-import-plugin-safely/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:7e705c4e0bb9cf16",
-      "contentExcerpt": "--- name: aida-import-plugin-safely description: 安全导入外部 Claude Plugin：先做风险审计，再选择性安装。当用户说\"导入插件\"、\"安装这个 plugin\"、\"检查插件安全性\"时触发。 --- # AIDA Import Plugin Safely ## Goal Import an external plugin safely with a short, risk-first summary. ## Safety Rules - Never execute hooks, scripts, MCP servers, or commands during import. - Default to installing only skills and rules. - Use import proposals for every install action. ## Plan 1. Call `aida_parse_plugin`. 2. Call `aida_audit_plugin_risk`. 3. Recommend the smallest safe install set. 4. Create an import proposal for the chosen subset. ## Response Style …",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:812f9df11d76",
-      "type": "skill",
-      "name": "aida-package-plugin",
-      "title": "aida-package-plugin",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-package-plugin/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-package-plugin/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:0521552cc5dd6bb4",
-      "contentExcerpt": "--- name: aida-package-plugin description: 将项目资产或 AIDA 内置 skill 打包成 Claude Plugin，供团队复用。当用户说\"打包插件\"、\"生成 plugin\"、\"把规则打包给团队\"时触发。 --- # AIDA Package Plugin ## Goal Package the right assets into a Claude Plugin with minimal noise and clear risk. ## Safety Rules - Check high-risk assets before packaging. - Do not include tokens, private URLs, or absolute local paths. - First phase exports Claude Plugin only. ## Plan 1. Call `aida_list_assets` to summarize packable assets. 2. Select the safest and most reusable assets first. 3. Call `aida_build_plugin`. 4. Call `aida_audit_plugin_risk` on the output…",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:46c1d894fd2e",
-      "type": "skill",
-      "name": "aida-resolve-asset-conflicts",
-      "title": "aida-resolve-asset-conflicts",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-resolve-asset-conflicts/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-resolve-asset-conflicts/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:c934dfa295f1fcd7",
-      "contentExcerpt": "--- name: aida-resolve-asset-conflicts description: 解决 AIDA 管理文件或 AI 资产路径中的 git 合并冲突，通过 proposal 方式逐一解释并修复。当用户说\"规则文件有冲突\"、\"AI 资产 merge 冲突\"时触发。 --- # AIDA Resolve Asset Conflicts ## Goal Explain the most important AI asset conflicts and create resolution proposals. ## Safety Rules - Never silently pick one side. - Always explain ours vs theirs briefly. - Create proposals for review before apply. ## Plan 1. Call `aida_detect_conflicts`. 2. Read only the conflicts that matter most. 3. Decide merge / keep ours / keep theirs / split. 4. Create resolution proposals. ## Response Style - Lead with con…",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:e526dbdb08f0",
-      "type": "skill",
-      "name": "aida-rules-to-skills",
-      "title": "aida-rules-to-skills",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-rules-to-skills/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-rules-to-skills/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:eddf2ebeea12ef12",
-      "contentExcerpt": "--- name: aida-rules-to-skills description: 将描述\"如何完成任务\"的规则提取为可复用的 skill（规则约束行为，skill 描述流程）。当用户说\"这些规则应该是 skill\"、\"把任务型规则转成 skill\"时触发。 --- # AIDA Rules to Skills ## Goal Find the best rules-to-skills candidates and turn them into a few grouped proposals. ## Safety Rules - Do not delete source rules directly. - Write skill drafts into proposals only. - Before generating drafts, ask once. - Group related rules into a small number of skills. ## Plan 1. Call `aida_list_assets` with `type: \"rule\"`, `includeContent: true`. 2. Identify rules that teach tasks, workflows, components, APIs, or debugging. …",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
-      ],
-      "confidence": "high",
-      "managedByAida": false,
-      "needsModelConfirmation": false,
-      "metadata": {}
-    },
-    {
-      "id": "skill:claude:b2bc96eaa958",
-      "type": "skill",
-      "name": "aida-sync-assets-across-tools",
-      "title": "aida-sync-assets-across-tools",
-      "sourceTool": "claude",
-      "sourcePath": ".claude/skills/aida-sync-assets-across-tools/SKILL.md",
-      "source": {
-        "tool": "claude",
-        "root": ".claude/skills",
-        "path": ".claude/skills/aida-sync-assets-across-tools/SKILL.md",
-        "format": "markdown"
-      },
-      "contentHash": "sha256:eeb47c8b417375f4",
-      "contentExcerpt": "--- name: aida-sync-assets-across-tools description: 跨工具同步 AI 资产：对比、去重并同步 Claude、Cursor、Codex 中的规则和配置。当用户说\"同步规则到 Cursor\"、\"多个工具的配置不一致\"时触发。 --- # AIDA Sync Assets Across Tools ## Goal Show the user where cross-tool duplication or drift is worst, then create sync proposals. ## Safety Rules - Scan all supported tools but write only to targets the user selects. - Do not automatically copy assets into every tool directory. - Hash matches are evidence only; the model decides semantic equivalence. ## Plan 1. Call `aida_list_assets` for Claude, Cursor, and Codex. 2. Compare tool counts, duplicate cont…",
-      "status": "active",
-      "tags": [],
-      "signals": [
-        "skill-package"
       ],
       "confidence": "high",
       "managedByAida": false,
@@ -26235,8 +26037,8 @@
         "path": ".vscode/mcp.json",
         "format": "json"
       },
-      "contentHash": "sha256:be310511a58591ba",
-      "contentExcerpt": "{ \"mcpServers\": { \"aida\": { \"command\": \"npx\", \"args\": [ \"-y\", \"--registry=https://registry.npmjs.org/\", \"ai-dev-analytics\", \"mcp\" ] } } }",
+      "contentHash": "sha256:284fe493a11547bf",
+      "contentExcerpt": "{ \"mcpServers\": { \"aida\": { \"command\": \"npx\", \"args\": [ \"-y\", \"--registry=https://registry.npmjs.org/\", \"aida\", \"mcp\" ] } } }",
       "status": "active",
       "tags": [],
       "signals": [
@@ -26261,8 +26063,8 @@
         "path": ".vscode/mcp.json",
         "format": "json"
       },
-      "contentHash": "sha256:be310511a58591ba",
-      "contentExcerpt": "{ \"mcpServers\": { \"aida\": { \"command\": \"npx\", \"args\": [ \"-y\", \"--registry=https://registry.npmjs.org/\", \"ai-dev-analytics\", \"mcp\" ] } } }",
+      "contentHash": "sha256:284fe493a11547bf",
+      "contentExcerpt": "{ \"mcpServers\": { \"aida\": { \"command\": \"npx\", \"args\": [ \"-y\", \"--registry=https://registry.npmjs.org/\", \"aida\", \"mcp\" ] } } }",
       "status": "active",
       "tags": [],
       "signals": [
@@ -26357,12 +26159,12 @@
   ],
   "summary": {
     "memory": 5,
+    "doc": 9,
     "command": 1,
     "rule": 912,
     "tool-config": 4,
-    "skill": 12,
     "mcp-config": 4,
-    "doc": 7
+    "skill": 2
   },
   "signals": {
     "duplicateContentGroups": [
@@ -29584,19 +29386,25 @@
         "hash": "sha256:be310511a58591ba",
         "assetIds": [
           "mcp-config:cursor:5a88ba47d4a7",
-          "tool-config:cursor:9260f99cfe58",
+          "tool-config:cursor:9260f99cfe58"
+        ]
+      },
+      {
+        "hash": "sha256:284fe493a11547bf",
+        "assetIds": [
           "doc:unknown:030717a27111",
           "mcp-config:generic:6b810ca710db"
         ]
       }
     ],
     "unknownDotDirs": [
+      ".claude-plugin",
       ".github",
       ".vscode"
     ],
     "nextSteps": [
-      "Ask your model to use the built-in aida-audit-ai-assets skill to interpret this asset map.",
-      "Use proposals for every merge, rewrite, archive, import, or tool-sync action before applying changes."
+      "Ask your model to use the built-in aida-audit skill to interpret this asset map.",
+      "For any merge/rewrite/archive/import/tool-sync action, ask the user first, then call aida_apply_governance to write in one journaled batch (revert via aida_undo)."
     ]
   }
 }

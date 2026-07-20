@@ -21,7 +21,7 @@ Package rules, skills, docs, etc. from the current project for team sharing.
 6. Show the risk report and advise on next steps.
 
 ### Mode B: Package AIDA Itself
-Package all built-in AIDA skills (aida-analyze, aida-cleanup, aida-remember, etc.) as a self-contained plugin for team sharing.
+Package all built-in AIDA skills (aida-govern, aida-audit, aida-remember, etc.) as a self-contained plugin for team sharing.
 
 1. Call `aida_build_self_plugin` (no args needed — outputs to `.aida/plugins/aida-<version>/` by default).
 2. Show the returned `outputPath` and `skills` list.

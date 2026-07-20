@@ -8,6 +8,7 @@
 [![license](https://img.shields.io/github/license/LWTlong/aida?color=%23333)](./LICENSE)
 [![node](https://img.shields.io/badge/node-%3E%3D18-339933)](https://nodejs.org)
 [![tests](https://img.shields.io/badge/tests-passing-brightgreen)](#验证)
+[![aida MCP server](https://glama.ai/mcp/servers/LWTlong/aida/badges/score.svg)](https://glama.ai/mcp/servers/LWTlong/aida)
 
 </div>
 
@@ -19,7 +20,7 @@
 
 扫描 `.claude/rules/`、`.cursor/rules/`、`.codex/`、`.aida/` 等目录，找出重复、矛盾、失效的规则和技能。所有写操作走 `aida_apply_governance` MCP 工具，每批 journal 一次，可通过 `aida_undo` 一键回滚。
 
-**核心 skill：** `/aida-govern`（一站式）、`/aida-clean-rules`、`/aida-rules-to-skills`
+**核心 skill：** `/aida-govern`（一站式）
 
 ### 2. 分层决策记忆
 
@@ -42,7 +43,7 @@
 /plugin install aida@aida
 ```
 
-重启 Claude Code。16 个 `aida-*` skill 会立刻可用。
+重启 Claude Code。12 个 `aida-*` skill 会立刻可用。
 
 **升级：**
 
@@ -70,20 +71,16 @@ npx aida init
 
 | 类别 | Skill | 用途 |
 |---|---|---|
-| **治理** | `/aida-govern` | 一站式：扫描 → 分析 → 确认 → 一次落盘（含 2.x 遗留物清理） |
-|  | `/aida-clean-rules` | 合并重复规则、拆分过长规则、解决冲突 |
-|  | `/aida-rules-to-skills` | 将任务型规则提取为可复用 skill |
-|  | `/aida-audit-docs` | 审计并清理 AI 生成的文档冗余 |
-|  | `/aida-resolve` | 处理 AI 资产文件的 git 合并冲突 |
-|  | `/aida-sync` | 同步 Claude、Cursor、Codex 中的规则配置 |
-|  | `/aida-import` | 安全导入外部 Claude Plugin |
-|  | `/aida-cleanup` | 底层清理（按行/文件粒度） |
+| **治理** | `/aida-govern` | 一站式：扫描 → 分析 → 确认 → 一次落盘（覆盖规则过载/任务型规则/文档冗余/跨工具重复/冲突/聚合镜像/2.x 遗留物） |
+|  | `/aida-resolve` | 解决 AI 资产文件的 git 合并冲突 |
+|  | `/aida-sync` | 跨工具同步：Claude ↔ Cursor ↔ Codex（你选源→目标） |
+|  | `/aida-import` | 从本地目录路径安全导入外部 Claude Plugin（先审计风险） |
 | **只读** | `/aida-audit` | 扫描并梳理项目所有 AI 资产 |
-|  | `/aida-analyze` | 沉淀功能/分支分析到项目记忆 |
-|  | `/aida-recall` | 检索项目记忆 |
-| **记忆** | `/aida-remember` | 沉淀项目决策为 MADR 记录 |
-|  | `/aida-remember-branch` | 沉淀当前分支相关的决策 |
-|  | `/aida-undo` | 回滚最近的 AIDA 写操作 |
+| **记忆** | `/aida-remember` | 记一条决策为 MADR，Claude Code 自动加载 |
+|  | `/aida-remember-branch` | 从当前分支的 diff 批量提取决策 |
+|  | `/aida-recall` | 召回之前沉淀的模块记忆 |
+|  | `/aida-analyze` | 分支/功能开发完后沉淀"改了什么、为什么" |
+|  | `/aida-undo` | 回滚最近一次 AIDA 写操作 |
 | **分享** | `/aida-pkg` | 打包资产为 Claude Plugin |
 |  | `/aida-help` | 显示 skill 参考卡片 |
 
@@ -113,7 +110,7 @@ npx aida init
   plugin.json           # Claude Plugin 清单（本仓库本身就是 plugin）
   marketplace.json      # Marketplace 清单
 src/
-  assets/skills/        # 16 个 aida-* skill 源（plugin skills 字段指过来）
+  assets/skills/        # 12 个 aida-* skill 源（plugin skills 字段指过来）
   core/                 # 扫描、治理、undo、memory、plugin builder
   mcp/server.ts         # MCP server
   cli/                  # aida CLI
